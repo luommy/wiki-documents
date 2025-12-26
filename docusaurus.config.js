@@ -127,13 +127,13 @@ const config = {
         },
         items: [
           {
-            href: 'https://www.camthink.ai',
+            href: 'https://www.camthink.ai/?utm_source=wiki&utm_medium=internal_nav&utm_campaign=wiki_to_site',
             position: 'right',
             label: '🏠 Home',
             className: 'home-button'
           },
           {
-            href: 'https://www.camthink.ai/store/',
+            href: 'https://www.camthink.ai/store/?utm_source=wiki&utm_medium=internal_nav&utm_campaign=wiki_to_store',
             position: 'right',
             label: '🛍️ Store',
             className: 'store-button'
