@@ -1,63 +1,45 @@
-name: Deploy Docusaurus to GitHub Pages (peaceiris)
+name: Deploy Docusaurus (Automated Pages, Manual Server)
 
 on:
+  # 1. 自动触发：当代码推送到 main 分支时
   push:
     branches:
-      - main # 监听 main 分支推送
+      - main
+      
+  # 2. 手动触发：在 GitHub Actions 页面显示“Run workflow”按钮
+  workflow_dispatch:
 
-######################################################################
-# 让 workflow 自带的 GITHUB_TOKEN 拥有写入权限，才能推送到 gh-pages 分支
-######################################################################
 permissions:
   contents: write
 
 jobs:
-  deploy:
+  # =======================================================
+  # JOB 1: 自动部署到 GitHub Pages
+  # 此 Job 仅在 push 事件发生时运行
+  # =======================================================
+  deploy_to_github_pages:
+    name: 🚀 Deploy to GitHub Pages
     runs-on: ubuntu-latest
+    if: github.event_name == 'push'
 
     steps:
       # 1. 检出源码
-      - name: Checkout repository
+      - name: 1. Checkout repository
         uses: actions/checkout@v3
 
       # 2. 安装 Node.js（并缓存 yarn 依赖）
-      - name: Setup Node.js
+      - name: 2. Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 20
           cache: yarn
 
       # 3. 安装依赖
-      - name: Install dependencies
+      - name: 3. Install dependencies
         run: yarn install --frozen-lockfile
 
-          # 6. 构建 Docusaurus 静态网站 (服务器版本)
-      - name: Build website for Cloud Server
-        env:
-          NODE_ENV: production
-          GITHUB_PAGES: false
-          DEPLOY_ENV: production
-          BASE_URL: /
-          SITE_URL: https://wiki.camthink.ai
-        run: yarn build
-
-      # 7. 使用 rsync 部署到云服务器
-      - name: Deploy to Cloud Server via SSH (rsync)
-        uses: burnett01/rsync-deployments@5.2
-        with:
-          switches: -avzr --delete
-          path: ./build/
-          remote_path: ${{ secrets.TARGET_PATH }}
-          remote_host: ${{ secrets.SERVER_HOST }}
-          remote_user: ${{ secrets.SERVER_USER }}
-          remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      # 5.5 清理上一次构建产物，防止路径前缀串味
-      - name: Cleanup build artifacts
-        run: rm -rf build .docusaurus
-
       # 4. 构建 Docusaurus 静态网站 (GitHub Pages 版本)
-      - name: Build website for GitHub Pages
+      - name: 4. Build website for GitHub Pages
         env:
           NODE_ENV: production
           GITHUB_ACTIONS: true
@@ -68,7 +50,7 @@ jobs:
         run: yarn build
 
       # 5. 部署到 GitHub Pages
-      - name: Deploy to GitHub Pages
+      - name: 5. Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -78,3 +60,51 @@ jobs:
           user_email: action@github.com
           commit_message: |
             docs: deploy ${{ github.sha }} via GitHub Actions
+
+  # =======================================================
+  # JOB 2: 手动部署到云服务器
+  # 此 Job 仅在 workflow_dispatch (手动点击按钮) 事件发生时运行
+  # =======================================================
+  deploy_to_cloud_server:
+    name: ☁️ Deploy to Cloud Server (Manual)
+    runs-on: ubuntu-latest
+    # 仅在 Actions 页面点击“Run workflow”按钮时运行
+    if: github.event_name == 'workflow_dispatch'
+
+    steps:
+      # 1. 检出源码 (手动触发时也需要重新检出代码)
+      - name: 1. Checkout repository
+        uses: actions/checkout@v3
+
+      # 2. 安装 Node.js（并缓存 yarn 依赖）
+      - name: 2. Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+          cache: yarn
+
+      # 3. 安装依赖
+      - name: 3. Install dependencies
+        run: yarn install --frozen-lockfile
+
+      # 6. 构建 Docusaurus 静态网站 (服务器版本)
+      - name: 6. Build website for Cloud Server
+        env:
+          NODE_ENV: production
+          GITHUB_ACTIONS: true
+          GITHUB_PAGES: false
+          DEPLOY_ENV: production
+          BASE_URL: /
+          SITE_URL: https://wiki.camthink.ai
+        run: yarn build
+
+      # 7. 使用 rsync 部署到云服务器
+      - name: 7. Deploy to Cloud Server via SSH (rsync)
+        uses: burnett01/rsync-deployments@5.2
+        with:
+          switches: -avzr --delete
+          path: ./build/
+          remote_path: ${{ secrets.TARGET_PATH }}
+          remote_host: ${{ secrets.SERVER_HOST }}
+          remote_user: ${{ secrets.SERVER_USER }}
+          remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
