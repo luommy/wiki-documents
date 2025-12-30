@@ -11,11 +11,7 @@ const BASE_URL = process.env.BASE_URL  // 手动覆盖优先
 
 const SITE_URL = process.env.SITE_URL  // 手动覆盖优先
   ?? (IS_GITHUB && IS_GITHUB_ENV ? 'https://camthink-ai.github.io' : 'https://wiki.camthink.ai');
-console.log('BASE_URL---------', BASE_URL);
-console.log('SITE_URL---------', SITE_URL);
 
-/** @type {import('@docusaurus/types').Config} */
-const SHOULD_ENABLE_GTAG = process.env.NODE_ENV === 'production';
 
 const configuredPlugins = [
   'docusaurus-plugin-image-zoom',
@@ -44,12 +40,12 @@ const configuredPlugins = [
   ],
 ];
 
-if (SHOULD_ENABLE_GTAG) {
+if (SITE_URL === 'https://wiki.camthink.ai') {
   configuredPlugins.push([
-    '@docusaurus/plugin-google-gtag',
+    '@docusaurus/plugin-google-tag-manager',
     {
-      trackingID: 'G-8XB41LWC1W',
-      anonymizeIP: true,
+      // @ts-ignore - Google Tag Manager plugin configuration
+      containerId: 'GTM-WRP2RQPS',
     },
   ]);
 }
@@ -127,13 +123,13 @@ const config = {
         },
         items: [
           {
-            href: 'https://www.camthink.ai/?utm_source=wiki&utm_medium=internal_nav&utm_campaign=wiki_to_site',
+            href: 'https://www.camthink.ai/',
             position: 'right',
             label: '🏠 Home',
             className: 'home-button'
           },
           {
-            href: 'https://www.camthink.ai/store/?utm_source=wiki&utm_medium=internal_nav&utm_campaign=wiki_to_store',
+            href: 'https://www.camthink.ai/store/',
             position: 'right',
             label: '🛍️ Store',
             className: 'store-button'
