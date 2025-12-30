@@ -12,8 +12,6 @@ const BASE_URL = process.env.BASE_URL  // 手动覆盖优先
 const SITE_URL = process.env.SITE_URL  // 手动覆盖优先
   ?? (IS_GITHUB && IS_GITHUB_ENV ? 'https://camthink-ai.github.io' : 'https://wiki.camthink.ai');
 
-/** @type {import('@docusaurus/types').Config} */
-const SHOULD_ENABLE_GTAG = process.env.NODE_ENV === 'production';
 
 const configuredPlugins = [
   'docusaurus-plugin-image-zoom',
@@ -42,12 +40,12 @@ const configuredPlugins = [
   ],
 ];
 
-if (SHOULD_ENABLE_GTAG) {
+if (SITE_URL === 'https://wiki.camthink.ai') {
   configuredPlugins.push([
-    '@docusaurus/plugin-google-gtag',
+    '@docusaurus/plugin-google-tag-manager',
     {
-      trackingID: 'G-XBWTN65KKB',
-      anonymizeIP: true,
+      // @ts-ignore - Google Tag Manager plugin configuration
+      containerId: 'GTM-WRP2RQPS',
     },
   ]);
 }
