@@ -25,7 +25,7 @@ The main board integrates the STM32N657L0H3 MCU with 64 MB of external PSRAM and
 
 ## Camera Module Specifications
 
-- **OS04C10 standard module**: 2688 × 1520 resolution, 1/4" sensor, lenses with HFOV 59° / 97° / 165°, manual focus.
+- **OS04C10 standard module**: 2688 × 1520 resolution, 1/4" sensor, lenses with DFOV 59° / 97° / 165°, manual focus.
 - **USB camera module**: Smartsens SC200AI sensor, 1920 × 1080 resolution, 1/2.8" sensor size, multiple FOV lens choices, UVC compliant.
 
 <div

@@ -1,3 +1,10 @@
+---
+sidebar_label: 模型训练与部署
+slug: /neoeyes-ne301-series/application-guide/model-training
+---
+
+# 模型训练与部署
+
 ## 1. 环境设置
 
 ### 1.1 安装 YOLO 训练环境
@@ -37,7 +44,7 @@ Results saved to /ultralytics/runs/detect/predict
 
 
 
-要将模型部署到 NE301 设备，需要设置项目开发环境。请参考项目根目录中的[开发环境设置](../../3-NE300-MB01-development-board/2-software-guide/0-development-environment-setup.md)文档进行环境设置。
+要将模型部署到 NE301 设备，需要设置项目开发环境。请参考项目根目录中的[开发环境设置](../../2-NE300-MB01-development-board/2-software-guide/0-development-environment-setup.md)文档进行环境设置。
 
 > 目前，Camthink NeoEyes NE301 AI Camera 固件已全部开源，想了解更多可查看——[NE 301开源地址](https://github.com/camthink-ai/ne301)。
 

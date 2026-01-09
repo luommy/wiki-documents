@@ -85,7 +85,7 @@ The Web UI provides one-click model deployment and replacement to make AI applic
 </div>
 
 - Rapid deployment: If you don’t want the default model, you can upload and deploy a new AI model via the Web UI—zero setup and zero code. You can also build a dataset from device snapshots, retrain a scene‑specific model, and redeploy.
-  - See also: [Train and deploy YOLOv8 on STM32N6](./2-application-guide/0-model-training-and-deployment/0-model-training-and-deployment.md)
+  - See also: [Train and deploy YOLOv8 on STM32N6](./3-application-guide/0-model-training-and-deployment/0-model-training-and-deployment.md)
 
 
 ### Hot-load Inference Parameters

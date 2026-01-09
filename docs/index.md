@@ -1,196 +1,139 @@
-import DocumentList from '@site/src/components/DocumentList';
+---
+title: Welcome
+hide_table_of_contents: true
+pagination_next: null
+pagination_prev: null
+slug: /
+---
+
 import Link from '@docusaurus/Link';
 import useBaseUrl from '@docusaurus/useBaseUrl';
+import '@site/src/css/docs-home.css';
 
-# Welcome
+<div className="docs-home-container">
 
-欢迎来到 **CamThink Wiki 中心**！
-
-我们很高兴您能加入我们的社区，这里是您了解和探索边缘AI感知技术的最佳场所。无论您是初学者还是有经验的开发者，您都能在这里找到有用的资源和支持。
-
-## CamThink，让边缘智能更具想象力
-
-**CamThink** 是一个专为开发者提供多种**开放硬件**和**开源软件**的品牌，我们致力于构建在现实世界中可广泛应用的**边缘AI感知套件**，我们的重点在于提供视觉、听觉和环境数据等多维感知能力，旨在让AI更全面地理解世界，推动边缘智能技术的普及与发展。作为 Milesight（星纵科技）的子品牌，CamThink 继承了其强大的研发能力和全球支持网络，为产品的可靠性和持续创新提供了有力保障。
-
-## 快速入口
-为了帮助您快速上手，这里提供了一些重要的资源链接：
-{/* 产品卡片容器 */}
-<div className="product-card-container">
-
-  {/* NeoEyes NE301 系列产品卡片 */}
-  <div className="product-card">
-    <div className="product-header">
-      <img src={useBaseUrl('img/ne301/overview/301.png')} alt="NeoEyes NE301" className="product-image"/>
-      <h3 className="product-title">NeoEyes NE301 边缘AI相机</h3>
-    </div>
-    <p className="product-description">
-      基于 STM32N6 的全新低功耗边缘 AI 相机，支持模块化扩展与本地实时推理，适配多场景部署与开发。
-    </p>
-    <div className="product-links">
-      <Link to={useBaseUrl('docs/neoeyes-ne301-series/overview')} className="link-item">
-        <span className="link-icon">📖</span>
-        <span>产品概述</span>
-      </Link>
-      <Link to={useBaseUrl('docs/neoeyes-ne301-series/quick-start')} className="link-item">
-        <span className="link-icon">🚀</span>
-        <span>快速入门</span>
-      </Link>
-      <Link to={useBaseUrl('docs/neoeyes-ne301-series/dev-board')} className="link-item">
-        <span className="link-icon">🔧</span>
-        <span>开发板</span>
-      </Link>
-      <Link to={useBaseUrl('docs/neoeyes-ne301-series/faq')} className="link-item">
-        <span className="link-icon">❓</span>
-        <span>常见问题</span>
-      </Link>
-    </div>
+  {/* Hero Search Area */}
+  <div className="docs-hero">
+    <h1>CamThink Wiki 中心</h1>
+    <p>探索边缘智能，从这里开始。构建属于你的 AIoT 应用。</p>
   </div>
 
-
-  {/* NeoEyes NE101 系列产品卡片 */}
-  <div className="product-card">
-    <div className="product-header">
-      <img src={useBaseUrl('img/Overview/NE101/NE101.png')} alt="NeoEyes NE101" className="product-image"/>
-      <h3 className="product-title">NeoEyes NE101 低功耗相机</h3>
-    </div>
-    <p className="product-description">
-      轻量级智能摄像设备，支持边缘视觉分析和无线连接，适用于IoT和轻量级AI应用场景。
-    </p>
-    <div className="product-links">
-      <Link to={useBaseUrl('docs/neoeyes-ne101-series/overview')} className="link-item">
-        <span className="link-icon">📖</span>
-        <span>产品概述</span>
-      </Link>
-      <Link to={useBaseUrl('docs/neoeyes-ne101-series/quick-start')} className="link-item">
-        <span className="link-icon">🚀</span>
-        <span>快速入门</span>
-      </Link>
-      <Link to={useBaseUrl('docs/neoeyes-ne101-series/ne100-mb01-development-board/dev-guide')} className="link-item">
-        <span className="link-icon">🔧</span>
-        <span>开发指南</span>
-      </Link>
-      <Link to={useBaseUrl('docs/neoeyes-ne101-series/application-guide/low-power-image-acquisition')} className="link-item">
-        <span className="link-icon">📱</span>
-        <span>应用指南</span>
-      </Link>
-    </div>
-  </div>
-
-  {/* NeoEdge NG4500 系列产品卡片 */}
-  <div className="product-card">
-    <div className="product-header">
-      <img src={useBaseUrl('img/Overview/NG45xx/NG45XX.png')} alt="NeoEdge NG45XX" className="product-image"/>
-      <h3 className="product-title">NeoEdge NG4500 AI边缘计算网关</h3>
-    </div>
-    <p className="product-description">
-      基于NVIDIA Jetson平台的高性能边缘计算设备，适用于复杂AI推理和多模态数据处理场景。
-    </p>
-    <div className="product-links">
-      <Link to={useBaseUrl('docs/neoedge-ng4500-series/overview')} className="link-item">
-        <span className="link-icon">📖</span>
-        <span>产品概述</span>
-      </Link>
-      <Link to={useBaseUrl('docs/neoedge-ng4500-series/quick-start')} className="link-item">
-        <span className="link-icon">🚀</span>
-        <span>快速入门</span>
-      </Link>
-      <Link to={useBaseUrl('docs/neoedge-ng4500-series/ng4500-cb01-development-board/dev-guide')} className="link-item">
-        <span className="link-icon">🔧</span>
-        <span>开发指南</span>
-      </Link>
-      <Link to={useBaseUrl('docs/neoedge-ng4500-series/application-guide/deepseek-r1')} className="link-item">
-        <span className="link-icon">📱</span>
-        <span>应用指南</span>
-      </Link>
-    </div>
+  <div className="docs-intro">
+    <p><strong>欢迎来到 CamThink Wiki 中心！</strong></p>
+    <p>我们很高兴您能加入我们的社区，这里是您了解和探索边缘AI感知技术的最佳场所。无论您是初学者还是有经验的开发者，您都能在这里找到有用的资源和支持。</p>
+    <p><strong>CamThink，让边缘智能更具想象力</strong></p>
+    <p style={{marginBottom: '0'}}>CamThink 是一个专为开发者提供多种开放硬件和开源软件的品牌，我们致力于构建在现实世界中可广泛应用的边缘AI感知套件，我们的重点在于提供视觉、听觉和环境数据等多维感知能力，旨在让AI更全面地理解世界，推动边缘智能技术的普及与发展。作为 Milesight（星纵科技）的子品牌，CamThink 继承了其强大的研发能力和全球支持网络，为产品的可靠性和持续创新提供了有力保障。</p>
   </div>
   
+  <div style={{height: '3rem'}}></div>
+
+  {/* ================= Latest Updates ================= */}
+  <h2 className="docs-section-title">最新文档</h2>
+  <div className="latest-docs-grid">
+    <Link to="/docs/neoeyes-ne301-series/quick-start" className="update-card">
+      <span className="update-badge">NEW</span>
+      <div className="update-title">NeoEyes NE301 快速入门</div>
+      <div className="update-meta">
+        <span>文档更新</span>
+        <span>• 2025-12-28</span>
+      </div>
+    </Link>
+    <Link to="/docs/neoedge-ng4500-series/application-guide/deepseek-r1" className="update-card">
+      <div className="update-title">DeepSeek R1 本地化部署指南</div>
+      <div className="update-meta">
+        <span>热门主题</span>
+        <span>• 2025-11-09</span>
+      </div>
+    </Link>
+    <Link to="/docs/neoedge-ng4500-series/ng4500-cb01-development-board/dev-guide" className="update-card">
+      <div className="update-title">NG4500 载板硬件接口定义参考</div>
+      <div className="update-meta">
+        <span>硬件资料</span>
+        <span>• 2025-09-20</span>
+      </div>
+    </Link>
+  </div>
+
+  {/* ================= Quick Access (Product Series) ================= */}
+  <h2 className="docs-section-title">快速入口</h2>
+  <div className="doc-categories-grid">
+    {/* NE301 */}
+    <div className="category-card">
+      <Link to="/docs/neoeyes-ne301-series/overview" className="cat-header" style={{background: 'linear-gradient(135deg, #fff1eb 0%, #ace0f9 100%)'}}>
+        <img src={useBaseUrl('img/ne301/overview/301.png')} style={{height: '80px', pointerEvents: 'none'}} alt="NE301" />
+      </Link>
+      <div className="cat-body">
+        <div className="cat-title">NeoEyes NE301</div>
+        <div className="cat-desc">STM32N6 边缘 AI 相机，支持 Cortex-M55 + NPU 高效推理。</div>
+        <div className="cat-links">
+          <Link to="/docs/neoeyes-ne301-series/overview" className="cat-link-item">产品概述</Link>
+          <Link to="/docs/neoeyes-ne301-series/quick-start" className="cat-link-item">快速入门</Link>
+          <Link to="/docs/neoeyes-ne301-series/NE300-MB01-development-board/dev-guide" className="cat-link-item">开发指南</Link>
+          <Link to="/docs/neoeyes-ne301-series/application-guide/model-training" className="cat-link-item">模型训练</Link>
+        </div>
+      </div>
+    </div>
+
+    {/* NE101 */}
+    <div className="category-card">
+      <Link to="/docs/neoeyes-ne101-series/overview" className="cat-header" style={{background: 'linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)'}}>
+        <img src={useBaseUrl('img/Overview/NE101/NE101.png')} style={{height: '80px', pointerEvents: 'none'}} alt="NE101" />
+      </Link>
+      <div className="cat-body">
+        <div className="cat-title">NeoEyes NE101</div>
+        <div className="cat-desc">ESP32-S3 低功耗传输节点，专为电池供电场景设计。</div>
+        <div className="cat-links">
+          <Link to="/docs/neoeyes-ne101-series/overview" className="cat-link-item">产品概述</Link>
+          <Link to="/docs/neoeyes-ne101-series/quick-start" className="cat-link-item">快速入门</Link>
+          <Link to="/docs/neoeyes-ne101-series/ne100-mb01-development-board/dev-guide" className="cat-link-item">开发指南</Link>
+          <Link to="/docs/neoeyes-ne101-series/application-guide/low-power-image-acquisition" className="cat-link-item">低功耗应用</Link>
+        </div>
+      </div>
+    </div>
+
+    {/* NG4500 */}
+    <div className="category-card">
+      <Link to="/docs/neoedge-ng4500-series/overview" className="cat-header" style={{background: 'linear-gradient(135deg, #cfd9df 0%, #e2ebf0 100%)'}}>
+        <img src={useBaseUrl('img/Overview/NG45xx/NG45XX.png')} style={{height: '80px', pointerEvents: 'none'}} alt="NG4500" />
+      </Link>
+      <div className="cat-body">
+        <div className="cat-title">NeoEdge NG4500</div>
+        <div className="cat-desc">NVIDIA Jetson 边缘计算网关，21~100 TOPS 强劲算力。</div>
+        <div className="cat-links">
+          <Link to="/docs/neoedge-ng4500-series/overview" className="cat-link-item">产品概述</Link>
+          <Link to="/docs/neoedge-ng4500-series/quick-start" className="cat-link-item">快速入门</Link>
+          <Link to="/docs/neoedge-ng4500-series/ng4500-cb01-development-board/dev-guide" className="cat-link-item">硬件指南</Link>
+          <Link to="/docs/neoedge-ng4500-series/application-guide/deepseek-r1" className="cat-link-item">LLM 部署</Link>
+        </div>
+      </div>
+    </div>
+  </div>
+
+{/*
+  <h2 className="docs-section-title">视频演示</h2>
+  <div className="videos-grid">
+    <div className="video-card" onClick={() => window.open('https://resources.camthink.ai/wiki/video/HomePage/How%20to%20Flash%20Firmware%20onto%20the%20CamThink%20NeoEyes%20NE101%20Low-Power%20Camera.mp4', '_blank')}>
+      <img src={useBaseUrl('img/ne301/overview/301.png')} className="video-thumb" style={{objectFit: 'contain', background: '#333'}} alt="NE301 Unboxing" />
+      <div className="video-play-btn"></div>
+      <div className="video-info">
+        <div className="video-title">NeoEyes NE301 开箱与初体验</div>
+        <div className="video-meta">全方位展示硬件细节与接口功能</div>
+      </div>
+    </div>
+
+    <div className="video-card" onClick={() => window.open('https://www.bilibili.com/', '_blank')}>
+      <img src={useBaseUrl('img/Overview/NE101/NE101.png')} className="video-thumb" style={{objectFit: 'contain', background: '#333'}} alt="NE101 Demo" />
+      <div className="video-play-btn"></div>
+      <div className="video-info">
+        <div className="video-title">NeoEyes NE101 低功耗抓拍演示</div>
+        <div className="video-meta">毫秒级唤醒与图像回传实测</div>
+      </div>
+    </div>
+  </div>
+*/}
 
 </div>
 
-{/* 产品卡片样式 */}
-<style>
-{`
-  .product-card-container {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 32px;
-    margin-bottom: 48px;
-  }
 
-  @media (max-width: 900px) {
-    .product-card-container {
-      grid-template-columns: 1fr;
-    }
-  }
-  
-  .product-card {
-    border: 1px solid var(--ifm-border-color);
-    border-radius: 12px;
-    padding: 24px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
-  
-  .product-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  }
-  
-  .product-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 16px;
-    gap: 16px;
-  }
-  
-  .product-image {
-    width: 150px;
-    height: 150px;
-    object-fit: contain;
-    border-radius: 8px;
-    padding: 8px;
-  }
-  
-  .product-title {
-    margin: 0;
-    font-size: 1.5rem;
-    font-weight: 600;
-  }
-  
-  .product-description {
-    margin: 0 0 16px 0;
-    line-height: 1.5;
-  }
-  
-  .product-links {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-  
-  .link-item {
-    display: flex;
-    align-items: center;
-    padding: 10px 12px;
-    border-radius: 6px;
-    text-decoration: none;
-    transition: background-color 0.2s ease;
-  }
-  
-  .link-item:hover {
-    background-color: var(--ifm-hover-overlay);
-  }
-  
-  .link-icon {
-    margin-right: 10px;
-    font-size: 18px;
-  }
-  
-  @media (max-width: 768px) {
-    .product-card-container {
-      grid-template-columns: 1fr;
-    }
-  }
-`}
-</style>
+
+
