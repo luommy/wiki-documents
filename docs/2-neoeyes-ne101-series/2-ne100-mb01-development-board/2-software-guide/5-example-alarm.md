@@ -1,4 +1,4 @@
-# NE101 Alarm 应用触发说明
+#  Alarm application trigger instructions
 
 ## 应用描述
 
@@ -7,10 +7,10 @@
 
 ## 问题原因
 
-该问题主要是由于 **NE101 硬件设计中的资源复用冲突** 导致的，并不是程序BUG，因硬件资源有限设计如此的，默认支持PIR，不支持Alarm，但可以动手实现，具体原因如下：
+该问题主要是由于 **NE101 硬件设计中的资源复用** 导致的，并不是程序BUG，因硬件资源有限设计如此的，默认支持PIR，不支持Alarm，但可以动手实现，具体原因如下：
 
 1.  **固件/IO 资源冲突**：
-    在 NE101 的固件源码中 (`main/sleep.h` 和 `main/misc.h`)，**PIR 传感器中断信号 (`PIR_INTDOUT_IO`)** 和 **Alarm 报警输入信号 (`ALARM_IN_IO`)** 被定义为同一个引脚：**GPIO 2**。
+    在 NE101 的固件源码中 `main/sleep.h` 和 `main/misc.h`，**PIR 传感器中断信号 `PIR_INTDOUT_IO`** 和 **Alarm 报警输入信号 `ALARM_IN_IO`** 被定义为同一个引脚：**GPIO 2**。
 
     参考代码如下：
 
@@ -42,8 +42,6 @@
 
 **原理**：
 由于 PIR 接口的 Signal 引脚已经物理连接到了 GPIO 2，将干节点按钮接在 Signal 和 GND 之间。当按钮按下时，Signal 被拉低（GND），符合固件中 `ALARM_IN_ACTIVE (0)` 的触发逻辑，从而成功触发报警。
-
----
 
 ### 方案二：修改主板硬件
 

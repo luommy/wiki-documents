@@ -1,4 +1,4 @@
-# NE101 Alarm Application Trigger Guide
+# Alarm Application Trigger Guide
 
 ## Application Description
 
@@ -10,7 +10,7 @@ In practice, you might encounter the following issue: You have correctly enabled
 This issue is mainly caused by a **resource reuse conflict in the NE101 hardware design**. It is not a software bug but a result of limited hardware resources. The default design supports PIR but not Alarm, though Alarm support can be achieved manually. The specific reasons are as follows:
 
 1.  **Firmware/IO Resource Conflict**:
-    In the NE101 firmware source code (`main/sleep.h` and `main/misc.h`), both the **PIR sensor interrupt signal (`PIR_INTDOUT_IO`)** and the **Alarm input signal (`ALARM_IN_IO`)** are defined as the same pin: **GPIO 2**.
+    In the NE101 firmware source code `main/sleep.h` and `main/misc.h`, both the **PIR sensor interrupt signal `PIR_INTDOUT_IO`** and the **Alarm input signal `ALARM_IN_IO`** are defined as the same pin: **GPIO 2**.
 
     Reference code:
 
@@ -42,8 +42,6 @@ Directly use the **PIR Interface**, which is already connected, to access the Al
 
 **Principle**:
 Since the Signal pin of the PIR interface is physically connected to GPIO 2, connecting a dry contact button between Signal and GND works effectively. When the button is pressed, the Signal is pulled low (to GND), which matches the `ALARM_IN_ACTIVE (0)` trigger logic in the firmware, thus successfully triggering the alarm.
-
----
 
 ### Solution 2: Modify Hardware
 
