@@ -1,3 +1,10 @@
+---
+sidebar_label: Model Training And Deployment
+slug: /neoeyes-ne301-series/application-guide/model-training
+---
+
+# Model Training And Deployment
+
 ## 1. Environment Setup
 
 ### 1.1 Install YOLO Training Environment
@@ -34,7 +41,7 @@ Results saved to /ultralytics/runs/detect/predict
 
 ### 1.4 Install NE301 Project Deployment Environment
 
-To deploy models to NE301 devices, you need to set up the project development environment. Please refer to the [Development Environment Setup](../../3-NE300-MB01-development-board/2-software-guide/0-development-environment-setup.md) document in the project root directory for environment setup.
+To deploy models to NE301 devices, you need to set up the project development environment. Please refer to the [Development Environment Setup](../../2-NE300-MB01-development-board/2-software-guide/0-development-environment-setup.md) document in the project root directory for environment setup.
 
 > Camthink NeoEyes NE301 AI Camera firmware is now fully open source. Learn more from the [NE301 repository](https://github.com/camthink-ai/ne301).
 

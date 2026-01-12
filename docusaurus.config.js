@@ -119,9 +119,14 @@ const config = {
           alt: 'CamThink',
           src: 'img/logo.svg',
           srcDark: 'img/logo_dark.svg',
-          href: '/docs',
+          href: '/',
         },
         items: [
+          {
+            to: '/docs',
+            position: 'left',
+            label: 'Docs',
+          },
           {
             href: 'https://www.camthink.ai/',
             position: 'right',
@@ -137,6 +142,12 @@ const config = {
           { href: 'https://github.com/camthink-ai', position: 'right', label: 'GitHub' },
           { type: 'localeDropdown', position: 'right' },
         ],
+      },
+      docs: {
+        sidebar: {
+          hideable: true,
+          autoCollapseCategories: true,
+        },
       },
       zoom: {
         selector: '.markdown img:not(.no-zoom), article img:not(.no-zoom), .theme-doc-markdown img:not(.no-zoom)',

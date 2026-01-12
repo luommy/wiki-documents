@@ -325,5 +325,173 @@
   "support.github.description": {
     "message": "Submit issues to report problems\nView source code and contribute",
     "description": "Support card description for github"
+  },
+  "homepage.hero.desc.p1": {
+    "message": "CamThink is an Edge AI platform for the real world,"
+  },
+  "homepage.hero.desc.p2": {
+    "message": "offering a complete solution from"
+  },
+  "homepage.hero.desc.bold1": {
+    "message": "Open Hardware Design"
+  },
+  "homepage.hero.desc.bold2": {
+    "message": "System Software"
+  },
+  "homepage.hero.desc.to": {
+    "message": "to"
+  },
+  "homepage.hero.desc.bold3": {
+    "message": "AI Model Deployment"
+  },
+  "homepage.hero.desc.p3": {
+    "message": "."
+  },
+  "homepage.hero.start": {
+    "message": "Start"
+  },
+  "homepage.platform.title": {
+    "message": "CamThink Platform Overview"
+  },
+  "homepage.platform.desc": {
+    "message": "A complete platform covering hardware, system, AI toolchain, and edge deployment"
+  },
+  "homepage.platform.card.hardware": {
+    "message": "Open schematics, PCB, modular design, supporting rapid customization, mass production, and batch deployment."
+  },
+  "homepage.platform.card.os": {
+    "message": "RTOS / Linux support, complete drivers and Board Support Package."
+  },
+  "homepage.platform.card.tools": {
+    "message": "Model management, invocation, training, quantization, conversion, and deployment full-process cloud platform support."
+  },
+  "homepage.platform.card.runtime": {
+    "message": "Local inference, low latency response, stable operation."
+  },
+  "homepage.platform.card.connect": {
+    "message": "Multi-protocol support like MQTT / HTTP, open platform, supporting local and private cloud deployment."
+  },
+  "homepage.products.title": {
+    "message": "Quick Access"
+  },
+  "homepage.products.desc": {
+    "message": "To help you get started quickly with CamThink products, here are some important resource links"
+  },
+  "homepage.stack.title": {
+    "message": "Platform Technology Stack Panorama"
+  },
+  "homepage.stack.subtitle": {
+    "message": "Covering your development needs from underlying computing power to upper-layer applications"
+  },
+  "homepage.stack.layer.app": {
+    "message": "Application Layer"
+  },
+  "homepage.stack.app.building": {
+    "message": "Smart Building"
+  },
+  "homepage.stack.app.agriculture": {
+    "message": "Smart Agriculture"
+  },
+  "homepage.stack.app.vision": {
+    "message": "Vision Analysis"
+  },
+  "homepage.stack.app.other": {
+    "message": "Other Fields"
+  },
+  "homepage.stack.layer.software": {
+    "message": "Software Platform"
+  },
+  "homepage.stack.mw.ai": {
+    "message": "AI Inference & Frameworks"
+  },
+  "homepage.stack.mw.os": {
+    "message": "OS & Core Components"
+  },
+  "homepage.stack.mw.conn": {
+    "message": "Connectivity & Protocols"
+  },
+  "homepage.stack.mw.tools": {
+    "message": "Tools & Extensions"
+  },
+  "homepage.stack.layer.hardware": {
+    "message": "Hardware Ecosystem"
+  },
+  "homepage.cta.title": {
+    "message": "How to Use This Wiki"
+  },
+  "homepage.cta.step1": {
+    "message": "Clarify Application Requirements"
+  },
+  "homepage.cta.step2": {
+    "message": "Select Product Series"
+  },
+  "homepage.cta.step3": {
+    "message": "Complete Quick Start"
+  },
+  "homepage.cta.step4": {
+    "message": "Device Debugging & Deployment"
+  },
+  "homepage.cta.step5": {
+    "message": "Secondary Development or Customization"
+  },
+  "homepage.community.title": {
+    "message": "Join Developer Community"
+  },
+  "homepage.community.desc": {
+    "message": "Explore, create, and share with developers worldwide"
+  },
+  "homepage.community.discord": {
+    "message": "Join real-time discussions, get technical support"
+  },
+  "homepage.community.github": {
+    "message": "Submit Issues, participate in feature proposals"
+  },
+  "homepage.community.contact": {
+    "message": "Product consultation and business cooperation"
+  },
+  "carousel.ne301.title": {
+    "message": "NeoEyes NE301 (AI Camera)"
+  },
+  "carousel.ne301.tagline": {
+    "message": "New low-power Edge AI camera based on STM32N6"
+  },
+  "carousel.ne301.desc": {
+    "message": "High-performance Cortex-M55 + NPU architecture, supporting local real-time inference. Modular design adaptable to various lenses and sensors, ideal for computer vision and AIoT nodes."
+  },
+  "carousel.link.overview": {
+    "message": "Overview"
+  },
+  "carousel.link.quickstart": {
+    "message": "Quick Start"
+  },
+  "carousel.link.devguide": {
+    "message": "Dev Guide"
+  },
+  "carousel.link.appguide": {
+    "message": "App Guide"
+  },
+  "carousel.ne101.title": {
+    "message": "NeoEyes NE101 (IoT Node)"
+  },
+  "carousel.ne101.tagline": {
+    "message": "Ultra-low power visual sensor node based on ESP32-S3"
+  },
+  "carousel.ne101.desc": {
+    "message": "Designed for battery-powered scenarios, supporting Wi-Fi/Cat.1/Wi-Fi HaLow connectivity. Minimalist architecture, millisecond wake-up capture from deep sleep, suitable for outdoor monitoring and meter reading."
+  },
+  "carousel.ng4500.title": {
+    "message": "NeoEdge NG4500 (AI Box)"
+  },
+  "carousel.ng4500.tagline": {
+    "message": "High-performance edge computing gateway based on NVIDIA Jetson"
+  },
+  "carousel.ng4500.desc": {
+    "message": "Delivers 21~100+ TOPS computing power, supporting multi-channel video analysis and LLM edge deployment. Rich interfaces (CAN/232/485) empowering complex industrial and automotive AI applications."
+  },
+  "carousel.link.hwguide": {
+    "message": "Hardware Guide"
+  },
+  "carousel.link.usecases": {
+    "message": "Use Cases"
   }
 }

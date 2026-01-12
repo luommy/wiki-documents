@@ -499,6 +499,8 @@ Alarm 报警触发
   - 硬件指南：
     - [组件总览](./2-NE300-MB01-development-board/1-hardware-guide/0-components-overview.md)
     - [硬件连接](./2-NE300-MB01-development-board/1-hardware-guide/1-hardware-connection.md)
+    - NE301原理图[「下载」](https://resources.camthink.ai/wiki/doc/NE301-Schematic-Open.pdf)
+    - NE301PCB文件[「下载」](https://resources.camthink.ai/wiki/doc/NE301-PCB-Open.pdf)
   - 软件指南：
     - [开发环境搭建](./2-NE300-MB01-development-board/2-software-guide/0-development-environment-setup.md)
     - [系统烧录与初始化](./2-NE300-MB01-development-board/2-software-guide/1-system-flashing-and-initialization.md)
