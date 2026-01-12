@@ -108,24 +108,23 @@
     /* Full viewport height minus nav */
     display: flex;
     flex-direction: column;
-    /* justify-content: center; REMOVED to allow margin:auto centering */
+    justify-content: center;
+    /* Center everything vertically */
     align-items: center;
 }
 
 .hero-scroll-indicator {
     position: relative;
-    /* Changed from absolute */
-    margin-top: auto;
-    /* Push to bottom */
-    margin-bottom: 2rem;
-    /* bottom: 40px; REMOVED */
-    /* left: 50%; REMOVED */
-    /* transform: translateX(-50%); REMOVED */
+    margin-top: 4rem;
+    /* Fixed distance from buttons */
+    margin-bottom: 0;
+    /* Removed margin-top: auto */
     animation: bounce 2s infinite;
     cursor: pointer;
     opacity: 0.7;
     z-index: 2;
 }
+
 
 @keyframes bounce {
 
@@ -134,15 +133,15 @@
     50%,
     80%,
     100% {
-        transform: translateX(-50%) translateY(0);
+        transform: translateY(0);
     }
 
     40% {
-        transform: translateX(-50%) translateY(-10px);
+        transform: translateY(-10px);
     }
 
     60% {
-        transform: translateX(-50%) translateY(-5px);
+        transform: translateY(-5px);
     }
 }
 
@@ -185,8 +184,8 @@
     position: relative;
     z-index: 1;
     max-width: 900px;
-    margin: auto;
-    /* Changed from 0 auto to center vertically */
+    margin: 0 auto;
+    /* Removed vertical auto, keep horizontal auto */
     display: flex;
     flex-direction: column;
     align-items: center;
