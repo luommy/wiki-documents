@@ -40,10 +40,8 @@ Home Assistant是一个免费的开源家庭自动化平台，旨在成为您智
 
 连接以 `NE301_<最后6位MAC数字>` 开头的WiFi端点，输入默认IP地址：192.168.10.10
 
-<div style={{display: 'flex', gap: '10px', justifyContent: 'center', margin: '20px 0'}}>
-  <img src="/img/ne301/application-guide/monitoring/connect.png" alt="connect" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
-  <img src="/img/ne301/application-guide/monitoring/login.png" alt="login" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
-</div>
+<img src="/img/ne301/application-guide/monitoring/connect.png" alt="connect" style={{display: 'block', margin: '20px auto', maxWidth: '40%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="/img/ne301/application-guide/monitoring/login.png" alt="login" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 - **默认用户名**：`admin`
 - **默认密码**：`hicamthink`

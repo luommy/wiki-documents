@@ -47,7 +47,7 @@ export default function Home(): JSX.Element {
                         </div>
 
                         <div className="hero-actions">
-                            <Link to="#platform-overview" className="btn-primary">
+                            <Link to="/docs" className="btn-primary">
                                 <Translate id="homepage.hero.start">开始探索</Translate>
                             </Link>
                             <Link to="https://github.com/camthink-ai" className="btn-github">

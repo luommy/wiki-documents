@@ -6,6 +6,18 @@ All notable changes to the CamThink Wiki documentation will be documented in thi
 
 > This changelog reflects updates starting from **2025-12-23**. Major changes prior to this date are not recorded.
 
+## [2026-01-16]
+
+### Added
+- **Homepage**: Added "Video Demos" and "Featured Shorts" interactive components.
+- **Documentation**: Warehouse Rack Detection use case.
+
+### Improved
+- **i18n**: Synchronized Homepage and English Docs.
+
+### Fixed
+- **Documentation**: Fixed layout distortion in Warehouse Rack Detection guide.
+
 ## [2026-01-12]
 
 ### Fixed
