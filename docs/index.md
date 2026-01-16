@@ -9,6 +9,8 @@ slug: /
 import Link from '@docusaurus/Link';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import '@site/src/css/docs-home.css';
+import VideoModal from '@site/src/components/VideoModal';
+import VideoCarousel from '@site/src/components/VideoCarousel';
 
 <div className="docs-home-container">
 
@@ -109,28 +111,34 @@ import '@site/src/css/docs-home.css';
     </div>
   </div>
 
-{/*
+
+
   <h2 className="docs-section-title">视频演示</h2>
   <div className="videos-grid">
-    <div className="video-card" onClick={() => window.open('https://resources.camthink.ai/wiki/video/HomePage/How%20to%20Flash%20Firmware%20onto%20the%20CamThink%20NeoEyes%20NE101%20Low-Power%20Camera.mp4', '_blank')}>
-      <img src={useBaseUrl('img/ne301/overview/301.png')} className="video-thumb" style={{objectFit: 'contain', background: '#333'}} alt="NE301 Unboxing" />
-      <div className="video-play-btn"></div>
-      <div className="video-info">
-        <div className="video-title">NeoEyes NE301 开箱与初体验</div>
-        <div className="video-meta">全方位展示硬件细节与接口功能</div>
-      </div>
-    </div>
-
-    <div className="video-card" onClick={() => window.open('https://www.bilibili.com/', '_blank')}>
-      <img src={useBaseUrl('img/Overview/NE101/NE101.png')} className="video-thumb" style={{objectFit: 'contain', background: '#333'}} alt="NE101 Demo" />
-      <div className="video-play-btn"></div>
-      <div className="video-info">
-        <div className="video-title">NeoEyes NE101 低功耗抓拍演示</div>
-        <div className="video-meta">毫秒级唤醒与图像回传实测</div>
-      </div>
-    </div>
+    <VideoModal 
+      videoId="GH0RVLQjGeY"
+      title="NeoEyes NE101 固件烧录与初体验"
+      description="全方位展示烧录细节与功能"
+      coverImage="https://img.youtube.com/vi/GH0RVLQjGeY/maxresdefault.jpg"
+    />
+    <VideoModal 
+      videoId="OsPkVlqArXs"
+      title="NeoEyes NE301 组装演示"
+      description="从开发板到成品相机"
+      coverImage="https://img.youtube.com/vi/OsPkVlqArXs/maxresdefault.jpg"
+    />
   </div>
-*/}
+
+  {/* ================= SHORTS SECTION ================= */}
+  <h2 className="docs-section-title" style={{marginTop: '4rem'}}>精选短视频</h2>
+  
+  <VideoCarousel videos={[
+    { videoId: 'mLg4TQ-i5KU', title: 'Start Exploring' },
+    { videoId: 'n8zZIutqi3Q', title: 'AI Camera' },
+    { videoId: 'a9JdVw-2k4o', title: 'Firmware Update' },
+    { videoId: '4XtHxtbsD-0', title: 'Cat-1 Module' },
+    { videoId: 'aaZQw551gAE', title: 'Unboxing' },
+  ]} />
 
 </div>
 

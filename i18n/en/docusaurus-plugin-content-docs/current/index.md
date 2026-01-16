@@ -9,6 +9,8 @@ slug: /
 import Link from '@docusaurus/Link';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import '@site/src/css/docs-home.css';
+import VideoModal from '@site/src/components/VideoModal';
+import VideoCarousel from '@site/src/components/VideoCarousel';
 
 <div className="docs-home-container">
 
@@ -109,27 +111,31 @@ import '@site/src/css/docs-home.css';
     </div>
   </div>
 
-{/*
-  <h2 className="docs-section-title">Featured Videos</h2>
+  <h2 className="docs-section-title">Video Demos</h2>
   <div className="videos-grid">
-    <div className="video-card" onClick={() => window.open('https://resources.camthink.ai/wiki/video/HomePage/How%20to%20Flash%20Firmware%20onto%20the%20CamThink%20NeoEyes%20NE101%20Low-Power%20Camera.mp4', '_blank')}>
-      <img src={useBaseUrl('img/ne301/overview/301.png')} className="video-thumb" style={{objectFit: 'contain', background: '#333'}} alt="NE301 Unboxing" />
-      <div className="video-play-btn"></div>
-      <div className="video-info">
-        <div className="video-title">NeoEyes NE301 Unboxing & First Look</div>
-        <div className="video-meta">Comprehensive showcase of hardware details and interfaces</div>
-      </div>
-    </div>
-
-    <div className="video-card" onClick={() => window.open('https://www.bilibili.com/', '_blank')}>
-      <img src={useBaseUrl('img/Overview/NE101/NE101.png')} className="video-thumb" style={{objectFit: 'contain', background: '#333'}} alt="NE101 Demo" />
-      <div className="video-play-btn"></div>
-      <div className="video-info">
-        <div className="video-title">NeoEyes NE101 Low Power Capture Demo</div>
-        <div className="video-meta">Millisecond wakeup and image transmission test</div>
-      </div>
-    </div>
+    <VideoModal 
+      videoId="GH0RVLQjGeY"
+      title="NeoEyes NE101 Firmware Flashing & First Look"
+      description="Comprehensive display of flashing details and functions"
+      coverImage="https://img.youtube.com/vi/GH0RVLQjGeY/maxresdefault.jpg"
+    />
+    <VideoModal 
+      videoId="OsPkVlqArXs"
+      title="NeoEyes NE301 Assembly Demo"
+      description="From development board to finished camera"
+      coverImage="https://img.youtube.com/vi/OsPkVlqArXs/maxresdefault.jpg"
+    />
   </div>
-*/}
+
+  {/* ================= SHORTS SECTION ================= */}
+  <h2 className="docs-section-title" style={{marginTop: '4rem'}}>Featured Shorts</h2>
+  
+  <VideoCarousel videos={[
+    { videoId: 'mLg4TQ-i5KU', title: 'Start Exploring' },
+    { videoId: 'n8zZIutqi3Q', title: 'AI Camera' },
+    { videoId: 'a9JdVw-2k4o', title: 'Firmware Update' },
+    { videoId: '4XtHxtbsD-0', title: 'Cat-1 Module' },
+    { videoId: 'aaZQw551gAE', title: 'Unboxing' },
+  ]} />
 
 </div>

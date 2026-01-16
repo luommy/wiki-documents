@@ -1,5 +1,5 @@
 ---
-sidebar_label: 模型训练与部署
+sidebar_label: Model Training and Deployment
 slug: /neoeyes-ne301-series/application-guide/model-training
 ---
 

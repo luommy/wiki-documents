@@ -40,10 +40,8 @@ First, correctly install the CamThink NE301 and press the button for 2 to 3 seco
 
 Connect to the WiFi endpoint starting with `NE301_<last 6 digits of MAC>` and enter the default IP address: 192.168.10.10
 
-<div style={{display: 'flex', gap: '10px', justifyContent: 'center', margin: '20px 0'}}>
-  <img src="/img/ne301/application-guide/monitoring/connect.png" alt="connect" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
-  <img src="/img/ne301/application-guide/monitoring/login.png" alt="login" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
-</div>
+<img src="/img/ne301/application-guide/monitoring/connect.png" alt="connect" style={{display: 'block', margin: '20px auto', maxWidth: '40%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="/img/ne301/application-guide/monitoring/login.png" alt="login" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 - **Default Username**: `admin`
 - **Default Password**: `hicamthink`
