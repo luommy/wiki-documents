@@ -11,7 +11,7 @@ const BASE_URL = process.env.BASE_URL ?? '/';
 const SITE_URL = process.env.SITE_URL ?? (
   DEPLOY_ENV === 'test' ? 'http://42.194.138.11:3002' :
     DEPLOY_ENV === 'production' ? 'https://wiki.camthink.ai' :
-      '/'
+      'http://localhost:3000'
 );
 
 const configuredPlugins = [
@@ -188,6 +188,12 @@ const config = {
         copyright: `Copyright © ${new Date().getFullYear()} CamThink.ai All rights reserved.`,
       },
       prism: { theme: prismThemes.github, darkTheme: prismThemes.dracula },
+      sitemap: {
+        changefreq: 'weekly',
+        priority: 0.5,
+        ignorePatterns: ['/markdown-page/**', '/search/**'],
+        filename: 'sitemap.xml',
+      },
     }),
 };
 
