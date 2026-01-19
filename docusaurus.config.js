@@ -4,14 +4,15 @@ import { themes as prismThemes } from 'prism-react-renderer';
 /* -------------------------------------------------- */
 /* 1️⃣  环境检测 / 动态变量                             */
 /* -------------------------------------------------- */
-const IS_GITHUB = process.env.GITHUB_ACTIONS === 'true';
-const IS_GITHUB_ENV = process.env.DEPLOY_ENV === 'github';
-const BASE_URL = process.env.BASE_URL  // 手动覆盖优先
-  ?? (IS_GITHUB && IS_GITHUB_ENV ? '/wiki-documents/' : '/');
 
-const SITE_URL = process.env.SITE_URL  // 手动覆盖优先
-  ?? (IS_GITHUB && IS_GITHUB_ENV ? 'https://camthink-ai.github.io' : 'https://wiki.camthink.ai');
-
+const DEPLOY_ENV = process.env.DEPLOY_ENV || 'local';
+const BASE_URL = process.env.BASE_URL ?? '/';
+// 根据部署环境设置默认 SITE_URL
+const SITE_URL = process.env.SITE_URL ?? (
+  DEPLOY_ENV === 'test' ? 'http://42.194.138.11:3002' :
+    DEPLOY_ENV === 'production' ? 'https://wiki.camthink.ai' :
+      'http://localhost:3000'
+);
 
 const configuredPlugins = [
   'docusaurus-plugin-image-zoom',
@@ -112,6 +113,9 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
+      metadata: DEPLOY_ENV === 'test'
+        ? [{ name: 'robots', content: 'noindex, nofollow' }]
+        : [],
       image: 'img/Camthink-logo.png',
       navbar: {
         title: '',
@@ -184,32 +188,12 @@ const config = {
         copyright: `Copyright © ${new Date().getFullYear()} CamThink.ai All rights reserved.`,
       },
       prism: { theme: prismThemes.github, darkTheme: prismThemes.dracula },
-      // announcementBar: {
-      //   id: 'support_us',
-      //   content: `
-      //     <div class="announcement-bar">
-      //       <div class="announcement-content">
-      //         <div class="announcement-carousel">
-      //           <div class="announcement-track">
-      //             <div class="announcement-text">
-      //               <b>
-      //                 <a
-      //                   href="https://www.camthink.ai/store"
-      //                   target="_blank"
-      //                   class="announcement-link"
-      //                 >
-      //                   🎄Christmas Gift | Free Shipping Over $300
-      //                 </a>
-      //               </b>
-      //             </div>
-      //           </div>
-      //         </div>
-      //       </div>
-      //     </div>
-      //   `,
-      //   textColor: '#091E42',
-      //   isCloseable: false,
-      // },
+      sitemap: {
+        changefreq: 'weekly',
+        priority: 0.5,
+        ignorePatterns: ['/markdown-page/**', '/search/**'],
+        filename: 'sitemap.xml',
+      },
     }),
 };
 
