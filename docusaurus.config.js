@@ -98,11 +98,17 @@ const config = {
       ({
         docs: {
           sidebarPath: './sidebars.js',
-          editUrl: undefined,  // 关闭 “编辑此页”
+          editUrl: undefined,  // 关闭 "编辑此页"
           routeBasePath: '/docs',
         },
         blog: false,
         theme: { customCss: './src/css/custom.css' },
+        sitemap: {
+          changefreq: 'weekly',
+          priority: 0.5,
+          ignorePatterns: ['**/markdown-page/**', '**/search/**'],
+          filename: 'sitemap.xml',
+        },
       }),
     ],
   ],
@@ -188,12 +194,6 @@ const config = {
         copyright: `Copyright © ${new Date().getFullYear()} CamThink.ai All rights reserved.`,
       },
       prism: { theme: prismThemes.github, darkTheme: prismThemes.dracula },
-      sitemap: {
-        changefreq: 'weekly',
-        priority: 0.5,
-        ignorePatterns: ['/markdown-page/**', '/search/**'],
-        filename: 'sitemap.xml',
-      },
     }),
 };
 
