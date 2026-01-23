@@ -89,4 +89,8 @@ make flash-app
 make flash-web
 make flash-model
 make flash-wakecore
-``` 
+```
+
+## Troubleshooting
+
+If you cannot find the NE301 WiFi AP after successful flashing, it might be due to missing WiFi firmware. Please refer to [WiFi Firmware Flashing Guide](3-wifi-firmware-flashing.md) for details. 

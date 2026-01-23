@@ -67,6 +67,8 @@ title: System Flashing and Initialization
 - STM32CubeProgrammer
 ![GUI](https://www.st.com/content/ccc/fragment/product_related/rpn_information/product_circuit_diagram/group3/0c/26/bb/21/a5/eb/4a/c7/stm32cubeprog_image/files/stm32cubeprog_image.jpg/jcr:content/translations/en.stm32cubeprog_image.jpg) 
 
+> **注意**：请使用 v2.19.0 版本的 STM32CubeProgrammer，最新的版本可能会导致烧录失败
+
 或 CLI
 ```bash
 export DKEL="<STM32CubeProgrammer_N6 Install Folder>/bin/ExternalLoader/MX66UW1G45G_STM32N6570-DK.stldr"
@@ -90,3 +92,8 @@ make flash-web
 make flash-model
 make flash-wakecore
 ```
+
+## 故障排查
+
+如果您在成功烧录后无法搜索到 NE301 的 WiFi 热点，可能是因为缺少 WiFi 固件。请参考 [WiFi 固件烧录指南](3-wifi-firmware-flashing.md) 了解详情。
+
