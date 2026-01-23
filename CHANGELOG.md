@@ -6,6 +6,18 @@ All notable changes to the CamThink Wiki documentation will be documented in thi
 
 > This changelog reflects updates starting from **2025-12-23**. Major changes prior to this date are not recorded.
 
+## [2026-01-23]
+
+### Added
+- **Docs**: NE101 Arduino Development Guide.
+- **Docs**: NE301 WiFi Firmware Flashing Guide.
+
+### Improved
+- **Docs**: NE301 System Flashing Guide.
+
+### Fixed
+- **Docs**: NE101 Alarm Trigger Software Development Guide.
+
 ## [2026-01-16]
 
 ### Added
