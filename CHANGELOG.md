@@ -6,6 +6,14 @@ All notable changes to the CamThink Wiki documentation will be documented in thi
 
 > This changelog reflects updates starting from **2025-12-23**. Major changes prior to this date are not recorded.
 
+## [2026-01-30]
+
+### Added
+- **Docs**: "Urban Waste Bin Overflow Monitoring" application guide for NE301 Series.
+
+### Changed
+- **CI/CD**: Temporarily disabled deployment to the internal test server.
+
 ## [2026-01-23]
 
 ### Added
