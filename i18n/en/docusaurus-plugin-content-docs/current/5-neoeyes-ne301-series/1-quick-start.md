@@ -147,6 +147,18 @@ The streaming preview page offers a low-latency RTSP/HTTP preview capture. This 
 - **Pull capture**: Some HTTP endpoints support on-demand capture from external systems. Configure the HTTP push target and enable this feature to trigger uploads via API calls.
 - **IO trigger**: Enables capture based on state changes on the expansion IO header. Choose between high-level or low-level triggers depending on the sensor you connect.
 
+#### PIR Configuration
+
+Adjust PIR (Passive Infrared) sensor parameters for your environment (e.g., corridor, outdoor) to avoid false alarms.
+
+- **Menu**: Web UI -> **Feature Debugging** -> **Wake-up Source** -> **IO Trigger - PIR**
+
+- **Parameters**:
+  - **Sensitivity**: Range 0-255. Recommended: 20-50 for indoor; lower for outdoor to reduce false positives from wind or small animals.
+  - **Blind Time**: Non-responsive window after a trigger event to prevent repetitive firing.
+  - **Window Time**: Time window to valid trigger determination.
+  - **Pulse Count**: Number of pulses required to register a valid trigger. Set to 2 or 3 to filter noise effectively.
+
 ### Remote Control
 
 > Used to configure the remote control function of the NE301 device. Users can send remote control commands according to actual scenario requirements to achieve communication between the device and the server. Please note that keeping this function enabled for a long time will increase the network overhead of the device.
@@ -186,7 +198,27 @@ Sleep Command:
 }
 ```
 
+### RTMP Streaming
+
+RTMP streaming can be fully configured via the Web UI, while retaining CLI commands for developer debugging.
+
+- **Menu**: Web UI -> **Feature Debugging** -> **Media Stream**
+
+- **Operations**:
+  1. **Enable RTMP**: Select to enable RTMP mode in the settings.
+  2. **Configuration**:
+      - **URL**: Enter RTMP Server URL (max 256 chars).
+      - **Stream Key**: Enter streaming key (max 128 chars, supports show/hide).
+  3. **Connect**: Click "Connect". The status LED turns green upon success.
+
+- **CLI Command (Advanced)**:
+  ```bash
+  # Check help for details
+  rtmp_url <url> [stream_key] # Configure stream address
+  ```
+
 ### Scheduled Capture
+
 
 Use scheduled capture when you need periodic uploads without manual intervention or external IO triggers.
 
@@ -267,7 +299,7 @@ Configure the fill light mode according to the scenario:
 
 #### Connectivity Management
 
-NeoEyes NE301 supports Wi‑Fi and Cat‑1. Configuration options vary by module.
+NeoEyes NE301 supports Wi‑Fi, Cat‑1, and PoE. Configuration options vary by connectivity type.
 
 - **Wi‑Fi**: The standard SKU scans nearby networks. Select your SSID, enter credentials, and save. NE301 remembers the most recent network.
 
@@ -285,6 +317,14 @@ NeoEyes NE301 supports Wi‑Fi and Cat‑1. Configuration options vary by module
   5. In **Cellular**, fill in APN, username, password, PIN, authentication type, and any required AT commands.
   6. Click **Send** to test. If the connection succeeds, *Cellular Status* shows `connect`. Click **Save** to persist.
   7. **Details** displays signal strength and other network information for diagnostics.
+
+- **PoE Network Settings**: Supports power and communication via Ethernet (PoE).
+  - **Menu**: Web UI -> **System Settings** -> **Connectivity** -> **PoE Network**
+  - **Connection Status**: Displays "Cable Connected" and current power status (e.g., `POE_ONLINE`) when plugged in.
+  - **IP Mode**:
+    - **DHCP (Recommended)**: Default. Automatically obtains IP from router.
+    - **Static**: For fixed IP scenarios. Requires manual entry of IP, Subnet Mask, Gateway, and Main/Backup DNS.
+  - **Monitoring**: Displays specific error codes (e.g., `POE_STATUS_DHCP_FAILED`, `POE_STATUS_IP_CONFLICT`) to assist troubleshooting.
 
 <!-- BLE management section intentionally omitted for now -->
 
