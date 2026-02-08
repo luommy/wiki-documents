@@ -6,19 +6,6 @@ All notable changes to the CamThink Wiki documentation will be documented in thi
 
 > This changelog reflects updates starting from **2025-12-23**. Major changes prior to this date are not recorded.
 
-## [2026-02-05]
-
-### Added
-- **NE301 PIR**: Supported flexible configuration of intelligent PIR sensor sensitivity, blind time, and other parameters via Web UI.
-- **NE301 RTMP**: Added CLI commands for Video Hub mode debugging and Web UI RTMP streaming support.
-- **NE301 PoE**: Added Ethernet Power Supply support, including Static IP/DHCP configuration and detailed status monitoring.
-- **Case Study**: NE301 Pest Control Monitoring in Chain Restaurants.
-
-
-### Fixed
-- **NE301 Firmware**: Fixed an issue where the device could not enter sleep mode after remote wake-up was enabled.
-
-
 ## [2026-01-30]
 
 ### Added
