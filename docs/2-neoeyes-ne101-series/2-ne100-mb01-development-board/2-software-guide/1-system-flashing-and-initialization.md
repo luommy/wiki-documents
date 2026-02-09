@@ -1,3 +1,9 @@
+---
+description: NE101 系统烧录与初始化指南，介绍如何使用 VSCode 插件或独立烧录工具进行固件烧录，以及 OTA 无线升级的详细步骤和注意事项。
+keywords: [NE101, 系统烧录, 固件升级, OTA, ESP32-S3, ESP-IDF, 烧录工具, 无线升级]
+tags: [软件指南, 系统烧录, 固件升级, OTA]
+---
+
 # System Flashing
 
 ## 设备烧录说明

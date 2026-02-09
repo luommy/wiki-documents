@@ -1,3 +1,9 @@
+---
+description: 这份SSD文档详细介绍了产品的关键特性、规格参数及使用说明，包括256GB至1TB容量、PCIe Gen3 x4 NVMe 1.3接口、3D TLC NAND闪存、高速读写性能（3234 MB/s读，3099 MB/s写），以及可靠性保障和高级功能。同时提供了安装与兼容性指导及注意事项。
+keywords: [SSD, 固态硬盘, PCIe Gen3, NVMe, M.2 2280, 存储, 3D TLC NAND, 硬件开发, 嵌入式系统, 高速存储]
+tags: [SSD, 固态硬盘, PCIe, NVMe, 硬件资源]
+---
+
 import AccessoriesTable from '@site/src/components/AccessoriesTable';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 

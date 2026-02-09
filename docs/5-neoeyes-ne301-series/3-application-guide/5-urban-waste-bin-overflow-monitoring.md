@@ -1,5 +1,8 @@
 ---
 sidebar_label: Urban Waste Bin Overflow Monitoring
+description: 本指南介绍如何利用 Camthink NeoEye 301 AI 相机和 Home Assistant 构建城市垃圾桶满溢监测系统，通过 MQTT 实现数据上报与可视化，提升城市卫生管理效率。
+keywords: [城市垃圾桶监测, NeoEye 301, 满溢检测, 智慧城市, Home Assistant, MQTT, 边缘AI, 垃圾管理, AI相机, 物联网]
+tags: [智慧城市, 垃圾桶监测, AI应用, NE301, 解决方案]
 ---
 
 # 案例-城市垃圾桶满溢监测

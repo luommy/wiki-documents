@@ -1,3 +1,9 @@
+---
+description: 本指南提供 NeoEdge NG4500 系列产品的快速入门教程，涵盖硬件组装（SSD、WiFi、4G/5G 模块）、系统镜像烧录、初始化配置及初步的 AI 应用部署步骤。
+keywords: [NG4500, 快速入门, 硬件组装, 系统烧录, AI 部署, Jetson Orin, 边缘计算]
+tags: [快速入门, 硬件指南, 软件部署, NG4500 系列, 部署指南]
+---
+
 # Quick Start
 
 ## 概述

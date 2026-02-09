@@ -1,5 +1,8 @@
 ---
 sidebar_label: Refrigerator Inventory Monitoring
+description: 本文档介绍基于 Camthink NeoEye 301 和 Home Assistant 的冰箱库存监控方案，适用于智能零售场景，详细讲解数据采集、YOLO 模型训练、量化及端到端部署流程。
+keywords: [冰箱库存监控, 智能零售, NeoEye 301, 库存管理, 饮料识别, YOLOv8, Home Assistant, MQTT, 边缘计算, AI模型训练]
+tags: [智能零售, 库存监控, NE301, AI应用, 解决方案]
 ---
 
 # 冰箱库存监控应用指南

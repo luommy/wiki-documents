@@ -1,3 +1,9 @@
+---
+description: 本指南详细介绍了如何使用 Arduino IDE 开发适配 NE101 系列摄像头的应用程序。内容涵盖 Arduino 环境搭建、ESP32-S3 核心硬件配置（如 OPI PSRAM）、引脚定义映射、摄像头电源控制逻辑以及 CameraWebServer 经典示例的源码适配与固件烧录流程。
+keywords: [NE101 开发, Arduino IDE, ESP32-S3, 摄像头开发, CameraWebServer, OPI PSRAM, 硬件配置, 固件烧录, 嵌入式开发, 乐鑫]
+tags: [NE101 系列, Arduino 开发, 摄像头应用, ESP32-S3, 示例代码]
+---
+
 # NE101 Arduino Dev Guide
 
 本文档将指导您如何使用 Arduino IDE 开发适配 NE101 摄像头的应用程序，以 `CameraWebServer` 示例为例。

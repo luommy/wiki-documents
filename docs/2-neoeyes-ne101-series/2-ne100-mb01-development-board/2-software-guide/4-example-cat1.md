@@ -1,3 +1,9 @@
+---
+description: LTE Cat-1 低功耗抓拍示例，展示如何在 NE101 上使用 LTE Cat-1 模块实现户外环境下的低功耗图像抓拍与传输，适用于无 WiFi 覆盖的应用场景。
+keywords: [NE101, LTE Cat-1, 4G, 蜂窝网络, 低功耗, 图像传输, 户外监控, 物联网通信]
+tags: [Cat-1 示例, 蜂窝网络, 低功耗抓拍, 4G 通信]
+---
+
 # Low-power capture based on cellular
 
 ## 概述

@@ -1,3 +1,9 @@
+---
+description: 了解如何将 Cinfer AI 推理服务与 Beaver IoT 平台深度集成。本文提供 NeoEyes NE101 相机通过 MQTT 接入、设备绑定及 AI 识别结果可视化的完整流程。
+keywords: [Beaver IoT, Cinfer, AI 集成, 物联网平台, NeoEyes NE101, MQTT 接入, 设备绑定, 图像识别, 边缘计算, 智能监控]
+tags: [Cinfer, Beaver IoT, 物联网, AI集成, 解决方案]
+---
+
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
 # Beaveriot Integration

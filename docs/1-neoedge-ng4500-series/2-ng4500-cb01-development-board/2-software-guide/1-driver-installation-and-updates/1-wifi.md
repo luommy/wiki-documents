@@ -1,3 +1,9 @@
+---
+description: 本指南介绍如何在 NeoEdge NG4520 平台安装与配置 WiFi 驱动（以 Realtek RTL8821CE 为例），涵盖源码编译、驱动加载及网络连接测试步骤。
+keywords: [WiFi 驱动, RTL8821CE, NG4500, 网络配置, 驱动编译, Jetson Orin, 无线连接, Realtek]
+tags: [WiFi 配置, 驱动安装, 网络指南, NG4500 系列, 硬件适配]
+---
+
 # WIFI
 
 本文档以 Realtek RTL8821CE 为例，介绍NG4520平台下 WIFI 驱动的安装与使用方法。

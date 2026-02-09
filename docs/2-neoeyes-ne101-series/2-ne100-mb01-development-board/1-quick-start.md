@@ -1,3 +1,9 @@
+---
+description: NeoEyes NE100-MB01 开发板快速入门指南。涵盖硬件准备、设备连接、基于 Web 的图像采集配置及 MQTT 数据上报等核心功能。
+keywords: [NE100-MB01, 快速入门, 硬件准备, 图像采集, MQTT, 定时抓拍, 固件升级, 开发板]
+tags: [NE100-MB01, 快速入门, 硬件指南, 软件配置, 边缘 AI]
+---
+
 # Quick Start
 
 ## 产品概述

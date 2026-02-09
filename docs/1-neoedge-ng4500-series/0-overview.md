@@ -1,3 +1,8 @@
+---
+description: CamThink NeoEdge NG4500 系列产品概述，搭载 NVIDIA Jetson Orin 核心，支持大语言模型（LLMs）和生成式 AI 推理，具备工业级设计与多种扩展接口。
+keywords: [NG4500, 产品概述, 边缘计算, Jetson Orin, AI 硬件, 生成式 AI, 工业级网关]
+tags: [产品概述, 边缘 AI, 硬件指南, NG4500 系列, 品牌介绍]
+---
 import Link from "@docusaurus/Link";
 import SupportGrid from '@site/src/components/SupportGrid';
 import AccessoriesTable from '@site/src/components/AccessoriesTable';

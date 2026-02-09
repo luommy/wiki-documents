@@ -1,3 +1,9 @@
+---
+description: 介绍如何在 NVIDIA Jetson Orin 平台（Nano / NX）上使用 MediaPipe 实现实时姿态估计与手部追踪。包含环境配置、示例代码及 GPU 加速优化建议。
+keywords: [MediaPipe, 姿态估计, 手部追踪, NVIDIA Jetson, Orin Nano, 实时 AI, GPU 加速, Python API]
+tags: [MediaPipe, 姿态估计, Jetson Orin, 人机交互, 边缘计算]
+---
+
 # Pose Estimation
 
 ---

@@ -1,3 +1,8 @@
+---
+description: 本指南详细介绍如何在 NVIDIA Jetson Orin 系列设备上安装并配置 Docker 与 NVIDIA Container Runtime。涵盖 GPU 加速配置、非 root 权限设置及运行时测试。
+keywords: [Docker, NVIDIA Jetson, Orin Nano, Container Runtime, GPU 加速, 容器化部署, 环境配置, NVIDIA Container Toolkit]
+tags: [Docker, Jetson Orin, 容器技术, 环境搭建, 边缘计算]
+---
 
 
 # Docker

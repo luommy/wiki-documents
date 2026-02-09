@@ -1,3 +1,9 @@
+---
+description: 本文详细介绍如何在 NVIDIA Jetson Orin 平台部署 Nx Meta VMS 视频管理系统。涵盖服务端与客户端安装、RTSP 推流配置、AI 插件启用及 Teachable Machine 模型集成流程。
+keywords: [Nx Meta, VMS, 视频管理系统, NVIDIA Jetson, Orin Nano, AI 插件, RTSP 推流, Teachable Machine, 边缘 AI]
+tags: [Nx Meta, 视频管理, Jetson Orin, 边缘计算, AI 插件]
+---
+
 # Nx Meta Platfrom
 
 ---

@@ -1,3 +1,9 @@
+---
+description: 本示例展示如何在 NE101 上实现基于深度学习的人脸检测功能，使用 ESP-DL 库开发，提供预编译固件和源码两种方式，适用于 AIoT 应用场景。
+keywords: [NE101, 人脸检测, ESP-DL, 深度学习, AI 应用, ESP32-S3, 机器视觉, 物联网]
+tags: [NE101 应用, 人脸识别, AI 示例, ESP-DL]
+---
+
 # Human Face Detect
 
 ## 概述

@@ -1,3 +1,9 @@
+---
+description: 本指南介绍如何使用 Ollama（轻量推理引擎）在 NVIDIA Jetson Orin 设备上本地部署 DeepSeek-R1 大语言模型，实现完全离线、低延迟的 AI 交互。
+keywords: [Ollama, DeepSeek-R1, NVIDIA Jetson, Orin Nano, 大语言模型, LLM 部署, 边缘 AI, Open WebUI]
+tags: [DeepSeek-R1, Ollama, Jetson Orin, 大语言模型, 边缘计算]
+---
+
 # Chatbot
 
 ---

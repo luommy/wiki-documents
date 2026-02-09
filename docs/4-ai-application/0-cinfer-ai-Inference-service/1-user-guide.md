@@ -1,4 +1,10 @@
 
+---
+description: 学习如何使用 Cinfer 进行 AI 模型管理、Token 授权及标准 API 请求。本文提供完整的软件操作指南，涵盖 Dashboard 监控、模型发布及访问控制。
+keywords: [Cinfer 使用指南, AI 推理服务, 模型管理, Token 授权, OpenAPI, 流程控制, 软件操作, 权限管理, 接口调用]
+tags: [Cinfer, 用户指南, 模型管理, 软件操作, 教程]
+---
+
 # User Guide
 
 ## 软件安装

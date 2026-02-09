@@ -1,5 +1,8 @@
 ---
 title: Development Environment Setup
+description: 本文档详细介绍了NE301项目的开发环境设置，包括通过Docker进行快速配置（推荐）和手动安装所需工具链的两种方法。涵盖了Git仓库克隆、Docker镜像构建与运行、以及ARM GCC、Python、Node.js、pnpm、STM32CubeProgrammer、STM32_SigningTool_CLI和ST Edge AI等核心开发工具的安装与验证。
+keywords: [NE301, 开发环境, 设置, Docker, 手动安装, ARM GCC, STM32CubeProgrammer, ST Edge AI, 软件开发, 嵌入式]
+tags: [NE301, 开发环境, Docker, 软件指南, 嵌入式开发]
 ---
 
 ## 快速开始

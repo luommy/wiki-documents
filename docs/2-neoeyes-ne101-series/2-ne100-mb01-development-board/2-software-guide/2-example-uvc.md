@@ -1,3 +1,9 @@
+---
+description: UVC USB 视频流示例，展示如何在 NE101 上通过 UVC 协议实现实时视频流传输，支持预编译固件和源码开发两种方式，基于 ESP32-S3 平台。
+keywords: [NE101, UVC, USB 视频, 视频流, ESP32-S3, 摄像头, 实时传输, USB Video Class]
+tags: [软件示例, UVC, 视频流, 摄像头应用]
+---
+
 # usb video streaming
 
 ## 概述

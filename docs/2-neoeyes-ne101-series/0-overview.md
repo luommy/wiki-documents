@@ -1,10 +1,16 @@
+---
+description: NeoEyes NE101 是一款基于事件触发抓拍的超低功耗智能相机，采用模块化设计，具有灵活的扩展能力，适用于AIoT和户外监测场景。
+keywords: [NeoEyes NE101, 事件相机, 低功耗, 智能相机, 模块化设计, AIoT, 户外监测, 工业自动化, 边缘AI, PIR, WiFi Halow]
+tags: [产品概述, 智能相机, IoT, 低功耗, 模块化, 边缘AI]
+---
+
 import Link from "@docusaurus/Link";
 import SupportGrid from '@site/src/components/SupportGrid';
 import AccessoriesTable from '@site/src/components/AccessoriesTable';
 import ApplicationScenarios from '@site/src/components/ApplicationScenarios';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
-# Product Info
+## 产品信息
 
 ## 产品介绍
 ![NE101](/img/Overview/NE101/NE101.png)
@@ -248,7 +254,7 @@ NE101整机产品规格如下：
 </table>
 
 
-# Brackets and Usage
+## 支架和使用
 
 本产品提供多种支架配件，支持多种安装方式，可满足多种场景使用需求。
 

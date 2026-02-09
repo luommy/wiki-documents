@@ -4,12 +4,6 @@ keywords: [NG4500-CB01, Development Guide, Carrier Board, Jetson Orin, Hardware 
 tags: [NG4500-CB01, Development Guide, Carrier Board, Jetson Orin, Edge AI]
 ---
 
----
-description: Comprehensive development guide for the NeoEdge NG4500-CB01 carrier board. Includes hardware specs, interface details, and software resources for Jetson Orin.
-keywords: [NG4500-CB01, Development Guide, Carrier Board, Jetson Orin, Hardware Specs, Software Framework, AI Application, CamThink]
-tags: [NG4500-CB01, Development Guide, Carrier Board, Jetson Orin, Edge AI]
----
-
 import Link from "@docusaurus/Link";
 import useBaseUrl from '@docusaurus/useBaseUrl';
 

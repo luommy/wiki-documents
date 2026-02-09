@@ -1,4 +1,10 @@
 
+---
+description: 本指南介绍如何利用 NeoEdge AI 边缘计算盒（NG4500 系列）部署“打架与跌倒” AI 模型。涵盖系统整体架构、固件安装及 VMS 视频管理系统的配置流程。
+keywords: [AI 边缘计算盒, NG4500, 打架检测, 跌倒检测, VMS 配置, IPC 部署, 行为识别, 边缘 AI 应用, 智能监控, 安全防护]
+tags: [AI应用, 行为分析, 边缘计算, 安全监控, NG4500]
+---
+
 # Fighting And Iterative Model Deployment
 
 ## 基本介绍

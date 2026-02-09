@@ -1,3 +1,9 @@
+---
+description: NE100-MB01 开发板硬件连接指南，详细介绍主板接口定义、GPIO 引脚配置、外设电源控制、PIR 传感器连接、16Pin 扩展接口及通信模块引脚定义。
+keywords: [NE100-MB01, 硬件连接, GPIO, 引脚定义, 接口说明, PIR 传感器, 扩展接口, UART, I2C, SPI]
+tags: [硬件指南, NE100-MB01, 接口定义, GPIO 配置, 传感器连接]
+---
+
 # Hardware Connection
 ## **Main Board Interfaces Overview**
 

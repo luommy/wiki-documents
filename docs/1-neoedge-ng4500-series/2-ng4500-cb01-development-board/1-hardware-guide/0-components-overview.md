@@ -1,3 +1,9 @@
+---
+description: 了解 NeoEdge NG4500 系列硬件组件概览，包含 NVIDIA Jetson Orin 模组对比、载板主要特性（双网口、USB 3.2、M.2 扩展）及支持的摄像头与扩展模块。
+keywords: [NG4500, 硬件组件, Jetson Orin, 载板特性, 接口说明, 扩展模块, 摄像头模组, 边缘计算]
+tags: [硬件指南, 组件概览, NG4500 系列, 核心模组, 扩展连接]
+---
+
 # Components Overview
 ## **Jetson Modules Brief**
 本产品支持的核心模组包括Orin Nano/NX, 及对应的Super版本。Jetson Orin 系列模组因配置不同，性能存在差异。

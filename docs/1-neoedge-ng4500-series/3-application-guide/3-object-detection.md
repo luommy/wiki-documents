@@ -1,3 +1,9 @@
+---
+description: 在 NVIDIA Jetson Orin 系列设备（如 Orin Nano / NX）上本地部署 YOLO11 目标检测模型。涵盖 Docker 快速启动、TensorRT 加速推理及 DLA 性能基准测试指南。
+keywords: [YOLO11, 目标检测, NVIDIA Jetson, Orin Nano, TensorRT 加速, DLA, 边缘 AI, 模型部署]
+tags: [YOLO11, 目标检测, Jetson Orin, TensorRT, 边缘计算]
+---
+
 # Object Detection
 
 ---

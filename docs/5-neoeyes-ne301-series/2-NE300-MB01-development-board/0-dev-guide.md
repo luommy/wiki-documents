@@ -1,3 +1,8 @@
+---
+description: NE300-MB01是高性能AI相机开发板，基于STM32U0+STM32N6芯片，具备超低功耗视频图像推理能力。支持多种摄像头、Wi-Fi/Cat-1通信，为智慧农业、安防监控等物联网应用提供快速原型设计。
+keywords: [NE300-MB01, AI相机, 开发板, STM32, 低功耗, 视频推理, 图像推理, 物联网, 摄像头模块, Cat-1]
+tags: [开发板, AI相机, 物联网, 低功耗, 嵌入式]
+---
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import SupportGrid from '@site/src/components/SupportGrid';
 

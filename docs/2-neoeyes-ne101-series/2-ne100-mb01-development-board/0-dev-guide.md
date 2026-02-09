@@ -1,7 +1,13 @@
+---
+description: NeoEyes NE100-MB01 开发板的详细指南，涵盖基于ESP32-S3的超低功耗设计、模块化特性、多样化通信选项、接口资源及应用场景，支持事件触发图像采集。
+keywords: [NE100-MB01, 开发板, ESP32-S3, 低功耗, 事件相机, 模块化, 物联网, AIoT, 硬件开发, 开发指南]
+tags: [开发指南, NE100-MB01, ESP32-S3, 低功耗, 硬件开发, 物联网]
+---
+
 import Link from "@docusaurus/Link";
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
-# Dev Guide
+## 开发指南
 ## 开发板概述
 
 NE100-CM01 是为 NeoEyes NE101 系列事件相机设计的高性能开发板。该开发板基于 ESP32-S3 模组，具有超低功耗设计，支持多种触发方式的事件图像采集。此主板能够快速实现物联网相机应用的原型设计和定制化，非常适合智慧农业、环境监测、安防监控和野生动物观察等应用场景。

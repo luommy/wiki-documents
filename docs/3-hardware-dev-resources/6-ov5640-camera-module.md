@@ -1,3 +1,9 @@
+---
+description: 本文档详细介绍了OV5640摄像头模块的技术规格与使用指南，该模块采用500万像素CMOS传感器，支持60°/120°视场角和自动对焦功能，适用于嵌入式视觉开发。内容涵盖产品特性、引脚定义及安装配置说明。
+keywords: [OV5640, 摄像头模块, 500万像素, DVP接口, 嵌入式视觉, 自动对焦, CMOS传感器, 硬件开发, 图像采集, 广角镜头]
+tags: [摄像头, OV5640, 视觉模块, 硬件资源, 图像传感器]
+---
+
 import AccessoriesTable from '@site/src/components/AccessoriesTable';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 

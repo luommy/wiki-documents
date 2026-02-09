@@ -1,3 +1,9 @@
+---
+description: NE100-MB01 开发板组件概览，详细介绍主板、相机模组、Cat-1 模块、WiFi Halow 模块等硬件规格与技术参数，支持多种通信方式和镜头选配。
+keywords: [NE100-MB01, 组件概览, 硬件规格, OV5640, Cat-1, WiFi Halow, USB 相机, 模块化设计, ESP32-S3]
+tags: [硬件指南, NE100-MB01, 组件说明, 相机模组, 通信模块]
+---
+
 # Components Overview
 ## **Product Brief**
 

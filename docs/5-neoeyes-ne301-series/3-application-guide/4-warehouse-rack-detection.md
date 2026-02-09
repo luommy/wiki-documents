@@ -1,5 +1,8 @@
 ---
 sidebar_label: Warehouse Rack Detection
+description: 本应用指南详细介绍了如何利用Camthink NeoEye 301 AI相机和Home Assistant平台，实现智能零售和仓储行业中的仓库货架状态监控。内容涵盖NE301的安装与网络配置、MQTT数据转发、通过AI工具栈进行图像收集、模型训练与量化部署，以及在Home Assistant中集成MQTT并配置数据实体，最终实现货架上物品的实时识别与可视化，并提供常见问题解答。
+keywords: [仓库货架监测, NeoEye 301, AI相机, Home Assistant, 智能零售, 仓储管理, MQTT, 模型训练, 量化部署, 边缘AI]
+tags: [NE301, 物联网, AI应用, 智能监控, 仓库管理]
 ---
 
 # 案例 - 仓库货架监测

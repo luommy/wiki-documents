@@ -1,3 +1,9 @@
+---
+description: Cinfer 开发指南，详细解析 ONNX 模型参数配置（Model Parameter）。涵盖输入输出定义、数据类型规范及 YOLO 实例分割、目标识别等模型配置示例。
+keywords: [Cinfer 开发指南, 模型参数, ONNX 配置, YAML 规范, 输入输出定义, YOLOv8, 实例分割, 目标识别]
+tags: [Cinfer, 开发指南, 模型配置, ONNX, API参考]
+---
+
 # Dev Guide
 ## Model Parameter说明
 Model Parameter在Cinfer中是模型管理的重要定义，对于ONNX模型的对外提供的出入参定义有着重要作用，此文件是定义模型如何与外界交互的核心配置文件。它详细描述了模型的配置、所需的输入数据格式以及推理后输出数据的结构。该文件采用 YAML 格式，遵循类似 JSON Schema 的规范，主要包含三个顶级字段：config、inputs 和 outputs，下方是相关信息说明
