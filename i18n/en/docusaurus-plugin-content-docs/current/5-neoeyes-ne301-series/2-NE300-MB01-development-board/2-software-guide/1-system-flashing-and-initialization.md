@@ -1,5 +1,7 @@
 ---
-title: System Flashing and Initialization
+description: Step-by-step guide for NE301 system flashing. Learn to flash apps, web interfaces, and AI models to STM32N6 and STM32U0 using ST-Link and CLI tools.
+keywords: [NE301 Flashing, STM32N6, STM32U0, System Initialization, ST-Link V2, Firmware Download, STM32CubeProgrammer, WakeCore, AI Model Flashing]
+tags: [NE301, System Flashing, Firmware Update, ST-Link, STM32N6]
 ---
 
 ## Hardware Connections
@@ -49,7 +51,7 @@ The mainboard contains two MCUs： **stm32n6** and **stm32u0**
      <img src="/img/ne301/development-board/software-guide/sys-flash/connect.png" alt="Power connection" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
    </p>
 
-### Download Firmwares 
+### Download Firmwares
 
 1. Fetech firmwares from [Github](https://github.com/camthink-ai/ne301/tree/main/bin)
 
@@ -59,13 +61,13 @@ The mainboard contains two MCUs： **stm32n6** and **stm32u0**
   ne301_App_signed_pkg.bin    --> use for stm32n6 App         --> flash addr 0x70100000
   ne301_Web_pkg.bin           --> use for web gui             --> flash addr 0x70400000
   ne301_Model_pkg.bin         --> use for AI model            --> flash addr 0x70900000
-  ne301_WakeCore.bin          --> use for stm32u0 wakecore    --> flash addr 0x08000000 
+  ne301_WakeCore.bin          --> use for stm32u0 wakecore    --> flash addr 0x08000000
 ```
 
 ### Flashing
 **Flash tools supported**
 - STM32CubeProgrammer
-![GUI](https://www.st.com/content/ccc/fragment/product_related/rpn_information/product_circuit_diagram/group3/0c/26/bb/21/a5/eb/4a/c7/stm32cubeprog_image/files/stm32cubeprog_image.jpg/jcr:content/translations/en.stm32cubeprog_image.jpg) 
+![GUI](https://www.st.com/content/ccc/fragment/product_related/rpn_information/product_circuit_diagram/group3/0c/26/bb/21/a5/eb/4a/c7/stm32cubeprog_image/files/stm32cubeprog_image.jpg/jcr:content/translations/en.stm32cubeprog_image.jpg)
 
 or CLI
 ```bash
@@ -78,7 +80,7 @@ STM32_Programmer_CLI -c port=SWD mode=HOTPLUG -el $DKEL -hardRst -w <bin-name>  
 ```bash
 Script/maker.sh flash <bin-name> <flash-addr>
 ```
-- make 
+- make
 
 ```bash
 # Flash all components
@@ -93,4 +95,4 @@ make flash-wakecore
 
 ## Troubleshooting
 
-If you cannot find the NE301 WiFi AP after successful flashing, it might be due to missing WiFi firmware. Please refer to [WiFi Firmware Flashing Guide](3-wifi-firmware-flashing.md) for details. 
+If you cannot find the NE301 WiFi AP after successful flashing, it might be due to missing WiFi firmware. Please refer to [WiFi Firmware Flashing Guide](3-wifi-firmware-flashing.md) for details.

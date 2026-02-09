@@ -1,3 +1,9 @@
+---
+description: Meet NeoEyes NE301, the world's first STM32N6 powered AI camera. Features 0.6 TOPS NPU, modular design, and ultra-low power consumption.
+keywords: [NeoEyes NE301, STM32N6, Neural-ART NPU, Low Power AI Camera, IoT Vision, Modular Design, CamThink]
+tags: [NeoEyes NE301, STM32N6 NPU, Ultra-Low Power AI, IoT Vision Camera, Product Overview]
+---
+
 import ApplicationScenarios from '@site/src/components/ApplicationScenarios';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import SupportGrid from '@site/src/components/SupportGrid';

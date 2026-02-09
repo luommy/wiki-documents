@@ -1,3 +1,9 @@
+---
+description: Integrate Cinfer AI inference service with BeaverIoT platform. End-to-end guide for connecting NeoEyes cameras to IoT dashboards.
+keywords: [BeaverIoT, Cinfer, AI Integration, IoT Dashboard, NeoEyes NE101, MQTT Integration, Device Binding]
+tags: [Cinfer, BeaverIoT, IoT Platform, AI Integration, Device Binding]
+---
+
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
 # Beaveriot Integration

@@ -1,5 +1,7 @@
 ---
-sidebar_label: Urban Waste Bin Overflow Monitoring
+description: Learn how to monitor urban waste bin overflow using NeoEyes NE301 and Home Assistant. Transform city sanitation from scheduled cleaning to demand-driven efficiency.
+keywords: [Waste Bin Monitoring, Overflow Detection, NeoEyes NE301, Smart City, Home Assistant, Edge AI, Urban Sanitation, Demand-driven Cleaning, STM32N6]
+tags: [NE301, Smart City, Waste Management, Home Assistant, Case Study]
 ---
 
 # Case Study - Urban Waste Bin Overflow Monitoring

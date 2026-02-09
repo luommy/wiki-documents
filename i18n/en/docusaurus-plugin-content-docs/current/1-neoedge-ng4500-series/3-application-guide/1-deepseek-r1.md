@@ -1,3 +1,9 @@
+---
+description: Step-by-step guide to deploying DeepSeek-R1 Large Language Model on NeoEdge NG4500 using Ollama. Enable offline AI inference with high privacy and low latency on Jetson Orin.
+keywords: [DeepSeek-R1, NeoEdge NG4500, Ollama, LLM Deployment, Edge AI, Offline Inference, Jetson Orin, AI Chatbot, Generative AI]
+tags: [DeepSeek-R1, LLM, Edge AI, Ollama, Jetson Orin]
+---
+
 # DeepSeek-R1 Local Deployment
 
 ---

@@ -1,5 +1,7 @@
 ---
-sidebar_label: Refrigerator Inventory Monitoring
+description: Comprehensive guide to refrigerator inventory monitoring using NeoEyes NE301 and Home Assistant. Learn data collection, model training, and MQTT integration for smart retail.
+keywords: [Refrigerator Monitoring, Smart Retail, NeoEyes NE301, Home Assistant, MQTT Integration, AI Inventory, Inventory Tracking, STM32N6 AI, Edge AI Solution]
+tags: [NE301, Smart Retail, Inventory Monitoring, Home Assistant, Case Study]
 ---
 
 # Refrigerator Inventory Monitoring Application Guide
@@ -270,7 +272,7 @@ A: The server in this guide is for internal use only. You need to install your o
 A: We recommend connecting a tablet/phone to NE301's WiFi and capturing via the button here.
 
 <img src="/img/ne301/application-guide/monitoring/stack44.png" alt="stack44" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
- 
+
 **3. Q: How to set value templates in Home Assistant?**
 
 A: You can visit the Home Assistant website for detailed information on how to use it. Here is an example of data reported by NE301:

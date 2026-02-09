@@ -1,4 +1,8 @@
-
+---
+description: Comprehensive guide to installing Docker CE and NVIDIA Container Toolkit on NeoEdge NG4500. Enable GPU-accelerated containers for AI and robotics applications.
+keywords: [NeoEdge NG4500, Docker Installation, NVIDIA Container Toolkit, GPU Acceleration, Jetson Orin, Container Runtime, AI Infrastructure, NGC Registry, Docker CE]
+tags: [NeoEdge NG4500, Docker, NVIDIA Container, GPU Acceleration, Software Framework]
+---
 
 # Docker
 
@@ -221,5 +225,3 @@ Expected Output：
 - [Jetson Docker Runtime Official Docs](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)
 - [NVIDIA Developer Forum](https://forums.developer.nvidia.com/)
 - [JetPack SDK  Download](https://developer.nvidia.com/embedded/jetpack)
-
-

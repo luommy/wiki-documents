@@ -1,3 +1,9 @@
+---
+description: Deploy "Fighting & Falling" AI models using NeoEdge AI BOX, VMS, and IPC. Learn system architecture, firmware installation, and VMS event configuration for edge safety.
+keywords: [Fighting Detection, Fall Detection, AI BOX, VMS Configuration, IPC Deployment, Edge AI Safety, NG4500 AI, Behavioral Analytics]
+tags: [AI Application, Safety Monitoring, Edge AI, Behavioral Analytics, NG4500]
+---
+
 # Fighting And Iterative Model Deployment
 
 ## Overview

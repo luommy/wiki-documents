@@ -1,3 +1,8 @@
+---
+description: Guide to developing for NeoEyes NE101 using the Arduino IDE. Includes pin definitions, hardware configuration, and CameraWebServer example.
+keywords: [NeoEyes NE101, Arduino IDE, ESP32-S3, Arduino Development, CameraWebServer, PSRAM Config, Dev Guide]
+tags: [NeoEyes NE101, Arduino IDE, ESP32-S3 Arduino, Rapid Prototyping, Dev Guide]
+---
 
 # NE101 Arduino Development Guide
 

@@ -1,3 +1,9 @@
+---
+description: Universal Type-C/Type-A to UART (TTL) serial communication module based on CP2102. Compatible with NE101 and NE301 for serial data debugging and secondary development.
+keywords: [Serial Communication Module, CP2102, UART, TTL, Type-C to UART, NE101 Debugging, NE301 Debugging, Serial Debugger]
+tags: [Hardware, Serial Communication, Debugging Tools, CP2102, UART]
+---
+
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
 # Serial Communication Module

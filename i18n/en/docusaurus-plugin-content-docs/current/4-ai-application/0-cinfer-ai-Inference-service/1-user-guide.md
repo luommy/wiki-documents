@@ -1,3 +1,8 @@
+---
+description: Learn how to use Cinfer for AI model management, token authorization, and standardized API requests. Complete guide for software operations.
+keywords: [Cinfer Guide, AI Inference, Model Management, Token Authorization, Software Operation, User Guide]
+tags: [Cinfer, AI Inference, Model Management, User Guide, Software Operation]
+---
 
 # User Guide
 

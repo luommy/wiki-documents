@@ -1,3 +1,9 @@
+---
+description: Step-by-step installation guide for the NeoEyes NE101 Developer Kit. Includes component overview, parts checklist, and detailed assembly instructions for each part.
+keywords: [NE101 Installation, Developer Kit, Assembly Guide, Hardware Parts, Camera Assembly, Housing Setup, Screw Package]
+tags: [NeoEyes NE101, Hardware Installation, Assembly Guide, Developer Kit, Components]
+---
+
 # Dev Kit Installation Guide
 
 ## Component Overview

@@ -1,3 +1,9 @@
+---
+description: Professional 5G NR module specs for NeoEdge series. Supports Sub-6GHz, SA/NSA networks, and integrated dual-band GNSS positioning.
+keywords: [5G Module, Sub-6GHz, NeoEdge, High-Speed Wireless, GNSS, M.2 Key B, Hardware Specification]
+tags: [NeoEdge NG4500, 5G NR Module, High-Speed Wireless, GNSS Support, Hardware Specification]
+---
+
 import AccessoriesTable from '@site/src/components/AccessoriesTable';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 

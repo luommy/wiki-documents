@@ -1,5 +1,7 @@
 ---
-title: Development Environment Setup
+description: Setup guide for NE301 development environment. Learn how to configure Docker (recommended) or manually install ARM GCC, STM32 tools, and AI toolchains.
+keywords: [NE301 Development, Environment Setup, Docker Container, ARM GCC, STM32CubeProgrammer, ST Edge AI, GitHub Repository, Toolchain Installation]
+tags: [NE301, Development Environment, Docker, STM32N6, Toolchain]
 ---
 
 ##  Quick Start
@@ -27,7 +29,7 @@ docker run -it --rm --privileged \
   -v $(pwd):/workspace \
   -v /dev/bus/usb:/dev/bus/usb \
   camthink/ne301-dev:latest
-  
+
 # 3. Inside container
 make                        # Build all
 ```
@@ -36,7 +38,7 @@ make                        # Build all
 
 **Prerequisites:**
 - ARM GCC 13.3+
-- GNU Make 3.81+ 
+- GNU Make 3.81+
 - Python 3.8+
 - Node.js 20+
 - pnpm 9+

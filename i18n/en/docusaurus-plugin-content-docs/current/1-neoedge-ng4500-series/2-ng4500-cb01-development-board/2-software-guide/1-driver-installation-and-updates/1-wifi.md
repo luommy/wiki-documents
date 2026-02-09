@@ -1,3 +1,9 @@
+---
+description: Guide for installing and configuring the Realtek RTL8821CE WiFi driver on NeoEdge NG4500-CB01. Includes direct system installation and source compilation methods.
+keywords: [NeoEdge NG4500, RTL8821CE, WiFi Driver, Realtek, Wireless Configuration, Linux Driver, Source Compilation, Jetson Orin]
+tags: [NG4500 WiFi, RTL8821CE, Driver Installation, Wireless Setup, Network Guide]
+---
+
 # WIFI
 
 This document provides installation and usage instructions for the Wi-Fi driver on the NeoEdge NG4500-CB01 platform, using the Realtek RTL8821CE module as a reference example.

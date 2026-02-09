@@ -1,3 +1,9 @@
+---
+description: FGH100M Wi-Fi HaLow module for NeoEyes NE101. Compliant with IEEE 802.11ah for ultra-long distance and low-power IoT connectivity.
+keywords: [Wi-Fi HaLow, IEEE 802.11ah, NeoEyes NE101, Sub-1GHz, Long Range IoT, Low Power Wireless]
+tags: [NeoEyes NE101, Wi-Fi HaLow, 802.11ah, Sub-1GHz, Long Range IoT]
+---
+
 import AccessoriesTable from '@site/src/components/AccessoriesTable';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 

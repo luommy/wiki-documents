@@ -1,3 +1,9 @@
+---
+description: Detailed hardware connection guide for NeoEdge NG4500. Covers PCBA interfaces (Top/Bottom), component assembly, and pinout details for M.2, CSI, and expansion IOs.
+keywords: [NeoEdge NG4500, Hardware Connection, PCBA Interfaces, SO-DIMM, M.2 Key M, CSI Interface, Expansion IO, Jetson Orin, Assembly Guide]
+tags: [NG4500 Hardware, Connection Guide, PCBA Interfaces, Pinout Details, Assembly]
+---
+
 import AccessoriesTable from '@site/src/components/AccessoriesTable';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 

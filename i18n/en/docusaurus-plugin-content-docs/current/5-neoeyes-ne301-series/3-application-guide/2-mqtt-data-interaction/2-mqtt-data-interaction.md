@@ -1,3 +1,9 @@
+---
+description: Learn how to configure MQTT/MQTTS on NeoEyes NE301 for real-time data reporting. Includes JSON protocol analysis, MQTTX client setup, and troubleshooting.
+keywords: [MQTT, MQTTS, NeoEyes NE301, Data Reporting, JSON Protocol, MQTTX, IoT Communication, Edge AI Data, Broker Configuration]
+tags: [MQTT Protocol, Data Reporting, NE301, JSON Format, IoT Communication]
+---
+
 # MQTT Data Interaction and Reporting
 
 This document primarily describes how to configure the MQTT/MQTTS function of NeoEyes NE301, use the MQTTX client to receive data reported by the device, and provides a detailed analysis of the reported data protocol format. This will help you better understand the data sent by the device for upper-layer application development.

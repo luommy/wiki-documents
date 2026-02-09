@@ -1,5 +1,8 @@
 ---
 title: Components Overview
+description: Detailed overview of the NE300-MB01 development board components, featuring STM32N657L0H3 MCU, Neural-ART Accelerator, and OS04C10 camera module.
+keywords: [NE300-MB01, STM32N6, Neural-ART, AI Camera Board, OS04C10, Hardware Components, Wi-Fi 6, Edge AI]
+tags: [NE300-MB01, Hardware Components, STM32N6, AI Camera, Overview]
 ---
 
 ## Product Overview

@@ -1,3 +1,9 @@
+---
+description: Frequently asked questions and technical troubleshooting guide for NeoEdge NG4500 AIBOX series. Covers system version checks, boot issues, and HDMI display fixes.
+keywords: [NeoEdge NG4500, FAQ, AIBOX Troubleshooting, Jetson Orin, HDMI Fix, System Version, Remote Desktop, Technical Support]
+tags: [NeoEdge NG4500, FAQ, Troubleshooting, Technical Guide, AIBOX]
+---
+
 # FAQs
 
 ## Overview

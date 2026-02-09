@@ -1,6 +1,7 @@
 ---
-title: Warehouse Rack Detection
-sidebar_label: Warehouse Rack Detection
+description: Learn how to monitor warehouse shelf status using NeoEyes NE301 and Home Assistant. Covers AI model training for chipset detection and MQTT data visualization.
+keywords: [Warehouse Monitoring, Shelf Detection, NeoEyes NE301, Home Assistant, AI Inventory, STM32N6 AI, Edge AI, MQTT Integration, Smart Warehousing]
+tags: [NE301, Smart Warehousing, Shelf Monitoring, Home Assistant, Case Study]
 ---
 
 # Use Case - Warehouse Rack Detection

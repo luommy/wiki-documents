@@ -1,3 +1,9 @@
+---
+description: Detailed pinout and connection guide for NE300-MB01. Learn about power control, RS485 interfaces, camera CSI-2 connections, and 16-pin expansion headers.
+keywords: [NE300-MB01 Connection, Hardware Pinout, STM32N657, CSI-2 Interface, RS485 Control, Expansion Header, Power Tree, SPI, I2C]
+tags: [NE300-MB01, Hardware, Connection Guide, Pinout, STM32N6]
+---
+
 # Hardware Connection
 
 ## Top-Side Interfaces

@@ -1,3 +1,9 @@
+---
+description: Quick start guide for the NeoEyes NE100-MB01 development board. Learn about hardware preparation, device connection, and core function configuration for IoT projects.
+keywords: [NE100-MB01, Quick Start, Hardware Preparation, Device Connection, Image Collection, MQTT, Functional Verification]
+tags: [NeoEyes NE100-MB01, Development Board, Quick Start, IoT Camera, Configuration]
+---
+
 # Quick Start
 
 ## Product Overview

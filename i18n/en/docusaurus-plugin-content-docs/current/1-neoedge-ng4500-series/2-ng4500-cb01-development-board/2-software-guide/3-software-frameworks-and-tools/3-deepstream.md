@@ -1,3 +1,9 @@
+---
+description: Master NVIDIA DeepStream SDK on NeoEdge NG4500 for real-time video analytics. Covers installation, sample pipelines, and custom model integration for AI vision.
+keywords: [DeepStream SDK, NeoEdge NG4500, Video Analytics, TensorRT, GStreamer, Object Detection, Real-time AI, Jetson Orin, Multi-sensor Processing]
+tags: [DeepStream, Video Analytics, Computer Vision, TensorRT, Jetson Orin]
+---
+
 # DeepStream
 
 ---
@@ -8,10 +14,10 @@ This guide provides instructions for installing and running the NVIDIA DeepStrea
 
 ## 1. Overview
 
-- Real-time video analytics SDK provided by NVIDIA  
-- Optimized with TensorRT and CUDA for maximum performance  
-- Supports multi-stream AI inference and object tracking  
-- Input sources include RTSP, USB/CSI cameras, and local video files  
+- Real-time video analytics SDK provided by NVIDIA
+- Optimized with TensorRT and CUDA for maximum performance
+- Supports multi-stream AI inference and object tracking
+- Input sources include RTSP, USB/CSI cameras, and local video files
 - Built-in support for object detection, classification, and tracking
 
 This guide covers：
@@ -38,9 +44,9 @@ This guide covers：
 
 ### Software
 
-- JetPack 6.1 GA or later (L4T ≥ R36.4)  
-- Ubuntu 20.04 / 22.04  
-- CUDA、TensorRT and cuDNN（included with JetPack 中）  
+- JetPack 6.1 GA or later (L4T ≥ R36.4)
+- Ubuntu 20.04 / 22.04
+- CUDA、TensorRT and cuDNN（included with JetPack 中）
 - Docker(optional, for containerized deployment)
 
 ---
@@ -315,6 +321,6 @@ For more DeepStream + TAO Toolkit integration examples, refer to: https://github
 
 ### References
 
-- [DeepStream Official Page](https://developer.nvidia.com/deepstream-sdk)  
-- [NGC Docker Images - DeepStream](https://catalog.ngc.nvidia.com/orgs/nvidia/containers/deepstream)  
+- [DeepStream Official Page](https://developer.nvidia.com/deepstream-sdk)
+- [NGC Docker Images - DeepStream](https://catalog.ngc.nvidia.com/orgs/nvidia/containers/deepstream)
 - [GitHub - dusty-nv/jetson-containers](https://github.com/dusty-nv/jetson-containers)

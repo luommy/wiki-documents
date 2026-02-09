@@ -1,9 +1,9 @@
 ---
-title: AI-Driven QSC Compliance for Chain Restaurants
-description: This use case demonstrates how to manage insect trap box status through edge AI solutions, transforming "scheduled cleaning" into "demand-driven" operations to improve QSC management in fast-food chains.
-tags: [Camthink, NeoEye 301, AI, QSC, Smart Monitoring, Home Assistant]
 sidebar_label: AI-Driven QSC For Chain Restaurant
 sidebar_position: 6
+description: Use NeoEyes NE301 and edge AI to automate QSC compliance in chain restaurants. Smart insect trap monitoring with Home Assistant.
+keywords: [QSC Compliance, NeoEyes NE301, Insect Trap Monitoring, Smart Restaurant, Home Assistant Integration, STM32N6 AI]
+tags: [NeoEyes NE301, QSC Compliance, Insect Trap Monitoring, Home Assistant, Application Guide]
 ---
 
 # Case Study - **AI-Driven QSC For Chain Restaurant**

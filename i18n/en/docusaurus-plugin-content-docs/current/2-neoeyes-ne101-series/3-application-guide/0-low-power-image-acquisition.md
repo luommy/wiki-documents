@@ -1,3 +1,9 @@
+---
+description: Sample implementation of a low-power image capture system on NeoEyes NE101. Covers program logic, wake-up mechanisms, and MQTT data transmission for IoT vision.
+keywords: [Low-Power Image Acquisition, NeoEyes NE101, ESP32-S3, MQTT, PIR Sensor, Image Capture, IoT Vision, Wake-up Mechanism]
+tags: [NeoEyes NE101, Image Acquisition, Low Power, MQTT, IoT Vision]
+---
+
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
 # Low-Power Image Acquisition

@@ -1,3 +1,8 @@
+---
+description: Technical specifications for LTE Cat.1 modules based on Quectel EG912U-GL and EG915Q-NA. Includes network coverage, data rates, and J1 interface pin definitions.
+keywords: [LTE Cat.1 Module, Quectel EG912U-GL, EG915Q-NA, IoT Connectivity, M2M Communication, UART Interface, Network Specifications]
+tags: [Hardware, Cat.1 Module, Connectivity, Quectel, LTE]
+---
 
 import AccessoriesTable from '@site/src/components/AccessoriesTable';
 import useBaseUrl from '@docusaurus/useBaseUrl';

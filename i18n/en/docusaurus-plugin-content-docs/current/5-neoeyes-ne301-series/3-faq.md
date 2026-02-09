@@ -1,3 +1,9 @@
+---
+description: Frequently asked questions about NeoEyes NE301. Explore hardware features, firmware updates, and the technical differences between NE301 and NE101 AI cameras.
+keywords: [NE301 FAQ, STM32N6 AI Camera, NE301 vs NE101, Hardware Features, Firmware Support, Troubleshooting, Edge AI Support, CamThink FAQ]
+tags: [NE301, FAQ, Troubleshooting, Hardware Specs, Support]
+---
+
 # FAQ
 
 Coming soon!!

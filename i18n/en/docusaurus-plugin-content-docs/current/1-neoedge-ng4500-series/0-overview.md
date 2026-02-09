@@ -1,3 +1,9 @@
+---
+description: Discover NeoEdge NG4500, a high-performance edge AI gateway powered by NVIDIA Jetson Orin. Optimized for LLM, VLM, and industrial AIoT applications with JetPack 6.0.
+keywords: [NeoEdge NG4500, Jetson Orin, Edge AI Gateway, 107 TOPS, LLM Deployment, Industrial AI, CamThink, JetPack 6.0, Vision Language Models]
+tags: [NeoEdge NG4500, Jetson Orin, Edge AI, Industrial AIoT, Product Overview]
+---
+
 import Link from "@docusaurus/Link";
 import SupportGrid from '@site/src/components/SupportGrid';
 import AccessoriesTable from '@site/src/components/AccessoriesTable';

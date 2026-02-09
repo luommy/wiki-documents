@@ -1,3 +1,8 @@
+---
+description: Learn how to install and run Ollama on NeoEdge NG4500 for local LLM inference with CUDA acceleration. Supports DeepSeek-R1 and other mainstream models.
+keywords: [Ollama, NeoEdge NG4500, Local LLM, CUDA Acceleration, Jetson Orin, DeepSeek-R1, AI Inference, Model Management, Chatbot Deployment]
+tags: [Ollama, Local LLM, AI Inference, Jetson Orin, DeepSeek-R1]
+---
 
 
 # Ollama
@@ -77,12 +82,12 @@ sudo docker run --runtime nvidia --rm --network=host \
 ### Common Commands
 
 ```bash
-ollama serve         # Start the Ollama background service  
-ollama run           # Run a model  
-ollama pull          # Download a model from the registry  
-ollama list          # List installed models  
-ollama show          # Display model information  
-ollama rm            # Remove a model  
+ollama serve         # Start the Ollama background service
+ollama run           # Run a model
+ollama pull          # Download a model from the registry
+ollama list          # List installed models
+ollama show          # Display model information
+ollama rm            # Remove a model
 ollama help          # Show help menu
 ```
 
@@ -101,25 +106,25 @@ ollama serve &
 
 ---
 
-## 5.  (Optional) Enable Remote Access
+## 5. (Optional) Enable Remote Access
 
 To allow external devices to access the Ollama service:
 
 1.Edit the systemd service file：
-   
+
    ```bash
    sudo nano /etc/systemd/system/ollama.service
    ```
 
 2. Add the following lines under the `[Service]` section:
-   
+
    ```ini
    Environment="OLLAMA_HOST=0.0.0.0"
    Environment="OLLAMA_ORIGINS=*"
    ```
 
 3. Reload and restart the service:
-   
+
    ```bash
    sudo systemctl daemon-reload
    sudo systemctl restart ollama
@@ -127,7 +132,7 @@ To allow external devices to access the Ollama service:
 
 ---
 
-## 6. Running 
+## 6. Running
 
 Use the  `ollama run` command to start model inference:
 
@@ -197,7 +202,7 @@ sudo groupdel ollama
 
 ---
 
-## 10. Appendix 
+## 10. Appendix
 
 ### Path References
 
