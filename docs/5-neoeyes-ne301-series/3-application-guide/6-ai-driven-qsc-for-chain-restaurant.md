@@ -12,7 +12,7 @@ sidebar_position: 6
 
 ## 1. 前言
 
-**[CamThink](https://www.camthink.ai/?utm_source=wiki&utm_medium=social&utm_campaign=use_case&utm_content=trapbox-monitor-20260203)** 是 **[Milesight](www.milesight.com)** 推出的全新开发者品牌，旨在让边缘 AI 对每个人都变得更简单。我们为社区建设者和企业工程师构建开放、开发者友好的边缘 AI 硬件，并帮助他们从早期原型过渡到可靠的实际部署——加速您在边缘 AI 领域的战略实施。
+**[CamThink](https://www.camthink.ai/?utm_source=wiki&utm_medium=social&utm_campaign=use_case&utm_content=trapbox-monitor-20260203)** 是 **[Milesight](https://www.milesight.com)** 推出的全新开发者品牌，旨在让边缘 AI 对每个人都变得更简单。我们为社区建设者和企业工程师构建开放、开发者友好的边缘 AI 硬件，并帮助他们从早期原型过渡到可靠的实际部署——加速您在边缘 AI 领域的战略实施。
 
 **Camthink** **[NeoEye 301](https://www.camthink.ai/product/neoeyes-301/?utm_source=wiki&utm_medium=social&utm_campaign=use_case&utm_content=trapbox-monitor-20260203)** 搭载了带有 Neural-ART NPU 的 STM32N6 (Cortex-M55) 处理器，能够以极低功耗提供实时 AI 推理和专业级图像处理。
 
