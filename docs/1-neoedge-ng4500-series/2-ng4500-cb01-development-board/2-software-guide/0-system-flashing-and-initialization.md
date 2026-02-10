@@ -1,3 +1,8 @@
+---
+description: 本指南详细介绍了 NeoEdge NG4500 系列产品的系统镜像烧录流程，涵盖 Ubuntu 电脑环境配置、硬件进入 Recovery 模式的方法、镜像包下载链接及命令行烧录步骤。
+keywords: [NG4500, 系统烧录, 镜像下载, Jetson Orin, Recovery 模式, SDK Manager, 固件更新, 边缘计算]
+tags: [系统烧录, 固件更新, 软件指南, NG4500 系列, 部署教程]
+---
 # System  Flashing
 
 本章旨在介绍 NG4500 系列产品的烧录方法，重点提供烧录镜像包的具体操作步骤。本文以 NG4511 设备为例，详细说明其烧录流程。

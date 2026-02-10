@@ -1,3 +1,8 @@
+---
+description: High-performance USB camera module with SC200AI sensor for NeoEyes NE101. Features 1080P HD video, adjustable focus, and UVC support.
+keywords: [USB Camera Module, SC200AI, NeoEyes NE101, 1080P HD, UVC Protocol, Adjustable Focus, Hardware Spec]
+tags: [NeoEyes NE101, SC200AI USB Camera, 1080P HD Vision, Adjustable Focus, Hardware Specification]
+---
 
 import AccessoriesTable from '@site/src/components/AccessoriesTable';
 import useBaseUrl from '@docusaurus/useBaseUrl';

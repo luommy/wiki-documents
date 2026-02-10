@@ -1,3 +1,9 @@
+---
+description: 本指南介绍 NeoEdge NG4500 系列设备常用接口（GPIO、UART、SPI、CAN、I2C）的驱动配置与控制方法，包含硬件资源分配、软件操作指令及测试代码示例。
+keywords: [NG4500, 接口配置, GPIO, UART, SPI, CAN, I2C, 驱动开发, Jetson Orin, 硬件控制]
+tags: [接口配置, 驱动开发, 硬件指南, NG4500 系列, 嵌入式开发]
+---
+
 # Interface
 
 本节介绍 NG4500系列设备常用接口（GPIO/I2C/SPI/CAN/USB/UART）的驱动与控制方法，重点说明硬件资源分配、典型应用场景及基础操作指令。

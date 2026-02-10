@@ -1,3 +1,9 @@
+---
+description: NeoEyes NE101 is an event-triggered AI camera based on ESP32-S3. Ideal for low-frequency capture and 3-year battery life applications.
+keywords: [NeoEyes NE101, ESP32-S3, Battery Powered Camera, Low Power IoT, Event-Triggered Vision, PIR Sensor, CamThink]
+tags: [NeoEyes NE101, ESP32-S3 AI, Battery Powered Camera, Event Triggered Vision, Product Overview]
+---
+
 import Link from "@docusaurus/Link";
 import SupportGrid from '@site/src/components/SupportGrid';
 import AccessoriesTable from '@site/src/components/AccessoriesTable';

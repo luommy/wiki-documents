@@ -1,3 +1,9 @@
+---
+description: jtop 是 NVIDIA Jetson 设备的专用命令行监控工具。本指南介绍如何在 Jetson Orin 上安装 jtop（jetson-stats），实时监控 CPU、GPU、功耗及温度等状态。
+keywords: [jtop, jetson-stats, NVIDIA Jetson, Orin Nano, 系统监控, 性能分析, 命令行工具, GPU 监控]
+tags: [jtop, Jetson Orin, 系统监控, 性能优化, 边缘计算]
+---
+
 # jtop
 ---
 ## 1. 概览

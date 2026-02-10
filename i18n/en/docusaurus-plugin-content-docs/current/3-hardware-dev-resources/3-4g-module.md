@@ -1,3 +1,9 @@
+---
+description: Technical details of Quectel EM05-G 4G LTE module for NeoEdge series. Global band coverage, Cat 4 speed, and industrial reliability.
+keywords: [Quectel EM05-G, 4G LTE Module, NeoEdge, IoT Connectivity, M.2 Key B, Hardware Specification]
+tags: [NeoEdge NG4500, Quectel EM05-G, 4G LTE Module, IoT Connectivity, Hardware Specification]
+---
+
 import AccessoriesTable from '@site/src/components/AccessoriesTable';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 

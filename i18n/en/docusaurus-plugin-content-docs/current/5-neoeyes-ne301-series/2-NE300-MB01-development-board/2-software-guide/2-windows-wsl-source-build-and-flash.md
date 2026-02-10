@@ -1,6 +1,10 @@
 ---
-title: Windows WSL Source Build And Flash
+description: Guide for building and flashing NE301 from source using Windows + WSL2 and Docker. Covers usbipd-win setup for ST-LINK passthrough and troubleshooting.
+keywords: [NE301, WSL2, Windows, Docker Desktop, usbipd-win, ST-LINK, Source Build, Firmware Flashing, STM32N6, Environment Setup]
+tags: [NE301, WSL2, Windows, Docker, Firmware]
 ---
+
+# Windows WSL Source Build And Flash
 
 > Audience: users who build and flash NE301 from source in a Windows + WSL setup (via Docker) after following [Development Environment Setup](./development-environment-setup) and [System Flashing And Initialization](./system-flashing-and-initialization). Use this as a reference and adjust based on your hardware situation.
 
@@ -85,9 +89,17 @@ If ST-LINK is not listed, re-check the usbipd attach status.
 3. **Flash components individually**:
    ```bash
    make flash-fsbl
+   ```
+   ```bash
    make flash-app
+   ```
+   ```bash
    make flash-web
+   ```
+   ```bash
    make flash-model
+   ```
+   ```bash
    make flash-wakecore
    ```
 
@@ -161,7 +173,7 @@ If the container cannot see any ST-LINK/serial devices, USB is not passed throug
 
 ## 6. Tips For Getting The Device MAC
 
-After flashing, reboot the device (Reset or power cycle) and connect to the WiFi AP named `NE301{MAC last 6 letters}`. If only one NE301 is nearby, just connect; for multiple devices, confirm the MAC:
+After flashing, reboot the device (Reset or power cycle) and connect to the WiFi AP named `NE301{MAC last 6 letters letters}`. If only one NE301 is nearby, just connect; for multiple devices, confirm the MAC:
 
 - After it joins the LAN, find the MAC from your router/switch DHCP lease or ARP list. If you know the device IP, in Windows run:
   ```powershell

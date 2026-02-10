@@ -1,3 +1,9 @@
+---
+description: Monitor NeoEdge NG4500 system resources in real-time with jtop. Covers installation, interactive interface, Python API, and Docker usage for Jetson Orin.
+keywords: [jtop, NeoEdge NG4500, System Monitoring, Jetson Orin, GPU Usage, CPU Metrics, jetson-stats, Power Consumption, Resource Tracker]
+tags: [jtop, System Monitoring, Jetson Orin, Resource Management, CLI Tools]
+---
+
 # jtop
 ---
 ## 1. Overview

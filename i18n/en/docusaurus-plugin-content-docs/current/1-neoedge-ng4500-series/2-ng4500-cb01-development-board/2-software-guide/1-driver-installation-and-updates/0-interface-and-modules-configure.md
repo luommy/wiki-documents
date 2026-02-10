@@ -1,3 +1,9 @@
+---
+description: Guide to configuring hardware interfaces on NeoEdge NG4500. Covers GPIO, UART (RS232/RS485), SPI, CAN, RTC, and camera module initialization.
+keywords: [NeoEdge NG4500, Hardware Interfaces, GPIO, UART, RS485, RS232, SPI, CAN Bus, RTC, Camera Configuration]
+tags: [NG4500 Interfaces, Hardware Configuration, Industrial Communication, Driver Setup, Sensor Integration]
+---
+
 # Interface
 
 This guide introduces the driver and control methods for common interfaces of the NG4500 series devices, including GPIO, I2C, SPI, CAN, USB, and UART. It focuses on hardware resource allocation, typical application scenarios, and basic operation commands.

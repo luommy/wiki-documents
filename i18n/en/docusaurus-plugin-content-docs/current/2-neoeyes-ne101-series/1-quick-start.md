@@ -1,3 +1,9 @@
+---
+description: Get started quickly with the NeoEyes NE101 event-triggered camera. Learn about product preparation, power-on, Wi-Fi configuration, and image capture settings.
+keywords: [NeoEyes NE101, Quick Start, Camera Configuration, Wi-Fi AP, Image Capture, MQTT, Setup Guide]
+tags: [NeoEyes NE101, Getting Started, Configuration, User Guide, Quick Start]
+---
+
 import AccessoriesTable from '@site/src/components/AccessoriesTable';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 

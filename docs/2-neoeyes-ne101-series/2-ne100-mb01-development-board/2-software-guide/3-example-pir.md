@@ -1,3 +1,9 @@
+---
+description: 本方案展示了如何利用 PIR 传感器在 NE100-MB01 开发板上实现智能运动检测与自动抓拍功能。涵盖硬件需求、灵敏度调节及基于 ESP-IDF 的源码开发验证流程，适用于低功耗安防监控场景。
+keywords: [PIR 传感器, 运动检测, 自动抓拍, NE100-MB01, ESP32-S3, 低功耗安防, 智能家居, 源码开发, 嵌入式开发]
+tags: [PIR 传感器, 运动检测, 自动抓拍, NE100 系列, 示例代码]
+---
+
 # Capture moving objects
 
 ## 概述
@@ -121,6 +127,6 @@ git clone https://github.com/camthink-ai/lowpower_camera.git
 - 根据场景调整检测角度
 
 > **调试技巧**：
-> 
+>
 > 1. 使用逻辑分析仪监测GPIO信号
 > 2. 通过串口日志分析误触发原因

@@ -1,3 +1,9 @@
+---
+description: Deploy and configure Nx Meta VMS on NVIDIA Jetson Orin. Learn server/client setup, RTSP streaming, AI detection events, and Teachable Machine integration for edge AI.
+keywords: [Nx Meta Platform, VMS, Jetson Orin, Edge AI, AIBOX, AI Manager Plugin, RTSP Streaming, Teachable Machine, Video Management System]
+tags: [Nx Meta, Jetson Orin, Edge AI, VMS, Video Analytics]
+---
+
 # Nx Meta Platfrom
 
 ---

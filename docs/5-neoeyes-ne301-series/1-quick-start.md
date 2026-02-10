@@ -1,4 +1,10 @@
-﻿# Quick Start
+﻿---
+description: 本教程详细介绍 NeoEyes NE301 快速上手流程，包括设备组装、Web UI 连接与配置、AI 模型部署与调试、MQTT 数据上报设置及硬件参数调整，帮助开发者快速实现边缘 AI 应用落地。
+keywords: [NE301快速开始, NeoEyes教程, AI相机配置, Web UI调试, 模型部署, MQTT配置, 边缘AI入门, 设备组装, 固件升级, 实时推理]
+tags: [快速入门, NE301, 使用教程, AI调试, 配置指南]
+---
+
+# Quick Start
 
 ## 概述
 

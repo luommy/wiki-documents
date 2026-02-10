@@ -1,3 +1,9 @@
+---
+description: Detailed overview of the NeoEyes NE100-MB01 development board components, including ESP32-S3 module, camera modules (OV5640, SC200AI), and wireless expansion options.
+keywords: [NE100-MB01 Components, ESP32-S3, OV5640, USB Camera, Cat-1 Module, WiFi Halow, Hardware Overview]
+tags: [NE100-MB01, Hardware Components, Camera Modules, Wireless Modules, Overview]
+---
+
 # Components Overview
 ## **Product Brief**
 

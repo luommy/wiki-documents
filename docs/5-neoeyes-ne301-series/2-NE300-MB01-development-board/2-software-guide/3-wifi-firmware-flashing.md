@@ -1,5 +1,8 @@
 ---
 title: Wi-Fi Firmware Flashing
+description: 本文档为NE301开发板用户提供详细的Wi-Fi固件烧录指南，解决无法搜索到NE301 WiFi AP的问题。内容涵盖准备工作（下载siwg917固件、准备SD卡）、烧录步骤（放入固件、插入SD卡检查、执行wifiup指令）及烧录完成后的验证。
+keywords: [NE301, Wi-Fi固件, 固件烧录, WiFi AP, siwg917, SD卡, 串口工具, 无线连接, 故障排查]
+tags: [NE301, WiFi, 固件, 烧录指南, 软件指南]
 ---
 # NE301 WiFi 固件烧录指南
 

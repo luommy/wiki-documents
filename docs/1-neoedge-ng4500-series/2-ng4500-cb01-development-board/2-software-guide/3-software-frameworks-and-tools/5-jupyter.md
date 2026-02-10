@@ -1,4 +1,10 @@
-# JupyterLab  
+---
+description: JupyterLab 在 NVIDIA Jetson Orin 上的安装与配置指南。学习如何使用 pip 安装 JupyterLab，配置远程访问，并设置 systemd 自启动服务进行交互式开发。
+keywords: [JupyterLab, NVIDIA Jetson, Orin Nano, Python 开发, 交互式环境, 远程访问, 自启动服务, 边缘 AI]
+tags: [JupyterLab, Jetson Orin, 开发环境, Python, 边缘计算]
+---
+
+# JupyterLab
 ---
 
 **JupyterLab** 是一个基于 Web 的下一代交互式开发环境，支持 Python、数据可视化与 AI 应用开发，非常适合 Jetson 平台使用。

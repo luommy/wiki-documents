@@ -1,3 +1,9 @@
+---
+description: 本教程详细介绍 CamThink AI Tool Stack 的使用方法，涵盖从数据采集、标注、YOLO 模型训练到 NE301 边缘设备量化部署的完整流程，帮助开发者快速构建 AI 应用。
+keywords: [AI Tool Stack, 模型训练, 数据标注, 模型量化, NE301, YOLO, 边缘部署, Docker, 深度学习, CamThink]
+tags: [开发工具, 模型训练, NE301, 量化部署, 教程]
+---
+
 # 使用 AI Tool Stack 训练和部署 AI 模型
 
 ![Automated AI model training process](/img/AIToolStack/work.png)

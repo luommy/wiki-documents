@@ -1,3 +1,9 @@
+---
+description: Quick start guide for Cinfer, CamThink's Vision AI inference software. Learn to deploy ONNX models via Docker, manage services, and integrate APIs for image recognition.
+keywords: [Cinfer, Vision AI, ONNX Runtime, FastAPI, Docker Deployment, Model Management, AI Inference Service, OpenAPI]
+tags: [Cinfer, AI Inference, ONNX Models, Docker, Quick Start]
+---
+
 # Quick Start
 
 ![Cinfer CamThink AI Inference Service](/img/Cinfer/cinfer-home.png)

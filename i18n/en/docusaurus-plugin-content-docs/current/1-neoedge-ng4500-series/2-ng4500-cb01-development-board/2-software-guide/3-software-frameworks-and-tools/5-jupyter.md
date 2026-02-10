@@ -1,4 +1,10 @@
-# JupyterLab  
+---
+description: Set up JupyterLab on NeoEdge NG4500 for interactive AI development. Learn installation via pip, remote access configuration, and auto-start service setup on Jetson Orin.
+keywords: [JupyterLab, NeoEdge NG4500, Interactive Development, Python, Jetson Orin, AI Coding, Web IDE, Remote Development, Data Science]
+tags: [JupyterLab, AI Development, Python, Web IDE, Jetson Orin]
+---
+
+# JupyterLab
 ---
 
 **JupyterLab** is a next-generation, web-based interactive development environment that supports Python, data visualization, and AI application development. It is especially well-suited for use on the Jetson platform. This guide provides step-by-step instructions on how to install, launch, and configure JupyterLab on Jetson.
@@ -10,18 +16,18 @@
 ## 1. Overview
 JupyterLab offers an interactive development environment with the following features:
 
-- Execute Python, C++, and CUDA code interactively  
-- Support for Markdown and data visualizations  
-- Multi-tab interface with integrated terminal, text editor, and graphical tools  
-- Compatible with ARM64 architecture — ideal for Jetson platforms  
-- Remote access via web browser  
+- Execute Python, C++, and CUDA code interactively
+- Support for Markdown and data visualizations
+- Multi-tab interface with integrated terminal, text editor, and graphical tools
+- Compatible with ARM64 architecture — ideal for Jetson platforms
+- Remote access via web browser
 
 This guide covers：
 
-- Installation via `pip`  
-- Configuration and remote access setup  
-- Enabling autostart as a service  
-- Uninstallation and troubleshooting  
+- Installation via `pip`
+- Configuration and remote access setup
+- Enabling autostart as a service
+- Uninstallation and troubleshooting
 
 ---
 
@@ -37,14 +43,14 @@ This guide covers：
 
 ### Software
 
-- JetPack 5.x (based on Ubuntu 20.04 or 22.04)  
-- Python 3.8 or higher  
-- `pip` and `venv` tools  
-- (Optional) Conda / virtualenv for environment management  
+- JetPack 5.x (based on Ubuntu 20.04 or 22.04)
+- Python 3.8 or higher
+- `pip` and `venv` tools
+- (Optional) Conda / virtualenv for environment management
 
 ---
 
-## 3.Installation 
+## 3.Installation
 
 ### Method A: Install via pip (Recommended)
 

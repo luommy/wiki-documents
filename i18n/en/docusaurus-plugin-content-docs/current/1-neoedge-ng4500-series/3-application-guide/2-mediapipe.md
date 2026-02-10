@@ -1,3 +1,9 @@
+---
+description: Perform real-time pose estimation and hand tracking on NeoEdge NG4500 using MediaPipe Python API. Includes environment setup and GPU acceleration tips for Jetson Orin.
+keywords: [MediaPipe, NeoEdge NG4500, Pose Estimation, Hand Tracking, Gesture Recognition, Computer Vision, Jetson Orin, Real-time AI, Human-Computer Interaction]
+tags: [MediaPipe, Pose Estimation, Computer Vision, AI Tracking, Jetson Orin]
+---
+
 # Pose Estimation
 
 ---
@@ -16,15 +22,15 @@ Pose estimation is widely used in applications such as gesture recognition, fitn
 
 ### Hardware
 
-- Jetson Orin series (Nano，NX）  
+- Jetson Orin series (Nano，NX）
 - USB or CSI camera (Optional but recommended)
 
 ### Software
 
-- **Operating System**：Ubuntu 20.04 / 22.04 LTS（Base on JetPack）  
-- **JetPack**：Official NVIDIA image (includes CUDA, cuDNN, TensorRT)  
-- **Python**：Version 3.8 or higher recommended  
-- **MediaPipe（Python）**：Install via `pip`  
+- **Operating System**：Ubuntu 20.04 / 22.04 LTS（Base on JetPack）
+- **JetPack**：Official NVIDIA image (includes CUDA, cuDNN, TensorRT)
+- **Python**：Version 3.8 or higher recommended
+- **MediaPipe（Python）**：Install via `pip`
 - **Dependencies**：OpenCV，FFmpeg，GStreamer(for camera/video support)
 
 ---
@@ -80,7 +86,7 @@ while True:
     if results.pose_landmarks:
         mp.solutions.drawing_utils.draw_landmarks(
             frame, results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
-    
+
     cv2.imshow("Pose Estimation", frame)
     if cv2.waitKey(5) & 0xFF == 27:
         break
@@ -138,8 +144,8 @@ cv2.destroyAllWindows()
 
 ### Tips
 
-- Use `jetson_clocks` and set`nvpmodel` to maximum performance mode  
-- Use multithreaded frame capture with OpenCV  
+- Use `jetson_clocks` and set`nvpmodel` to maximum performance mode
+- Use multithreaded frame capture with OpenCV
 - Reduce input resolution (e.g., 640×480) to improve frame rate
 
 ---
@@ -158,6 +164,6 @@ cv2.destroyAllWindows()
 ## 8. Appendix
 
 ### References
- 
+
 - [MediaPipe GitHub](https://github.com/google/mediapipe)
 - [MediaPipe Samples](https://github.com/google-ai-edge/mediapipe-samples)

@@ -1,3 +1,9 @@
+---
+description: 本文档详细介绍了Fn-Link FG6222MPUC-02 Wi-Fi模块的技术规格，该模块支持Wi-Fi 5 (802.11a/b/g/n/ac)和蓝牙5.0，采用M.2 Key E接口，支持2.4GHz和5GHz双频段，具有2T2R MIMO技术及高达866.7Mbps的传输速率。内容涵盖主要特性、射频性能、蓝牙规格及硬件安装说明。
+keywords: [Wi-Fi模块, 802.11ac, 蓝牙5.0, M.2 Key E, 双频, MIMO, 无线通信, 硬件开发, 物联网, FG6222MPUC-02]
+tags: [Wi-Fi, 蓝牙, 无线模块, 硬件资源, M.2接口]
+---
+
 import AccessoriesTable from '@site/src/components/AccessoriesTable';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 

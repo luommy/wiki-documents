@@ -1,3 +1,9 @@
+---
+description: 深入了解 NeoEdge NG4500 系列使用的 NG4500-CB01 载板开发指南，涵盖硬件接口定义、技术规格、引脚配置及与 NVIDIA Jetson Orin 核心板的兼容性说明。
+keywords: [NG4500-CB01, 开发指南, 载板定义, 硬件接口, Jetson Orin, 边缘计算, 工业级设计, 技术规格]
+tags: [开发指南, 硬件接口, 载板定义, NG4500 系列, 硬件开发]
+---
+
 import Link from "@docusaurus/Link";
 import useBaseUrl from '@docusaurus/useBaseUrl';
 

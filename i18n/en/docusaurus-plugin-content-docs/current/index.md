@@ -4,6 +4,9 @@ hide_table_of_contents: true
 pagination_next: null
 pagination_prev: null
 slug: /
+description: Welcome to the official CamThink Wiki. Explore open hardware designs, system software, and AI model deployment for NeoEdge and NeoEyes series.
+keywords: [CamThink, Edge AI Wiki, Open Hardware, AI Model Deployment, NeoEdge, NeoEyes, NVIDIA Jetson, STM32N6, ESP32-S3]
+tags: [CamThink, Documentation Hub, Edge AI Products, Hardware Platform, Developer Resources]
 ---
 
 import Link from '@docusaurus/Link';

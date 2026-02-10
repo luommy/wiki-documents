@@ -1,3 +1,9 @@
+---
+description: NeoEdge NG4500-CB01 载板硬件连接指南。详细介绍了 Orin Nano/NX 模组安装、外设接口（M.2, CSI, 工业端子）及音频接口的连接方法。
+keywords: [NG4500-CB01, 硬件连接, Orin Nano, Orin NX, 接口定义, M.2 扩展, CSI 摄像头, 工业控制]
+tags: [NG4500 系列, 硬件指南, 接口说明, 边缘计算, 载板连接]
+---
+
 import AccessoriesTable from '@site/src/components/AccessoriesTable';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 

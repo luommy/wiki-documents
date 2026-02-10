@@ -1,3 +1,9 @@
+---
+description: Deploy YOLOv11 on NeoEdge NG4500 for real-time object detection. Optimize inference using TensorRT and DLA on NVIDIA Jetson Orin for high-speed edge AI applications.
+keywords: [YOLOv11, Object Detection, NeoEdge NG4500, Jetson Orin, TensorRT, DLA, AI Inference, Real-time Vision, Ultralytics]
+tags: [YOLOv11, Object Detection, TensorRT, Jetson Orin, Edge AI]
+---
+
 # Object Detection
 
 ---
@@ -10,11 +16,11 @@ YOLOv11 is the latest-generation object detection model released by Ultralytics,
 
 This guide covers:
 
-- Preparing the environment and installing JetPack  
-- Running YOLOv11 quickly using Docker  
-- Installing YOLOv11 and its dependencies locally  
-- Accelerating inference with TensorRT  
-- Leveraging DLA acceleration and benchmarking performance  
+- Preparing the environment and installing JetPack
+- Running YOLOv11 quickly using Docker
+- Installing YOLOv11 and its dependencies locally
+- Accelerating inference with TensorRT
+- Leveraging DLA acceleration and benchmarking performance
 
 > YOLOv11 runs exceptionally well on devices such as the Jetson Orin Nano, offering a powerful solution for real-time edge AI deployment.
 

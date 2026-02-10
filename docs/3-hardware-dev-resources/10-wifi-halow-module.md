@@ -1,3 +1,9 @@
+---
+description: 本文档详细介绍了基于FGH100M设计的Wi-Fi HaLow模块，该模块支持IEEE 802.11ah标准，提供远距离、低功耗的Sub-1 GHz频段通信（868MHz, 915MHz可选），适用于物联网和智能设备场景。内容涵盖主要特性、SPI接口说明及规格尺寸。
+keywords: [Wi-Fi HaLow, 物联网模块, FGH100M, IEEE 802.11ah, 低功耗, 远距离通信, Sub-1 GHz, SPI接口, 硬件开发, 智能设备]
+tags: [Wi-Fi HaLow, 物联网, 无线模块, 硬件资源, SPI]
+---
+
 import AccessoriesTable from '@site/src/components/AccessoriesTable';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 

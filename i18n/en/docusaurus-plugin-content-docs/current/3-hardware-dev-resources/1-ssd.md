@@ -1,3 +1,9 @@
+---
+description: Hardware specifications and installation guide for M.2 NVMe SSDs compatible with NeoEdge NG4500. Supports PCIe Gen3 x4 for high-speed storage.
+keywords: [NeoEdge NG4500, NVMe SSD, M.2 2280, Storage Expansion, PCIe Gen3 x4, Hardware Specification]
+tags: [NeoEdge NG4500, NVMe SSD, M.2 2280, Hardware Specification, Storage Expansion]
+---
+
 import AccessoriesTable from '@site/src/components/AccessoriesTable';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 

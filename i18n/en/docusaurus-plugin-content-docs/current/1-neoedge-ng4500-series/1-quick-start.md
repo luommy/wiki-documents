@@ -1,3 +1,9 @@
+---
+description: Quick start guide for NeoEdge NG4500. Learn hardware assembly, system initialization, and how to deploy the NanoOWL visual reasoning model via Docker containers.
+keywords: [NeoEdge NG4500, Quick Start, Hardware Assembly, NanoOWL, Jetson Orin, Docker, System Setup, Edge AI Deployment]
+tags: [NeoEdge NG4500, Quick Start, NanoOWL, Jetson Orin, AI Deployment]
+---
+
 # Quick Start
 
 ## Overview

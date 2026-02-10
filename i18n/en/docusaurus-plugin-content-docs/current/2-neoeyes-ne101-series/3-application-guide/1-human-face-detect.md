@@ -1,3 +1,9 @@
+---
+description: Implement real-time human face detection on NeoEyes NE101 using deep learning and the ESP-DL framework. Includes performance testing and UART output analysis.
+keywords: [Human Face Detection, NeoEyes NE101, Deep Learning, ESP-DL, ESP-WHO, AIoT, Facial Landmarks, Image Recognition]
+tags: [NeoEyes NE101, AI, Face Detection, Deep Learning, ESP-DL]
+---
+
 # Human Face Detection
 
 ## Overview

@@ -1,7 +1,8 @@
 ---
 title: AI 加速 QSC 合规：智能捕虫监测
 description: 本案例展示了如何通过边缘 AI 方案管理捕虫箱状态，将“定时清理”转变为“按需驱动”，提升连锁快餐店的 QSC 管理水平。
-tags: [Camthink, NeoEye 301, AI, QSC, 智能监测, Home Assistant]
+keywords: [QSC管理, 连锁餐饮, 捕虫箱监测, NeoEye 301, 边缘AI, 智能卫生, Home Assistant, 昆虫防治, AI相机, 数字化运营]
+tags: [餐饮零售, QSC管理, NE301, 智能监测, 解决方案]
 sidebar_label: AI-Driven QSC For Chain Restaurant
 sidebar_position: 6
 ---

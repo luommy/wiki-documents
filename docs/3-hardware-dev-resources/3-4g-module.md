@@ -1,3 +1,9 @@
+---
+description: 本文档详细介绍了Quectel EM05-G 4G模块，一款专为IoT/M2M应用设计的LTE Cat 4模块。它支持全球多网络制式，提供高速传输（下行150Mbps，上行50Mbps），兼容多系统，并具备工业级可靠性。内容涵盖产品特性、规格参数、M.2 Key B接口说明及硬件设计要点。
+keywords: [4G模块, LTE Cat 4, Quectel EM05-G, IoT/M2M, M.2模块, 无线通信, 硬件开发, 工业级, 全球频段, 高速传输]
+tags: [4G, 无线模块, LTE, 硬件资源, Quectel]
+---
+
 import AccessoriesTable from '@site/src/components/AccessoriesTable';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 

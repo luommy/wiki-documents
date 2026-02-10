@@ -1,4 +1,10 @@
-﻿import ApplicationScenarios from '@site/src/components/ApplicationScenarios';
+﻿---
+description: NeoEyes NE301 是一款低功耗边缘 AI 智能相机，搭载 STM32N6 芯片，具备 0.6TOPS 算力。支持 Web UI 调试、模块化扩展（WiFi/Cat-1/POE）及多种传感器触发，适用于智慧城市、工业及农业场景。
+keywords: [NeoEyes NE301, 边缘AI相机, STM32N6, 低功耗相机, 智能视觉, 嵌入式AI, 物联网, 模块化设计, 智慧城市, 工业检测]
+tags: [NE301, AI相机, 边缘计算, 物联网, 智能硬件]
+---
+
+import ApplicationScenarios from '@site/src/components/ApplicationScenarios';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import SupportGrid from '@site/src/components/SupportGrid';
 

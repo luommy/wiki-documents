@@ -1,3 +1,9 @@
+---
+description: 本指南介绍如何在 NVIDIA Jetson Orin 上安装与运行 DeepStream SDK。涵盖从 .deb 包到 Docker 的多种安装方式，以及自定义模型集成与实时视频分析示例。
+keywords: [DeepStream, NVIDIA Jetson, Orin Nano, 视频分析, TensorRT, AI 推理, 目标追踪, 实时监控, 边缘 AI]
+tags: [DeepStream, 视频分析, NVIDIA SDK, Jetson Orin, AI 应用]
+---
+
 # DeepStream
 
 ---

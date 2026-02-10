@@ -1,3 +1,9 @@
+---
+description: Learn how to flash system images on NeoEdge NG4500 series devices. Step-by-step guide for Recovery mode, image package downloading, and flashing via Ubuntu host.
+keywords: [NeoEdge NG4500, System Flashing, Image Programming, Recovery Mode, JetPack, Ubuntu Flash, Firmware Update, NVIDIA Jetson]
+tags: [NG4500 Flashing, System Initialization, Recovery Mode, Firmware Update, Setup Guide]
+---
+
 # System  Flashing
 
 This chapter aims to introduce the programming method for the NG4500 series products, focusing on providing specific operation steps for programming the image package. Taking the NG4511 device as an example, it details the programming process.

@@ -1,5 +1,8 @@
 ---
 title: Components Overview
+description: 本文档详细解析 NE300-MB01 开发板硬件组件，涵盖 STM32N657L0H3 主控、STM32U0 电源管理、Wi-Fi 6 模块及 OS04C10/USB 摄像头接口参数。提供丰富的 I/O 扩展与调试接口说明，助力硬件开发与集成。
+keywords: [NE300-MB01, 硬件组件, STM32N6, STM32U0, Wi-Fi 6, 摄像头接口, 开发板资源, OS04C10, 硬件规格, 嵌入式开发]
+tags: [硬件组件, NE300, 开发板, 接口定义, 硬件资源]
 ---
 
 ## Components Overview

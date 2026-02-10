@@ -1,3 +1,9 @@
+---
+description: Resolve issues with NE301 WiFi AP visibility. Learn how to flash siwg917 WiFi firmware using an SD card and serial console for the STM32N6 development board.
+keywords: [NE301 WiFi, Firmware Flashing, siwg917, STM32N6, SD Card Update, WiFi AP Troubleshooting, Serial Console, CamThink]
+tags: [NE301, WiFi Firmware, Troubleshooting, SD Card, STM32N6]
+---
+
 # NE301 WiFi Firmware Flashing Guide
 
 If you are a DIY enthusiast and have received the NE301 development board, you might encounter a situation where the NE301 WiFi AP cannot be found because it is a bare board. This is usually caused by the lack of WiFi firmware on the development board. This article will guide you on how to check and flash the WiFi firmware.

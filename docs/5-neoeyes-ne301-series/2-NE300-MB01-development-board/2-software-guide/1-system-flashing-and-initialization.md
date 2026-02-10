@@ -1,5 +1,8 @@
 ---
 title: System Flashing and Initialization
+description: 本文档详细介绍了NE301系列开发板的系统烧录与初始化过程，包括硬件连接（ST-Link与MCU接线）、固件下载（ne301_FSBL_signed.bin, ne301_App_signed_pkg.bin, ne301_Web_pkg.bin, ne301_Model_pkg.bin, ne301_WakeCore.bin）、以及多种烧录方法（STM32CubeProgrammer GUI/CLI、Script/maker.sh、make命令）。此外，还提供了针对WiFi热点问题的故障排查指引。
+keywords: [NE301, 系统烧录, 固件初始化, STM32N6, STM32U0, ST-Link, STM32CubeProgrammer, 固件下载, 故障排查, WiFi固件]
+tags: [NE301, 烧录指南, 固件, STM32, 软件指南]
 ---
 
 ## 硬件连接

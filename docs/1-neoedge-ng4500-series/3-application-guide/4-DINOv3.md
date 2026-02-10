@@ -1,3 +1,9 @@
+---
+description: 本文详细介绍如何在 NVIDIA Jetson Orin 平台部署 DINOv3 视觉基础模型。包含热力图可视化与视频流无监督分割案例，助力开发者掌握自监督学习技术。
+keywords: [DINOv3, NVIDIA Jetson, Orin Nano, 视觉基础模型, 自监督学习, 图像分割, 热力图可视化, KMeans 聚类, 边缘 AI]
+tags: [DINOv3, 视觉模型, Jetson Orin, 图像分割, 边缘计算]
+---
+
 # DINOv3
 
 ---

@@ -1,3 +1,9 @@
+---
+description: Comprehensive development guide for NE300-MB01. Explore key features, technical specifications, and resources for STM32N6 powered AI camera development.
+keywords: [NE300-MB01, Dev Guide, STM32N6, STM32U0, AI Camera Development, Hardware Specs, IoT Vision, Edge AI]
+tags: [NE300-MB01, Dev Guide, STM32N6, Hardware, Specifications]
+---
+
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import SupportGrid from '@site/src/components/SupportGrid';
 

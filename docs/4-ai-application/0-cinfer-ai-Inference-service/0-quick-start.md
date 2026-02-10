@@ -1,5 +1,11 @@
 
 
+---
+description: Cinfer 快速入门指南。了解如何通过 Docker 部署通用 Vision AI 推理软件，管理 ONNX 模型并集成标准 OpenAPI 服务进行图像识别。
+keywords: [Cinfer, Vision AI, ONNX, Docker 部署, 模型管理, AI 推理, OpenAPI, 快速入门, 计算机视觉, 边缘计算]
+tags: [Cinfer, AI推理, 快速入门, Docker, 教程]
+---
+
 # Quick Start
 
 ![Cinfer CamThink AI Inference Service](/img/Cinfer/cinfer-home.png)

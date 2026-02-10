@@ -1,3 +1,9 @@
+---
+description: Developer guide for Cinfer model parameter specifications. Learn how to define YAML schemas for model inputs, outputs, and processing strategies for ONNX models.
+keywords: [Cinfer Dev Guide, Model Parameter Specification, ONNX Schema, YAML Config, Input Output Definition, AI Inference API, Postprocessing Strategy]
+tags: [Cinfer, Development Guide, AI Inference, YAML, API Specification]
+---
+
 # Dev Guide
 ## Model Parameter Specification
 Model Parameter is a critical definition in Cinfer’s model management. It governs the external input/output schema for ONNX models and serves as the core configuration file defining how a model interacts with the outside world. It describes model configuration, required input data formats, and the structure of inference outputs. The file uses YAML and follows a JSON-Schema-like convention with three top-level fields: config, inputs, and outputs. Details are below.

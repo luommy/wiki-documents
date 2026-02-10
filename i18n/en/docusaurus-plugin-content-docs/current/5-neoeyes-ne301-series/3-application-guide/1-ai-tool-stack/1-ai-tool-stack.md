@@ -1,3 +1,9 @@
+---
+description: Learn how to use CamThink's AI Tool Stack with NeoEyes NE301 for end-to-end model development. Covers data collection, annotation, training, and quantization.
+keywords: [AI Tool Stack, NeoEyes NE301, Model Training, Data Annotation, Model Quantization, Edge AI Workflow, Ultralytics, Dataset Building, IoT Vision]
+tags: [AI Tool Stack, Model Training, NE301, Edge AI, Quantization]
+---
+
 # Training and Deploying AI Models with AI Tool Stack
 
 ![Automated AI model training process](/img/AIToolStack/work.png)
@@ -154,7 +160,7 @@ After completing all data annotation, click "Train Model" to start training the 
 After completing model training, you can view logs in the training details, as well as the accuracy performance of the trained model. You can also operate the following functions. All model files can be found in the list in Model Space:
 - Export Model: Can export the trained .pt model to a local folder
 - Test Model: Can upload images to test the overall detection effect of the current trained model to evaluate training results
-- **Quantize (TFLite & CamThink NE301): Can quantize to tflite models and NE301-usable model file packages. If you need to deploy to NE301 devices, this step is necessary** 
+- **Quantize (TFLite & CamThink NE301): Can quantize to tflite models and NE301-usable model file packages. If you need to deploy to NE301 devices, this step is necessary**
 ![AI Tool Stack](/img/AIToolStack/modoltest.png)
 
 

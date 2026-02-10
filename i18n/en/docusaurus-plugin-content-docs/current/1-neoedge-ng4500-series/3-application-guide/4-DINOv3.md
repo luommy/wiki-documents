@@ -1,3 +1,8 @@
+---
+description: Detailed guide on deploying Meta's DINOv3 vision model on NVIDIA Jetson Orin. Covers heatmap visualization and real-time unsupervised video segmentation.
+keywords: [DINOv3, Meta AI, Vision Transformer, Jetson Orin, Self-supervised Learning, Image Segmentation, ViT, Computer Vision, Edge AI]
+tags: [DINOv3, Vision Transformer, Computer Vision, Jetson Orin, Meta AI]
+---
 # DINOv3
 
 ---

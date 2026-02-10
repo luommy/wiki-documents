@@ -1,6 +1,7 @@
 ---
-sidebar_label: Model Training And Deployment
-slug: /neoeyes-ne301-series/application-guide/model-training
+description: Learn how to train and deploy YOLOv8 models on NeoEyes NE301. Detailed guide for environment setup, TFLite quantization, and edge deployment on STM32N6 MCU.
+keywords: [YOLOv8 Training, NE301 Deployment, STM32N6 AI, Model Quantization, TFLite, Ultralytics, Edge AI Inference, Computer Vision, Model Export]
+tags: [NE301, YOLOv8, Model Training, AI Deployment, STM32N6]
 ---
 
 # Model Training And Deployment
@@ -72,8 +73,8 @@ TensorFlow Lite: export success ✅ 0.0s, saved as 'yolov8n_saved_model/yolov8n_
 
 Export complete (35.4s)
 Results saved to /ultralytics
-Predict:         yolo predict task=detect model=yolov8n_saved_model/yolov8n_int8.tflite imgsz=256 int8 
-Validate:        yolo val task=detect model=yolov8n_saved_model/yolov8n_int8.tflite imgsz=256 data=coco.yaml int8 
+Predict:         yolo predict task=detect model=yolov8n_saved_model/yolov8n_int8.tflite imgsz=256 int8
+Validate:        yolo val task=detect model=yolov8n_saved_model/yolov8n_int8.tflite imgsz=256 data=coco.yaml int8
 Visualize:       https://netron.app
 💡 Learn more at https://docs.ultralytics.com/modes/export
 ```

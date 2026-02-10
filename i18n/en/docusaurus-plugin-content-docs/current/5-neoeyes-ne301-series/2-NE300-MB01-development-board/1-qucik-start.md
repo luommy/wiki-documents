@@ -1,3 +1,9 @@
+---
+description: Quick start guide for the NE300-MB01 development board. Learn to power up, connect, and validate the board-level features of this STM32N6 AI camera.
+keywords: [NE300-MB01 Quick Start, Development Board, STM32N6, Board Validation, USB Power, UART Debugging, CV Light Board, SD Card Slot]
+tags: [NE300-MB01, Development Board, Quick Start, Hardware Validation, STM32N6]
+---
+
 # Quick Start
 
 ## Product Overview

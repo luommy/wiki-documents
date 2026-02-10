@@ -1,3 +1,9 @@
+---
+description: Get started with NeoEyes NE301. Covers power-on, Web UI configuration, real-time inference preview, and MQTT data reporting setup.
+keywords: [NeoEyes NE301, Quick Start, Edge AI Preview, STM32N6, Web UI Config, MQTT Setup, Low Power AI]
+tags: [NeoEyes NE301, Quick Start, Edge Inference, STM32N6 AI, User Guide]
+---
+
 # Quick Start
 
 ## Overview

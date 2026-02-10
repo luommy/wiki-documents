@@ -1,3 +1,9 @@
+---
+description: ESP32-S3 开发环境搭建指南，详细介绍如何在 Windows 下使用 VSCode 安装 ESP-IDF v5.1.6 开发框架，包含快速安装、高级安装、项目编译与烧录的完整流程。
+keywords: [ESP32-S3, 开发环境, ESP-IDF, VSCode, Windows, 环境搭建, 开发框架, 编译烧录]
+tags: [软件指南, 开发环境, ESP-IDF, VSCode, ESP32-S3]
+---
+
 # Development Environment Setup
 
 ## 文档概述

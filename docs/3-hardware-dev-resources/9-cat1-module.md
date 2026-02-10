@@ -1,3 +1,8 @@
+---
+description: 本文档详细介绍了基于EG912U-GL和EG915Q-NA的LTE Cat 1模组，专为M2M和IoT应用设计。支持全球多频段网络覆盖、10Mbps下行速率及丰富接口（UART/USB），适用于物联网通信与硬件开发调试。
+keywords: [Cat.1模块, LTE Cat 1, EG912U, EG915Q, 物联网, M2M, 无线通信, 硬件开发, 4G通信, 移远通信]
+tags: [Cat.1, 4G模块, 物联网, 硬件资源, 通信模组]
+---
 
 import AccessoriesTable from '@site/src/components/AccessoriesTable';
 import useBaseUrl from '@docusaurus/useBaseUrl';

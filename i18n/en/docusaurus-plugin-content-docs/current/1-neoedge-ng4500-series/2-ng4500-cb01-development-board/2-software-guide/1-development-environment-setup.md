@@ -1,3 +1,9 @@
+---
+description: Learn how to set up the development environment for NeoEdge NG4500 series. Covers local source code deployment, cross-compilation, and remote debugging via SSH/RDP.
+keywords: [NeoEdge NG4500, Development Environment, Jetson Orin, Cross-compilation, Kernel Update, Remote Debugging, SSH, RDP, Source Code]
+tags: [NG4500 Development, Environment Setup, Jetson Linux, Remote Debugging, Kernel Compilation]
+---
+
 # Development Environment Setup
 
 This chapter details the development environment setup process for **NG4520**, including local environment configuration, source code deployment, cross-compilation, kernel and device tree updates, as well as remote debugging and desktop access. It aims to help developers efficiently build a development ecosystem for embedded AI edge computing devices.

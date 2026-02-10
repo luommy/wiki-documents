@@ -1,3 +1,8 @@
+---
+description: 本文档详细介绍了5G模块的核心功能与技术规格，包括支持5G NR Sub-6GHz (SA/NSA)、LTE-FDD/TDD、WCDMA/HSPA+等多网络制式，采用M.2 Key B接口，集成L1+L5双频GNSS，支持HPUE增强和工业级设计。内容涵盖产品特性、规格参数、接口配置、电源稳定性及散热管理等使用说明。
+keywords: [5G模块, 5G NR, Sub-6GHz, M.2 Key B, PCIe, USB 3.1, GNSS, HPUE, 硬件开发, 无线通信]
+tags: [5G, 无线模块, M.2接口, 硬件资源, 通信模组]
+---
 
 import AccessoriesTable from '@site/src/components/AccessoriesTable';
 import useBaseUrl from '@docusaurus/useBaseUrl';

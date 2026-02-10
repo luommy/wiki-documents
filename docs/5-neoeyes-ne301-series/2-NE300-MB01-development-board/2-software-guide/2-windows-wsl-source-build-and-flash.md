@@ -1,5 +1,8 @@
 ---
 title: Windows Wsl Source Build And Flash
+description: 本文档为NE301用户提供在Windows + WSL环境中从源码构建和烧录NE301的详细指南。涵盖了环境准备（WSL2、Docker、STLink驱动、STM32CubeProgrammer）、ST-LINK透传到WSL的步骤、Docker开发容器的启动、固件构建与烧录流程，以及Docker命令、CRLF脚本问题、USBIPD attach失败、ST-LINK连接故障等常见问题的排查与解决方案。
+keywords: [NE301, Windows, WSL, Docker, ST-LINK, 源码构建, 固件烧录, 嵌入式开发, 故障排查, STM32]
+tags: [NE301, Windows, WSL, 烧录指南, 软件开发]
 ---
 
 > 适用对象：参照[《开发环境搭建》](./development-environment-setup)、[《系统烧录与初始化》](./system-flashing-and-initialization)在 Windows + WSL 环境中通过 Docker 从源码构建并烧录 NE301 的用户。本篇仅做参考，具体可结合设备使用情况分析。

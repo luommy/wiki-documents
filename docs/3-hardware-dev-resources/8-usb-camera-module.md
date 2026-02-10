@@ -1,3 +1,8 @@
+---
+description: 本文档详细介绍了高性能USB摄像头模块，搭载SC200AI传感器，支持1080P高清视频输出及多视场角选择（51°/88°/137°）。专为NeoEyes NE101设计，具备玻璃镜头、独立ISP及可调焦功能，适用于监控与AI视觉应用。
+keywords: [USB摄像头, SC200AI, 1080P, 宽动态, 广角镜头, NE101, AI视觉, 独立ISP, 硬件开发, 监控相机]
+tags: [USB摄像头, 视觉模块, 硬件资源, SC200AI, AI视觉]
+---
 
 import AccessoriesTable from '@site/src/components/AccessoriesTable';
 import useBaseUrl from '@docusaurus/useBaseUrl';

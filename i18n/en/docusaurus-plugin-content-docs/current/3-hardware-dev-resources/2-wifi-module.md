@@ -1,3 +1,9 @@
+---
+description: Technical specifications for Fn-Link FG6222MPUC-02 Wi-Fi 5 & Bluetooth 5.0 module. Supports dual-band 2.4GHz/5GHz with M.2 Key E interface for NeoEdge series.
+keywords: [WiFi Module, Bluetooth 5.0, Fn-Link, FG6222MPUC-02, Wi-Fi 5, Dual Band WiFi, M.2 Key E, Hardware Specification]
+tags: [Hardware Resources, WiFi Module, Bluetooth, Connectivity, Fn-Link]
+---
+
 import AccessoriesTable from '@site/src/components/AccessoriesTable';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 

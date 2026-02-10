@@ -1,3 +1,9 @@
+---
+description: Technical specifications for the OV5640 5MP camera module. Supports 60° and 120° FOV, compatible with NeoEyes NE101 and NE301.
+keywords: [OV5640, 5MP Camera, NeoEyes, MIPI CSI, Wide Angle Camera, Image Sensor, Hardware Spec]
+tags: [NeoEyes NE101, OV5640 Module, 5MP Camera, Wide Angle Lens, Hardware Specification]
+---
+
 import AccessoriesTable from '@site/src/components/AccessoriesTable';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
@@ -90,4 +96,3 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 ## Dimension
 ![NG45_PCBA_IO_Bottom](/img/Hardware_Dev_Resources/OV5640_Module/OV5640_Module_Outline.png)
-

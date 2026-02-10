@@ -1,3 +1,9 @@
+---
+description: NE101 快速入门指南，涵盖设备使用、配置与安装。详细介绍 NE101 智能相机开机、WiFi AP 配置、图像抓拍、MQTT/MQTTS 数据上报、固件更新及支架安装步骤，助您快速上手 NE101 设备。
+keywords: [NE101, 快速入门, 智能相机, 设备配置, MQTT, MQTTS, Docusaurus, 物联网设备, 硬件指南, 安装教程]
+tags: [NE101, 快速入门, 智能相机, MQTT, Docusaurus]
+---
+
 import AccessoriesTable from '@site/src/components/AccessoriesTable';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 

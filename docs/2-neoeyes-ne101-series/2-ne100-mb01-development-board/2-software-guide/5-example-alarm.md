@@ -1,3 +1,9 @@
+---
+description: 本指南针对 NE101 接入 Alarm 报警触发失效的问题提供深度解析与解决方案。涵盖 GPIO 2 资源复用原理、修改 PIR 接口物理连接及主板硬件焊接两种实战方案，助力开发者实现低功耗抓拍唤醒。
+keywords: [NE101 报警触发, Alarm 接口, GPIO 2 复用, PIR 传感器, 硬件修改, 低功耗唤醒, 自动抓拍, 嵌入式开发, 问题排查]
+tags: [NE101 系列, 报警触发, 问题排查, 硬件方案, 示例代码]
+---
+
 #  Alarm application trigger instructions
 
 ## 应用描述
