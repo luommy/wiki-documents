@@ -394,7 +394,7 @@ Product casing and bracket dimension instruction：
         {
           title: "AGV navigation",
           description: "Based on lidar and visual sensors, the hybrid SLAM technology supports precise positioning and navigation in complex environments such as factories and warehouses. The positioning accuracy can reach ±2cm, and supports multi-AGV collaboration and intelligent obstacle avoidance, and is suitable for logistics, warehousing, and manufacturing, etc.",
-          image: "https://www.lscm.hk/files/image/2-Technology-Commercialisation/Case%20Studies/Case-AGV-1.jpg"
+          image: "/img/ng4500/product-info/agv.png"
         },
         {
           title: "Robotic systems",

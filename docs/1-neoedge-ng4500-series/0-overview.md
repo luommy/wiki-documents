@@ -394,7 +394,7 @@ NG4500系列整机产品规格信息如下
         {
           title: "AGV导航",
           description: "基于激光雷达、视觉传感器的混合SLAM技术，支持工厂、仓库等复杂环境下的精确定位与导航，定位精度可达±2cm，支持多AGV协同运行和智能避障，适用于物流、制造等场景。",
-          image: "https://www.lscm.hk/files/image/2-Technology-Commercialisation/Case%20Studies/Case-AGV-1.jpg"
+          image: "/img/ng4500/product-info/agv.png"
         },
         {
           title: "服务机器人",
