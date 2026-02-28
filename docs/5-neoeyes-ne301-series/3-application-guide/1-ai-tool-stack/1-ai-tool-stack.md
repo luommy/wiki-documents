@@ -9,7 +9,7 @@ tags: [开发工具, 模型训练, NE301, 量化部署, 教程]
 ![Automated AI model training process](/img/AIToolStack/work.png)
 
 ## 主要工具与产品
-本教程主要会使用AI Tool Stack来与NeoEyes NE301结合完成模型数据采集到部署的过程，AI Tool Stack是CamThink为NeoEyes NE301构建的端到端边缘AI工具，涵盖数据采集、标注、训练、量化和部署，它支持用户自行部署和管理，AI Tool Stack的训练和量化的底层支撑来自于[ultralytics](https://github.com/ultralytics/ultralytics)项目库，感谢ultralytics团队的出色贡献。
+本教程主要会使用AI Tool Stack来与NeoEyes NE301结合完成模型数据采集到部署的过程，AI Tool Stack是CamThink为NeoEyes NE301构建的端到端边缘AI工具，涵盖数据采集、标注、训练、量化和部署，它支持用户自行部署和管理，AI Tool Stack的训练和量化的底层支撑来自于[Ultralytics](https://www.ultralytics.com)项目库，感谢Ultralytics团队的出色贡献。
 
 ### AI Tool Stack
 ![AI Tool Stack](/img/AIToolStack/an.png)
@@ -106,7 +106,7 @@ docker ps
 
 a.你可以通过右侧的「Upload Images」上传本地文件
 
-b.你可以在右上角的「Import Dataset」上传数据集文件，支持COCO数据集和YOLO数据集格式，如果你需要详细了解支持的数据集格式可通过「Export Dataset」导出文件查看数据结构，本工具标注源数据，格式如下：
+b.你可以在右上角的「Import Dataset」上传数据集文件，支持COCO数据集和Ultralytics YOLO数据集格式，如果你需要详细了解支持的数据集格式可通过「Export Dataset」导出文件查看数据结构，本工具标注源数据，格式如下：
 ```plaintext
 ├── images/
 ├── annotations/
@@ -186,9 +186,9 @@ c.现在你只需要手动操作NE301侧面的拍摄按键进行图像的抓取�
 </div>
 
 ## 现有模型量化和部署
-如果你已经拥有训练好的yolov8模型，恰好它是yolov8n模型，为什么是yolov8n，因为在NE301上部署中的模型n尺寸下的模型性能和表现比较合适，未来还会支持yolov11等模型，如果你需要将现有模型部署在NE301中，你可以在AI Tool Stack的「Model Space」菜单中找到「Upload Model for Quantization」按钮，点击它在表单中填写信息
+如果你已经拥有训练好的YOLOv8模型，恰好它是YOLOv8n模型，为什么是YOLOv8n，因为在NE301上部署中的模型n尺寸下的模型性能和表现比较合适，未来还会支持YOLO11等模型，如果你需要将现有模型部署在NE301中，你可以在AI Tool Stack的「Model Space」菜单中找到「Upload Model for Quantization」按钮，点击它在表单中填写信息
 - Model Name：定义一个名称
-- Model Type：默认Yolov8n
+- Model Type：默认YOLOv8n
 - Input Size：默认640，根据你的模型输入图像大小调整
 - Number of Classes：根据你的模型检测类数量调整
 - Class Names：填写你的模型类型
