@@ -9,7 +9,7 @@ tags: [AI Tool Stack, Model Training, NE301, Edge AI, Quantization]
 ![Automated AI model training process](/img/AIToolStack/work.png)
 
 ## Main Tools and Products
-This tutorial will primarily use AI Tool Stack in combination with NeoEyes NE301 to complete the process from model data collection to deployment. AI Tool Stack is an end-to-end edge AI tool built by CamThink for NeoEyes NE301, covering data collection, annotation, training, quantization, and deployment. It supports user self-deployment and management. The underlying support for AI Tool Stack's training and quantization comes from the [ultralytics](https://github.com/ultralytics/ultralytics) project library. Thanks to the excellent contributions from the ultralytics team.
+This tutorial will primarily use AI Tool Stack in combination with NeoEyes NE301 to complete the process from model data collection to deployment. AI Tool Stack is an end-to-end edge AI tool built by CamThink for NeoEyes NE301, covering data collection, annotation, training, quantization, and deployment. It supports user self-deployment and management. The underlying support for AI Tool Stack's training and quantization comes from the [Ultralytics](https://www.ultralytics.com) project library. Thanks to the excellent contributions from the Ultralytics team.
 
 ### AI Tool Stack
 ![AI Tool Stack](/img/AIToolStack/an.png)
@@ -107,7 +107,7 @@ Currently supports the following methods to build image datasets for projects:
 
 a. You can upload local files through the "Upload Images" on the right side
 
-b. You can upload dataset files through "Import Dataset" in the upper right corner, supporting COCO dataset and YOLO dataset formats. If you need to understand the supported dataset formats in detail, you can export files through "Export Dataset" to view the data structure. This tool annotates source data in the following format:
+b. You can upload dataset files through "Import Dataset" in the upper right corner, supporting COCO dataset and Ultralytics YOLO dataset formats. If you need to understand the supported dataset formats in detail, you can export files through "Export Dataset" to view the data structure. This tool annotates source data in the following format:
 ```plaintext
 ├── images/
 ├── annotations/
