@@ -208,9 +208,9 @@ MODEL_JSON = $(WEIGHTS_DIR)/$(MODEL_NAME).json
 
 ```sh
 # 在项目根目录
-make model
+make pkg-model
 
-# 构建结果在 build/ne301_Model.bin
+# 构建结果在 build/ne301_Model_xxx_pkg.bin
 ```
 
 **步骤 3：将模型导入设备**

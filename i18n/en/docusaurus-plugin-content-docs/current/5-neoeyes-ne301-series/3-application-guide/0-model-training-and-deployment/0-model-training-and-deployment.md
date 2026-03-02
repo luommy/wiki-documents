@@ -203,9 +203,9 @@ MODEL_JSON = $(WEIGHTS_DIR)/$(MODEL_NAME).json
 
 ```sh
 # In project root directory
-make model
+make pkg-model
 
-# Build result is in build/ne301_Model.bin
+# Build result is in build/ne301_Model_xxx_pkg.bin
 ```
 
 **Step 3: Flash to Device**
