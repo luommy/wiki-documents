@@ -377,16 +377,18 @@ RTMP 推流功能现在可以通过 Web 界面进行完整配置，同时也保�
 导入导出包含固件、模型、设备配置文件三类内容，适用于升级、迁移与批量部署等场景。
 
 - 固件导入/升级（本地 OTA）
-  - 此部分的固件分为三个文件，包含APP文件、Web文件以及FSBL文件，可选择任意板块进行升级。
-  - 选择好后，可本地上传或拖动到区域内，上传后系统自动完成校验与写入，完成后设备将自动重启，此期间请勿进行操作。
-  - 可选“保留当前配置”，勾选后升级不覆盖现有参数；不勾选则恢复为出厂配置。
+  - 此部分的固件分为三个文件，包含APP文件、Web文件以及FSBL文件，可选择任意板块进行升级，（通过设备网页可升级 APP 和Web的版本，FBSL 升级需通过 console）
+    - APP文件示例：[ne301_App_signed_v2.0.1.30_pkg.bin ](https://github.com/camthink-ai/ne301/releases/download/v20260213_main/ne301_App_signed_v2.0.1.30_pkg.bin)
+    - Web 文件示例：[ne301_Web_v1.3.4.4_pkg.bin](https://github.com/camthink-ai/ne301/releases/download/v20260213_main/ne301_Web_v1.3.4.4_pkg.bin)
+    - FSBL文件示例：[ne301_FSBL_signed_v1.0.0.2_pkg.bin](https://github.com/camthink-ai/ne301/releases/download/v20260213_main/ne301_FSBL_signed_v1.0.0.2_pkg.bin)
   - 若升级失败将保留旧版本，避免设备不可用。
-- 模型导入
+- 模型导入(可选)
   - 选择模型包（包含模型文件与相关参数说明的文件），上传后自动部署到设备。
+    - 模型包示例：[ne301_Model_v2.0.0.0_pkg.bin](https://github.com/camthink-ai/ne301/releases/download/v20260213_main/ne301_Model_v2.0.0.0_pkg.bin)
   - 部署成功后可在“功能调试”中应用并验证当前模型。
   - 建议与“推理参数热加载”配合，按场景微调置信度/NMS 等参数。
   - 支持回滚至出厂预置模型，可通过重置设备实现。
-- 配置导入
+- 配置导入(可选）
   - 选择配置文件（.json）并上传，系统支持导入前预览覆盖项，确认后应用到对应模块。
   - 部分配置即时生效；网络/通信等底层配置可能需要重启设备生效。
 - 配置导出
