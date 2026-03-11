@@ -197,7 +197,7 @@ Use the mobile phone or computer that downloaded the model to connect to NE301's
 
 ## Deploying Existing Models
 
-If you already have a trained Ultralytics YOLOv8 model, and it happens to be a Ultralytics YOLOv8n model—why Ultralytics YOLOv8n? Because in NE301 deployment, the model performance and performance under the n size are relatively appropriate. Ultralytics YOLOv11 and Ultralytics YOLO26  will be supported in the future. If you need to deploy existing models in NE301, you can find the "Upload Model for Quantization" button in AI Tool Stack's "Model Space" menu. Click it and fill in the information in the form:
+If you already have a trained Ultralytics YOLOv8 model, and it happens to be a Ultralytics YOLOv8n model—why Ultralytics YOLOv8n? Because in NE301 deployment, the model performance and performance under the n size are relatively appropriate. Ultralytics YOLO11 and Ultralytics YOLO26  will be supported in the future. If you need to deploy existing models in NE301, you can find the "Upload Model for Quantization" button in AI Tool Stack's "Model Space" menu. Click it and fill in the information in the form:
 
 - Model Name: Define a name
 - Model Type: Default Ultralytics YOLOv8n

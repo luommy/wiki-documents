@@ -6,6 +6,18 @@ All notable changes to the CamThink Wiki documentation will be documented in thi
 
 > This changelog reflects updates starting from **2025-12-23**. Major changes prior to this date are not recorded.
 
+## [2026-02-09]
+
+### Added
+- **NE301 Quick Start**: Added description for PIR, RTMP, and PoE features (Synchronized with Chinese).
+
+### Improved
+- **Case Study**: Synchronized content for Pest Control Monitoring in Chain Restaurants.
+
+### Fixed
+- **Case Study**: Fixed sidebar configuration for Pest Control Monitoring guide.
+
+
 ## [2026-01-30]
 
 ### Added
