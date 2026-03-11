@@ -187,7 +187,7 @@ Use the mobile phone or computer that downloaded the model to connect to NE301's
 </div>
 
 ## Deploying Existing Models
-If you already have a trained YOLOv8 model, and it happens to be a YOLOv8n model—why YOLOv8n? Because in NE301 deployment, the model performance and performance under the n size are relatively appropriate. YOLOv11 and other models will be supported in the future. If you need to deploy existing models in NE301, you can find the "Upload Model for Quantization" button in AI Tool Stack's "Model Space" menu. Click it and fill in the information in the form:
+If you already have a trained YOLOv8 model, and it happens to be a YOLOv8n model—why YOLOv8n? Because in NE301 deployment, the model performance and performance under the n size are relatively appropriate. YOLO11 and other models will be supported in the future. If you need to deploy existing models in NE301, you can find the "Upload Model for Quantization" button in AI Tool Stack's "Model Space" menu. Click it and fill in the information in the form:
 - Model Name: Define a name
 - Model Type: Default YOLOv8n
 - Input Size: Default 640, adjust according to your model's input image size
