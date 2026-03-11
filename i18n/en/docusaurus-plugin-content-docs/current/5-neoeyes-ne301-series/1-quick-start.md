@@ -363,18 +363,22 @@ NeoEyes NE301 supports Wi‑Fi, Cat‑1, and PoE. Configuration options vary by 
 Firmware, models, and configuration files can all be imported or exported—useful for upgrades, migration, and batch deployment.
 
 - **Firmware (local OTA)**
-  - Firmware is packaged into three files: APP, Web, and FSBL. You may update them individually.
+  - Firmware is packaged into three files: APP, Web, and FSBL. You may update them individually (APP and Web can be upgraded via the device web page; FSBL upgrade requires console access).
+    - APP file example: [ne301_App_signed_v2.0.1.30_pkg.bin](https://github.com/camthink-ai/ne301/releases/download/v20260213_main/ne301_App_signed_v2.0.1.30_pkg.bin)
+    - Web file example: [ne301_Web_v1.3.4.4_pkg.bin](https://github.com/camthink-ai/ne301/releases/download/v20260213_main/ne301_Web_v1.3.4.4_pkg.bin)
+    - FSBL file example: [ne301_FSBL_signed_v1.0.0.2_pkg.bin](https://github.com/camthink-ai/ne301/releases/download/v20260213_main/ne301_FSBL_signed_v1.0.0.2_pkg.bin)
   - Upload or drag the files into the target area. The system validates and flashes them automatically, then reboots. Do not interrupt power.
   - Optionally enable “Keep current configuration” to preserve existing settings.
   - If the upgrade fails, the previous firmware remains to ensure the device is still usable.
 
-- **Model import**
+- **Model import (Optional)**
   - Upload a model package that contains the weights and parameter definitions.
+    - Model package example: [ne301_Model_v2.0.0.0_pkg.bin](https://github.com/camthink-ai/ne301/releases/download/v20260213_main/ne301_Model_v2.0.0.0_pkg.bin)
   - After deployment, activate it under “Feature Debugging”.
   - Combine with “Hot-load inference parameters” to fine-tune confidence/NMS thresholds per scenario.
   - You can revert to the factory model via a device reset.
 
-- **Configuration import**
+- **Configuration import (Optional)**
   - Upload a `.json` configuration file. The system shows the modules to be overwritten before applying.
   - Some changes take effect immediately; low-level network changes may require a reboot.
 
