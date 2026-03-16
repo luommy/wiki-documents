@@ -6,6 +6,32 @@ All notable changes to the CamThink Wiki documentation will be documented in thi
 
 > This changelog reflects updates starting from **2025-12-23**. Major changes prior to this date are not recorded.
 
+## [2026-03-11]
+
+### Fixed
+- **Model Support**: Fixed several known issues related to the built-in YOLO vision models.
+
+## [2026-03-10]
+
+### Added
+- **Docs**: Added detailed operational guidelines and images for NE301 integration in the AI Tool Stack tutorial.
+
+### Improved
+- **Docs**: Updated and enhanced the model import/export section in the NE301 Quick Start guide.
+
+## [2026-03-02]
+
+### Improved
+- **Docs**: Updated the model build command and modified the target output path to `pkg-model` in the NE301 guide.
+
+## [2026-02-28]
+
+### Improved
+- **Docs**: Standardized and unified CamThink brand and product model naming conventions across AI Tool Stack documentation.
+
+### Maintenance
+- **Repository**: Deleted incorrectly committed local environment and cache directories such as `.vscode` and `__pycache__`.
+
 ## [2026-02-09]
 
 ### Added

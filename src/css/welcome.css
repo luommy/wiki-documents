@@ -100,7 +100,7 @@
     background-color: transparent;
     /* Allow parent bg to show */
     color: var(--ct-hero-text);
-    padding: 0 1rem;
+    padding: 3rem 1rem 2rem;
     text-align: center;
     transition: background-color 0.3s ease, color 0.3s ease;
     width: 100%;
@@ -108,8 +108,8 @@
     /* Full viewport height minus nav */
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    /* Center everything vertically */
+    justify-content: flex-start;
+    /* Center everything via margin: auto safely */
     align-items: center;
 }
 
@@ -184,8 +184,8 @@
     position: relative;
     z-index: 1;
     max-width: 900px;
-    margin: 0 auto;
-    /* Removed vertical auto, keep horizontal auto */
+    margin: auto;
+    /* Use auto for safe vertical centering */
     display: flex;
     flex-direction: column;
     align-items: center;
