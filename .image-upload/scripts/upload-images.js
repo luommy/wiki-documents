@@ -135,12 +135,24 @@ function extractAllImages(files) {
 }
 
 /**
- * 过滤需要上传的图片(本地图片以 /img/ 开头)
+ * 过滤需要上传的图片(本地图片以 /img/ 开头，且不是远程 URL)
  * @param {string[]} images - 图片路径数组
  * @returns {string[]} 需要上传的图片路径
  */
 function filterLocalImages(images) {
-  return images.filter(img => img.startsWith('/img/'));
+  return images.filter(img => {
+    // 只处理本地路径（以 /img/ 开头）
+    if (!img.startsWith('/img/')) {
+      return false;
+    }
+
+    // 排除已经是远程 URL 的图片
+    if (img.startsWith('https://resources.camthink.ai/wiki/img/')) {
+      return false;
+    }
+
+    return true;
+  });
 }
 
 /**
