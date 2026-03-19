@@ -3,7 +3,7 @@
     "baseUrl": "https://fsx.camthink.ai",
     "username": "harry",
     "password": "${FILE_BROWSER_PASSWORD}",
-    "remoteBasePath": "/wiki",
+    "remoteBasePath": "",
     "publicBaseUrl": "https://resources.camthink.ai/wiki"
   },
   "upload": {
