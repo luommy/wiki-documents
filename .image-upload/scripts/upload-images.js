@@ -43,16 +43,28 @@ function loadConfig(configPath) {
 
   const config = JSON.parse(fs.readFileSync(finalPath, 'utf-8'));
 
-  // 替换环境变量
-  if (config.fileBrowser.password && config.fileBrowser.password.startsWith('${')) {
-    const envVar = config.fileBrowser.password.match(/\$\{(.+)\}/)?.[1];
-    if (envVar) {
-      config.fileBrowser.password = process.env[envVar];
-      if (!config.fileBrowser.password) {
-        throw new Error(`环境变量 ${envVar} 未设置`);
+  // 递归替换环境变量
+  function replaceEnvVars(obj) {
+    for (const key in obj) {
+      if (typeof obj[key] === 'string') {
+        // 匹配 ${VAR_NAME} 格式
+        if (obj[key].startsWith('${') && obj[key].endsWith('}')) {
+          const envVar = obj[key].match(/\$\{(.+)\}/)?.[1];
+          if (envVar) {
+            const value = process.env[envVar];
+            if (!value) {
+              throw new Error(`环境变量 ${envVar} 未设置`);
+            }
+            obj[key] = value;
+          }
+        }
+      } else if (typeof obj[key] === 'object' && obj[key] !== null) {
+        replaceEnvVars(obj[key]);
       }
     }
   }
+
+  replaceEnvVars(config);
 
   return config;
 }
