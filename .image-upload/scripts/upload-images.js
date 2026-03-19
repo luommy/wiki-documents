@@ -305,13 +305,25 @@ async function main() {
     }
 
     const uploadSpinner = ora('上传中...').start();
-    const uploadResults = await uploader.uploadImages(
-      localImages,
-      staticDir,
-      options.force,
-      pathMapping  // 传递路径映射
-    );
-    uploadSpinner.stop();
+    let uploadResults;
+    try {
+      uploadResults = await uploader.uploadImages(
+        localImages,
+        staticDir,
+        options.force,
+        pathMapping  // 传递路径映射
+      );
+      uploadSpinner.succeed('所有图片上传成功');
+    } catch (error) {
+      uploadSpinner.fail('图片上传失败');
+      console.error(chalk.red.bold('\n❌ 上传失败，中止操作\n'));
+      console.error(chalk.red(error.message));
+      console.error(chalk.yellow('\n💡 提示:'));
+      console.error(chalk.yellow('  - 检查网络连接'));
+      console.error(chalk.yellow('  - 使用 --force 参数重试'));
+      console.error(chalk.yellow('  - 检查 File Browser 服务状态'));
+      process.exit(1);
+    }
 
     // 显示上传统计
     const stats = uploader.getStats();
@@ -323,7 +335,20 @@ async function main() {
       stats.errors.forEach(err => {
         console.log(chalk.red(`    - ${err.file}: ${err.error}`));
       });
+      console.error(chalk.red.bold('\n❌ 有图片上传失败，未修改任何文档'));
+      process.exit(1);
     }
+
+    // 验证所有图片都已成功上传
+    const failedImages = localImages.filter(img => !uploadResults[img]);
+    if (failedImages.length > 0) {
+      console.error(chalk.red.bold('\n❌ 以下图片上传失败:\n'));
+      failedImages.forEach(img => console.error(chalk.red(`  - ${img}`)));
+      console.error(chalk.yellow('\n未修改任何文档，请修复问题后重试'));
+      process.exit(1);
+    }
+
+    console.log(chalk.green.bold('\n✅ 所有图片上传成功，开始更新文档...\n'));
 
     // 8. 替换 Markdown 文件中的链接
     console.log(chalk.bold.cyan('\n🔄 替换图片链接\n'));

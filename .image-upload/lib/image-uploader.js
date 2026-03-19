@@ -6,6 +6,7 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const chalk = require('chalk');
 const FileBrowserAPI = require('./api-client');
 
 class ImageUploader {
@@ -216,34 +217,85 @@ class ImageUploader {
   }
 
   /**
-   * 批量上传图片
+   * 批量上传图片（增强版）
    * @param {string[]} localPaths - 本地路径数组
    * @param {string} staticDir - static 目录路径
    * @param {boolean} force - 是否强制上传
    * @param {Object} pathMapping - 路径映射 { localPath: mappedRemotePath }
    * @returns {Promise<Object>} 结果映射 { localPath: remoteUrl }
+   * @throws {Error} 如果有图片上传失败
    */
   async uploadImages(localPaths, staticDir, force = false, pathMapping = {}) {
     const results = {};
-    const concurrency = this.config.upload.concurrency || 3;
+    const concurrency = this.config.upload.concurrency || 5; // 提高默认并发数到 5
+    const maxRetries = this.config.upload.retryAttempts || 3;
+    const failedUploads = [];
 
-    // 使用并发控制
+    console.log(chalk.gray(`  并发数: ${concurrency}, 最大重试: ${maxRetries}`));
+
+    // 分批上传，支持重试
     for (let i = 0; i < localPaths.length; i += concurrency) {
       const batch = localPaths.slice(i, i + concurrency);
+      const batchNum = Math.floor(i / concurrency) + 1;
+      const totalBatches = Math.ceil(localPaths.length / concurrency);
 
-      await Promise.allSettled(
+      console.log(chalk.gray(`  批次 ${batchNum}/${totalBatches}: 上传 ${batch.length} 个图片...`));
+
+      const batchResults = await Promise.allSettled(
         batch.map(async (localPath) => {
-          try {
-            // 使用映射路径（如果有）
-            const mappedRemotePath = pathMapping[localPath] || null;
-            const remoteUrl = await this.uploadImage(localPath, staticDir, force, mappedRemotePath);
-            results[localPath] = remoteUrl;
-          } catch (error) {
-            // 错误已在 uploadImage 中记录到统计
-            results[localPath] = null;
+          let lastError = null;
+
+          // 重试逻辑
+          for (let attempt = 1; attempt <= maxRetries; attempt++) {
+            try {
+              const mappedRemotePath = pathMapping[localPath] || null;
+              const remoteUrl = await this.uploadImage(localPath, staticDir, force, mappedRemotePath);
+              return { localPath, remoteUrl, success: true };
+            } catch (error) {
+              lastError = error;
+
+              // 如果是文件不存在错误，不需要重试
+              if (error.message.includes('文件不存在')) {
+                break;
+              }
+
+              // 如果还有重试机会，等待一段时间
+              if (attempt < maxRetries) {
+                const waitTime = attempt * 1000; // 递增等待时间
+                console.log(chalk.yellow(`    ⚠ ${localPath} 上传失败 (尝试 ${attempt}/${maxRetries})，${waitTime}ms 后重试...`));
+                await new Promise(resolve => setTimeout(resolve, waitTime));
+              }
+            }
           }
+
+          // 所有重试都失败
+          return { localPath, error: lastError, success: false };
         })
       );
+
+      // 处理批次结果
+      for (const result of batchResults) {
+        if (result.status === 'fulfilled') {
+          const { localPath, remoteUrl, success, error } = result.value;
+          if (success) {
+            results[localPath] = remoteUrl;
+          } else {
+            failedUploads.push({ localPath, error: error?.message || '未知错误' });
+            results[localPath] = null;
+          }
+        } else {
+          // Promise rejected (不应该发生，但保险起见)
+          const localPath = batch[batchResults.indexOf(result)];
+          failedUploads.push({ localPath, error: result.reason?.message || 'Promise rejected' });
+          results[localPath] = null;
+        }
+      }
+    }
+
+    // 如果有失败的图片，抛出错误
+    if (failedUploads.length > 0) {
+      const errorDetails = failedUploads.map(f => `  - ${f.localPath}: ${f.error}`).join('\n');
+      throw new Error(`有 ${failedUploads.length} 个图片上传失败:\n${errorDetails}`);
     }
 
     return results;

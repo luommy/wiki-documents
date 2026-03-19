@@ -7,7 +7,7 @@
     "publicBaseUrl": "https://resources.camthink.ai/wiki"
   },
   "upload": {
-    "concurrency": 3,
+    "concurrency": 8,
     "retryAttempts": 3,
     "skipUploaded": true
   },
