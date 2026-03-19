@@ -24,6 +24,7 @@ const dotenv = require('dotenv');
 const ImageUploader = require('../lib/image-uploader');
 const { extractImages, parseFile } = require('../lib/markdown-parser');
 const LinkReplacer = require('../lib/link-replacer');
+const { mapImagePaths } = require('../lib/path-mapper');
 
 // 加载环境变量
 dotenv.config();
@@ -225,6 +226,15 @@ async function main() {
     if (options.dryRun) {
       console.log(chalk.bold.cyan('\n📋 Dry Run 模式 - 预览\n'));
 
+      // 生成路径映射预览
+      const pathMapping = {};
+      for (const file of files) {
+        const images = fileImages.get(file) || [];
+        const localImgs = filterLocalImages(images);
+        const fileMapping = mapImagePaths(localImgs, file);
+        Object.assign(pathMapping, fileMapping);
+      }
+
       console.log(chalk.bold('将处理的文件:'));
       files.forEach(file => {
         const images = fileImages.get(file) || [];
@@ -232,14 +242,25 @@ async function main() {
         if (localImgs.length > 0) {
           console.log(chalk.gray(`  ${file}`));
           localImgs.forEach(img => {
-            console.log(chalk.gray(`    - ${img}`));
+            const mapped = pathMapping[img];
+            if (mapped && mapped !== img) {
+              console.log(chalk.gray(`    - ${img} → ${mapped}`));
+            } else {
+              console.log(chalk.gray(`    - ${img}`));
+            }
           });
         }
       });
 
       console.log(chalk.bold('\n将上传的图片:'));
       localImages.forEach(img => {
-        console.log(chalk.gray(`  ${img}`));
+        const mapped = pathMapping[img];
+        if (mapped && mapped !== img) {
+          console.log(chalk.cyan(`  ${img}`));
+          console.log(chalk.gray(`    → ${mapped}`));
+        } else {
+          console.log(chalk.gray(`  ${img}`));
+        }
       });
 
       console.log(chalk.bold.cyan('\n✓ Dry run 完成(未做任何修改)\n'));
@@ -262,11 +283,32 @@ async function main() {
     // 7. 上传图片
     console.log(chalk.bold.cyan('\n📤 开始上传图片\n'));
 
+    // 生成路径映射（基于文档名）
+    const pathMapping = {};
+    for (const file of files) {
+      const images = fileImages.get(file) || [];
+      const fileMapping = mapImagePaths(images, file);
+      Object.assign(pathMapping, fileMapping);
+    }
+
+    // 显示路径映射（如果有变化）
+    const hasMapping = Object.keys(pathMapping).some(key => pathMapping[key] !== key);
+    if (hasMapping) {
+      console.log(chalk.gray('→ 检测到智能路径映射:'));
+      for (const [local, mapped] of Object.entries(pathMapping)) {
+        if (local !== mapped) {
+          console.log(chalk.gray(`  ${local} → ${mapped}`));
+        }
+      }
+      console.log('');
+    }
+
     const uploadSpinner = ora('上传中...').start();
     const uploadResults = await uploader.uploadImages(
       localImages,
       staticDir,
-      options.force
+      options.force,
+      pathMapping  // 传递路径映射
     );
     uploadSpinner.stop();
 

@@ -102,9 +102,10 @@ class ImageUploader {
    * @param {string} localPath - 本地图片路径(相对于 static 目录)
    * @param {string} staticDir - static 目录绝对路径
    * @param {boolean} force - 是否强制上传(忽略缓存)
+   * @param {string|null} mappedRemotePath - 映射后的远程路径(可选)
    * @returns {Promise<string>} 远程 URL
    */
-  async uploadImage(localPath, staticDir, force = false) {
+  async uploadImage(localPath, staticDir, force = false, mappedRemotePath = null) {
     // 构建完整文件路径
     const fullPath = path.join(staticDir, localPath);
 
@@ -130,9 +131,10 @@ class ImageUploader {
     }
 
     // 构建远程路径
+    // 如果提供了映射路径，使用映射路径；否则使用默认逻辑
     // localPath 格式: /img/xxx/yyy.png
     // remotePath 格式: /wiki/img/xxx/yyy.png
-    const remotePath = `${this.config.fileBrowser.remoteBasePath}${localPath}`;
+    const remotePath = mappedRemotePath || `${this.config.fileBrowser.remoteBasePath}${localPath}`;
 
     try {
       // File Browser 会在上传文件时自动创建文件夹
@@ -218,9 +220,10 @@ class ImageUploader {
    * @param {string[]} localPaths - 本地路径数组
    * @param {string} staticDir - static 目录路径
    * @param {boolean} force - 是否强制上传
+   * @param {Object} pathMapping - 路径映射 { localPath: mappedRemotePath }
    * @returns {Promise<Object>} 结果映射 { localPath: remoteUrl }
    */
-  async uploadImages(localPaths, staticDir, force = false) {
+  async uploadImages(localPaths, staticDir, force = false, pathMapping = {}) {
     const results = {};
     const concurrency = this.config.upload.concurrency || 3;
 
@@ -231,7 +234,9 @@ class ImageUploader {
       await Promise.allSettled(
         batch.map(async (localPath) => {
           try {
-            const remoteUrl = await this.uploadImage(localPath, staticDir, force);
+            // 使用映射路径（如果有）
+            const mappedRemotePath = pathMapping[localPath] || null;
+            const remoteUrl = await this.uploadImage(localPath, staticDir, force, mappedRemotePath);
             results[localPath] = remoteUrl;
           } catch (error) {
             // 错误已在 uploadImage 中记录到统计
