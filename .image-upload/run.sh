@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# 图片上传工具便捷执行脚本
-# 从项目根目录运行此脚本,自动切换到 .image-upload 目录并执行上传工具
+# Image Upload Tool Convenience Script
+# Run this script from project root directory, automatically switches to .image-upload directory and executes the upload tool
 
-# 切换到 .image-upload 目录
+# Switch to .image-upload directory
 cd "$(dirname "$0")" || exit 1
 
-# 执行 upload-images 脚本,传递所有参数
+# Execute upload-images script, passing all arguments
 yarn upload-images "$@"

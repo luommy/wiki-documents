@@ -1,112 +1,114 @@
-### Download Node.js
+<div align="center">
 
-https://nodejs.org/en/download/
+# CamThink Wiki Documentation
 
-```
-# Download and install fnm:
-curl -o- https://fnm.vercel.app/install | bash
-# Download and install Node.js:
-fnm install 22
-# Verify the Node.js version:
-node -v # Should print "v22.14.0".
-# Download and install Yarn:
-corepack enable yarn
-# Verify Yarn version:
-yarn -v
-```
+[![License](https://img.shields.io/badge/Proprietary-blue?style=flat-square)](LICENSE)
+[![Docusaurus](https://img.shields.io/badge/Docusaurus-3.6.1-25C2A0?style=flat-square&logo=docusaurus)](https://docusaurus.io/)
+[![Node](https://img.shields.io/badge/Node-%3E%3D18.0-brightgreen?style=flat-square&logo=node.js)](https://nodejs.org/)
+
+**Official documentation for CamThink AI hardware products**
+
+[🌐 Live Site](https://wiki.camthink.ai) · [📚 Preview](https://camthink-ai.github.io/wiki-documents/) · [🐛 Report Bug](https://github.com/camthink-ai/wiki-documents/issues)
+
+</div>
+
+---
+
+## Overview
+
+Product documentation website built with Docusaurus 3.6.1, featuring bilingual support (Chinese/English), local search, image zoom, and Mermaid diagrams.
+
+**Product Lines:** NG4500 (Edge Computing) · NE101 (Smart Cameras) · NE301 (Advanced Cameras) · Hardware Resources · AI Applications
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- **Node.js** >= 18.0
+- **Yarn** 1.22+
 
 ### Installation
 
-```
-$ yarn
-```
-
-### Local Development
-
-```
-$ yarn start
-```
-
-This command starts a local development server and opens up a browser window. Most changes are reflected live without having to restart the server.
-
-### Build
-
-```
-$ yarn build
-```
-
-This command generates static content into the `build` directory and can be served using any static contents hosting service.
-
-### Deployment
-
-Using SSH:
-
-```
-$ USE_SSH=true yarn deploy
-```
-
-Not using SSH:
-
-```
-$ GIT_USER=<Your GitHub username> yarn deploy
-```
-
-If you are using GitHub pages for hosting, this command is a convenient way to build the website and push to the `gh-pages` branch.
-
-### Image Upload Tool
-
-本项目包含一个自动化图片上传工具,用于将 Markdown 文档中的本地图片上传到 File Browser 服务器,并自动替换图片链接。
-
-#### 快速开始
-
 ```bash
-# 进入工具目录
-cd .image-upload
-
-# 安装依赖
+git clone https://github.com/camthink-ai/wiki-documents.git
+cd wiki-documents
 yarn install
-
-# 配置环境变量
-echo "FILE_BROWSER_PASSWORD=your_password" > .env
-
-# 预览模式(推荐首次使用)
-yarn upload-images ../docs --dry-run
-
-# 实际上传
-yarn upload-images ../docs
 ```
 
-#### 主要功能
-
-- ✅ 批量上传 Markdown 文档中的本地图片
-- ✅ 自动替换图片链接为远程 URL
-- ✅ 智能缓存机制,避免重复上传
-- ✅ 支持多种图片格式(Markdown、JSX、自定义组件)
-- ✅ 并发上传控制,提高效率
-- ✅ 详细的错误处理和日志
-
-#### 使用场景
+### Development
 
 ```bash
-# 上传单个文件
-yarn upload-images ../docs/guide/getting-started.md
-
-# 上传整个目录
-yarn upload-images ../docs/
-
-# 强制重新上传(忽略缓存)
-yarn upload-images ../docs --force
-
-# 仅预览,不做修改
-yarn upload-images ../docs --dry-run
+yarn start        # Start dev server at localhost:3000
+yarn build        # Build for production
+yarn serve        # Serve production build
 ```
 
-#### 详细文档
+---
 
-- [完整使用指南](./.image-upload/README.md)
-- [实现文档](./.image-upload/docs/image-uploader-impl.md)
+## 📖 Documentation Guide
 
-### preview
+### Structure
 
-Link to preview the website: [demo](https://camthink-ai.github.io/wiki-documents/)
+```
+wiki-documents/
+├── docs/                    # Chinese documentation
+├── i18n/en/                 # English translations
+├── static/img/              # Static images
+└── .image-upload/           # Image upload tool
+```
 
+### Writing Docs
+
+**Frontmatter (required):**
+```yaml
+---
+id: unique-doc-id
+title: Document Title
+sidebar_position: 1
+---
+```
+
+**Image formats:**
+```markdown
+![Description](/img/path/image.png)
+<img src="/img/path/image.png" style={{maxWidth: '80%'}} />
+<ZoomableImage src="/img/path/image.png" alt="Description" />
+```
+
+---
+
+## 🖼️ Image Upload Tool
+
+Upload local images to File Browser and replace paths with remote URLs.
+
+```bash
+cd .image-upload
+yarn install
+cp .env.example .env    # Configure credentials
+
+# Usage from project root
+./upload-images.sh docs/your-document.md
+./upload-images.sh docs --dry-run    # Preview mode
+```
+
+**Features:** Concurrent uploads · Auto-sync CN/EN docs · Smart folder naming
+
+**📖 [Full Documentation](./.image-upload/README.md)**
+
+---
+
+## 📚 Resources
+
+- [Docusaurus Docs](https://docusaurus.io/)
+- [CamThink Website](https://www.camthink.ai)
+- [Image Upload Tool](./.image-upload/README.md)
+
+---
+
+<div align="center">
+
+**Built with ❤️ using Docusaurus**
+
+</div>
