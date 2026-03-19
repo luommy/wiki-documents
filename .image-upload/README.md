@@ -59,7 +59,29 @@ yarn test-api
 
 ### 3. 运行工具
 
+#### 方法一：使用便捷脚本（推荐）
+
+在项目根目录运行：
+
 ```bash
+# 预览模式(推荐首次使用)
+./upload-images.sh docs --dry-run
+
+# 实际上传
+./upload-images.sh docs
+
+# 上传单个文件
+./upload-images.sh docs/guide/getting-started.md
+
+# 强制重新上传
+./upload-images.sh docs --force
+```
+
+#### 方法二：进入工具目录运行
+
+```bash
+cd .image-upload
+
 # 预览模式(推荐首次使用)
 yarn upload-images ../docs --dry-run
 
