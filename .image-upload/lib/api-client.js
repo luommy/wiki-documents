@@ -76,7 +76,7 @@ class FileBrowserAPI {
     try {
       const url = `/api/resources${remotePath}${override ? '?override=true' : ''}`;
 
-      await this.client.put(url, fileBuffer, {
+      await this.client.post(url, fileBuffer, {
         headers: {
           ...this.getAuthHeaders(),
           'Content-Type': 'application/octet-stream',
