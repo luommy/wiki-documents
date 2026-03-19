@@ -329,7 +329,6 @@ async function main() {
     const stats = uploader.getStats();
     console.log(chalk.bold('\n📊 上传统计:'));
     console.log(chalk.green(`  ✓ 成功上传: ${stats.uploaded}`));
-    console.log(chalk.gray(`  - 跳过(缓存): ${stats.skipped}`));
     if (stats.failed > 0) {
       console.log(chalk.red(`  ✗ 失败: ${stats.failed}`));
       stats.errors.forEach(err => {
@@ -419,7 +418,6 @@ async function main() {
     console.log(chalk.gray(`  - 处理文件: ${files.length}`));
     console.log(chalk.gray(`  - 更新文件: ${updatedFiles}`));
     console.log(chalk.gray(`  - 上传图片: ${stats.uploaded}`));
-    console.log(chalk.gray(`  - 跳过图片: ${stats.skipped}`));
 
     if (syncedFiles.length > 0) {
       console.log(chalk.green(`  - 同步文件: ${syncedFiles.length}`));

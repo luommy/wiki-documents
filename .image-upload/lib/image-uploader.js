@@ -102,7 +102,7 @@ class ImageUploader {
    * 上传单个图片
    * @param {string} localPath - 本地图片路径(相对于 static 目录)
    * @param {string} staticDir - static 目录绝对路径
-   * @param {boolean} force - 是否强制上传(忽略缓存)
+   * @param {boolean} force - 是否强制上传(忽略缓存) - 已废弃，保留参数兼容性
    * @param {string|null} mappedRemotePath - 映射后的远程路径(可选)
    * @returns {Promise<string>} 远程 URL
    */
@@ -121,16 +121,6 @@ class ImageUploader {
       throw error;
     }
 
-    // 计算 hash
-    const hash = this.calculateHash(fullPath);
-
-    // 检查缓存
-    if (!force && this.config.upload.skipUploaded && this.cache.has(hash)) {
-      const cached = this.cache.get(hash);
-      this.stats.skipped++;
-      return this.buildPublicUrl(cached.remotePath);
-    }
-
     // 构建远程路径
     // 如果提供了映射路径，使用映射路径；否则使用默认逻辑
     // localPath 格式: /img/xxx/yyy.png
@@ -146,17 +136,6 @@ class ImageUploader {
 
       // 上传文件
       await this.apiClient.uploadFile(remotePath, fileBuffer, true);
-
-      // 更新缓存
-      const fileStat = fs.statSync(fullPath);
-      this.cache.set(hash, {
-        remotePath: remotePath,
-        uploadedAt: new Date().toISOString(),
-        size: fileStat.size
-      });
-
-      // 保存缓存
-      this.saveCache();
 
       // 更新统计
       this.stats.uploaded++;
