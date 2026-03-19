@@ -12,26 +12,37 @@ const path = require('path');
  * @returns {Object} { language: 'zh'|'en', counterpart: 对应语言版本路径|null }
  */
 function getLanguageCounterpart(docPath) {
-  const normalizedPath = path.normalize(docPath);
+  // 规范化路径
+  let normalizedPath = path.normalize(docPath);
+
+  // 如果是绝对路径，转换为相对路径（相对于项目根目录）
+  if (path.isAbsolute(normalizedPath)) {
+    // 项目根目录是 .image-upload 的上两级
+    const projectRoot = path.resolve(__dirname, '..', '..');
+    normalizedPath = path.relative(projectRoot, normalizedPath);
+  }
+
+  // 移除所有 ../ 前缀，获取相对路径
+  const relativePath = normalizedPath.replace(/^(\.\.[\/\\])+/, '');
 
   // 检查是否是英文文档（在 i18n/en 目录下）
-  if (normalizedPath.includes(path.join('i18n', 'en'))) {
+  if (relativePath.startsWith(path.join('i18n', 'en')) || relativePath.includes(path.join('i18n', 'en'))) {
     // 英文 → 中文
     // i18n/en/docusaurus-plugin-content-docs/current/... → docs/...
-    const match = normalizedPath.match(/i18n[\/\\]en[\/\\]docusaurus-plugin-content-docs[\/\\]current[\/\\](.+)/);
+    const match = relativePath.match(/i18n[\/\\]en[\/\\]docusaurus-plugin-content-docs[\/\\]current[\/\\](.+)/);
     if (match) {
       return {
         language: 'en',
         counterpart: path.join('docs', match[1])
       };
     }
-  } else if (normalizedPath.startsWith('docs')) {
+  } else if (relativePath.startsWith('docs')) {
     // 中文 → 英文
     // docs/... → i18n/en/docusaurus-plugin-content-docs/current/...
-    const relativePath = normalizedPath.replace(/^docs[\/\\]/, '');
+    const docRelativePath = relativePath.replace(/^docs[\/\\]/, '');
     return {
       language: 'zh',
-      counterpart: path.join('i18n', 'en', 'docusaurus-plugin-content-docs', 'current', relativePath)
+      counterpart: path.join('i18n', 'en', 'docusaurus-plugin-content-docs', 'current', docRelativePath)
     };
   }
 
@@ -60,8 +71,12 @@ function syncToCounterpart(sourceDoc, linkMapping) {
     };
   }
 
+  // 确定项目根目录（从 .image-upload 目录向上一级）
+  const projectRoot = path.resolve(__dirname, '..', '..');
+  const counterpartAbsPath = path.resolve(projectRoot, counterpart);
+
   // 检查对应文档是否存在
-  if (!fs.existsSync(counterpart)) {
+  if (!fs.existsSync(counterpartAbsPath)) {
     return {
       success: false,
       counterpart,
@@ -73,7 +88,7 @@ function syncToCounterpart(sourceDoc, linkMapping) {
 
   try {
     // 读取对应文档内容
-    let content = fs.readFileSync(counterpart, 'utf-8');
+    let content = fs.readFileSync(counterpartAbsPath, 'utf-8');
     let updatedCount = 0;
 
     // 替换链接
@@ -89,7 +104,7 @@ function syncToCounterpart(sourceDoc, linkMapping) {
 
     // 如果有更新，写回文件
     if (updatedCount > 0) {
-      fs.writeFileSync(counterpart, content, 'utf-8');
+      fs.writeFileSync(counterpartAbsPath, content, 'utf-8');
     }
 
     return {
