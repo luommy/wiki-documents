@@ -25,6 +25,7 @@ const ImageUploader = require('../lib/image-uploader');
 const { extractImages, parseFile } = require('../lib/markdown-parser');
 const LinkReplacer = require('../lib/link-replacer');
 const { mapImagePaths } = require('../lib/path-mapper');
+const { syncToCounterpart, getLanguageCounterpart } = require('../lib/language-sync');
 
 // 加载环境变量
 dotenv.config();
@@ -329,6 +330,7 @@ async function main() {
 
     const replacer = new LinkReplacer();
     let updatedFiles = 0;
+    const allMappings = {}; // 收集所有映射用于同步
 
     for (const [file, images] of fileImages.entries()) {
       const localImgs = filterLocalImages(images);
@@ -342,6 +344,7 @@ async function main() {
       localImgs.forEach(img => {
         if (uploadResults[img]) {
           mapping[img] = uploadResults[img];
+          allMappings[img] = uploadResults[img]; // 收集映射
         }
       });
 
@@ -362,12 +365,40 @@ async function main() {
       console.log(chalk.gray(`  ✓ ${file} (${localImgs.length} 个图片)`));
     }
 
-    // 9. 完成总结
+    // 9. 同步到对应语言版本
+    console.log(chalk.bold.cyan('\n🌐 同步到对应语言版本\n'));
+
+    const syncedFiles = [];
+    const failedSyncs = [];
+
+    for (const file of files) {
+      const result = syncToCounterpart(file, allMappings);
+
+      if (result.success) {
+        if (result.updated > 0) {
+          console.log(chalk.green(`  ✓ ${result.counterpart} (${result.updated} 个链接)`));
+          console.log(chalk.gray(`    方向: ${result.language}`));
+          syncedFiles.push(result.counterpart);
+        } else {
+          console.log(chalk.gray(`  - ${result.counterpart} (无需更新)`));
+        }
+      } else if (result.counterpart) {
+        console.log(chalk.yellow(`  ⚠ ${result.counterpart}`));
+        console.log(chalk.yellow(`    ${result.error}`));
+        failedSyncs.push(result);
+      }
+    }
+
+    // 10. 完成总结
     console.log(chalk.bold.green('\n✨ 处理完成!\n'));
     console.log(chalk.gray(`  - 处理文件: ${files.length}`));
     console.log(chalk.gray(`  - 更新文件: ${updatedFiles}`));
     console.log(chalk.gray(`  - 上传图片: ${stats.uploaded}`));
     console.log(chalk.gray(`  - 跳过图片: ${stats.skipped}`));
+
+    if (syncedFiles.length > 0) {
+      console.log(chalk.green(`  - 同步文件: ${syncedFiles.length}`));
+    }
 
     if (stats.failed > 0) {
       console.log(chalk.red(`  - 失败图片: ${stats.failed}`));
