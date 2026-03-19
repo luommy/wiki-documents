@@ -1,6 +1,4 @@
 const axios = require('axios');
-const fs = require('fs').promises;
-const path = require('path');
 
 /**
  * File Browser API 客户端
@@ -13,6 +11,17 @@ class FileBrowserAPI {
    * @param {string} config.password - 密码
    */
   constructor(config) {
+    // 验证必需参数
+    if (!config.baseUrl) {
+      throw new Error('baseUrl 是必需的配置参数');
+    }
+    if (!config.username) {
+      throw new Error('username 是必需的配置参数');
+    }
+    if (!config.password) {
+      throw new Error('password 是必需的配置参数');
+    }
+
     this.baseUrl = config.baseUrl;
     this.username = config.username;
     this.password = config.password;
@@ -37,7 +46,9 @@ class FileBrowserAPI {
       this.token = response.data;
       return this.token;
     } catch (error) {
-      throw new Error(`登录失败: ${error.message}`);
+      const status = error.response?.status;
+      const message = error.response?.data?.message || error.message;
+      throw new Error(`登录失败 (HTTP ${status || 'N/A'}): ${message}`);
     }
   }
 
