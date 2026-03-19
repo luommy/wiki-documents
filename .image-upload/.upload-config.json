@@ -3,14 +3,13 @@
     "baseUrl": "https://fsx.camthink.ai",
     "username": "harry",
     "password": "${FILE_BROWSER_PASSWORD}",
-    "remoteBasePath": "/wiki/img",
-    "publicBaseUrl": "https://resources.camthink.ai/wiki/img"
+    "remoteBasePath": "/wiki",
+    "publicBaseUrl": "https://resources.camthink.ai/wiki"
   },
   "upload": {
     "concurrency": 3,
     "retryAttempts": 3,
-    "skipUploaded": true,
-    "createFolder": true
+    "skipUploaded": true
   },
   "markdown": {
     "fileExtensions": [".md", ".mdx"],

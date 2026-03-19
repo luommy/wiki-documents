@@ -94,11 +94,16 @@ class FileBrowserAPI {
    */
   async createFolder(folderPath) {
     try {
+      // File Browser API: POST /api/resources/{path}?override=false
+      // 请求体需要指定规则,但创建文件夹需要使用特殊方式
       await this.client.post(
-        `/api/resources${folderPath}`,
-        {},
+        `/api/resources${folderPath}?override=false`,
+        '', // 空字符串作为请求体,避免创建 JSON 文件
         {
-          headers: this.getAuthHeaders(),
+          headers: {
+            ...this.getAuthHeaders(),
+            'Content-Type': 'application/octet-stream', // 使用二进制流避免 JSON 解析
+          },
         }
       );
     } catch (error) {

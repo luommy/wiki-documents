@@ -142,7 +142,7 @@ async function main() {
     .option('-c, --config <path>', '配置文件路径')
     .option('--dry-run', '仅扫描和预览,不上传或修改文件', false)
     .option('--force', '强制上传所有图片(忽略缓存)', false)
-    .option('--no-cache', '禁用缓存', false)
+    .option('--no-cache', '禁用缓存')  // 移除默认值,让 Commander 自动处理
     .option('--static-dir <path>', 'static 目录路径(默认为自动检测)')
     .parse(process.argv);
 

@@ -135,11 +135,8 @@ class ImageUploader {
     const remotePath = `${this.config.fileBrowser.remoteBasePath}${localPath}`;
 
     try {
-      // 确保文件夹存在
-      if (this.config.upload.createFolder) {
-        const folderPath = path.dirname(remotePath);
-        await this.apiClient.createFolder(folderPath);
-      }
+      // File Browser 会在上传文件时自动创建文件夹
+      // 因此不需要显式创建文件夹
 
       // 读取文件内容
       const fileBuffer = fs.readFileSync(fullPath);
