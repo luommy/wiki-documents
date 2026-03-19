@@ -1,4 +1,7 @@
 ---
+id: test-upload
+title: 测试图片上传
+sidebar_position: 1
 sidebar_label: Test Upload
 description: 测试图片上传功能
 ---
