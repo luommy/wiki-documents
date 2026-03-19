@@ -1,0 +1,19 @@
+{
+  "fileBrowser": {
+    "baseUrl": "https://fsx.camthink.ai",
+    "username": "harry",
+    "password": "${FILE_BROWSER_PASSWORD}",
+    "remoteBasePath": "/wiki/img",
+    "publicBaseUrl": "https://resources.camthink.ai/wiki/img"
+  },
+  "upload": {
+    "concurrency": 3,
+    "retryAttempts": 3,
+    "skipUploaded": true,
+    "createFolder": true
+  },
+  "markdown": {
+    "fileExtensions": [".md", ".mdx"],
+    "imageExtensions": [".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp"]
+  }
+}
