@@ -117,7 +117,7 @@ class FileBrowserAPI {
    */
   async fileExists(remotePath) {
     try {
-      await this.client.head(`/api/resources${remotePath}`, {
+      await this.client.get(`/api/resources${remotePath}`, {
         headers: this.getAuthHeaders(),
       });
       return true;
@@ -139,7 +139,7 @@ class FileBrowserAPI {
       const response = await this.client.get(`/api/resources${folderPath}`, {
         headers: this.getAuthHeaders(),
       });
-      return response.data;
+      return response.data.items || [];
     } catch (error) {
       throw new Error(`列出文件夹内容失败 (${folderPath}): ${error.message}`);
     }
