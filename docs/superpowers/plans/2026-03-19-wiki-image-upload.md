@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED: Use superpowers:subagent-driven-development (if subagents available) or superpowers:executing-plans to implement this plan. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** 构建一个 Node.js CLI 工具，实现 Wiki 图片自动上传到 File Browser 并更新 Markdown 中的链接
+**Goal:** 构建一个 Node.js CLI 工具,实现 Wiki 图片自动上传到 File Browser 并更新 Markdown 中的链接
 
-**Architecture:** 使用 Node.js 创建 CLI 工具，通过 File Browser API 上传图片，解析 Markdown 文件提取图片引用，替换为远程 URL。采用模块化设计：API 客户端、Markdown 解析器、链接替换器、上传协调器。
+**Architecture:** 使用 Node.js 创建独立 CLI 工具(位于 `.image-upload/` 目录),通过 File Browser API 上传图片,解析 Markdown 文件提取图片引用,替换为远程 URL。采用模块化设计:API 客户端、Markdown 解析器、链接替换器、上传协调器。
 
 **Tech Stack:** Node.js, Axios, Chalk, Commander, Glob, Inquirer, Ora, Crypto-js
 
@@ -14,53 +14,86 @@
 
 ```
 wiki-documents/
-├── scripts/
-│   ├── test-api.js              # API 验证脚本（新建）
-│   └── upload-images.js         # 主 CLI 工具（新建）
-├── lib/
-│   ├── api-client.js            # File Browser API 封装（新建）
-│   ├── markdown-parser.js       # Markdown 文件解析（新建）
-│   ├── image-uploader.js        # 图片上传逻辑（新建）
-│   └── link-replacer.js         # 链接替换逻辑（新建）
-├── test/
-│   └── fixtures/
-│       ├── sample.png           # 测试图片（新建）
-│       └── test-article.md      # 测试文章（新建）
-├── .upload-config.json          # 配置文件（新建）
-├── .upload-cache.json           # 上传缓存（新建，git忽略）
-└── package.json                 # 项目依赖（修改）
+├── .image-upload/                # 图片上传工具独立目录(新建)
+│   ├── package.json              # 独立的依赖配置(新建)
+│   ├── scripts/
+│   │   ├── test-api.js           # API 验证脚本(新建)
+│   │   └── upload-images.js      # 主 CLI 工具(新建)
+│   ├── lib/
+│   │   ├── api-client.js         # File Browser API 封装(新建)
+│   │   ├── markdown-parser.js    # Markdown 文件解析(新建)
+│   │   ├── image-uploader.js     # 图片上传逻辑(新建)
+│   │   └── link-replacer.js      # 链接替换逻辑(新建)
+│   ├── test/
+│   │   └── fixtures/
+│   │       ├── sample.png        # 测试图片(新建)
+│   │       └── test-article.md   # 测试文章(新建)
+│   ├── .upload-config.json       # 配置文件(新建)
+│   └── .upload-cache.json        # 上传缓存(新建,git忽略)
+└── .gitignore                    # 修改:添加 .image-upload/ 忽略规则
 ```
+
+**重要说明:**
+- 所有开发产出物都在 `.image-upload/` 目录内
+- CLI 工具通过相对路径访问父项目的 `static/` 目录
+- 不修改主项目的 `package.json`
 
 ---
 
 ## Chunk 1: 项目设置和 API 验证
 
-### Task 1: 安装依赖
+### Task 1: 创建 .image-upload 目录和独立 package.json
 
 **Files:**
-- Modify: `package.json`
+- Create: `.image-upload/package.json`
 
-- [ ] **Step 1: 安装所需的 npm 包**
+- [ ] **Step 1: 创建 .image-upload 目录**
 
 ```bash
-yarn add axios@^1.6.0 chalk@^4.1.2 commander@^11.0.0 glob@^10.3.0 inquirer@^8.2.0 ora@^5.4.0 crypto-js@^4.2.0
+mkdir -p .image-upload
 ```
 
-Expected: 成功安装所有依赖包
+- [ ] **Step 2: 创建独立的 package.json**
 
-- [ ] **Step 2: 验证安装**
+创建 `.image-upload/package.json`:
 
-```bash
-yarn list --pattern "axios|chalk|commander|glob|inquirer|ora|crypto-js"
+```json
+{
+  "name": "wiki-image-upload",
+  "version": "1.0.0",
+  "description": "Wiki 图片自动上传工具",
+  "private": true,
+  "scripts": {
+    "test-api": "node scripts/test-api.js",
+    "upload-images": "node scripts/upload-images.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "chalk": "^4.1.2",
+    "commander": "^11.0.0",
+    "glob": "^10.3.0",
+    "inquirer": "^8.2.0",
+    "ora": "^5.4.0",
+    "crypto-js": "^4.2.0",
+    "dotenv": "^16.0.0"
+  }
+}
 ```
 
-Expected: 显示所有已安装的包及其版本
-
-- [ ] **Step 3: 提交依赖更新**
+- [ ] **Step 3: 安装依赖**
 
 ```bash
-git add package.json yarn.lock
-git commit -m "chore: 添加图片上传工具依赖包"
+cd .image-upload && yarn install
+```
+
+Expected: 在 `.image-upload/node_modules/` 中安装所有依赖
+
+- [ ] **Step 4: 提交目录结构**
+
+```bash
+cd .. # 回到项目根目录
+git add .image-upload/package.json .image-upload/yarn.lock
+git commit -m "feat: 创建独立的图片上传工具目录和配置"
 ```
 
 ---
@@ -68,12 +101,12 @@ git commit -m "chore: 添加图片上传工具依赖包"
 ### Task 2: 创建配置文件
 
 **Files:**
-- Create: `.upload-config.json`
+- Create: `.image-upload/.upload-config.json`
 - Modify: `.gitignore`
 
 - [ ] **Step 1: 创建配置文件**
 
-创建 `.upload-config.json`:
+创建 `.image-upload/.upload-config.json`:
 
 ```json
 {
@@ -99,27 +132,28 @@ git commit -m "chore: 添加图片上传工具依赖包"
 
 - [ ] **Step 2: 更新 .gitignore**
 
-在 `.gitignore` 文件末尾添加：
+在项目根目录的 `.gitignore` 文件末尾添加:
 
 ```gitignore
 # 图片上传工具
-.upload-cache.json
-.upload-config.local.json
-test/fixtures/uploaded/
+.image-upload/.upload-cache.json
+.image-upload/.upload-config.local.json
+.image-upload/.env
+.image-upload/test/fixtures/uploaded/
 ```
 
-- [ ] **Step 3: 创建环境变量文件（本地使用，不提交）**
+- [ ] **Step 3: 创建环境变量文件(本地使用,不提交)**
 
-创建 `.env` (不提交到 git):
+创建 `.image-upload/.env` (不提交到 git):
 
 ```bash
-echo "FILE_BROWSER_PASSWORD=N0ep+\$=WMkz%4vxV" > .env
+echo "FILE_BROWSER_PASSWORD=N0ep+\$=WMkz%4vxV" > .image-upload/.env
 ```
 
 - [ ] **Step 4: 提交配置文件**
 
 ```bash
-git add .upload-config.json .gitignore
+git add .image-upload/.upload-config.json .gitignore
 git commit -m "feat: 添加图片上传工具配置文件"
 ```
 
@@ -128,33 +162,33 @@ git commit -m "feat: 添加图片上传工具配置文件"
 ### Task 3: 创建测试资源
 
 **Files:**
-- Create: `test/fixtures/sample.png`
-- Create: `test/fixtures/test-article.md`
+- Create: `.image-upload/test/fixtures/sample.png`
+- Create: `.image-upload/test/fixtures/test-article.md`
 
 - [ ] **Step 1: 创建测试目录**
 
 ```bash
-mkdir -p test/fixtures
+mkdir -p .image-upload/test/fixtures
 ```
 
 - [ ] **Step 2: 创建测试图片**
 
-使用任意 PNG 图片或从现有图片复制：
+使用任意 PNG 图片或从现有图片复制:
 
 ```bash
-cp static/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image1.png test/fixtures/sample.png
+cp static/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image1.png .image-upload/test/fixtures/sample.png
 ```
 
-如果源文件不存在，创建一个占位图片：
+如果源文件不存在,创建一个占位图片:
 
 ```bash
 # 创建一个简单的 1x1 像素 PNG
-echo "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" | base64 -d > test/fixtures/sample.png
+echo "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" | base64 -d > .image-upload/test/fixtures/sample.png
 ```
 
 - [ ] **Step 3: 创建测试文章**
 
-创建 `test/fixtures/test-article.md`:
+创建 `.image-upload/test/fixtures/test-article.md`:
 
 ```markdown
 ---
@@ -164,15 +198,15 @@ description: 测试图片上传功能
 
 # 测试文章
 
-这是一张测试图片：
+这是一张测试图片:
 
 ![测试图片](/img/test/sample.png)
 
-这是 JSX 格式的图片：
+这是 JSX 格式的图片:
 
 <img src="/img/test/sample.png" style={{display: "block", margin: "20px auto", maxWidth: "80%"}} />
 
-这是另一张图片：
+这是另一张图片:
 
 ![另一张图片](/img/test/another.png)
 ```
@@ -180,7 +214,7 @@ description: 测试图片上传功能
 - [ ] **Step 4: 提交测试资源**
 
 ```bash
-git add test/
+git add .image-upload/test/
 git commit -m "test: 添加图片上传测试资源"
 ```
 
@@ -189,11 +223,11 @@ git commit -m "test: 添加图片上传测试资源"
 ### Task 4: 创建 API 客户端基础结构
 
 **Files:**
-- Create: `lib/api-client.js`
+- Create: `.image-upload/lib/api-client.js`
 
-- [ ] **Step 1: 创建 API 客户端框架**
+- [ ] **Step 1: 创建 lib 目录和 API 客户端框架**
 
-创建 `lib/api-client.js`:
+创建 `.image-upload/lib/api-client.js`:
 
 ```javascript
 const axios = require('axios');
@@ -245,7 +279,7 @@ class FileBrowserAPI {
    */
   getAuthHeaders() {
     if (!this.token) {
-      throw new Error('未登录，请先调用 login() 方法');
+      throw new Error('未登录,请先调用 login() 方法');
     }
     return {
       'X-Auth': this.token,
@@ -259,8 +293,7 @@ module.exports = FileBrowserAPI;
 - [ ] **Step 2: 提交 API 客户端框架**
 
 ```bash
-mkdir -p lib
-git add lib/api-client.js
+git add .image-upload/lib/api-client.js
 git commit -m "feat: 添加 File Browser API 客户端基础结构"
 ```
 
@@ -269,11 +302,11 @@ git commit -m "feat: 添加 File Browser API 客户端基础结构"
 ### Task 5: 实现 API 测试脚本
 
 **Files:**
-- Create: `scripts/test-api.js`
+- Create: `.image-upload/scripts/test-api.js`
 
-- [ ] **Step 1: 创建 API 测试脚本**
+- [ ] **Step 1: 创建 scripts 目录和 API 测试脚本**
 
-创建 `scripts/test-api.js`:
+创建 `.image-upload/scripts/test-api.js`:
 
 ```javascript
 #!/usr/bin/env node
@@ -281,7 +314,7 @@ git commit -m "feat: 添加 File Browser API 客户端基础结构"
 const FileBrowserAPI = require('../lib/api-client');
 const fs = require('fs').promises;
 const path = require('path');
-require('dotenv').config();
+require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
 // 配置
 const config = {
@@ -292,7 +325,7 @@ const config = {
 
 if (!config.password) {
   console.error('❌ 错误: 未设置 FILE_BROWSER_PASSWORD 环境变量');
-  console.error('请创建 .env 文件并设置: FILE_BROWSER_PASSWORD=your_password');
+  console.error('请创建 .image-upload/.env 文件并设置: FILE_BROWSER_PASSWORD=your_password');
   process.exit(1);
 }
 
@@ -305,7 +338,7 @@ async function testAPI() {
     // 测试 1: 登录
     console.log('1. 测试登录...');
     const token = await api.login();
-    console.log(`✓ 登录成功，Token 长度: ${token.length}\n`);
+    console.log(`✓ 登录成功,Token 长度: ${token.length}\n`);
 
     // 测试 2: 创建测试文件夹
     console.log('2. 测试创建文件夹...');
@@ -355,28 +388,19 @@ async function testAPI() {
 testAPI();
 ```
 
-- [ ] **Step 2: 安装 dotenv 包（用于读取 .env 文件）**
+- [ ] **Step 2: 运行测试验证**
 
 ```bash
-yarn add dotenv
+cd .image-upload && yarn test-api
 ```
 
-- [ ] **Step 3: 在 package.json 添加测试脚本**
+Expected: 输出 "=== 所有测试通过 ==="
 
-在 `package.json` 的 `scripts` 部分添加：
-
-```json
-{
-  "scripts": {
-    "test-api": "node scripts/test-api.js"
-  }
-}
-```
-
-- [ ] **Step 4: 提交测试脚本**
+- [ ] **Step 3: 提交测试脚本**
 
 ```bash
-git add scripts/test-api.js package.json
+cd .. # 回到项目根目录
+git add .image-upload/scripts/test-api.js
 git commit -m "feat: 添加 File Browser API 测试脚本"
 ```
 
@@ -385,16 +409,16 @@ git commit -m "feat: 添加 File Browser API 测试脚本"
 ### Task 6: 实现 API 客户端的完整功能
 
 **Files:**
-- Modify: `lib/api-client.js:1-70`
+- Modify: `.image-upload/lib/api-client.js:1-70`
 
 - [ ] **Step 1: 添加上传文件方法**
 
-在 `lib/api-client.js` 的 `getAuthHeaders()` 方法后添加：
+在 `.image-upload/lib/api-client.js` 的 `getAuthHeaders()` 方法后添加:
 
 ```javascript
   /**
    * 上传文件
-   * @param {string} remotePath - 远程路径（如 /wiki/img/test/image.png）
+   * @param {string} remotePath - 远程路径(如 /wiki/img/test/image.png)
    * @param {Buffer} fileBuffer - 文件内容
    * @param {boolean} override - 是否覆盖已存在的文件
    * @returns {Promise<void>}
@@ -417,7 +441,7 @@ git commit -m "feat: 添加 File Browser API 测试脚本"
 
 - [ ] **Step 2: 添加创建文件夹方法**
 
-继续添加：
+继续添加:
 
 ```javascript
   /**
@@ -436,7 +460,7 @@ git commit -m "feat: 添加 File Browser API 测试脚本"
       );
     } catch (error) {
       if (error.response?.status === 409) {
-        // 文件夹已存在，不算错误
+        // 文件夹已存在,不算错误
         return;
       }
       throw new Error(`创建文件夹失败 (${folderPath}): ${error.message}`);
@@ -446,7 +470,7 @@ git commit -m "feat: 添加 File Browser API 测试脚本"
 
 - [ ] **Step 3: 添加检查文件存在方法**
 
-继续添加：
+继续添加:
 
 ```javascript
   /**
@@ -471,7 +495,7 @@ git commit -m "feat: 添加 File Browser API 测试脚本"
 
 - [ ] **Step 4: 添加列出文件夹内容方法**
 
-继续添加：
+继续添加:
 
 ```javascript
   /**
@@ -494,7 +518,7 @@ git commit -m "feat: 添加 File Browser API 测试脚本"
 - [ ] **Step 5: 提交 API 客户端完整实现**
 
 ```bash
-git add lib/api-client.js
+git add .image-upload/lib/api-client.js
 git commit -m "feat: 完成 File Browser API 客户端所有方法"
 ```
 
@@ -507,10 +531,10 @@ git commit -m "feat: 完成 File Browser API 客户端所有方法"
 
 - [ ] **Step 1: 确保 .env 文件存在**
 
-检查 `.env` 文件：
+检查 `.image-upload/.env` 文件:
 
 ```bash
-cat .env
+cat .image-upload/.env
 ```
 
 Expected: 显示 `FILE_BROWSER_PASSWORD=...`
@@ -518,16 +542,16 @@ Expected: 显示 `FILE_BROWSER_PASSWORD=...`
 - [ ] **Step 2: 运行测试脚本**
 
 ```bash
-yarn test-api
+cd .image-upload && yarn test-api
 ```
 
-Expected: 所有测试通过，输出类似：
+Expected: 所有测试通过,输出类似:
 
 ```
 === File Browser API 验证测试 ===
 
 1. 测试登录...
-✓ 登录成功，Token 长度: XXX
+✓ 登录成功,Token 长度: XXX
 
 2. 测试创建文件夹...
 ✓ 文件夹创建成功: /wiki/img/test-api
@@ -547,13 +571,13 @@ Expected: 所有测试通过，输出类似：
 
 - [ ] **Step 3: 手动验证公开访问 URL**
 
-在浏览器中打开：`https://resources.camthink.ai/wiki/img/test-api/sample.png`
+在浏览器中打开:`https://resources.camthink.ai/wiki/img/test-api/sample.png`
 
 Expected: 图片正常显示
 
 - [ ] **Step 4: 如果测试失败**
 
-检查以下内容：
+检查以下内容:
 1. File Browser 服务是否在线
 2. 用户名密码是否正确
 3. 网络连接是否正常
@@ -566,11 +590,11 @@ Expected: 图片正常显示
 ### Task 8: 实现 Markdown 解析器
 
 **Files:**
-- Create: `lib/markdown-parser.js`
+- Create: `.image-upload/lib/markdown-parser.js`
 
 - [ ] **Step 1: 创建 Markdown 解析器**
 
-创建 `lib/markdown-parser.js`:
+创建 `.image-upload/lib/markdown-parser.js`:
 
 ```javascript
 /**
@@ -617,7 +641,7 @@ class MarkdownParser {
       }
     }
 
-    // 去重（同一图片可能被引用多次）
+    // 去重(同一图片可能被引用多次)
     const uniqueImages = [];
     const seen = new Set();
 
@@ -650,7 +674,7 @@ module.exports = MarkdownParser;
 - [ ] **Step 2: 提交 Markdown 解析器**
 
 ```bash
-git add lib/markdown-parser.js
+git add .image-upload/lib/markdown-parser.js
 git commit -m "feat: 添加 Markdown 图片引用解析器"
 ```
 
@@ -659,11 +683,11 @@ git commit -m "feat: 添加 Markdown 图片引用解析器"
 ### Task 9: 实现链接替换器
 
 **Files:**
-- Create: `lib/link-replacer.js`
+- Create: `.image-upload/lib/link-replacer.js`
 
 - [ ] **Step 1: 创建链接替换器**
 
-创建 `lib/link-replacer.js`:
+创建 `.image-upload/lib/link-replacer.js`:
 
 ```javascript
 /**
@@ -688,7 +712,7 @@ class LinkReplacer {
       );
       result = result.replace(mdRegex, `![$1](${newUrl})`);
 
-      // 替换 JSX 格式（保持其他属性不变）
+      // 替换 JSX 格式(保持其他属性不变)
       const jsxRegex = new RegExp(
         `(<img[^>]+src=\\{?["'])${this.escapeRegex(oldPath)}(["'][^>]*\\/?>)`,
         'g'
@@ -715,7 +739,7 @@ module.exports = LinkReplacer;
 - [ ] **Step 2: 提交链接替换器**
 
 ```bash
-git add lib/link-replacer.js
+git add .image-upload/lib/link-replacer.js
 git commit -m "feat: 添加 Markdown 图片链接替换器"
 ```
 
@@ -724,11 +748,11 @@ git commit -m "feat: 添加 Markdown 图片链接替换器"
 ### Task 10: 实现图片上传协调器
 
 **Files:**
-- Create: `lib/image-uploader.js`
+- Create: `.image-upload/lib/image-uploader.js`
 
 - [ ] **Step 1: 创建图片上传协调器**
 
-创建 `lib/image-uploader.js`:
+创建 `.image-upload/lib/image-uploader.js`:
 
 ```javascript
 const fs = require('fs').promises;
@@ -766,7 +790,7 @@ class ImageUploader {
       const cacheData = await fs.readFile(cachePath, 'utf-8');
       this.cache = JSON.parse(cacheData);
     } catch (error) {
-      // 缓存文件不存在，使用空缓存
+      // 缓存文件不存在,使用空缓存
       this.cache = { images: {} };
     }
   }
@@ -802,7 +826,7 @@ class ImageUploader {
 
   /**
    * 上传单个图片
-   * @param {string} localPath - 本地路径（如 /img/ne301/app/image.png）
+   * @param {string} localPath - 本地路径(如 /img/ne301/app/image.png)
    * @param {string} staticDir - static 目录绝对路径
    * @param {boolean} force - 是否强制重新上传
    * @returns {Promise<{success: boolean, url?: string, error?: string}>}
@@ -924,7 +948,7 @@ module.exports = ImageUploader;
 - [ ] **Step 2: 提交图片上传协调器**
 
 ```bash
-git add lib/image-uploader.js
+git add .image-upload/lib/image-uploader.js
 git commit -m "feat: 添加图片上传协调器"
 ```
 
@@ -932,17 +956,17 @@ git commit -m "feat: 添加图片上传协调器"
 
 ## Chunk 2 完成检查点
 
-✅ **已完成的任务：**
+✅ **已完成的任务:**
 - Task 8: 实现 Markdown 解析器
 - Task 9: 实现链接替换器
 - Task 10: 实现图片上传协调器
 
-**关键成果：**
+**关键成果:**
 - 核心库全部实现完成
-- 模块化设计，职责清晰
+- 模块化设计,职责清晰
 - 准备好集成到 CLI 工具
 
-**下一步：** 继续 Chunk 3 - CLI 工具实现
+**下一步:** 继续 Chunk 3 - CLI 工具实现
 
 ---
 
@@ -951,11 +975,11 @@ git commit -m "feat: 添加图片上传协调器"
 ### Task 11: 创建 CLI 工具主框架
 
 **Files:**
-- Create: `scripts/upload-images.js`
+- Create: `.image-upload/scripts/upload-images.js`
 
 - [ ] **Step 1: 创建 CLI 工具框架**
 
-创建 `scripts/upload-images.js`:
+创建 `.image-upload/scripts/upload-images.js`:
 
 ```javascript
 #!/usr/bin/env node
@@ -967,7 +991,7 @@ const inquirer = require('inquirer');
 const glob = require('glob');
 const path = require('path');
 const fs = require('fs').promises;
-require('dotenv').config();
+require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
 const FileBrowserAPI = require('../lib/api-client');
 const MarkdownParser = require('../lib/markdown-parser');
@@ -980,7 +1004,7 @@ program
   .description('上传 Wiki 图片到 File Browser 并更新 Markdown 链接')
   .version('1.0.0')
   .argument('<path>', 'Markdown 文件或目录路径')
-  .option('-d, --dry-run', '预览模式，不实际上传')
+  .option('-d, --dry-run', '预览模式,不实际上传')
   .option('-f, --force', '强制重新上传所有图片')
   .option('--config <path>', '配置文件路径', '.upload-config.json')
   .option('--cache <path>', '缓存文件路径', '.upload-cache.json');
@@ -1004,7 +1028,7 @@ async function main() {
     console.log(chalk.green(`✓ 找到 ${markdownFiles.length} 个 Markdown 文件\n`));
 
     if (markdownFiles.length === 0) {
-      console.log(chalk.yellow('未找到 Markdown 文件，退出'));
+      console.log(chalk.yellow('未找到 Markdown 文件,退出'));
       return;
     }
 
@@ -1025,7 +1049,7 @@ async function main() {
     console.log(chalk.green(`✓ 找到 ${allImages.size} 张本地图片\n`));
 
     if (allImages.size === 0) {
-      console.log(chalk.yellow('未找到本地图片引用，退出'));
+      console.log(chalk.yellow('未找到本地图片引用,退出'));
       return;
     }
 
@@ -1111,7 +1135,7 @@ main();
 - [ ] **Step 2: 提交 CLI 工具框架**
 
 ```bash
-git add scripts/upload-images.js
+git add .image-upload/scripts/upload-images.js
 git commit -m "feat: 添加图片上传 CLI 工具主框架"
 ```
 
@@ -1120,11 +1144,11 @@ git commit -m "feat: 添加图片上传 CLI 工具主框架"
 ### Task 12: 实现 CLI 辅助函数
 
 **Files:**
-- Modify: `scripts/upload-images.js:110-120`
+- Modify: `.image-upload/scripts/upload-images.js:110-120`
 
 - [ ] **Step 1: 添加配置加载函数**
 
-在 `main()` 函数之前添加：
+在 `main()` 函数之前添加:
 
 ```javascript
 /**
@@ -1134,7 +1158,9 @@ git commit -m "feat: 添加图片上传 CLI 工具主框架"
  */
 async function loadConfig(configPath) {
   try {
-    const configData = await fs.readFile(configPath, 'utf-8');
+    // 配置文件路径相对于 .image-upload 目录
+    const fullPath = path.join(__dirname, '..', configPath);
+    const configData = await fs.readFile(fullPath, 'utf-8');
     const config = JSON.parse(configData);
 
     // 替换环境变量
@@ -1157,7 +1183,7 @@ async function loadConfig(configPath) {
 
 - [ ] **Step 2: 添加文件扫描函数**
 
-继续添加：
+继续添加:
 
 ```javascript
 /**
@@ -1188,7 +1214,7 @@ async function scanMarkdownFiles(targetPath) {
 
 - [ ] **Step 3: 添加图片上传处理函数**
 
-继续添加：
+继续添加:
 
 ```javascript
 /**
@@ -1199,7 +1225,8 @@ async function scanMarkdownFiles(targetPath) {
  * @returns {Promise<Object>}
  */
 async function processImageUpload(uploader, imagePath, force = false) {
-  const staticDir = path.join(process.cwd(), 'static');
+  // static 目录在父项目中,使用相对路径
+  const staticDir = path.join(__dirname, '../../static');
 
   console.log(chalk.cyan(`处理: ${imagePath}`));
 
@@ -1212,7 +1239,7 @@ async function processImageUpload(uploader, imagePath, force = false) {
       console.log(chalk.green(`  ✓ 上传成功: ${result.url}`));
     }
   } else if (result.error === 'FILE_EXISTS' && result.needsConfirmation) {
-    // 文件已存在，询问用户
+    // 文件已存在,询问用户
     const answer = await inquirer.prompt([
       {
         type: 'list',
@@ -1248,7 +1275,7 @@ async function processImageUpload(uploader, imagePath, force = false) {
 
 - [ ] **Step 4: 添加报告生成函数**
 
-继续添加：
+继续添加:
 
 ```javascript
 /**
@@ -1294,51 +1321,57 @@ function generateReport(stats, results) {
 - [ ] **Step 5: 提交 CLI 辅助函数**
 
 ```bash
-git add scripts/upload-images.js
+git add .image-upload/scripts/upload-images.js
 git commit -m "feat: 完成 CLI 工具所有辅助函数"
 ```
 
 ---
 
-### Task 13: 集成到 package.json
+### Task 13: 创建便捷执行脚本
 
 **Files:**
-- Modify: `package.json`
+- Create: `.image-upload/run.sh`
 
-- [ ] **Step 1: 添加 npm script**
+- [ ] **Step 1: 创建便捷执行脚本**
 
-在 `package.json` 的 `scripts` 部分添加：
-
-```json
-{
-  "scripts": {
-    "upload-images": "node scripts/upload-images.js"
-  }
-}
-```
-
-- [ ] **Step 2: 提交 package.json 更新**
+创建 `.image-upload/run.sh`:
 
 ```bash
-git add package.json
-git commit -m "feat: 添加 upload-images npm script"
+#!/bin/bash
+# 便捷执行脚本 - 从项目根目录运行
+
+cd "$(dirname "$0")"
+node scripts/upload-images.js "$@"
+```
+
+- [ ] **Step 2: 设置执行权限**
+
+```bash
+chmod +x .image-upload/run.sh
+```
+
+- [ ] **Step 3: 提交执行脚本**
+
+```bash
+git add .image-upload/run.sh
+git commit -m "feat: 添加便捷执行脚本"
 ```
 
 ---
 
 ## Chunk 3 完成检查点
 
-✅ **已完成的任务：**
+✅ **已完成的任务:**
 - Task 11: 创建 CLI 工具主框架
 - Task 12: 实现 CLI 辅助函数
-- Task 13: 集成到 package.json
+- Task 13: 创建便捷执行脚本
 
-**关键成果：**
+**关键成果:**
 - CLI 工具完整实现
 - 支持预览模式、强制上传、同名文件询问
-- 集成到 npm scripts
+- 可通过便捷脚本执行
 
-**下一步：** 继续 Chunk 4 - 测试和验证
+**下一步:** 继续 Chunk 4 - 测试和验证
 
 ---
 
@@ -1351,7 +1384,7 @@ git commit -m "feat: 添加 upload-images npm script"
 
 - [ ] **Step 1: 创建测试文章**
 
-创建一个简单的测试文章：
+创建一个简单的测试文章:
 
 ```bash
 cat > docs/test-upload-article.md << 'EOF'
@@ -1362,11 +1395,11 @@ description: 测试图片上传功能
 
 # 测试上传文章
 
-这是一张测试图片：
+这是一张测试图片:
 
 ![测试图片](/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image1.png)
 
-这是 JSX 格式：
+这是 JSX 格式:
 
 <img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image2.png" style={{display: "block", margin: "20px auto", maxWidth: "80%"}} />
 EOF
@@ -1375,15 +1408,15 @@ EOF
 - [ ] **Step 2: 运行预览模式测试**
 
 ```bash
-yarn upload-images --dry-run docs/test-upload-article.md
+cd .image-upload && yarn upload-images --dry-run ../docs/test-upload-article.md
 ```
 
-Expected: 显示将要上传的图片列表，不实际上传
+Expected: 显示将要上传的图片列表,不实际上传
 
 - [ ] **Step 3: 运行实际上传**
 
 ```bash
-yarn upload-images docs/test-upload-article.md
+yarn upload-images ../docs/test-upload-article.md
 ```
 
 Expected:
@@ -1395,19 +1428,19 @@ Expected:
 - [ ] **Step 4: 验证链接替换**
 
 ```bash
-cat docs/test-upload-article.md
+cat ../docs/test-upload-article.md
 ```
 
 Expected: 图片链接已从 `/img/...` 替换为 `https://resources.camthink.ai/wiki/img/...`
 
 - [ ] **Step 5: 验证图片可访问**
 
-在浏览器中打开替换后的 URL，确认图片正常显示
+在浏览器中打开替换后的 URL,确认图片正常显示
 
 - [ ] **Step 6: 清理测试文件**
 
 ```bash
-rm docs/test-upload-article.md
+rm ../docs/test-upload-article.md
 ```
 
 ---
@@ -1420,7 +1453,7 @@ rm docs/test-upload-article.md
 - [ ] **Step 1: 测试不存在的文件路径**
 
 ```bash
-yarn upload-images docs/nonexistent.md
+yarn upload-images ../docs/nonexistent.md
 ```
 
 Expected: 提示文件不存在错误
@@ -1428,37 +1461,45 @@ Expected: 提示文件不存在错误
 - [ ] **Step 2: 测试没有图片的文章**
 
 ```bash
-echo "# No Images" > docs/no-images.md
-yarn upload-images docs/no-images.md
-rm docs/no-images.md
+echo "# No Images" > ../docs/no-images.md
+yarn upload-images ../docs/no-images.md
+rm ../docs/no-images.md
 ```
 
-Expected: 提示未找到本地图片，正常退出
+Expected: 提示未找到本地图片,正常退出
 
 - [ ] **Step 3: 测试同名文件冲突**
 
-创建两个文章引用同一图片：
+创建两个文章引用同一图片:
 
 ```bash
-echo '![Test](/img/ne301/test.png)' > docs/test1.md
-echo '![Test](/img/ne301/test.png)' > docs/test2.md
-yarn upload-images docs/
-rm docs/test1.md docs/test2.md
+echo '![Test](/img/ne301/test.png)' > ../docs/test1.md
+echo '![Test](/img/ne301/test.png)' > ../docs/test2.md
+yarn upload-images ../docs/
+rm ../docs/test1.md ../docs/test2.md
 ```
 
-Expected: 正确处理重复引用，只上传一次
+Expected: 正确处理重复引用,只上传一次
 
 - [ ] **Step 4: 测试缓存功能**
 
 ```bash
-# 第一次上传
-yarn upload-images docs/test-upload-article.md
+# 创建测试文章
+cat > ../docs/test-cache.md << 'EOF'
+![Test](/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image1.png)
+EOF
 
-# 第二次上传（应该使用缓存）
-yarn upload-images docs/test-upload-article.md
+# 第一次上传
+yarn upload-images ../docs/test-cache.md
+
+# 第二次上传(应该使用缓存)
+yarn upload-images ../docs/test-cache.md
+
+# 清理
+rm ../docs/test-cache.md
 ```
 
-Expected: 第二次运行时显示"已缓存"，跳过上传
+Expected: 第二次运行时显示"已缓存",跳过上传
 
 ---
 
@@ -1480,7 +1521,7 @@ cp docs/5-neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monito
 - [ ] **Step 3: 运行上传**
 
 ```bash
-yarn upload-images docs/5-neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring.md
+cd .image-upload && yarn upload-images ../docs/5-neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring.md
 ```
 
 - [ ] **Step 4: 验证链接**
@@ -1490,16 +1531,16 @@ yarn upload-images docs/5-neoeyes-ne301-series/application-guide/urban-waste-bin
 - [ ] **Step 5: 构建测试**
 
 ```bash
-yarn build
+cd .. && yarn build
 ```
 
-Expected: 构建成功，图片正常显示
+Expected: 构建成功,图片正常显示
 
-- [ ] **Step 6: 恢复原文件（如果需要）**
+- [ ] **Step 6: 恢复原文件(如果需要)**
 
 ```bash
-# 如果测试成功，保留新的链接
-# 如果需要恢复，执行：
+# 如果测试成功,保留新的链接
+# 如果需要恢复,执行:
 mv docs/5-neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring.md.backup docs/5-neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring.md
 ```
 
@@ -1507,17 +1548,17 @@ mv docs/5-neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monito
 
 ## Chunk 4 完成检查点
 
-✅ **已完成的任务：**
+✅ **已完成的任务:**
 - Task 14: 功能测试
 - Task 15: 边界情况测试
 - Task 16: 端到端验证
 
-**关键成果：**
+**关键成果:**
 - 所有功能测试通过
 - 边界情况处理正确
 - 端到端工作流验证成功
 
-**下一步：** 继续 Chunk 5 - 文档和收尾
+**下一步:** 继续 Chunk 5 - 文档和收尾
 
 ---
 
@@ -1526,73 +1567,75 @@ mv docs/5-neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monito
 ### Task 17: 创建使用文档
 
 **Files:**
-- Create: `docs/upload-guide.md`
+- Create: `.image-upload/README.md`
 
 - [ ] **Step 1: 创建使用文档**
 
-创建 `docs/upload-guide.md`:
+创建 `.image-upload/README.md`:
 
 ```markdown
-# Wiki 图片上传工具使用指南
+# Wiki 图片上传工具
+
+独立的图片上传工具,用于将本地图片上传到 File Browser 并自动更新 Markdown 文件中的链接。
 
 ## 快速开始
 
 ### 1. 配置环境变量
 
-创建 `.env` 文件（不提交到 git）：
+创建 `.env` 文件(不提交到 git):
 
 ```bash
 FILE_BROWSER_PASSWORD=your_password_here
 ```
 
-### 2. 上传图片
-
-上传单个文件的所有图片：
+### 2. 安装依赖
 
 ```bash
-yarn upload-images docs/your-article.md
+yarn install
 ```
 
-上传整个目录的所有图片：
+### 3. 运行工具
+
+从项目根目录执行:
 
 ```bash
-yarn upload-images docs/5-neoeyes-ne301-series/
-```
+# 上传单个文件
+./.image-upload/run.sh docs/your-article.md
 
-### 3. 预览模式
+# 或者进入 .image-upload 目录执行
+cd .image-upload && yarn upload-images ../docs/your-article.md
 
-查看将要上传哪些图片，不实际上传：
+# 上传整个目录
+./.image-upload/run.sh docs/5-neoeyes-ne301-series/
 
-```bash
-yarn upload-images --dry-run docs/your-article.md
-```
+# 预览模式
+./.image-upload/run.sh --dry-run docs/your-article.md
 
-### 4. 强制重新上传
+# 强制重新上传
+./.image-upload/run.sh --force docs/your-article.md
 
-忽略缓存，重新上传所有图片：
-
-```bash
-yarn upload-images --force docs/your-article.md
+# API 验证
+cd .image-upload && yarn test-api
 ```
 
 ## 工作流程
 
-1. 编写文章，嵌入本地图片（`/img/...`）
-2. 运行 `yarn upload-images <path>`
+1. 编写文章,嵌入本地图片(```/img/...```)
+2. 运行上传工具
 3. 工具自动上传图片并更新 Markdown 中的链接
 4. 运行 `yarn build` 构建站点
 
 ## 同名文件处理
 
-当远程已存在同名文件时，工具会询问：
+当远程已存在同名文件时,工具会询问:
 
-- **跳过 (S)**: 不上传，保留原文件
+- **跳过 (S)**: 不上传,保留原文件
 - **覆盖 (O)**: 强制上传并覆盖
 - **中止 (A)**: 停止整个上传过程
 
 ## 配置说明
 
-配置文件：`.upload-config.json`
+配置文件:```.upload-config.json```
 
 ```json
 {
@@ -1610,48 +1653,52 @@ yarn upload-images --force docs/your-article.md
 
 ## 注意事项
 
-1. **权限限制**: File Browser 只有创建权限，没有删除权限
-2. **谨慎上传**: 确保文章定稿后再上传，避免产生垃圾文件
-3. **缓存机制**: 已上传的图片会被缓存，避免重复上传
+1. **权限限制**: File Browser 只有创建权限,没有删除权限
+2. **谨慎上传**: 确保文章定稿后再上传,避免产生垃圾文件
+3. **缓存机制**: 已上传的图片会被缓存,避免重复上传
 4. **路径一致性**: 保持本地和远程路径结构一致
 
 ## 故障排查
 
 ### 登录失败
 
-检查：
+检查:
 - 用户名密码是否正确
 - File Browser 服务是否在线
 - 网络连接是否正常
 
 ### 上传失败
 
-检查：
+检查:
 - 文件是否存在
 - 文件权限是否正确
 - 磁盘空间是否充足
 
 ### 链接未替换
 
-检查：
+检查:
 - Markdown 格式是否正确
-- 图片路径是否以 `/img/` 开头
-- 是否在预览模式（dry-run）
+- 图片路径是否以 ```/img/``` 开头
+- 是否在预览模式(dry-run)
 
-## API 验证
+## 目录结构
 
-测试 File Browser API 是否正常：
-
-```bash
-yarn test-api
+```
+.image-upload/
+├── scripts/           # CLI 工具脚本
+├── lib/               # 核心库
+├── test/              # 测试资源
+├── .upload-config.json  # 配置文件
+├── .upload-cache.json   # 上传缓存(git忽略)
+└── .env                # 环境变量(git忽略)
 ```
 ```
 
 - [ ] **Step 2: 提交使用文档**
 
 ```bash
-git add docs/upload-guide.md
-git commit -m "docs: 添加图片上传工具使用指南"
+git add .image-upload/README.md
+git commit -m "docs: 添加图片上传工具使用文档"
 ```
 
 ---
@@ -1663,30 +1710,30 @@ git commit -m "docs: 添加图片上传工具使用指南"
 
 - [ ] **Step 1: 在 README 添加工具说明**
 
-在项目 README 的适当位置添加：
+在项目 README 的适当位置添加:
 
 ```markdown
 ## 图片上传工具
 
-本项目提供了自动化图片上传工具，用于将本地图片上传到 File Browser 并更新 Markdown 中的链接。
+本项目提供了独立的图片上传工具(位于 ```.image-upload/``` 目录),用于将本地图片上传到 File Browser 并更新 Markdown 中的链接。
 
 ### 使用方法
 
 ```bash
 # 上传单个文件
-yarn upload-images docs/your-article.md
+./.image-upload/run.sh docs/your-article.md
 
 # 上传整个目录
-yarn upload-images docs/5-neoeyes-ne301-series/
+./.image-upload/run.sh docs/5-neoeyes-ne301-series/
 
 # 预览模式
-yarn upload-images --dry-run docs/your-article.md
+./.image-upload/run.sh --dry-run docs/your-article.md
 
 # API 验证
-yarn test-api
+cd .image-upload && yarn test-api
 ```
 
-详细文档请参考：[图片上传工具使用指南](./docs/upload-guide.md)
+详细文档请参考: [图片上传工具 README](./.image-upload/README.md)
 ```
 
 - [ ] **Step 2: 提交 README 更新**
@@ -1707,9 +1754,9 @@ git commit -m "docs: 在 README 添加图片上传工具说明"
 
 ```bash
 # API 测试
-yarn test-api
+cd .image-upload && yarn test-api
 
-# 功能测试（使用测试文章）
+# 功能测试(使用测试文章)
 yarn upload-images --dry-run test/fixtures/test-article.md
 ```
 
@@ -1718,7 +1765,7 @@ Expected: 所有测试通过
 - [ ] **Step 2: 检查文件完整性**
 
 ```bash
-ls -la lib/ scripts/ test/fixtures/
+ls -la .image-upload/lib/ .image-upload/scripts/ .image-upload/test/fixtures/
 ```
 
 Expected: 所有必需文件都存在
@@ -1729,9 +1776,9 @@ Expected: 所有必需文件都存在
 git status
 ```
 
-Expected: 工作目录干净，所有更改已提交
+Expected: 工作目录干净,所有更改已提交
 
-- [ ] **Step 4: 创建最终提交（如有遗漏）**
+- [ ] **Step 4: 创建最终提交(如有遗漏)**
 
 ```bash
 git add -A
@@ -1742,12 +1789,12 @@ git commit -m "feat: 完成 Wiki 图片自动上传系统"
 
 ## Chunk 5 完成检查点
 
-✅ **已完成的任务：**
+✅ **已完成的任务:**
 - Task 17: 创建使用文档
 - Task 18: 更新项目 README
 - Task 19: 最终验证和清理
 
-**关键成果：**
+**关键成果:**
 - 完整的使用文档
 - README 更新
 - 所有功能验证通过
@@ -1757,17 +1804,17 @@ git commit -m "feat: 完成 Wiki 图片自动上传系统"
 
 ## 实施完成总结
 
-✅ **所有 Chunk 完成：**
+✅ **所有 Chunk 完成:**
 - Chunk 1: 项目设置和 API 验证
 - Chunk 2: 核心库实现
 - Chunk 3: CLI 工具实现
 - Chunk 4: 测试和验证
 - Chunk 5: 文档和收尾
 
-**总任务数：** 19 个任务
-**总步骤数：** ~60 个步骤
+**总任务数:** 19 个任务
+**总步骤数:** ~60 个步骤
 
-**成功标准验证：**
+**成功标准验证:**
 - ✅ 能够成功登录 File Browser
 - ✅ 能够创建远程文件夹
 - ✅ 能够上传图片并获取公开访问 URL
@@ -1778,6 +1825,6 @@ git commit -m "feat: 完成 Wiki 图片自动上传系统"
 - ✅ 支持预览模式
 - ✅ 错误情况有友好的提示
 - ✅ 缓存机制正常工作
-- ✅ 集成到 package.json scripts
+- ✅ 所有开发产出物隔离在 `.image-upload/` 目录
 
-**准备好执行了吗？**
+**准备好执行了吗?**
