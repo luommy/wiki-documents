@@ -111,6 +111,7 @@ yarn upload-images ../docs --dry-run
 - 首次使用工具
 - 确认要处理的文件范围
 - 检查图片路径是否正确
+- 预览智能路径映射
 
 #### 2. 上传单个文件
 
@@ -121,6 +122,11 @@ yarn upload-images ../docs/guide/getting-started.md
 **适用场景:**
 - 处理单个新增文档
 - 快速验证工具功能
+
+**自动语言同步:**
+- 修改中文文档 → 自动同步到英文版本
+- 修改英文文档 → 自动同步到中文版本
+- 无需手动维护两个版本
 
 #### 3. 上传整个目录
 
@@ -284,6 +290,43 @@ https://resources.camthink.ai/wiki/img/section3/image.png
 - ✅ 保留原始目录结构
 - ✅ 不同内容的同名文件不会冲突
 - ✅ 相同内容的文件自动去重(通过 hash)
+
+## 🌐 语言版本同步
+
+### 自动同步中英文文档
+
+工具会自动检测文档的语言版本，并在替换图片链接后同步到对应的语言版本。
+
+**工作原理：**
+
+1. **中文文档** (`docs/...`)
+   - 替换图片链接后，自动同步到英文版本
+   - 目标：`i18n/en/docusaurus-plugin-content-docs/current/...`
+
+2. **英文文档** (`i18n/en/...`)
+   - 替换图片链接后，自动同步到中文版本
+   - 目标：`docs/...`
+
+**示例：**
+
+```bash
+# 修改中文文档
+./upload-images.sh docs/5-neoeyes-ne301-series/3-application-guide/4-refrigerator-inventory-monitoring.md
+
+# 输出：
+# 🔄 替换图片链接
+#   ✓ docs/.../4-refrigerator-inventory-monitoring.md (52 个图片)
+#
+# 🌐 同步到对应语言版本
+#   ✓ i18n/en/.../4-refrigerator-inventory-monitoring.md (52 个链接)
+#     方向: 中文 → 英文
+```
+
+**优势：**
+- ✅ 无需手动维护两个版本
+- ✅ 保证中英文文档图片链接一致
+- ✅ 自动检测对应文档是否存在
+- ✅ 显示同步进度和更新数量
 
 ## ⚠️ 注意事项
 
