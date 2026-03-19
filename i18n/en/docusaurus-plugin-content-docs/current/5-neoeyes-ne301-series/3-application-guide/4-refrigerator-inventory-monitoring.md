@@ -34,33 +34,33 @@ In this section, we will show you step-by-step how to implement this complete us
 First, correctly install the CamThink NE301 and press the button for 2 to 3 seconds to activate WiFi.
 
 <div style={{display: 'flex', gap: '10px', justifyContent: 'center', margin: '20px 0'}}>
-  <img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/refrigerator1.png" alt="refrigerator1" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
-  <img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/refrigerator2.png" alt="refrigerator2" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+  <img src="/img/ne301/application-guide/monitoring/refrigerator1.png" alt="refrigerator1" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+  <img src="/img/ne301/application-guide/monitoring/refrigerator2.png" alt="refrigerator2" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 </div>
 
 ### Configure Network and MQTT Data Forwarding
 
 Connect to the WiFi endpoint starting with `NE301_<last 6 digits of MAC>` and enter the default IP address: 192.168.10.10
 
-<img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/connect.png" alt="connect" style={{display: 'block', margin: '20px auto', maxWidth: '40%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
-<img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/login.png" alt="login" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="/img/ne301/application-guide/monitoring/connect.png" alt="connect" style={{display: 'block', margin: '20px auto', maxWidth: '40%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="/img/ne301/application-guide/monitoring/login.png" alt="login" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 - **Default Username**: `admin`
 - **Default Password**: `hicamthink`
 
 Click login to view the live view with detailed settings.
 
-<img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/live.png" alt="live" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="/img/ne301/application-guide/monitoring/live.png" alt="live" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 Navigate to **System Settings** to connect to network access.
 
-<img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/system.png" alt="system" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="/img/ne301/application-guide/monitoring/system.png" alt="system" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 > CamThink NE301 supports both WiFi and Cellular modules. Select the appropriate method to ensure network connectivity works.
 
 Navigate to **Application Management** to configure where data and images will be forwarded.
 
-<img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/application-management.png" alt="application-management" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="/img/ne301/application-guide/monitoring/application-management.png" alt="application-management" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 Enter definitions for your own MQTT Broker or AI Stack Server:
 - **Server Address**: IP address of the MQTT Broker.
@@ -75,36 +75,36 @@ Enter definitions for your own MQTT Broker or AI Stack Server:
 
 Login to your own AI Tool Stack server to create a new project.
 
-<img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/AI-tool-stack.png" alt="AI-tool-stack" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="/img/ne301/application-guide/monitoring/AI-tool-stack.png" alt="AI-tool-stack" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 Click to create a new AI Model project, enter name and description:
 
 <div style={{display: 'flex', gap: '10px', justifyContent: 'center', margin: '20px 0'}}>
-  <img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/stack1.png" alt="stack1" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
-  <img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/stack2.png" alt="stack2" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+  <img src="/img/ne301/application-guide/monitoring/stack1.png" alt="stack1" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+  <img src="/img/ne301/application-guide/monitoring/stack2.png" alt="stack2" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 </div>
 
 Open this project and bind the device for image collection. You need to create this device first.
 
 <div style={{display: 'flex', gap: '10px', justifyContent: 'center', margin: '20px 0'}}>
-  <img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/stack3.png" alt="stack3" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
-  <img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/stack4.png" alt="stack4" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+  <img src="/img/ne301/application-guide/monitoring/stack3.png" alt="stack3" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+  <img src="/img/ne301/application-guide/monitoring/stack4.png" alt="stack4" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 </div>
 
 Refrigerator pictures taken by NE301 will be uplinked as configured.
 If you already have images prepared, you can directly upload them to this platform for model training.
 
-<img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/stack5.png" alt="stack5" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="/img/ne301/application-guide/monitoring/stack5.png" alt="stack5" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 Before starting training, create a class here, we name it `Beverage`.
 
-<img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/stack6.png" alt="stack6" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="/img/ne301/application-guide/monitoring/stack6.png" alt="stack6" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 Select the appropriate type to label objects.
 
 <div style={{display: 'flex', gap: '10px', justifyContent: 'center', margin: '20px 0'}}>
-  <img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/stack7.png" alt="stack7" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
-  <img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/stack8.png" alt="stack8" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+  <img src="/img/ne301/application-guide/monitoring/stack7.png" alt="stack7" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+  <img src="/img/ne301/application-guide/monitoring/stack8.png" alt="stack8" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 </div>
 
 Go through one by one to ensure all objects are labeled correctly.
@@ -112,37 +112,37 @@ If you already have a dataset, you can upload it directly here.
 
 Click "Train Model" to start training.
 
-<img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/stack9.png" alt="stack9" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="/img/ne301/application-guide/monitoring/stack9.png" alt="stack9" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 Click "New Training" to create a new task, keep all default settings.
 
-<img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/stack10.png" alt="stack10" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="/img/ne301/application-guide/monitoring/stack10.png" alt="stack10" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 Then start training. This will take some time.
 
 <div style={{display: 'flex', gap: '10px', justifyContent: 'center', margin: '20px 0'}}>
-  <img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/stack11.png" alt="stack11" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
-  <img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/stack12.png" alt="stack12" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+  <img src="/img/ne301/application-guide/monitoring/stack11.png" alt="stack11" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+  <img src="/img/ne301/application-guide/monitoring/stack12.png" alt="stack12" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 </div>
 
 To deploy the model to NE301, we need to quantize it before uploading to the device. Click the Quantization button.
 
 <div style={{display: 'flex', gap: '10px', justifyContent: 'center', margin: '20px 0'}}>
-  <img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/stack13.png" alt="stack13" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
-  <img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/stack14.png" alt="stack14" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+  <img src="/img/ne301/application-guide/monitoring/stack13.png" alt="stack13" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+  <img src="/img/ne301/application-guide/monitoring/stack14.png" alt="stack14" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 </div>
 
 Click it to start, keep default settings here.
 
-<img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/stack15.png" alt="stack15" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="/img/ne301/application-guide/monitoring/stack15.png" alt="stack15" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 It takes a little time to complete. The NE301 model package (*.bin) is the precisely quantized model. Click to download.
 
-<img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/stack16.png" alt="stack16" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="/img/ne301/application-guide/monitoring/stack16.png" alt="stack16" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 You can also test the model here to confirm if everything is working fine.
 
-<img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/stack17.png" alt="stack17" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="/img/ne301/application-guide/monitoring/stack17.png" alt="stack17" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 
 ### Verify and Deploy New Model
@@ -150,20 +150,20 @@ You can also test the model here to confirm if everything is working fine.
 Let's go back to the device to upload the new model. Click the upload button to install.
 
 <div style={{display: 'flex', gap: '10px', justifyContent: 'center', margin: '20px 0'}}>
-  <img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/stack18.png" alt="stack18" style={{width: '32%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
-  <img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/stack19.png" alt="stack19" style={{width: '32%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
-  <img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/stack20.png" alt="stack20" style={{width: '32%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+  <img src="/img/ne301/application-guide/monitoring/stack18.png" alt="stack18" style={{width: '32%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+  <img src="/img/ne301/application-guide/monitoring/stack19.png" alt="stack19" style={{width: '32%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+  <img src="/img/ne301/application-guide/monitoring/stack20.png" alt="stack20" style={{width: '32%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 </div>
 
 After completion, beverage cans are marked correctly.
 
-<img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/stack21.png" alt="stack21" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="/img/ne301/application-guide/monitoring/stack21.png" alt="stack21" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 You can upload more pictures to verify performance.
 
 <div style={{display: 'flex', gap: '10px', justifyContent: 'center', margin: '20px 0'}}>
-  <img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/stack22.png" alt="stack22" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
-  <img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/stack23.png" alt="stack23" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+  <img src="/img/ne301/application-guide/monitoring/stack22.png" alt="stack22" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+  <img src="/img/ne301/application-guide/monitoring/stack23.png" alt="stack23" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 </div>
 
 ### Configure Home Assistant Application
@@ -172,46 +172,46 @@ To make the data more valuable for customers, we chose Home Assistant for integr
 
 Open “Devices & Services” to install MQTT integration.
 
-<img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/stack24.png" alt="stack24" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="/img/ne301/application-guide/monitoring/stack24.png" alt="stack24" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 Click **Add Integration** button to install the MQTT plugin.
 
-<img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/stack25.png" alt="stack25" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="/img/ne301/application-guide/monitoring/stack25.png" alt="stack25" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 Just type MQTT to search for it.
 
 <div style={{display: 'flex', gap: '10px', justifyContent: 'center', margin: '20px 0'}}>
-  <img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/stack26.png" alt="stack26" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
-  <img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/stack27.png" alt="stack27" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+  <img src="/img/ne301/application-guide/monitoring/stack26.png" alt="stack26" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+  <img src="/img/ne301/application-guide/monitoring/stack27.png" alt="stack27" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 </div>
 
 Choose the second one, and input the MQTT Broker configured in NE301.
 
-<img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/stack28.png" alt="stack28" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="/img/ne301/application-guide/monitoring/stack28.png" alt="stack28" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
-<img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/stack29.png" alt="stack29" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="/img/ne301/application-guide/monitoring/stack29.png" alt="stack29" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 Submit to save. MQTT connection is ready.
 
 Create an MQTT device to ensure data can be subscribed correctly.
 
-<img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/stack30.png" alt="stack30" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="/img/ne301/application-guide/monitoring/stack30.png" alt="stack30" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 Other settings keep default.
 
-<img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/stack31.png" alt="stack31" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="/img/ne301/application-guide/monitoring/stack31.png" alt="stack31" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 Select type `Numeric` and enter entity name here.
 
-<img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/stack32.png" alt="stack32" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="/img/ne301/application-guide/monitoring/stack32.png" alt="stack32" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 Keep these settings empty.
 
-<img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/stack33.png" alt="stack33" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="/img/ne301/application-guide/monitoring/stack33.png" alt="stack33" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 Please enter specific MQTT details correctly here, especially downlink and uplink topics, and templates.
 
-<img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/stack34.png" alt="stack34" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="/img/ne301/application-guide/monitoring/stack34.png" alt="stack34" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 ```jinja2
 {{ value_json.ai_result.ai_result.detection_count }}
@@ -219,17 +219,17 @@ Please enter specific MQTT details correctly here, especially downlink and uplin
 For more details on how to set value templates, you can visit the Home Assistant website or contact us.
 Click "Next" and save.
 
-<img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/stack35.png" alt="stack35" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="/img/ne301/application-guide/monitoring/stack35.png" alt="stack35" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 The first entity for beverage count is created well.
 
 Let's create the second entity to identify names.
 
-<img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/stack36.png" alt="stack36" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="/img/ne301/application-guide/monitoring/stack36.png" alt="stack36" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 Input value template for `name`.
 
-<img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/stack37.png" alt="stack37" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="/img/ne301/application-guide/monitoring/stack37.png" alt="stack37" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 The value template name is different here.
 ```jinja2
@@ -237,27 +237,27 @@ The value template name is different here.
 ```
 Click submit to save it.
 
-<img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/stack38.png" alt="stack38" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="/img/ne301/application-guide/monitoring/stack38.png" alt="stack38" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 Refresh the page to view activities with values correctly.
-<img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/stack39.png" alt="stack39" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="/img/ne301/application-guide/monitoring/stack39.png" alt="stack39" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 Home Assistant supports viewing on dashboards, including history records.
-<img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/stack40.png" alt="stack40" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="/img/ne301/application-guide/monitoring/stack40.png" alt="stack40" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 ## Quick Test
 
 Let's take some beverages to test.
 
-<img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/stack41.png" alt="stack41" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="/img/ne301/application-guide/monitoring/stack41.png" alt="stack41" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 The quantity of beverages changes immediately.
 
-<img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/stack42.png" alt="stack42" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="/img/ne301/application-guide/monitoring/stack42.png" alt="stack42" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 These values are also updated on the Home Assistant platform where customers can verify all historical data.
 
-<img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/stack43.png" alt="stack43" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="/img/ne301/application-guide/monitoring/stack43.png" alt="stack43" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 The Home Assistant platform supports other applications triggering alerts, which you can configure for comprehensive management.
 
@@ -271,7 +271,7 @@ A: The server in this guide is for internal use only. You need to install your o
 
 A: We recommend connecting a tablet/phone to NE301's WiFi and capturing via the button here.
 
-<img src="https://resources.camthink.ai/wiki/img/ne301/application-guide/refrigerator-inventory-monitoring/stack44.png" alt="stack44" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="/img/ne301/application-guide/monitoring/stack44.png" alt="stack44" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 **3. Q: How to set value templates in Home Assistant?**
 

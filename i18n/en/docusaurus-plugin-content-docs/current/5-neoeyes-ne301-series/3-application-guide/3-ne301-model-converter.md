@@ -78,7 +78,7 @@ docker ps
 
 Download and install Docker Desktop for Windows, then restart your computer.
 
-![](https://resources.camthink.ai/wiki/img/ne301/application-guide/ne301-model-converter/docker-desktop.png)
+![](/img/ne301/application-guide/ne301-model-converter/docker-desktop.png)
 
 *Docker Desktop running interface*
 
@@ -155,7 +155,7 @@ http://localhost:8000
 
 Seeing the [NE301](https://www.camthink.ai/store/ne301/) Model Converter interface indicates successful deployment.
 
-![](https://resources.camthink.ai/wiki/img/ne301/application-guide/ne301-model-converter/web-interface.png)
+![](/img/ne301/application-guide/ne301-model-converter/web-interface.png)
 
 *NE301 Model Converter Web Interface*
 
@@ -214,19 +214,19 @@ The project provides a complete set of example files in the `example/` directory
 1. Click **"Select Model File"**
 2. Choose `.pt` or `.pth` file
 
-![](https://resources.camthink.ai/wiki/img/ne301/application-guide/ne301-model-converter/upload-pytorch-model.png)
+![](/img/ne301/application-guide/ne301-model-converter/upload-pytorch-model.png)
 
 *Upload PyTorch Model File*
 
 1. (Recommended) Upload `classes.yaml`
 
-![](https://resources.camthink.ai/wiki/img/ne301/application-guide/ne301-model-converter/upload-class-yaml.png)
+![](/img/ne301/application-guide/ne301-model-converter/upload-class-yaml.png)
 
 *Upload Class Definition File*
 
 1. (Strongly Recommended) Upload calibration dataset ZIP
 
-![](https://resources.camthink.ai/wiki/img/ne301/application-guide/ne301-model-converter/upload-calibration-dataset.png)
+![](/img/ne301/application-guide/ne301-model-converter/upload-calibration-dataset.png)
 
 *Upload Calibration Dataset*
 
@@ -256,7 +256,7 @@ The project provides a complete set of example files in the `example/` directory
 [Step 4/4] NE301 Packaging (70-100%)
 ```
 
-![](https://resources.camthink.ai/wiki/img/ne301/application-guide/ne301-model-converter/conversion-progress.png)
+![](/img/ne301/application-guide/ne301-model-converter/conversion-progress.png)
 
 *Real-time Conversion Progress Display*
 
@@ -267,7 +267,7 @@ After conversion completes:
 1. Click **"Download"**
 2. File automatically saves to local storage
 
-![](https://resources.camthink.ai/wiki/img/ne301/application-guide/ne301-model-converter/download-result.png)
+![](/img/ne301/application-guide/ne301-model-converter/download-result.png)
 
 *Download Conversion Result*
 
@@ -277,13 +277,13 @@ After conversion, it's recommended to verify the model on [NE301](https://www.ca
 
 1. Import model to [NE301](https://www.camthink.ai/store/ne301/) device
 
-![](https://resources.camthink.ai/wiki/img/ne301/application-guide/ne301-model-converter/upload-model.png)
+![](/img/ne301/application-guide/ne301-model-converter/upload-model.png)
 
 *Import Model to [NE301](https://www.camthink.ai/store/ne301/) Device*
 
 1. Upload an image, and [NE301](https://www.camthink.ai/store/ne301/) will automatically recognize and display the results
 
-![](https://resources.camthink.ai/wiki/img/ne301/application-guide/ne301-model-converter/model-verification.png)
+![](/img/ne301/application-guide/ne301-model-converter/model-verification.png)
 
 *[NE301](https://www.camthink.ai/store/ne301/) Device Model Verification*
 
