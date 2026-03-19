@@ -29,22 +29,9 @@ async function testAPI() {
     const token = await api.login();
     console.log(`✓ 登录成功,Token 长度: ${token.length}\n`);
 
-    // 测试 2: 创建测试文件夹
-    console.log('2. 测试创建文件夹...');
-    const testFolder = '/wiki/img/test-' + Date.now(); // 使用时间戳避免冲突
-    try {
-      await api.createFolder(testFolder);
-      console.log(`✓ 文件夹创建成功: ${testFolder}\n`);
-    } catch (error) {
-      if (error.response?.status === 409) {
-        console.log(`✓ 文件夹已存在: ${testFolder}\n`);
-      } else {
-        throw error;
-      }
-    }
-
-    // 测试 3: 上传文件
-    console.log('3. 测试上传文件...');
+    // 测试 2 & 3: 上传文件到新文件夹(会自动创建)
+    console.log('2. 测试上传文件到新文件夹...');
+    const testFolder = '/wiki/img/test-' + Date.now();
     const testImagePath = path.join(__dirname, '../test/fixtures/sample.png');
     const remotePath = `${testFolder}/sample.png`;
 
@@ -56,7 +43,7 @@ async function testAPI() {
 
     try {
       await api.uploadFile(remotePath, imageBuffer);
-      console.log(`✓ 文件上传成功: ${remotePath}\n`);
+      console.log(`✓ 文件上传成功,文件夹自动创建: ${testFolder}\n`);
     } catch (error) {
       console.error('✗ 上传失败详情:');
       console.error('  错误消息:', error.message);
@@ -67,13 +54,13 @@ async function testAPI() {
       throw error;
     }
 
-    // 测试 4: 检查文件存在
-    console.log('4. 测试检查文件...');
+    // 测试 3: 检查文件存在
+    console.log('3. 测试检查文件...');
     const exists = await api.fileExists(remotePath);
     console.log(`✓ 文件存在检查: ${exists}\n`);
 
-    // 测试 5: 验证公开访问 URL
-    console.log('5. 验证公开访问 URL...');
+    // 测试 4: 验证公开访问 URL
+    console.log('4. 验证公开访问 URL...');
     const publicUrl = `https://resources.camthink.ai${remotePath}`;
     console.log(`公开 URL: ${publicUrl}`);
     console.log('请在浏览器中验证该 URL 是否可访问\n');
