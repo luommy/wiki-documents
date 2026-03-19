@@ -31,7 +31,7 @@ async function testAPI() {
 
     // 测试 2: 创建测试文件夹
     console.log('2. 测试创建文件夹...');
-    const testFolder = '/wiki/img/test-api';
+    const testFolder = '/wiki/img/test-' + Date.now(); // 使用时间戳避免冲突
     try {
       await api.createFolder(testFolder);
       console.log(`✓ 文件夹创建成功: ${testFolder}\n`);
@@ -48,9 +48,24 @@ async function testAPI() {
     const testImagePath = path.join(__dirname, '../test/fixtures/sample.png');
     const remotePath = `${testFolder}/sample.png`;
 
+    console.log(`  本地文件: ${testImagePath}`);
+    console.log(`  远程路径: ${remotePath}`);
+
     const imageBuffer = await fs.readFile(testImagePath);
-    await api.uploadFile(remotePath, imageBuffer);
-    console.log(`✓ 文件上传成功: ${remotePath}\n`);
+    console.log(`  文件大小: ${imageBuffer.length} bytes`);
+
+    try {
+      await api.uploadFile(remotePath, imageBuffer);
+      console.log(`✓ 文件上传成功: ${remotePath}\n`);
+    } catch (error) {
+      console.error('✗ 上传失败详情:');
+      console.error('  错误消息:', error.message);
+      if (error.response) {
+        console.error('  HTTP 状态:', error.response.status);
+        console.error('  响应数据:', error.response.data);
+      }
+      throw error;
+    }
 
     // 测试 4: 检查文件存在
     console.log('4. 测试检查文件...');
