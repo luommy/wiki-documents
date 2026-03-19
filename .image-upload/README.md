@@ -532,6 +532,88 @@ yarn upload-images ../docs --static-dir /path/to/static
 
 ---
 
+### 错误 7: TLS 连接错误
+
+**错误信息:**
+```
+错误: 登录失败 (HTTP N/A): Client network socket disconnected before secure TLS connection was established
+```
+
+**可能原因:**
+1. 系统代理设置干扰（macOS 系统代理配置）
+2. Node.js 尝试使用系统代理但连接失败
+3. 网络环境需要代理但未正确配置
+
+**解决方案:**
+
+#### 方案 1: 禁用代理（推荐）
+
+已在 `lib/api-client.js` 中配置 `proxy: false`，默认禁用代理。
+
+如果仍然遇到问题，可以运行测试脚本诊断：
+```bash
+cd .image-upload
+node test-connection.js
+```
+
+#### 方案 2: 使用环境变量
+
+如果网络环境需要通过代理访问外网，设置环境变量：
+```bash
+export NO_PROXY=fsx.camthink.ai,*.camthink.ai
+yarn upload-images ../docs
+```
+
+#### 方案 3: 检查网络环境
+
+```bash
+# 测试直接连接
+curl -v https://fsx.camthink.ai/api/login
+
+# 检查系统代理设置
+scutil --proxy
+
+# 检查环境变量
+env | grep -i proxy
+```
+
+---
+
+### 错误 8: 缓存导致图片未上传
+
+**现象:**
+```
+📊 上传统计:
+  ✓ 成功上传: 0
+  - 跳过(缓存): 52
+```
+但图片实际未上传到服务器。
+
+**可能原因:**
+1. 缓存数据过期或不正确
+2. 之前上传失败但缓存已记录
+3. 路径映射与缓存不匹配
+
+**解决方案:**
+
+使用 `--force` 参数强制重新上传：
+```bash
+yarn upload-images ../docs/your-file.md --force
+```
+
+或者清理缓存后重新上传：
+```bash
+rm lib/.upload-cache.json
+yarn upload-images ../docs/your-file.md
+```
+
+**最佳实践:**
+- 首次上传后，验证图片是否真的在服务器上可访问
+- 如果发现图片无法访问，立即使用 `--force` 重新上传
+- 不要依赖缓存跳过，除非确认图片已正确上传
+
+---
+
 ### 调试技巧
 
 #### 1. 使用 Dry Run 预览

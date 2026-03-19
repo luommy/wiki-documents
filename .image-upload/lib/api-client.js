@@ -1,4 +1,5 @@
 const axios = require('axios');
+const https = require('https');
 
 /**
  * File Browser API 客户端
@@ -26,9 +27,19 @@ class FileBrowserAPI {
     this.username = config.username;
     this.password = config.password;
     this.token = null;
+
+    // 创建自定义 HTTPS Agent（解决 TLS 连接问题）
+    const httpsAgent = new https.Agent({
+      rejectUnauthorized: true,
+      keepAlive: true,
+      minVersion: 'TLSv1.2',
+    });
+
     this.client = axios.create({
       baseURL: config.baseUrl,
       timeout: 30000,
+      httpsAgent: httpsAgent,
+      proxy: false,  // 明确禁用代理，避免系统代理干扰
     });
   }
 
