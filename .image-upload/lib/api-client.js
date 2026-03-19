@@ -64,6 +64,86 @@ class FileBrowserAPI {
       'X-Auth': this.token,
     };
   }
+
+  /**
+   * 上传文件
+   * @param {string} remotePath - 远程路径(如 /wiki/img/test/image.png)
+   * @param {Buffer} fileBuffer - 文件内容
+   * @param {boolean} override - 是否覆盖已存在的文件
+   * @returns {Promise<void>}
+   */
+  async uploadFile(remotePath, fileBuffer, override = false) {
+    try {
+      const url = `/api/resources${remotePath}${override ? '?override=true' : ''}`;
+
+      await this.client.put(url, fileBuffer, {
+        headers: {
+          ...this.getAuthHeaders(),
+          'Content-Type': 'application/octet-stream',
+        },
+      });
+    } catch (error) {
+      throw new Error(`上传文件失败 (${remotePath}): ${error.message}`);
+    }
+  }
+
+  /**
+   * 创建文件夹
+   * @param {string} folderPath - 文件夹路径
+   * @returns {Promise<void>}
+   */
+  async createFolder(folderPath) {
+    try {
+      await this.client.post(
+        `/api/resources${folderPath}`,
+        {},
+        {
+          headers: this.getAuthHeaders(),
+        }
+      );
+    } catch (error) {
+      if (error.response?.status === 409) {
+        // 文件夹已存在,不算错误
+        return;
+      }
+      throw new Error(`创建文件夹失败 (${folderPath}): ${error.message}`);
+    }
+  }
+
+  /**
+   * 检查文件或文件夹是否存在
+   * @param {string} remotePath - 远程路径
+   * @returns {Promise<boolean>}
+   */
+  async fileExists(remotePath) {
+    try {
+      await this.client.head(`/api/resources${remotePath}`, {
+        headers: this.getAuthHeaders(),
+      });
+      return true;
+    } catch (error) {
+      if (error.response?.status === 404) {
+        return false;
+      }
+      throw new Error(`检查文件存在失败 (${remotePath}): ${error.message}`);
+    }
+  }
+
+  /**
+   * 列出文件夹内容
+   * @param {string} folderPath - 文件夹路径
+   * @returns {Promise<Array>} 文件列表
+   */
+  async listFolder(folderPath) {
+    try {
+      const response = await this.client.get(`/api/resources${folderPath}`, {
+        headers: this.getAuthHeaders(),
+      });
+      return response.data;
+    } catch (error) {
+      throw new Error(`列出文件夹内容失败 (${folderPath}): ${error.message}`);
+    }
+  }
 }
 
 module.exports = FileBrowserAPI;
