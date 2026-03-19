@@ -24,11 +24,38 @@ yarn install
 
 ### 2. 配置环境变量
 
-创建 `.env` 文件:
+工具需要 File Browser 的认证信息才能上传文件。
+
+#### 步骤 1: 复制示例配置文件
 
 ```bash
+cp .env.example .env
+```
+
+#### 步骤 2: 编辑 .env 文件
+
+```bash
+# File Browser 用户名
+FILE_BROWSER_USERNAME=your_username_here
+
+# File Browser 密码
 FILE_BROWSER_PASSWORD=your_password_here
 ```
+
+**说明：**
+- 用户名和密码用于登录 File Browser 服务 (`https://fsx.camthink.ai`)
+- `.env` 文件已被 `.gitignore` 忽略，不会提交到 git，确保密码安全
+- 如果是从其他开发者那里获取代码，需要自行创建 `.env` 文件
+
+#### 验证配置
+
+运行测试脚本验证配置是否正确：
+
+```bash
+yarn test-api
+```
+
+如果配置正确，会显示"所有测试通过"。
 
 ### 3. 运行工具
 
@@ -124,9 +151,9 @@ yarn upload-images ../docs --no-cache
 {
   "fileBrowser": {
     "baseUrl": "https://fsx.camthink.ai",
-    "username": "harry",
+    "username": "${FILE_BROWSER_USERNAME}",
     "password": "${FILE_BROWSER_PASSWORD}",
-    "remoteBasePath": "/wiki",
+    "remoteBasePath": "",
     "publicBaseUrl": "https://resources.camthink.ai/wiki"
   },
   "upload": {
@@ -148,9 +175,9 @@ yarn upload-images ../docs --no-cache
 | 字段 | 说明 | 示例 |
 |------|------|------|
 | `baseUrl` | File Browser 服务器地址 | `https://fsx.camthink.ai` |
-| `username` | 登录用户名 | `harry` |
+| `username` | 登录用户名(支持环境变量) | `${FILE_BROWSER_USERNAME}` |
 | `password` | 登录密码(支持环境变量) | `${FILE_BROWSER_PASSWORD}` |
-| `remoteBasePath` | 远程基础路径 | `/wiki` |
+| `remoteBasePath` | 远程基础路径 | `""` (空字符串，直接上传到 `/img/...`) |
 | `publicBaseUrl` | 公开访问 URL 前缀 | `https://resources.camthink.ai/wiki` |
 
 #### `upload` - 上传配置
@@ -173,13 +200,23 @@ yarn upload-images ../docs --no-cache
 在 `.env` 文件中设置:
 
 ```bash
+# File Browser 用户名
+FILE_BROWSER_USERNAME=your_username_here
+
+# File Browser 密码
 FILE_BROWSER_PASSWORD=your_password_here
 ```
 
+**配置方式：**
+1. 复制示例配置：`cp .env.example .env`
+2. 编辑 `.env` 文件，填写实际的认证信息
+3. 运行 `yarn test-api` 验证配置是否正确
+
 **安全提示:**
-- 永远不要将 `.env` 文件提交到 Git
-- `.gitignore` 已配置忽略 `.env` 文件
-- 密码通过环境变量注入,避免硬编码
+- ✅ 永远不要将 `.env` 文件提交到 Git
+- ✅ `.gitignore` 已配置忽略 `.env` 文件
+- ✅ 认证信息通过环境变量注入，避免硬编码
+- ✅ `.env.example` 提供配置模板，可以提交到 git
 
 ## 🔄 同名文件处理
 

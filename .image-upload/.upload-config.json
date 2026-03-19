@@ -1,7 +1,7 @@
 {
   "fileBrowser": {
     "baseUrl": "https://fsx.camthink.ai",
-    "username": "harry",
+    "username": "${FILE_BROWSER_USERNAME}",
     "password": "${FILE_BROWSER_PASSWORD}",
     "remoteBasePath": "",
     "publicBaseUrl": "https://resources.camthink.ai/wiki"
