@@ -107,7 +107,7 @@ function generateRemotePath(docPath, imagePath) {
     }
 
     // Get last folder before filename, but skip product IDs
-    const PRODUCT_IDS = ['ne301', 'ng4500', 'ne4500', 'ng4500', 'ne101'];
+    const PRODUCT_IDS = ['ne301', 'ng4500', 'ne4500', 'ne101'];
     const lastFolderIndex = imageParts.length - 2;
     let lastFolder = lastFolderIndex > imgIndex + 1 ? imageParts[lastFolderIndex] : null;
 
@@ -119,8 +119,12 @@ function generateRemotePath(docPath, imagePath) {
     // Get filename and URL-encode special characters
     let fileName = path.basename(imagePath);
     // Only encode if not already encoded
-    if (decodeURIComponent(fileName) === fileName) {
-      fileName = encodeURIComponent(fileName);
+    try {
+      if (decodeURIComponent(fileName) === fileName) {
+        fileName = encodeURIComponent(fileName);
+      }
+    } catch {
+      // Already encoded or malformed, use as-is
     }
 
     // 5. Build remote path
@@ -134,9 +138,11 @@ function generateRemotePath(docPath, imagePath) {
 
     const remotePath = '/' + remoteParts.join('/');
 
-    // Validate result
-    if (remotePath.includes('//')) {
-      console.error('Generated path contains double slashes:', remotePath);
+    // Validate and fix double slashes
+    const normalizedPath = remotePath.replace(/\/+/g, '/');
+    if (normalizedPath !== remotePath) {
+      console.warn('Fixed double slashes in path:', remotePath, '→', normalizedPath);
+      return normalizedPath;
     }
 
     return remotePath;
