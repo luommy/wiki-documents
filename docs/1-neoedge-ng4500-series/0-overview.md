@@ -275,7 +275,7 @@ NG4500系列整机产品规格信息如下
 <AccessoriesTable
   accessories={[
     {
-      image: "/img/Accessories/ng45xx_power_adapter.jpg",
+      image: "https://resources.camthink.ai/wiki/img/Accessories/ng45xx_power_adapter.jpg",
       name: "电源适配器",
       quantity: "1",
       description: [
@@ -284,19 +284,19 @@ NG4500系列整机产品规格信息如下
       ]
     },
     {
-      image: "/img/Accessories/ng45xx_power_cable.jpg",
+      image: "https://resources.camthink.ai/wiki/img/Accessories/ng45xx_power_cable.jpg",
       name: "电源线（可选）",
       quantity: "1",
       description: ["标准三芯电源线1.5m，可选配EU/CN/US/AU/UK规格"]
     },
     {
-      image: "/img/Accessories/ng45xx_connector.jpg",
+      image: "https://resources.camthink.ai/wiki/img/Accessories/ng45xx_connector.jpg",
       name: "工业级接线端子",
       quantity: "2",
       description: ["16pin公端子*1、8pin公端子*1"]
     },
     {
-      image: "/img/Accessories/ng45xx_bracket.jpg",
+      image: "https://resources.camthink.ai/wiki/img/Accessories/ng45xx_bracket.jpg",
       name: "安装支架",
       quantity: "2",
       description: ["壁挂安装支架*2、DIN导轨安装支架*1"]
@@ -310,44 +310,44 @@ NG4500系列整机产品规格信息如下
 <AccessoriesTable
   accessories={[
     {
-      image: "/img/Accessories/ng45xx_ssd.png",
+      image: "https://resources.camthink.ai/wiki/img/Accessories/ng45xx_ssd.png",
       name: <a href="../hardware-dev-resources/ssd">SSD</a>,
       quantity: "1",
       description: ["M.2 NVMe SSD 容量256G-1TB可选"]
     },
     {
-      image: "/img/Accessories/ng45xx_wifi.png",
+      image: "https://resources.camthink.ai/wiki/img/Accessories/ng45xx_wifi.png",
       name: <a href="../hardware-dev-resources/wifi-module">WiFi模组</a>,
       quantity: "1",
       description: ["6221M-PUC 双频 Wi-Fi 和蓝牙 5.0 模块"]
     },
     {
-      image: "/img/Accessories/ng45xx_4g.png",
+      image: "https://resources.camthink.ai/wiki/img/Accessories/ng45xx_4g.png",
       name: <a href="../hardware-dev-resources/3-4g-module">4G模块</a>,
       quantity: "1",
       description: [
         "Quectel EM05 EM05-G 4G M.2模块，支持欧洲、美国、中国、日本、澳大利亚等主要地区使用"]
     },
     {
-      image: "/img/Accessories/ng45xx_5g.png",
+      image: "https://resources.camthink.ai/wiki/img/Accessories/ng45xx_5g.png",
       name: <a href="../hardware-dev-resources/4-5g-module">5G模块</a>,
       quantity: "1",
       description: ["Quectel RM520N-GL 5G M.2模块，支持全球主要地区使用"]
     },
     {
-      image: "/img/Accessories/ng45xx_fan.png",
+      image: "https://resources.camthink.ai/wiki/img/Accessories/ng45xx_fan.png",
       name: "风扇",
       quantity: "1",
       description: ["散热风扇套件, NG4500-CB01载板可用"]
     },
     {
-      image: "/img/Accessories/IMX219.png",
+      image: "https://resources.camthink.ai/wiki/img/Accessories/IMX219.png",
       name: "Raspberry Pi Camera Module 2",
       quantity: "1",
       description: ["SONY IMX219 3280*2464 1/4' 1.12um"]
     },
     {
-      image: "/img/Accessories/SC0870.png",
+      image: "https://resources.camthink.ai/wiki/img/Accessories/SC0870.png",
       name: "Raspberry Pi High Quality Camera",
       quantity: "1",
       description: ["SC0870 Raspberry Pi M12 High Quality Camera"]
@@ -399,7 +399,7 @@ NG4500系列整机产品规格信息如下
         {
           title: "AGV导航",
           description: "基于激光雷达、视觉传感器的混合SLAM技术，支持工厂、仓库等复杂环境下的精确定位与导航，定位精度可达±2cm，支持多AGV协同运行和智能避障，适用于物流、制造等场景。",
-          image: "/img/ng4500/product-info/agv.png"
+          image: "https://resources.camthink.ai/wiki/img/ng4500/product-info/agv.png"
         },
         {
           title: "服务机器人",

@@ -95,4 +95,4 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 - **Thermal Considerations**：Adequate heat dissipation is required for prolonged operation.
 
 ## Dimension
-![NG45_PCBA_IO_Bottom](/img/Hardware_Dev_Resources/OV5640_Module/OV5640_Module_Outline.png)
+![NG45_PCBA_IO_Bottom](https://resources.camthink.ai/wiki/img/hardware-dev-resources/ov5640-camera-module/OV5640_Module_Outline.png)

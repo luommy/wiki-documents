@@ -276,7 +276,7 @@ Product casing and bracket dimension instruction：
 <AccessoriesTable
   accessories={[
     {
-      image: "/img/Accessories/ng45xx_power_adapter.jpg",
+      image: "https://resources.camthink.ai/wikihttps://resources.camthink.ai/wiki/img/Accessories/ng45xx_power_adapter.jpg",
       name: "power adapter(optional)",
       quantity: "1",
       description: [
@@ -285,19 +285,19 @@ Product casing and bracket dimension instruction：
       ]
     },
     {
-      image: "/img/Accessories/ng45xx_power_cable.jpg",
+      image: "https://resources.camthink.ai/wikihttps://resources.camthink.ai/wiki/img/Accessories/ng45xx_power_cable.jpg",
       name: "powercable(optional)",
       quantity: "1",
       description: ["standard 3C power cable 1.5m, EU standard by default, other regions optional"]
     },
     {
-      image: "/img/Accessories/ng45xx_connector.jpg",
+      image: "https://resources.camthink.ai/wikihttps://resources.camthink.ai/wiki/img/Accessories/ng45xx_connector.jpg",
       name: "Industrial-grade terminal blocks (standard accessories)",
       quantity: "2",
       description: ["16pin male terminal connector*1、8pin male terminal connector*1"]
     },
     {
-      image: "/img/Accessories/ng45xx_bracket.jpg",
+      image: "https://resources.camthink.ai/wikihttps://resources.camthink.ai/wiki/img/Accessories/ng45xx_bracket.jpg",
       name: "Mounting bracket (standard accessory)",
       quantity: "2",
       description: ["Wall mounting brackets*2、DIN-rail bracket*1"]
@@ -311,44 +311,44 @@ Product casing and bracket dimension instruction：
 <AccessoriesTable
   accessories={[
     {
-      image: "/img/Accessories/ng45xx_ssd.png",
+      image: "https://resources.camthink.ai/wikihttps://resources.camthink.ai/wiki/img/Accessories/ng45xx_ssd.png",
       name: <a href="../hardware-dev-resources/ssd">SSD</a>,
       quantity: "1",
       description: ["M.2 NVMe SSD capacity 256G-1TB optional"]
     },
     {
-      image: "/img/Accessories/ng45xx_wifi.png",
+      image: "https://resources.camthink.ai/wikihttps://resources.camthink.ai/wiki/img/Accessories/ng45xx_wifi.png",
       name: <a href="../hardware-dev-resources/wifi-module">Wi-Fi module</a>,
       quantity: "1",
       description: ["6221M-PUC dual-band Wi-Fi and bluetooth 5.0 module"]
     },
     {
-      image: "/img/Accessories/ng45xx_4g.png",
+      image: "https://resources.camthink.ai/wikihttps://resources.camthink.ai/wiki/img/Accessories/ng45xx_4g.png",
       name: <a href="../hardware-dev-resources/3-4g-module">4G module</a>,
       quantity: "1",
       description: [
         "Quectel EM05 EM05-G 4G M.2 module, supports Europe, America, China, Japan, Australia frequency bands."]
     },
     {
-      image: "/img/Accessories/ng45xx_5g.png",
+      image: "https://resources.camthink.ai/wikihttps://resources.camthink.ai/wiki/img/Accessories/ng45xx_5g.png",
       name: <a href="../hardware-dev-resources/4-5g-module">5G module</a>,
       quantity: "1",
       description: ["Quectel RM520N-GL 5G M.2 module, supports global mainstream bands."]
     },
     {
-      image: "/img/Accessories/ng45xx_fan.png",
+      image: "https://resources.camthink.ai/wikihttps://resources.camthink.ai/wiki/img/Accessories/ng45xx_fan.png",
       name: "fan",
       quantity: "1",
       description: ["cool fan kits, suitable for NG4500 carrier board"]
     },
     {
-      image: "/img/Accessories/IMX219.png",
+      image: "https://resources.camthink.ai/wikihttps://resources.camthink.ai/wiki/img/Accessories/IMX219.png",
       name: "Raspberry Pi Camera Module 2",
       quantity: "1",
       description: ["SONY IMX219 3280*2464 1/4' 1.12um"]
     },
     {
-      image: "/img/Accessories/SC0870.png",
+      image: "https://resources.camthink.ai/wikihttps://resources.camthink.ai/wiki/img/Accessories/SC0870.png",
       name: "Raspberry Pi High Quality Camera",
       quantity: "1",
       description: ["SC0870 Raspberry Pi M12 High Quality Camera"]
@@ -400,7 +400,7 @@ Product casing and bracket dimension instruction：
         {
           title: "AGV navigation",
           description: "Based on lidar and visual sensors, the hybrid SLAM technology supports precise positioning and navigation in complex environments such as factories and warehouses. The positioning accuracy can reach ±2cm, and supports multi-AGV collaboration and intelligent obstacle avoidance, and is suitable for logistics, warehousing, and manufacturing, etc.",
-          image: "/img/ng4500/product-info/agv.png"
+          image: "https://resources.camthink.ai/wikihttps://resources.camthink.ai/wiki/img/ng4500/product-info/agv.png"
         },
         {
           title: "Robotic systems",

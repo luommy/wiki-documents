@@ -21,8 +21,8 @@ The NeoEyes NE100 series is a high-performance smart camera product line special
 
 ### Device Connection
 
-![NE101 main board1](/img/NE101_Main_Board.png)  
-![NE101 main board2](/img/NE101_Main_Board2.png)  
+![NE101 main board1](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/quick-start/NE101_Main_Board.png)  
+![NE101 main board2](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/quick-start/NE101_Main_Board2.png)  
 
 **Notes**：
 
@@ -53,14 +53,14 @@ For detailed hardware connections, please refer to: [Hardware Connection Guide](
    - Use mobile phone/computer to connect the device Wi-Fi
    - Visit http://192.168.1.1
 
-![wifi connect](/img/NE101_wifi_connect.png)
-![web interface](/img/NE101_web.png)
+![wifi connect](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/quick-start/NE101_wifi_connect.png)
+![web interface](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/quick-start/NE101_web.png)
 
 ### Core Function Configuration
 
 #### Image Collection Setup
 
-![real-time web](/img/NE101_web_cam.png)
+![real-time web](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/quick-start/NE101_web_cam.png)
 
 **Key Parameters**：
 
@@ -76,11 +76,11 @@ For detailed hardware connections, please refer to: [Hardware Connection Guide](
   - Image adjustment: brightness/contrast/saturation (this option is not available when using USB module).
   - Screen mirroring function (this option is not available when using USB module).
 
-![imageadjustment](/img/NE101_web_ImageAdjustment.png)
+![imageadjustment](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/quick-start/NE101_web_ImageAdjustment.png)
 
 #### Scheduled Image Capturing Configuration
 
-![cap setting](/img/NE101_web_cap_setting.png)
+![cap setting](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/quick-start/NE101_web_cap_setting.png)
 
 **Operation Mode**：
 
@@ -91,7 +91,7 @@ For detailed hardware connections, please refer to: [Hardware Connection Guide](
 
 #### Network Connection and Data Reporting
 
-![network connection](/img/NE101_web_WLANConnection.png)
+![network connection](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/quick-start/NE101_web_WLANConnection.png)
 
 **Network test (serial port connection)**：
 
@@ -100,7 +100,7 @@ For detailed hardware connections, please refer to: [Hardware Connection Guide](
 ping www.example.com -c 4
 ```
 
-![network testing](/img/NE101_ping.png)
+![network testing](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/quick-start/NE101_ping.png)
 
 **Data Reporting**：
 
@@ -108,8 +108,8 @@ ping www.example.com -c 4
 2. Use MQTTX tool to verify data flow
 3. Check the reporting status
 
-![datareport](/img/NE101_web_DataReport.png)
-![MQTT data](/img/NE101_MQTT.png)
+![datareport](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/quick-start/NE101_web_DataReport.png)
+![MQTT data](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/quick-start/NE101_MQTT.png)
 
 **MQTTX User Manual：**
 
@@ -172,7 +172,7 @@ Or paste Base64 data into [Base64 Image Viewer](https://base64.guru/converter/de
 3. Confirm image quality (resolution/exposure/focus).
 4. Verify data upload (server receives confirmation to confirm whether the received image is normal).
 
-![cap success](/img/NE101_cap_success.png)
+![cap success](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/quick-start/NE101_cap_success.png)
 
 ## Detailed Explanation of Device Working Mode
 
@@ -192,6 +192,6 @@ Or paste Base64 data into [Base64 Image Viewer](https://base64.guru/converter/de
 - **Device Information**：View the MAC address/firmware version on the management interface.
 - **Wireless Upgrade**：Supports OTA firmware update on the management interface.
 
-![OTA upgrade](/img/NE101_ota.png)
+![OTA upgrade](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/quick-start/NE101_ota.png)
 
 > **Technical Support**: It is recommended to complete a full functional test for first time use.

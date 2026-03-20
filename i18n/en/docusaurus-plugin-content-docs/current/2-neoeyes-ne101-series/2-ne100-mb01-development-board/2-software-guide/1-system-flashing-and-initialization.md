@@ -28,7 +28,7 @@ Serial driver download from：[CH341SER.EXE](https://github.com/camthink-ai/lowp
 
 1. Install the serial driver and launch the flashing tool.
    
-   ![flash_tool](/img/NE101_flash_tool.png)
+   ![flash_tool](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/system-flashing-and-initialization/NE101_flash_tool.png)
 
 2. Configure Flashing Parameters：
    
@@ -42,7 +42,7 @@ Serial driver download from：[CH341SER.EXE](https://github.com/camthink-ai/lowp
     - Then, click START to flash
     - Press the reset button or reconnect the USB power to reboot the device
    
-   ![flashing tool interface](/img/NE101_flash_tool1.png)
+   ![flashing tool interface](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/system-flashing-and-initialization/NE101_flash_tool1.png)
 
 ## OTA Firmware Updates Guide
 
@@ -59,21 +59,21 @@ Serial driver download from：[CH341SER.EXE](https://github.com/camthink-ai/lowp
    - Navigate to Device Maintenance → Firmware Upgrade
    - After clicking the `Browse` to select the firmware package, click `Upgrade` to upload it.
    
-   ![OTA Upgrade](/img/NE101_ota.png)
+   ![OTA Upgrade](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/system-flashing-and-initialization/NE101_ota.png)
 
 3. **Wait for the Upgrade to Complete**
    
    - The system will automatically verify and install the new firmware
    - After the upgrade is completed, the Wi-Fi will reconnect automatically
    
-   ![upgrade interface](/img/NE101_ota2.png)
+   ![upgrade interface](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/system-flashing-and-initialization/NE101_ota2.png)
 
 4. **Verify Version Information**
    
    - Check the new firmware version on the Device Maintenance page
    - Confirm that all functional modules are operating correctly
    
-   ![Device information](/img/NE101_ota3.png)
+   ![Device information](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/system-flashing-and-initialization/NE101_ota3.png)
 
 ### Notes
 

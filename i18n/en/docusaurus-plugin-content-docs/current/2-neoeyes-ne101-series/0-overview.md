@@ -14,7 +14,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 ## Product Introduction
 
-![NE101](/img/Overview/NE101/NE101.png)
+![NE101](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/NE101.png)
 
 CamThink Event-triggered Camera NeoEyes NE101 is a low-power consumption camera based on event-triggered mechanisms. It adopts a modular design concept and features **ultra-low power consumption**. The camera supports developers to expand multiple photography trigger methods (PIR/radar/sound, etc.), and can be equipped with different sensor modules to achieve **event monitoring image capture**and autonomously wake up and collect images based on trigger conditions, greatly extending the battery life. Its **open-architecture hardware** allows developers to flexibly expand functional modules according to actual needs and quickly complete the implementation from prototype to commercial product.
 
@@ -29,7 +29,7 @@ CamThink Event-triggered Camera NeoEyes NE101 is a low-power consumption camera 
 - **Optional power supply solution**: NE101 supports battery power by default. It can work with 4 x AA batteries, or Type-C charging through the motherboard.
 - **Hardware openness**: Fully open to provide the structural design files for DIY housing (3D printable) or customized extensions, also provide complete open source firmware, allowing developers to start quickly with useful functions such as: low-power mode, device wake-up, MQTT data transmission, fill-light control, scheduled shooting, image parameter adjustment, and network management. Details on development and flashing, please refer to [「Development Guide」](./2-ne100-mb01-development-board/0-dev-guide.md).
 
-![NE101](/img/Overview/NE101/Module.png)
+![NE101](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/Module.png)
 
 ### Ultra-low Power Consumption Support
 
@@ -48,7 +48,7 @@ CamThink Event-triggered Camera NeoEyes NE101 is a low-power consumption camera 
 
 - **Open Source Firmware and Commercialization Support**: The firmware source code of NE101 is completely open source, supporting free commercial use and secondary development. The firmware provides ready-to-use functions such as image capture, low-power management, and data communication. On this basis, developers can quickly expand application logic and shorten the development cycle from prototype to implementation. For details on firmware functions and developer guidelines, please refer to:[「Ultra-low power camera example」](./3-application-guide/0-low-power-image-acquisition.md)
 
-![Wireless communication](/img/Overview/NE101/Conet.png)
+![Wireless communication](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/Conet.png)
 
 ### Hardware Interface Extension
 
@@ -151,8 +151,8 @@ Note: The USB camera module will occupy extra I/O resources. For details, please
 [「Hardware Guide-Hardware Connection-16Pin GPIO Expansion」](./2-ne100-mb01-development-board/1-hardware-guide/1-hardware-connection.md)
 
 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', justifyContent: 'center', alignItems: 'center' }}>
-  <img src={useBaseUrl('/img/Overview/NE101/sensor1.png')} alt="Cat-1 PCBA" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
-  <img src={useBaseUrl('/img/Overview/NE101/sensor2.png')} alt="WiFi HaLow PCBA" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src={useBaseUrl('https://resources.camthink.ai/wikihttps://resources.camthink.ai/wiki/img/Overview/NE101/sensor1.png')} alt="Cat-1 PCBA" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src={useBaseUrl('https://resources.camthink.ai/wikihttps://resources.camthink.ai/wiki/img/Overview/NE101/sensor2.png')} alt="WiFi HaLow PCBA" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
 </div>
 
 ### Applicability and Deployment
@@ -163,9 +163,9 @@ Note: The USB camera module will occupy extra I/O resources. For details, please
 - **Wireless and Outdoor Deployment Support**: NE101 supports battery power supply, low power consumption operation, combined with IP67 protection design, suitable for long-term deployment in various harsh environments.
 - **Flexible Installations**: NE101 supports various installation methods such as wall mounting, desktop mounting, pole installation, etc., and provides a wide range of original brackets and house extension components to meet various deployment needs. Common bracket specifications and main uses can be found in[Product Accessories-Product Optional Accessories](#Product Optional Accessories).
 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px', justifyContent: 'center', alignItems: 'center' }}>
-  <img src={useBaseUrl('/img/Overview/NE101/Bracket/1.png')} alt="bracket" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
-  <img src={useBaseUrl('/img/Overview/NE101/Bracket/3.png')} alt="bracket" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
-  <img src={useBaseUrl('/img/Overview/NE101/Bracket/5.png')} alt="bracket" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src={useBaseUrl('https://resources.camthink.ai/wikihttps://resources.camthink.ai/wiki/img/Overview/NE101/Bracket/1.png')} alt="bracket" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src={useBaseUrl('https://resources.camthink.ai/wikihttps://resources.camthink.ai/wiki/img/Overview/NE101/Bracket/3.png')} alt="bracket" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src={useBaseUrl('https://resources.camthink.ai/wikihttps://resources.camthink.ai/wiki/img/Overview/NE101/Bracket/5.png')} alt="bracket" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
 </div>
 
 ## Product Information
@@ -175,7 +175,7 @@ Note: The USB camera module will occupy extra I/O resources. For details, please
 NE101 camera specifications:
 
 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px', justifyContent: 'center', alignItems: 'center' }}>
-  <img src={useBaseUrl('/img/Overview/NE101/NE101.png')} alt="NE101" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src={useBaseUrl('https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/NE101.png')} alt="NE101" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
   <img src={useBaseUrl('/img/Overview/NE101/ProductBL.png')} alt="NE101" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
   <img src={useBaseUrl('/img/Overview/NE101/ProductR.png')} alt="NE101" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
 </div>
@@ -275,7 +275,7 @@ NE101 provides a number of bracket accessories, supports multiple installation m
 
 ### Product Dimension
 
-![NE_Series_OutlineSize.png](/img/Hardware_Guide/Edge_AI_Camera/BracketsAndUsage/NE_Series_OutlineSize.png)
+![NE_Series_OutlineSize.png](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/NE_Series_OutlineSize.png)
 
 ### Product Accessories
 
@@ -285,7 +285,7 @@ NE101 provides a number of bracket accessories, supports multiple installation m
 <AccessoriesTable
   accessories={[
     {
-      image: "/img/Accessories/Battery.png",
+      image: "https://resources.camthink.ai/wikihttps://resources.camthink.ai/wiki/img/Accessories/Battery.png",
       name: "Battery",
       quantity: "4",
       description: ["AA Battery"]
@@ -300,37 +300,37 @@ NE101 provides a number of bracket accessories, supports multiple installation m
 <AccessoriesTable
 accessories={[
 {
-image: "/img/Overview/NE101/Bracket/1.png",
+image: "https://resources.camthink.ai/wikihttps://resources.camthink.ai/wiki/img/Overview/NE101/Bracket/1.png",
 name: "Desktop Bracket Extension",
 quantity: "1",
 description: ["Suitable for desktop and top mounting installations"]
 },
 {
-image: "/img/Overview/NE101/Bracket/3.png",
+image: "https://resources.camthink.ai/wikihttps://resources.camthink.ai/wiki/img/Overview/NE101/Bracket/3.png",
 name: "Back Bracket Extension",
 quantity: "1",
 description: ["Suitable for wall mounting installation"]
 },
 {
-image: "/img/Overview/NE101/Bracket/5.png",
+image: "https://resources.camthink.ai/wikihttps://resources.camthink.ai/wiki/img/Overview/NE101/Bracket/5.png",
 name: "Pole Bracket",
 quantity: "1",
 description: ["Suitable for complex scenes when the camera needs to be adjusted at multiple angles. The kit includes metal poles*2 and conversion heads*2. The metal poles can be customized."]
 },
 {
-image: "/img/Overview/NE101/Bracket/4.png",
+image: "https://resources.camthink.ai/wikihttps://resources.camthink.ai/wiki/img/Overview/NE101/Bracket/4.png",
 name: "Dial Bracket",
 quantity: "1",
 description: ["Suitable for fixed installation of instrument image collection in a stable light condition."]
 },
 {
-image: "/img/Overview/NE101/Bracket/2.png",
+image: "https://resources.camthink.ai/wikihttps://resources.camthink.ai/wiki/img/Overview/NE101/Bracket/2.png",
 name: "Meter Bracket",
 quantity: "-",
 description: ["Printable 3D design files can be provided to users for customization, please note that this is a non-physical selection."]
 },
 {
-image: "/img/Overview/NE101/sensor2.png",
+image: "https://resources.camthink.ai/wikihttps://resources.camthink.ai/wiki/img/Overview/NE101/sensor2.png",
 name: "OV5640 Camera Module",
 quantity: "1",
 description: [
@@ -342,7 +342,7 @@ description: [
 ]
 },
 {
-image: "/img/Overview/NE101/sensor1.png",
+image: "https://resources.camthink.ai/wikihttps://resources.camthink.ai/wiki/img/Overview/NE101/sensor1.png",
 name: "SC200AI USB Camera Module",
 quantity: "1",
 description: [
@@ -353,13 +353,13 @@ description: [
 ]
 },
 {
-image: "/img/Overview/NE101/wifihalow.png",
+image: "https://resources.camthink.ai/wikihttps://resources.camthink.ai/wiki/img/Overview/NE101/wifihalow.png",
 name: "Wi-Fi-Halow wireless module and antenna",
 quantity: "1",
 description: ["Can be installed via the motherboard slot; supports 868/915 MHz frequency band versions."]
 },
 {
-image: "/img/Overview/NE101/cat1PCBA.png",
+image: "https://resources.camthink.ai/wikihttps://resources.camthink.ai/wiki/img/Overview/NE101/cat1PCBA.png",
 name: "Cat.1 wireless module and antenna",
 quantity: "1",
 description: ["Can be installed via the motherboard slot; supports both global and North America versions."]
@@ -371,33 +371,33 @@ description: ["Can be installed via the motherboard slot; supports both global a
 
 #### Wall Mounting Bracket and Installation Instruction
 
-![NE_Series_Bracket_Wall_Mount.png](/img/Hardware_Guide/Edge_AI_Camera/BracketsAndUsage/NE_Series_Bracket_Wall_Mount.png)
+![NE_Series_Bracket_Wall_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/NE_Series_Bracket_Wall_Mount.png)
 
-![NE_Series_Wall_Mount.png](/img/Hardware_Guide/Edge_AI_Camera/BracketsAndUsage/NE_Series_Wall_Mount.png)
+![NE_Series_Wall_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/NE_Series_Wall_Mount.png)
 
 #### Meter Bracket and Installation Instruction
 
-![NE_Series_Bracket_Meter_Mount.png](/img/Hardware_Guide/Edge_AI_Camera/BracketsAndUsage/NE_Series_Bracket_Meter_Mount.png)
+![NE_Series_Bracket_Meter_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/NE_Series_Bracket_Meter_Mount.png)
 
-![NE_Series_Meter_Mount.png](/img/Hardware_Guide/Edge_AI_Camera/BracketsAndUsage/NE_Series_Meter_Mount.png)
+![NE_Series_Meter_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/NE_Series_Meter_Mount.png)
 
 #### Pole Bracket and Installation Instruction
 
-![NE_Series_Bracket_Rod_Mount.png](/img/Hardware_Guide/Edge_AI_Camera/BracketsAndUsage/NE_Series_Bracket_Rod_Mount.png)
+![NE_Series_Bracket_Rod_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/NE_Series_Bracket_Rod_Mount.png)
 
-![NE_Series_Rod_Mount.png](/img/Hardware_Guide/Edge_AI_Camera/BracketsAndUsage/NE_Series_Rod_Mount.png)
+![NE_Series_Rod_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/NE_Series_Rod_Mount.png)
 
 #### 3-axis Ball Bracket and Installation Instruction
 
-![NE_Series_Bracket_ShaftBall_Mount.png](/img/Hardware_Guide/Edge_AI_Camera/BracketsAndUsage/NE_Series_Bracket_ShaftBall_Mount.png)
+![NE_Series_Bracket_ShaftBall_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/NE_Series_Bracket_ShaftBall_Mount.png)
 
-![NE_Series_ShaftBall_Mount.png](/img/Hardware_Guide/Edge_AI_Camera/BracketsAndUsage/NE_Series_ShaftBall_Mount.png)
+![NE_Series_ShaftBall_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/NE_Series_ShaftBall_Mount.png)
 
 #### Desktop Bracket and Installation Instruction
 
-![NE_Series_Bracket_U_Type_Mount.png](/img/Hardware_Guide/Edge_AI_Camera/BracketsAndUsage/NE_Series_Bracket_U_Type_Mount.png)
+![NE_Series_Bracket_U_Type_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/NE_Series_Bracket_U_Type_Mount.png)
 
-![NE_Series_U_Type_Mount.png](/img/Hardware_Guide/Edge_AI_Camera/BracketsAndUsage/NE_Series_U_Type_Mount.png)
+![NE_Series_U_Type_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/NE_Series_U_Type_Mount.png)
 
 ## Product Applications
 
