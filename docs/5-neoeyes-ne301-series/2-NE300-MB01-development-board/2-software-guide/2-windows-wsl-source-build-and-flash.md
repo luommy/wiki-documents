@@ -44,8 +44,8 @@ tags: [NE301, Windows, WSL, 烧录指南, 软件开发]
    ```
 
    <div style={{display:'flex', gap:'16px', flexWrap:'wrap', justifyContent:'center'}}>
-     <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/software-guide/windows-wsl-source-build-and-flash/lsusb.png" alt="NE301主板正面图" style={{width:'100%', maxWidth:'360px', borderRadius:'8px'}} />
-     <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/software-guide/windows-wsl-source-build-and-flash/attach.png" alt="NE301主板接口图" style={{width:'100%', maxWidth:'360px', borderRadius:'8px'}} />
+     <img src="/img/ne301/windows-wsl-source/lsusb.png" alt="NE301主板正面图" style={{width:'100%', maxWidth:'360px', borderRadius:'8px'}} />
+     <img src="/img/ne301/windows-wsl-source/attach.png" alt="NE301主板接口图" style={{width:'100%', maxWidth:'360px', borderRadius:'8px'}} />
    </div>
 
    - 若提示需要重启，重启 Windows 后重跑以上命令。
@@ -179,7 +179,7 @@ PowerShell 中 `\` 不能续行；使用一行命令或反引号 ``` ` ```。推
 连接串口后，输入`ifconfig wifi ap`指令查看串口输出
 
 <p align="center">
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/software-guide/windows-wsl-source-build-and-flash/info.png" alt="串口调试" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
+  <img src="/img/ne301/windows-wsl-source/info.png" alt="串口调试" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
 </p>
 
 ## 7.特殊情况

@@ -91,15 +91,15 @@ flowchart LR
    
    Open the directory in VS Code：
    
-   ![NE101_code_dir.png](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/application-guide/low-power-image-acquisition/NE101_code_dir.png)
+   ![NE101_code_dir.png](/img/NE101_code_dir.png)
 
 3. **Select the build button to compile the source code**
    
-   ![NE101_idf_build.png](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/application-guide/low-power-image-acquisition/NE101_idf_build.png)
+   ![NE101_idf_build.png](/img/NE101_idf_build.png)
 
 4. **Select the flash button to upload the generated firmware to the device**
    
-   ![NE101_idf_flash.png](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/application-guide/low-power-image-acquisition/NE101_idf_flash.png)
+   ![NE101_idf_flash.png](/img/NE101_idf_flash.png)
 
 ## Software Description
 

@@ -52,9 +52,9 @@ Key features include:：
    - Access the web management interface at http://192.168.1.1, as shown in the figure below.
    - Check if the video streaming displays correctly.
    
-   ![Wifi Connection](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/example-uvc/NE101_wifi_connect.png)
-   ![device Interface](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/example-uvc/NE101_web.png)
-   ![UVC Video Streaming](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/example-uvc/NE101_web_cam.png)
+   ![Wifi Connection](/img/NE101_wifi_connect.png)
+   ![device Interface](/img/NE101_web.png)
+   ![UVC Video Streaming](/img/NE101_web_cam.png)
 
 ### Using Source Code Development
 
@@ -68,27 +68,27 @@ git clone https://github.com/camthink-ai/lowpower_camera.git
 
 Open the directory in VS Code
 
-![Project Root Directory](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/example-uvc/NE101_code_dir.png)
+![Project Root Directory](/img/NE101_code_dir.png)
 
 #### 3. Configuration ：
 
 Open the `camera.h file` located in the `/main` directory and enable the UVC feature.
 
-![Sensitivity Settings](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/example-uvc/NE101_example_uvc1.png)
+![Sensitivity Settings](/img/NE101_example_uvc1.png)
 
 #### 4. Compile and deploy the source code
 
 1. Select esp32s3 as the target chip.：
 
-![Esp32s3 selection](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/example-uvc/NE101_idf_IC.png)
+![Esp32s3 selection](/img/NE101_idf_IC.png)
 
 2. Select the build button to compile the source code. 
 
-![Showing build output](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/example-uvc/NE101_idf_build.png)
+![Showing build output](/img/NE101_idf_build.png)
 
 3. Select the flash button to upload the generated firmware to the device：
 
-![screenshot showing flashing process](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/example-uvc/NE101_idf_flash.png)
+![screenshot showing flashing process](/img/NE101_idf_flash.png)
 
 #### 5. Check the video streaming output
 

@@ -17,15 +17,15 @@ tags: [AI应用, 行为分析, 边缘计算, 安全监控, NG4500]
 以下是IPC与AI Box的实拍图：
 
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '8px 0 16px' }}>
-  <img src="https://resources.camthink.ai/wiki/img/ai-application/ai-box-appliction-expansion/fighting-and-Iterative-model-deployment/ipc.png" alt="ipc" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
-  <img src="https://resources.camthink.ai/wiki/img/ai-application/ai-box-appliction-expansion/fighting-and-Iterative-model-deployment/box.png" alt="box" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/AIBoxApplictionExpansion/ipc.png" alt="ipc" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/AIBoxApplictionExpansion/box.png" alt="box" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 
 ## 整体架构
 
 <div style={{ textAlign: 'center', margin: '12px 0' }}>
-  <img src="https://resources.camthink.ai/wiki/img/ai-application/ai-box-appliction-expansion/fighting-and-Iterative-model-deployment/Interactive-diagram.png" alt="交互图" style={{ maxWidth: '720px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/AIBoxApplictionExpansion/Interactive-diagram.png" alt="交互图" style={{ maxWidth: '720px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 上图为整体的架构展示，IPC作为前端采集设备，通过交换机接入网口实现局域网通信，IPC前端采集到的实时视频流接入到VMS中，VMS本身不具备AI推理能力，VMS的Server端将数据转给AI BOX 进行处理，AI BOX作为边缘端设备，保持低功耗的前提还具备高算力性能，同时具备适配IOT等多类场景下的多种硬件接口及其扩展性，这是传统服务器所不具备的。AI BOX处理并分析好数据后会将分析结果传回给VMS Server，VMS Server最终将数据显示到我们VMS Client上进行显示。
@@ -39,7 +39,7 @@ tags: [AI应用, 行为分析, 边缘计算, 安全监控, NG4500]
 > 如果没有WinSCP，其它的文件传输工具也可以。
 
 <div style={{ textAlign: 'center', margin: '12px 0' }}>
-  <img src="https://resources.camthink.ai/wiki/img/ai-application/ai-box-appliction-expansion/fighting-and-Iterative-model-deployment/winscp.png" alt="winscp" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/AIBoxApplictionExpansion/winscp.png" alt="winscp" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 ### 步骤二：登录校验
@@ -47,7 +47,7 @@ tags: [AI应用, 行为分析, 边缘计算, 安全监控, NG4500]
 登录成功后，查看AIBOX的目录
 
 <div style={{ textAlign: 'center', margin: '12px 0' }}>
-  <img src="https://resources.camthink.ai/wiki/img/ai-application/ai-box-appliction-expansion/fighting-and-Iterative-model-deployment/winscp2.png" alt="winscp" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/AIBoxApplictionExpansion/winscp2.png" alt="winscp" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 ### 步骤三：固件包导入
@@ -57,7 +57,7 @@ tags: [AI应用, 行为分析, 边缘计算, 安全监控, NG4500]
 AIBOX 算法固件包下载地址：[msaibox_arm64_1.0.0.1-r1-c1.deb](https://resource-cam-think.oss-cn-hongkong.aliyuncs.com/wiki/ai-app/fight-fall-model-deploy/msaibox_arm64_1.0.0.1-r1-c1.deb?x-oss-credential=LTAI5tNEE8YCDoztSbpntwqZ%2F20251106%2Fcn-hongkong%2Foss%2Faliyun_v4_request&x-oss-date=20251106T094938Z&x-oss-expires=32400&x-oss-signature-version=OSS4-HMAC-SHA256&x-oss-signature=66daaa60590da506cfbfba76866a276b8916cfd82000a0a0545f1a41caacbdc0)。
 
 <div style={{ textAlign: 'center', margin: '12px 0' }}>
-  <img src="https://resources.camthink.ai/wiki/img/ai-application/ai-box-appliction-expansion/fighting-and-Iterative-model-deployment/deb.png" alt="deb" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/AIBoxApplictionExpansion/deb.png" alt="deb" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 ### 步骤四：SSH工具
@@ -67,7 +67,7 @@ AIBOX 算法固件包下载地址：[msaibox_arm64_1.0.0.1-r1-c1.deb](https://re
 打开Putty，输入IP地址
 
 <div style={{ textAlign: 'center', margin: '12px 0' }}>
-  <img src="https://resources.camthink.ai/wiki/img/ai-application/ai-box-appliction-expansion/fighting-and-Iterative-model-deployment/putty.png" alt="putty" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/AIBoxApplictionExpansion/putty.png" alt="putty" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>  
 
 ### 步骤五：登入Box
@@ -76,8 +76,8 @@ AIBOX 算法固件包下载地址：[msaibox_arm64_1.0.0.1-r1-c1.deb](https://re
 
 
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '8px 0 16px' }}>
-  <img src="https://resources.camthink.ai/wiki/img/ai-application/ai-box-appliction-expansion/fighting-and-Iterative-model-deployment/login.png" alt="login" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
-  <img src="https://resources.camthink.ai/wiki/img/ai-application/ai-box-appliction-expansion/fighting-and-Iterative-model-deployment/login2.png" alt="login" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/AIBoxApplictionExpansion/login.png" alt="login" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/AIBoxApplictionExpansion/login2.png" alt="login" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 ### 步骤六：进入文件目录
@@ -85,7 +85,7 @@ AIBOX 算法固件包下载地址：[msaibox_arm64_1.0.0.1-r1-c1.deb](https://re
 切换到 root 用户并进入 AI BOX 的文件目录。
 
 <div style={{ textAlign: 'center', margin: '12px 0' }}>
-  <img src="https://resources.camthink.ai/wiki/img/ai-application/ai-box-appliction-expansion/fighting-and-Iterative-model-deployment/directory.png" alt="directory" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/AIBoxApplictionExpansion/directory.png" alt="directory" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>  
 
 ### 步骤七：安装固件
@@ -93,8 +93,8 @@ AIBOX 算法固件包下载地址：[msaibox_arm64_1.0.0.1-r1-c1.deb](https://re
 输入 ls 查看 AI BOX 的文件目录，打开存放固件的文件夹，输入 ls 查找固件文件输入：dpkg -i deb固件文件名（命令格式：dpkg -i + 固件文件名）,最后即可安装部署成功
 
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '8px 0 16px' }}>
-  <img src="https://resources.camthink.ai/wiki/img/ai-application/ai-box-appliction-expansion/fighting-and-Iterative-model-deployment/dpkg.png" alt="dpkg" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
-  <img src="https://resources.camthink.ai/wiki/img/ai-application/ai-box-appliction-expansion/fighting-and-Iterative-model-deployment/systemctl.png" alt="systemctl" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/AIBoxApplictionExpansion/dpkg.png" alt="dpkg" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/AIBoxApplictionExpansion/systemctl.png" alt="systemctl" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 
@@ -105,14 +105,14 @@ AIBOX 算法固件包下载地址：[msaibox_arm64_1.0.0.1-r1-c1.deb](https://re
 采用C/S架构软件设计,安装细节参考VMS用户手册：Chapter 2. Installation
 
 <div style={{ textAlign: 'center', margin: '12px 0' }}>
-  <img src="https://resources.camthink.ai/wiki/img/ai-application/ai-box-appliction-expansion/fighting-and-Iterative-model-deployment/vms-install.png" alt="vms-install" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/AIBoxApplictionExpansion/vms-install.png" alt="vms-install" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>  
 
 > Milesight VMS 下载链接
 
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '8px 0 16px' }}>
-  <img src="https://resources.camthink.ai/wiki/img/ai-application/ai-box-appliction-expansion/fighting-and-Iterative-model-deployment/download-vms.png" alt="download-vms" style={{ flex: '1 1 220px', maxWidth: '320px', width: 'auto', maxHeight: '320px', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)', objectFit: 'contain' }} />
-  <img src="https://resources.camthink.ai/wiki/img/ai-application/ai-box-appliction-expansion/fighting-and-Iterative-model-deployment/download-vms2.png" alt="download-vms" style={{ flex: '1 1 220px', maxWidth: '320px', width: 'auto', maxHeight: '320px', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)', objectFit: 'contain' }} />
+  <img src="/img/AIBoxApplictionExpansion/download-vms.png" alt="download-vms" style={{ flex: '1 1 220px', maxWidth: '320px', width: 'auto', maxHeight: '320px', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)', objectFit: 'contain' }} />
+  <img src="/img/AIBoxApplictionExpansion/download-vms2.png" alt="download-vms" style={{ flex: '1 1 220px', maxWidth: '320px', width: 'auto', maxHeight: '320px', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)', objectFit: 'contain' }} />
 </div>  
 
 ### 步骤二：在VMS中添加智能盒子
@@ -121,7 +121,7 @@ AIBOX 算法固件包下载地址：[msaibox_arm64_1.0.0.1-r1-c1.deb](https://re
 配置好后点击应用，校验是否配置成功
 
 <div style={{ textAlign: 'center', margin: '12px 0' }}>
-  <img src="https://resources.camthink.ai/wiki/img/ai-application/ai-box-appliction-expansion/fighting-and-Iterative-model-deployment/vms-add-box.png" alt="vms-install" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/AIBoxApplictionExpansion/vms-add-box.png" alt="vms-install" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>  
 
 ### 步骤三：摄像机配置-后端参数配置
@@ -131,7 +131,7 @@ AIBOX 算法固件包下载地址：[msaibox_arm64_1.0.0.1-r1-c1.deb](https://re
 * 依据场景需要对参数配置好后，可通过应用进行保存并生效，同时可批量并执行应用到其他摄像机。
 
 <div style={{ textAlign: 'center', margin: '12px 0' }}>
-  <img src="https://resources.camthink.ai/wiki/img/ai-application/ai-box-appliction-expansion/fighting-and-Iterative-model-deployment/parameter-configuration.png" alt="vms-install" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/AIBoxApplictionExpansion/parameter-configuration.png" alt="vms-install" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 
@@ -140,8 +140,8 @@ AIBOX 算法固件包下载地址：[msaibox_arm64_1.0.0.1-r1-c1.deb](https://re
 本步骤用于配置触发算法识别了会执行什么动作、动作执行具体是怎么样的以及执行后的报警显示配置，是基于UI显示上的触发动作。
 
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '8px 0 16px' }}>
-  <img src="https://resources.camthink.ai/wiki/img/ai-application/ai-box-appliction-expansion/fighting-and-Iterative-model-deployment/action-setting.png" alt="action-setting" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
-  <img src="https://resources.camthink.ai/wiki/img/ai-application/ai-box-appliction-expansion/fighting-and-Iterative-model-deployment/action-setting.png" alt="action-setting" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/AIBoxApplictionExpansion/action-setting.png" alt="action-setting" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/AIBoxApplictionExpansion/action-setting.png" alt="action-setting" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div> 
 
 ### 步骤五：LIVE 显示实时验证
@@ -149,7 +149,7 @@ AIBOX 算法固件包下载地址：[msaibox_arm64_1.0.0.1-r1-c1.deb](https://re
 通过LIVE页面即可实时验证效果，如有触发会执行上一步骤中设定的规则动作。
 
 <div style={{ textAlign: 'center', margin: '12px 0' }}>
-  <img src="https://resources.camthink.ai/wiki/img/ai-application/ai-box-appliction-expansion/fighting-and-Iterative-model-deployment/live.png" alt="live" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/AIBoxApplictionExpansion/live.png" alt="live" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 ## IPC前端部署
@@ -160,11 +160,11 @@ AIBOX 算法固件包下载地址：[msaibox_arm64_1.0.0.1-r1-c1.deb](https://re
 * IPC设备不局限于我们内部的产品，其它IPC也会支持
 
 <div style={{ textAlign: 'center', margin: '12px 0' }}>
-  <img src="https://resources.camthink.ai/wiki/img/ai-application/ai-box-appliction-expansion/fighting-and-Iterative-model-deployment/ipc-front-end-deployment.png" alt="ipc-front-end-deployment" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/AIBoxApplictionExpansion/ipc-front-end-deployment.png" alt="ipc-front-end-deployment" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 <div style={{ textAlign: 'center', margin: '12px 0' }}>
-  <img src="https://resources.camthink.ai/wiki/img/ai-application/ai-box-appliction-expansion/fighting-and-Iterative-model-deployment/ipc-front-end-deployment2.png" alt="ipc-front-end-deployment" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/AIBoxApplictionExpansion/ipc-front-end-deployment2.png" alt="ipc-front-end-deployment" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 

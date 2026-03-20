@@ -36,13 +36,13 @@ sudo apt install -y build-essential git wget curl python3 python3-pip \
 
 2. After the connection is complete, switch the first bit of the device’s `SW1` DIP switch to `ON` to put the device into Recovery mode.
 
-![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/system-flashing-and-initialization/NG45XX_Recovery_SW1.png)
+![](/img/NG45XX_SOFTWARE/NG45XX_Recovery_SW1.png)
 
 3. If the device has entered Recovery mode, the command output will show an NVIDIA Corp device with **ID 0955:7623**.
 
 > Note: If the NVIDIA Corp device does not appear, it indicates that Recovery mode was not properly entered. Please check the Recovery mode switch settings and the USB cable.
 
-![NG45XX_flash_lsusb](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/system-flashing-and-initialization/NG45XX_flash_lsusb.jpg)
+![NG45XX_flash_lsusb](/img/NG45XX_flash_lsusb.jpg)
 
 ## Method for Flashing Image Package
 

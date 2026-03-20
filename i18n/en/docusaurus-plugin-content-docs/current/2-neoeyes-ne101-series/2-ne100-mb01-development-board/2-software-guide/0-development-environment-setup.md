@@ -26,20 +26,20 @@ For advanced users who prefer CLI-based workflows, refer to：[Standard Toolchai
    - Download and install the latest version from the [VSCodewebsite](https://code.visualstudio.com/).
    - Launch VSCode, search for and install the "Espressif IDF" extension from the extension marketplace.
    
-   ![VSCode extension](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/development-environment-setup/NE101_Setup_idf1.png)
+   ![VSCode extension](/img/NE101_Setup_idf1.png)
 
 2. **Configure the ESP-IDF Development Environment**
    
    - Press `Ctrl+Shift+P` to open the command palette.
    - Type and select the command `Configure ESP-IDF extension`.
    
-   ![command palette](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/development-environment-setup/NE101_Setup_idf2.png)
+   ![command palette](/img/NE101_Setup_idf2.png)
 
 ### Installation Modes
 
 Three installation modes are available to suit different setup preferences：
 
-![Installation Modes ](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/development-environment-setup/NE101_Setup_idf3.png)
+![Installation Modes ](/img/NE101_Setup_idf3.png)
 
 1. **EXPRESS**（Recommended）
    
@@ -61,12 +61,12 @@ Three installation modes are available to suit different setup preferences：
 
 It is recommended to choose the **EXPRESS** and and start with version v5.1.6.
 
-![selecting](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/development-environment-setup/NE101_Setup_idf4.png)
-![setup process](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/development-environment-setup/NE101_Setup_idf5.png)
+![selecting](/img/NE101_Setup_idf4.png)
+![setup process](/img/NE101_Setup_idf5.png)
 
 The following screen will be displayed upon successful installation:
 
-![successful installation](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/development-environment-setup/NE101_Setup_idf6.png)
+![successful installation](/img/NE101_Setup_idf6.png)
 
 ## Project Development
 
@@ -85,26 +85,26 @@ git clone https://github.com/camthink-ai/lowpower_camera.git
    - In Visual Studio Code, go to File > Open Folder.
    - Navigate to the folder where the project is located.
    
-   ![项目目录结构](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/development-environment-setup/NE101_CodeList.png)
-   ![项目文件浏览](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/development-environment-setup/NE101_CodeList1.png)
+   ![项目目录结构](/img/NE101_CodeList.png)
+   ![项目文件浏览](/img/NE101_CodeList1.png)
 
 2. **Project setup**
    
    - Select the correct COM port from the bottom status bar.
    - Select esp32s3 as the target chip.
    
-   ![target chip](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/development-environment-setup/NE101_idf_IC.png)
+   ![target chip](/img/NE101_idf_IC.png)
 
 3. **Compile and deploy the source code**
    
    - (Optional) Run the"menuconfig"command to modify project configuration.
    - Select the build button to compile the source code：
    
-   ![Compile process](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/development-environment-setup/NE101_idf_build.png)
+   ![Compile process](/img/NE101_idf_build.png)
    
    - Select the flash button to upload the generated firmware to the device：
    
-   ![Showing build output](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/development-environment-setup/NE101_idf_flash.png)
+   ![Showing build output](/img/NE101_idf_flash.png)
 
 ## Environment Verification
 

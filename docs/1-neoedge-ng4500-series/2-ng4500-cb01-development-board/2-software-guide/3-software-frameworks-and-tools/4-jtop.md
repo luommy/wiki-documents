@@ -68,7 +68,7 @@ sudo reboot
 jtop
 ```
 
-![jtop](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/software-frameworks-and-tools/jtop/jtop.gif)
+![jtop](/img/jtop.gif)
 
 jtop 提供多个页面，使用方向键或 Tab 键切换：
 

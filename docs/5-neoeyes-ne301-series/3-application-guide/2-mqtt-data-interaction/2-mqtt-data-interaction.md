@@ -37,8 +37,8 @@ NeoEyes NE301 支持通过 MQTT 协议将 AI 推理结果和设备相关信息�
 配置完成后，点击 **"保存" (Save)**，设备将尝试连接 MQTT 服务器。
 
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '8px 0 16px' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/mqtt-data-interaction/mqtt-data-interaction/mqtt.png" alt="MQTT 配置" style={{ flex: '1 1 280px', maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/mqtt-data-interaction/mqtt-data-interaction/communication.png" alt="MQTTS 配置" style={{ flex: '1 1 280px', maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/ne301/application-guide/mqtt-data-interaction/mqtt.png" alt="MQTT 配置" style={{ flex: '1 1 280px', maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/ne301/application-guide/mqtt-data-interaction/communication.png" alt="MQTTS 配置" style={{ flex: '1 1 280px', maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 > 如需加密，切换为MQTTS进行配置。
@@ -53,7 +53,7 @@ NeoEyes NE301 支持通过 MQTT 协议将 AI 推理结果和设备相关信息�
 4.  点击 **"Connect"** 按钮连接服务器。
 
 <div style={{ textAlign: 'center', margin: '12px 0' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/mqtt-data-interaction/mqtt-data-interaction/emqx-new-connection.png" alt="MQTTX 新建连接" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/ne301/application-guide/mqtt-data-interaction/emqx-new-connection.png" alt="MQTTX 新建连接" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 连接成功后，添加订阅：
@@ -63,7 +63,7 @@ NeoEyes NE301 支持通过 MQTT 协议将 AI 推理结果和设备相关信息�
 3.  点击 **"Confirm"**。
 
 <div style={{ textAlign: 'center', margin: '12px 0' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/mqtt-data-interaction/mqtt-data-interaction/emqx-sub.png" alt="MQTTX 订阅主题" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/ne301/application-guide/mqtt-data-interaction/emqx-sub.png" alt="MQTTX 订阅主题" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 ## 3. 触发抓拍与数据接收
@@ -82,7 +82,7 @@ NeoEyes NE301 支持通过 MQTT 协议将 AI 推理结果和设备相关信息�
 当设备完成推理后，MQTTX 客户端将收到一条 JSON 格式的消息。如下图所示：
 
 <div style={{ textAlign: 'center', margin: '12px 0' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/mqtt-data-interaction/mqtt-data-interaction/mqtts-ex.png" alt="数据接收示例" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/ne301/application-guide/mqtt-data-interaction/mqtts-ex.png" alt="数据接收示例" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 ## 4. 数据协议格式解析

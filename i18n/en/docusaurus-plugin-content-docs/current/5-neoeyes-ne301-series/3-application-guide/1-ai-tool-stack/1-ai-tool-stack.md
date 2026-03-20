@@ -6,7 +6,7 @@ tags: [AI Tool Stack, Model Training, NE301, Edge AI, Quantization]
 
 # Training and Deploying AI Models with AI Tool Stack
 
-![Automated AI model training process](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/work.png)
+![Automated AI model training process](/img/AIToolStack/work.png)
 
 ## Main Tools and Products
 
@@ -14,7 +14,7 @@ This tutorial will primarily use AI Tool Stack in combination with NeoEyes NE301
 
 ### AI Tool Stack
 
-![AI Tool Stack](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/an.png)
+![AI Tool Stack](/img/AIToolStack/an.png)
 
 AI Tool Stack provides the following core functional modules:
 
@@ -27,7 +27,7 @@ AI Tool Stack is completely open source and hosted on GitHub. You can find the c
 
 ### NeoEyes NE301
 
-![NE301](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/ne301-2.png)  
+![NE301](/img/ne301/quick-start/ne301-2.png)  
 CamThink AI Camera NeoEyes NE301 supports dynamic deployment of AI models. Therefore, models trained in this tutorial can be exported as NE301-usable resource packages for model updates on the device's WebUI, enabling edge deployment of models and allowing NeoEyes NE301 to possess the detection capabilities of our trained models for continuous edge AI operation. Click to view the hardware-related features of [NE301](../../0-overview.md)
 
 ### Server or Personal Computer
@@ -40,7 +40,7 @@ AI Tool Stack is open source, and if you need to train models, you will need a p
 
 To enable connection between NE301 cameras and AI Tool Stack applications, since AI Tool Stack has a built-in MQTT service, we will connect through NE301's built-in MQTT functionality with AI Tool Stack's MQTT service to implement NE301 data collection upload. Remote model updates will be supported in the future. Therefore, before starting, you need to ensure that NE301 can access the AI Tool Stack service, and the MQTT service within the AI Tool Stack service must be accessible externally. The network topology is as follows:
 
-![Topological](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/Topological.png)
+![Topological](/img/AIToolStack/Topological.png)
 
 ## Installation Instructions
 
@@ -110,19 +110,19 @@ If you haven't trained any models and want to complete model training and model 
 
 ## Complete Workflow Guide
 
-![AI Tool Stack](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/Home.png)
+![AI Tool Stack](/img/AIToolStack/Home.png)
 
 ### Create Project
 
 After entering the Web page, click the "Start Creating Project" button or "AI Model Projects" menu to enter the project management page. Build a project according to your needs to annotate data and train models. After entering the AI Model Projects page, click the "Create New AI Model Project" button to create a project. Enter your project name and project description, click save to create the project. After the project is successfully created, click the card to enter the project workbench.
 
-![AI Tool Stack](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/aiproject.png)![AI Tool Stack](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/projectmodal.png)
+![AI Tool Stack](/img/AIToolStack/aiproject.png)![AI Tool Stack](/img/AIToolStack/projectmodal.png)
 
 ### Build Dataset
 
 Click the project to enter the project workbench. The workbench is divided into left-side tools, bottom shortcut key hints, and right-side class management, annotated data list, and dataset image management.
 
-![AI Tool Stack](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/projectinfo.png)
+![AI Tool Stack](/img/AIToolStack/projectinfo.png)
 
 #### 1. Upload/Import Dataset
 
@@ -139,7 +139,7 @@ b. You can upload dataset files through "Import Dataset" in the upper right corn
 └── classes.json   # id/name/color
 ```
 
-![AI Tool Stack](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/impdata.png)
+![AI Tool Stack](/img/AIToolStack/impdata.png)
 
 #### 2. Let NE301 Collect Images
 
@@ -147,35 +147,35 @@ You need to have an NE301 device and configure it in the device according to the
 
 a. Power on NE301, long press the photo button for 2s to enable device WiFi AP. Use a personal computer or mobile phone to connect to NE301's WiFi AP, use 192.168.10.10 to enter the NE301 Web UI page. Enter the "**System Settings**" page and select the router WiFi AP that the current device can connect to in the "**Communications**" menu. Ensure that the NE301 device can normally access the deployed AI Tool Stack service using this WiFi, for example, the router can access external networks and connect to locally deployed AI Tool Stack services through IP.
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/wakeup2.jpg)![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/communications.png)
+![](/img/ne301/quick-start/wakeup2.jpg)![](/img/ne301/quick-start/communications.png)
 
 b. Configure NE301's MQTT service to enable NE301 to report currently collected image data to AI Tool Stack projects through MQTT. Enter NE301's "**Application Management**" menu, enter Data Reporting Topic and Server Address information to connect with AI Tool Stack's built-in MQTT service. AI Tool Stack can be obtained in the MQTT at the top of the project workbench, as shown in the figure below. After confirming the information is correct, you can click "**connect**" to connect NE301 to AI Tool Stack's specified model training project.
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/MQTT.png)![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/MQTT.png)
+![](/img/ne301/quick-start/MQTT.png)![](/img/AIToolStack/MQTT.png)
 
 c. Now you only need to manually operate the shooting button on the side of NE301 to capture images. After capture, the images will automatically upload to the project space. You can manually hold NE301 to collect data within the network range, or fix NE301 for data collection. After collecting images, you can proceed with the next step of annotation work on the images.
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/Capture.png)![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/repimage.png)
+![](/img/AIToolStack/Capture.png)![](/img/AIToolStack/repimage.png)
 
 ### Data Annotation
 
 > Currently, NE301 mainly adapts to object detection models. We recommend building datasets with object detection datasets first.  
 > Before starting to annotate data, you need to add the annotation class text you need in the class input box on the right side, select the annotation box color for this class, and click save to create the annotation class. The annotation shortcuts are the same as conventional annotation tools. For details, please refer to the shortcut key hints in the annotation workbench. Click "Shortcuts" at the bottom to expand the instructions. Other functions such as deleting classes, deleting annotation data, deleting images, changing functions, etc. can be operated according to the interface instructions.
 
-![AI Tool Stack](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/CreateClass.png)![AI Tool Stack](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/Annotation.png)
+![AI Tool Stack](/img/AIToolStack/CreateClass.png)![AI Tool Stack](/img/AIToolStack/Annotation.png)
 
 ### Model Training
 
 After completing all data annotation, click "Train Model" to start training the model. After entering the training interface, you need to build a new training task for the current project dataset. Click "New Training", configure training information. If you don't fully understand the training parameters, we recommend you directly use the default configuration settings. Advanced parameters don't need to be adjusted; they will all run with default values. Click "Start Training" to start the training task. After the task starts, check the training process logs and wait for training to complete.
 
-![AI Tool Stack](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/train.png)![AI Tool Stack](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/trainfrom.png) ![AI Tool Stack](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/trainlog.png)
+![AI Tool Stack](/img/AIToolStack/train.png)![AI Tool Stack](/img/AIToolStack/trainfrom.png) ![AI Tool Stack](/img/AIToolStack/trainlog.png)
 
 After completing model training, you can view logs in the training details, as well as the accuracy performance of the trained model. You can also operate the following functions. All model files can be found in the list in Model Space:
 
 - Export Model: Can export the trained .pt model to a local folder
 - Test Model: Can upload images to test the overall detection effect of the current trained model to evaluate training results
 - **Quantize (TFLite & CamThink NE301): Can quantize to tflite models and NE301-usable model file packages. If you need to deploy to NE301 devices, this step is necessary**  
-![AI Tool Stack](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/modoltest.png)
+![AI Tool Stack](/img/AIToolStack/modoltest.png)
 
 ### Model Quantization
 
@@ -185,7 +185,7 @@ After testing the model effects, you can start quantization work and prepare to 
 
 After model training is completed, you can click "Quantize (TFLite & CamThink NE301)" to build a model quantization task. In the task popup, you can set some quantization parameters. Except for the input size parameter, we don't recommend making any changes to the others. **For the input size parameter setting, we recommend setting one of 256, 416, or 640. This parameter represents the image input size supported by the quantized model. If you don't want to adjust, use the default value. We recommend you set 256. If you want better accuracy performance, set 416. Inference performance is tight at 640, so set it carefully**. Click "Start Quantization" and the model will start the quantization process. You only need to wait for quantization to complete. This process requires a long wait. Please do not close the task window. It will take approximately 5-10 minutes. After model quantization is completed, you can see the quantized NE301 model resource package. Click "Download Model Package" to download it (or find this resource in the Model Space menu after closing to download). The next step is to update the model to the NE301 device locally.
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/QT.png)![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/startQT.png)![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/QTMdown.png)
+![](/img/AIToolStack/QT.png)![](/img/AIToolStack/startQT.png)![](/img/AIToolStack/QTMdown.png)
 
 ### Model Deployment
 
@@ -193,7 +193,7 @@ Now we have trained the model and exported the NE301 device-deployable model res
 
 Use the mobile phone or computer that downloaded the model to connect to NE301's WiFi, enter the NE301 Web UI page, click "upload" in Current Model to select the downloaded NE301 model file for model update. After waiting for the model update, test the device model detection effect. You can test through the "Model Validation" function carried on the NE301 management page, or directly preview the target class detection effect in NE301. You can adjust Conf and NMS to verify the effect.
 
-![AI Tool Stack](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/inference-setting.png)![AI Tool Stack](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/loding.png)![AI Tool Stack](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/modolval.png)
+![AI Tool Stack](/img/ne301/quick-start/inference-setting.png)![AI Tool Stack](/img/AIToolStack/loding.png)![AI Tool Stack](/img/AIToolStack/modolval.png)
 
 ## Deploying Existing Models
 
@@ -206,14 +206,14 @@ If you already have a trained Ultralytics YOLOv8 model, and it happens to be a U
 - Class Names: Fill in your model types  
 Click "Upload" to upload your model. Find the model you uploaded in the list. You can click test to test this model's performance.
 
-![AI Tool Stack](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/MSU.png)![AI Tool Stack](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/MSUfrom.png)![AI Tool Stack](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/MSUtest.png)
+![AI Tool Stack](/img/AIToolStack/MSU.png)![AI Tool Stack](/img/AIToolStack/MSUfrom.png)![AI Tool Stack](/img/AIToolStack/MSUtest.png)
 
 After model verification is completed, we begin to quantize the model to make the model quantized into NE301-deployable model resources. Click the quantization button in the list, fill in Input Size (256, 416, 640) in the popup, click the "Start Quantization" button, and wait for the quantization work to complete. This process takes a long time, please be patient. After model quantization is completed, NE301-usable model resources will appear in the list. You can download this file and deploy it on the NE301 device. For model deployment details, see [Model Deployment](#model-deployment)
 
-![AI Tool Stack](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/MSUQT.png)![AI Tool Stack](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/MSUQTfrom.png)![AI Tool Stack](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/MSUdown.png)
+![AI Tool Stack](/img/AIToolStack/MSUQT.png)![AI Tool Stack](/img/AIToolStack/MSUQTfrom.png)![AI Tool Stack](/img/AIToolStack/MSUdown.png)
 
 ## Overview of Training to Model Quantization Deployment Results
 
 Below is our process of collecting 31 images from NE301 devices using MQTT to push to the project, completing annotation. This model is a detection model for identifying tweezers and screwdrivers. Below are the detection effects after training and quantization deployed to NE301. This entire process took less than 2 hours.
 
-![AI Tool Stack](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/modolrun.png)
+![AI Tool Stack](/img/AIToolStack/modolrun.png)

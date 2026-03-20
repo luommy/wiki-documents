@@ -44,7 +44,7 @@ To perform secondary development, make sure the following：
 
 Connect the development board to PC using a Type-C cable.
 
-![NE101 interface](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/application-guide/human-face-detect/NE101_Main_Board2.png)
+![NE101 interface](/img/NE101_Main_Board2.png)
 
 #### 2. Firmware flashing
 
@@ -78,9 +78,9 @@ WhoDetect: 0, bbox: [0.826712, 47, 40, 169, 195], left_eye: [80, 105], left_mout
 2. Observe the serial output for facial landmark data.
 3. Move the camera around to test dynamic face detection performance.
 
-![Static Illustration of Face Detection](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/application-guide/human-face-detect/NE101_example_human_detect_1.png)
+![Static Illustration of Face Detection](/img/NE101_example_human_detect_1.png)
 
-![Real-Time Face Detection Example](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/application-guide/human-face-detect/NE101_example_human_detect.gif)
+![Real-Time Face Detection Example](/img/NE101_example_human_detect.gif)
 
 ### Source Code Development
 
@@ -94,21 +94,21 @@ git clone https://github.com/camthink-ai/esp-who
 
 1. Open the directory in VS Code：`examples/human_face_detect`
    
-   ![Project Root Directory](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/application-guide/human-face-detect/NE101_human_face_detect_dir.png)
+   ![Project Root Directory](/img/NE101_human_face_detect_dir.png)
 
 2. Select esp32-s3 as the target chip：
    
-   ![芯片选择界面](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/application-guide/human-face-detect/NE101_idf_IC.png)
+   ![芯片选择界面](/img/NE101_idf_IC.png)
 
 #### 3. Compile and deploy the source code
 
 1. Select the build button to compile the source code：
    
-   ![Esp32s3 selection](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/application-guide/human-face-detect/NE101_idf_build.png)
+   ![Esp32s3 selection](/img/NE101_idf_build.png)
 
 2. Select the flash button to upload the generated firmware to the device：
    
-   ![Showing build output](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/application-guide/human-face-detect/NE101_idf_flash.png)
+   ![Showing build output](/img/NE101_idf_flash.png)
 
 #### 4. Performance Test
 

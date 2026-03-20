@@ -37,7 +37,7 @@ tags: [接口配置, 驱动开发, 硬件指南, NG4500 系列, 嵌入式开发]
 
 - 使用 `gpioinfo` 查询 GPIO 映射关系和状态：
 
-![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/driver-installation-and-updates/interface-and-modules-configure/NG45XX_GPIO.png)
+![](/img/NG45XX_SOFTWARE/Driver/NG45XX_GPIO.png)
 
 - 使用 `gpioset` 控制 GPIO 输出：
 
@@ -80,7 +80,7 @@ sudo gpioset --mode=wait gpiochip0 144=0
     - 使用接头1连接 PC，接头2连接 Jetson RS232 的 TX/RX。
     - 确保电平转换正确，避免损坏硬件。
   
-  ![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/driver-installation-and-updates/interface-and-modules-configure/NG45XX_RS232.png)
+  ![](/img/NG45XX_SOFTWARE/Driver/NG45XX_RS232.png)
 
 - RS485
   
@@ -286,20 +286,20 @@ int main(int argc, char* argv[]) {
 - SPI 使能
   
   - 运行指令，启动配置工具：` sudo python /opt/nvidia/jetson-io/jetson-io.py`
-      ![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/driver-installation-and-updates/interface-and-modules-configure/NG45XX_40PIN_SPI1.png)
+      ![](/img/NG45XX_SOFTWARE/NG45XX_40PIN_SPI1.png)
   
   - 选择 `Configure Jetson 40pin Header`
-      ![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/driver-installation-and-updates/interface-and-modules-configure/NG45XX_40PIN_SPI2.png)
+      ![](/img/NG45XX_SOFTWARE/NG45XX_40PIN_SPI2.png)
   
   - 选择 `Configure header pins manually`  
-      ![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/driver-installation-and-updates/interface-and-modules-configure/NG45XX_40PIN_SPI3.png)
+      ![](/img/NG45XX_SOFTWARE/NG45XX_40PIN_SPI3.png)
   
   - 按空格选择 SPI1 和 SPI3，启用 SPI
     
-      ![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/driver-installation-and-updates/interface-and-modules-configure/NG45XX_40PIN_SPI4.png)
+      ![](/img/NG45XX_SOFTWARE/NG45XX_40PIN_SPI4.png)
   
   - 返回并选择 `Save and reboot to reconfigure pins`，重启后生效
-      ![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/driver-installation-and-updates/interface-and-modules-configure/NG45XX_40PIN_SPI5.png)
+      ![](/img/NG45XX_SOFTWARE/NG45XX_40PIN_SPI5.png)
 
 - 运行&验证示例
 
@@ -394,7 +394,7 @@ sudo timedatectl set-ntp false
 
 - 下述内容主要描述启动和配置摄像头模块的方法，以`imx219`为例，硬件连接如下：
   
-  ![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/driver-installation-and-updates/interface-and-modules-configure/NG45XX_IMX219.png)
+  ![](/img/NG45XX_SOFTWARE/NG45XX_IMX219.png)
 
 - 通过`config-by-hardware.py`脚本启动摄像头，重启后生效
   

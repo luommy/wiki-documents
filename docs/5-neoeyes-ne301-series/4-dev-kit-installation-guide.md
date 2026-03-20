@@ -10,7 +10,7 @@ tags: [NE301, 硬件安装, 开发者套件, 相机, 组装]
 
 
 <div style={{ display: 'flex', justifyContent: 'center', margin: '20px 0' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/ne301-dev-kit.png" alt="Panorama" style={{ width: '100%', maxWidth: '800px', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.15)' }} />
+  <img src="/img/ne301/dev-kit-installation-guide/ne301-dev-kit.png" alt="Panorama" style={{ width: '100%', maxWidth: '800px', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.15)' }} />
 </div>
 
 
@@ -190,13 +190,13 @@ tags: [NE301, 硬件安装, 开发者套件, 相机, 组装]
 - 十字自攻螺丝（尖尾,碳钢,黑色，1.7*4mm）
 
 <!-- <div style={{ display: 'flex', justifyContent: 'center', margin: '20px 0' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/NE101_Guide19.png" alt="NE101_Guide19" style={{ width: '100%', maxWidth: '400px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="/img/InstallationGuide/NE101_Guide19.png" alt="NE101_Guide19" style={{ width: '100%', maxWidth: '400px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
 </div> -->
 
 ### 步骤一：相机模组
 
 <div style={{ display: 'flex', justifyContent: 'center', margin: '24px 0' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/camera-moudle.jpg" alt="NE301_Camera-Moudle" style={{ width: '100%', maxWidth: '400px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="/img/ne301/dev-kit-installation-guide/camera-moudle.jpg" alt="NE301_Camera-Moudle" style={{ width: '100%', maxWidth: '400px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
 </div>
 整体效果图如上图所示，包含了，Sensor主板、辅助板、镜头、固定镜头的螺丝、M12镜头支撑座、HFOV 137°镜头模组需要的垫片以及主板。    
 
@@ -204,9 +204,9 @@ tags: [NE301, 硬件安装, 开发者套件, 相机, 组装]
 安装过程中需要注意将Sensor板上面的保护膜撕掉，保证镜头模组的清晰度。撕掉之后需要把镜头安装在Sensor板上，然后拧紧螺丝，保证镜头牢固。
 
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '24px 0' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/sensor-1.jpg" alt="NE301_Guide1" style={{ flex: '1 1 200px', maxWidth: '30%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/sensor-2.jpg" alt="NE301_Guide2" style={{ flex: '1 1 200px', maxWidth: '30%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/sensor-3.jpg" alt="NE301_Guide3" style={{ flex: '1 1 200px', maxWidth: '30%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="/img/ne301/dev-kit-installation-guide/sensor-1.jpg" alt="NE301_Guide1" style={{ flex: '1 1 200px', maxWidth: '30%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="/img/ne301/dev-kit-installation-guide/sensor-2.jpg" alt="NE301_Guide2" style={{ flex: '1 1 200px', maxWidth: '30%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="/img/ne301/dev-kit-installation-guide/sensor-3.jpg" alt="NE301_Guide3" style={{ flex: '1 1 200px', maxWidth: '30%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
 </div>
 
 在安装相机模组时镜头部分后检查镜头是否安装牢固，螺丝是否拧紧，然后拿出Sensor辅助板。
@@ -215,20 +215,20 @@ Sensor辅助板的作用是将Sensor板连接到主板上，保证Sensor板的�
 > Tips:需要额外注意Sensor板的安装方向，如果安装方向错误，会导致Sensor板无法连接到主板上，从而导致相机无法正常工作。
 
 <div style={{ display: 'flex', justifyContent: 'center', margin: '24px 0' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/sensor-4.jpg" alt="NE301_Guide4" style={{ width: '100%', maxWidth: '500px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="/img/ne301/dev-kit-installation-guide/sensor-4.jpg" alt="NE301_Guide4" style={{ width: '100%', maxWidth: '500px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
 </div>
 
 
 如果你的镜头模组是137°FOV，那么需要将NE301_M12垫片贴在镜头模组的背面，如下图所示：
 
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '24px 0' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/sensor-6.png" alt="NE301_Guide6" style={{ flex: '1 1 250px', maxWidth: '45%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/sensor-7.jpg" alt="NE301_Guide7" style={{ flex: '1 1 250px', maxWidth: '45%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="/img/ne301/dev-kit-installation-guide/sensor-6.png" alt="NE301_Guide6" style={{ flex: '1 1 250px', maxWidth: '45%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="/img/ne301/dev-kit-installation-guide/sensor-7.jpg" alt="NE301_Guide7" style={{ flex: '1 1 250px', maxWidth: '45%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
 </div>
 
 安装好后的镜头模组如下图所示：在后续装到主板上时，需要把镜头上的外壳拧掉。
 <div style={{ display: 'flex', justifyContent: 'center', margin: '24px 0' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/sensor-5.jpg" alt="NE301_Guide5" style={{ width: '100%', maxWidth: '500px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="/img/ne301/dev-kit-installation-guide/sensor-5.jpg" alt="NE301_Guide5" style={{ width: '100%', maxWidth: '500px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
 </div>
   
 
@@ -238,7 +238,7 @@ Sensor辅助板的作用是将Sensor板连接到主板上，保证Sensor板的�
 相机模组安装好后，便可以组装下外壳了。下面是外壳部分的零件图。
 
 <div style={{ display: 'flex', justifyContent: 'center', margin: '24px 0' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/panel-1.jpg" alt="NE301_Guide8" style={{ width: '100%', maxWidth: '500px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="/img/ne301/dev-kit-installation-guide/panel-1.jpg" alt="NE301_Guide8" style={{ width: '100%', maxWidth: '500px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
 </div>
 
 我们可以从上框入手，这部分涉及相机的面板部分。
@@ -249,8 +249,8 @@ Sensor辅助板的作用是将Sensor板连接到主板上，保证Sensor板的�
 > Tips：务必注意白色X1透镜的安装，需在玻璃面板安装前放置好。
 
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '24px 0' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/panel-2.jpg" alt="NE301_Guide9" style={{ flex: '1 1 250px', maxWidth: '45%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/panel-3.jpg" alt="NE101_Guide10" style={{ flex: '1 1 250px', maxWidth: '45%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="/img/ne301/dev-kit-installation-guide/panel-2.jpg" alt="NE301_Guide9" style={{ flex: '1 1 250px', maxWidth: '45%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="/img/ne301/dev-kit-installation-guide/panel-3.jpg" alt="NE101_Guide10" style={{ flex: '1 1 250px', maxWidth: '45%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
 </div>
 
 ###  步骤三：中框部分
@@ -258,17 +258,17 @@ Sensor辅助板的作用是将Sensor板连接到主板上，保证Sensor板的�
 中框部分：NE301_按键、NE301_压板、两个十字自攻螺丝（平尾,碳钢,黑色）。
 
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '24px 0' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/mid-frame.jpg" alt="NE301_Mid-Frame" style={{ flex: '1 1 250px', maxWidth: '45%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/side-button.jpg" alt="NE301_Side-Button" style={{ flex: '1 1 250px', maxWidth: '45%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="/img/ne301/dev-kit-installation-guide/mid-frame.jpg" alt="NE301_Mid-Frame" style={{ flex: '1 1 250px', maxWidth: '45%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="/img/ne301/dev-kit-installation-guide/side-button.jpg" alt="NE301_Side-Button" style={{ flex: '1 1 250px', maxWidth: '45%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
 </div>
 
 如上图所示，先检查下配件，将孔位对齐。
 然后将按键安装到中框侧边处，相机图样朝外，然后将压板套在按键上同时穿过两侧的圆柱，最后将用两枚螺丝拧上。固定按键的螺丝尽量拧紧，否则会出现按键松动或者偏移的情况。如果你有安装NE101这部分的经验，那么安装NE301这部分会更加容易！
 
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '24px 0' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/NE101_Guide4.png" alt="NE301_Guide11" style={{ flex: '1 1 200px', maxWidth: '30%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/NE101_Guide5.png" alt="NE301_Guide12" style={{ flex: '1 1 200px', maxWidth: '30%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/NE101_Guide6.png" alt="NE301_Guide13" style={{ flex: '1 1 200px', maxWidth: '30%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="/img/InstallationGuide/NE101_Guide4.png" alt="NE301_Guide11" style={{ flex: '1 1 200px', maxWidth: '30%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="/img/InstallationGuide/NE101_Guide5.png" alt="NE301_Guide12" style={{ flex: '1 1 200px', maxWidth: '30%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="/img/InstallationGuide/NE101_Guide6.png" alt="NE301_Guide13" style={{ flex: '1 1 200px', maxWidth: '30%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
 </div>
 
 > Tips：最好在安装主板前先安装好按键这部分，这样可以避免按键松动或者偏移的情况。
@@ -278,8 +278,8 @@ Sensor辅助板的作用是将Sensor板连接到主板上，保证Sensor板的�
 电池盒部分：标准版本为电池供电，通过电池盒内部的螺丝孔与两枚螺丝来和中框进行固定，电池仓连接线用于连接主板背部电源接口。
 
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '24px 0' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/NE101_Guide7.png" alt="NE301_Guide14" style={{ flex: '1 1 300px', maxWidth: '45%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/battery-compartment.jpg" alt="NE301_Guide15" style={{ flex: '1 1 300px', maxWidth: '45%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="/img/InstallationGuide/NE101_Guide7.png" alt="NE301_Guide14" style={{ flex: '1 1 300px', maxWidth: '45%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="/img/ne301/dev-kit-installation-guide/battery-compartment.jpg" alt="NE301_Guide15" style={{ flex: '1 1 300px', maxWidth: '45%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
 </div>
 
 ### 步骤五：下框部分
@@ -287,7 +287,7 @@ Sensor辅助板的作用是将Sensor板连接到主板上，保证Sensor板的�
 下框部分：将密封圈套在下框里侧的凹槽中，同时准备好下框的四个螺丝。
 
 <div style={{ display: 'flex', justifyContent: 'center', margin: '24px 0' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/NE101_Guide8.png" alt="NE301_Guide16" style={{ width: '100%', maxWidth: '500px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="/img/InstallationGuide/NE101_Guide8.png" alt="NE301_Guide16" style={{ width: '100%', maxWidth: '500px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
 </div>
 
 ### 步骤六：主板部分
@@ -297,14 +297,14 @@ Sensor辅助板的作用是将Sensor板连接到主板上，保证Sensor板的�
 接着将镜头模组的Sensor辅助板接入主板卡扣中，此处卡扣是一个拨片，通过上挑和下压来固定模组连接线，最后接着在相机模组下方，将CV灯板的pin角插到主板上，其中圆形的光敏传感器在左，正方形的补光灯在右，都安装好之后可以将模组镜头上的保护壳摘下。
 
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '24px 0' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/cv-board-1.jpg" alt="NE301_Board" style={{ flex: '1 1 200px', maxWidth: '30%', height: '220px', objectFit: 'cover', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/board.jpg" alt="NE301_Board" style={{ flex: '1 1 200px', maxWidth: '30%', height: '220px', objectFit: 'cover', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="/img/ne301/dev-kit-installation-guide/cv-board-1.jpg" alt="NE301_Board" style={{ flex: '1 1 200px', maxWidth: '30%', height: '220px', objectFit: 'cover', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="/img/ne301/dev-kit-installation-guide/board.jpg" alt="NE301_Board" style={{ flex: '1 1 200px', maxWidth: '30%', height: '220px', objectFit: 'cover', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
 </div>
 
 主板部分如下图所示：
 
 <div style={{ display: 'flex', justifyContent: 'center', margin: '24px 0' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/cv-board-2.jpg" alt="NE301_Board" style={{ flex: '1 1 200px', maxWidth: '30%', height: '220px', objectFit: 'cover', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="/img/ne301/dev-kit-installation-guide/cv-board-2.jpg" alt="NE301_Board" style={{ flex: '1 1 200px', maxWidth: '30%', height: '220px', objectFit: 'cover', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
 </div>
 
 > **请注意** ：
@@ -356,9 +356,9 @@ Sensor辅助板的作用是将Sensor板连接到主板上，保证Sensor板的�
 
 
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '24px 0' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/battery-g.jpg" alt="NE301_Battery" style={{ flex: '1 1 200px', maxWidth: '30%', height: '220px', objectFit: 'cover', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/NE101_Guide14.png" alt="NE301_Battery" style={{ flex: '1 1 200px', maxWidth: '30%', height: '220px', objectFit: 'cover', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/NE101_Guide15.png" alt="NE301_Battery" style={{ flex: '1 1 200px', maxWidth: '30%', height: '220px', objectFit: 'cover', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="/img/ne301/dev-kit-installation-guide/battery-g.jpg" alt="NE301_Battery" style={{ flex: '1 1 200px', maxWidth: '30%', height: '220px', objectFit: 'cover', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="/img/InstallationGuide/NE101_Guide14.png" alt="NE301_Battery" style={{ flex: '1 1 200px', maxWidth: '30%', height: '220px', objectFit: 'cover', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="/img/InstallationGuide/NE101_Guide15.png" alt="NE301_Battery" style={{ flex: '1 1 200px', maxWidth: '30%', height: '220px', objectFit: 'cover', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
 </div>
 
 至此中框、主板、电池部分均已固定好。
@@ -369,14 +369,14 @@ Sensor辅助板的作用是将Sensor板连接到主板上，保证Sensor板的�
 
 
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '24px 0' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/301-1.jpg" alt="NE301_Top_Cover" style={{ flex: '1 1 200px', maxWidth: '30%', height: '220px', objectFit: 'cover', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/301-2.jpg" alt="NE301_Bottom_Cover" style={{ flex: '1 1 200px', maxWidth: '30%', height: '220px', objectFit: 'cover', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="/img/ne301/dev-kit-installation-guide/301-1.jpg" alt="NE301_Top_Cover" style={{ flex: '1 1 200px', maxWidth: '30%', height: '220px', objectFit: 'cover', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="/img/ne301/dev-kit-installation-guide/301-2.jpg" alt="NE301_Bottom_Cover" style={{ flex: '1 1 200px', maxWidth: '30%', height: '220px', objectFit: 'cover', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
 </div>
 
 > **需注意细节** ：安装时注意上下盖有凸起的圆形部分要和中框凹空部分保持对应，如果反着安装上下盖与中框之间会有缝隙。
 
 <div style={{ display: 'flex', justifyContent: 'center', margin: '24px 0' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/NE101_Guide18.png" alt="NE301_Top_Bottom_Cover" style={{ width: '100%', maxWidth: '500px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="/img/InstallationGuide/NE101_Guide18.png" alt="NE301_Top_Bottom_Cover" style={{ width: '100%', maxWidth: '500px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
 </div>
 
 至此，您的NE301 AI Camera 开发者套件已安装全部完成，您可以开始使用了。具体使用方式与安装部署可见——[快速开始](./1-quick-start.md)。

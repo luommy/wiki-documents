@@ -12,7 +12,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 ## 硬件规格
 
-![SC200AI](https://resources.camthink.ai/wiki/img/hardware-dev-resources/usb-camera-module/usb5.png)
+![SC200AI](/img/Hardware_Dev_Resources/USB_Module/usb5.png)
 
 #### **产品特性**   
 本产品为高性能USB接口摄像模组，搭载1/2.7英寸200万像素图像传感器，支持1080P 30fps高清视频输出。
@@ -66,7 +66,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 ## 产品介绍
 本相机模组适用于NeoEyes 101相机
-![image](https://resources.camthink.ai/wiki/img/hardware-dev-resources/usb-camera-module/usb6.png)
+![image](/img/Hardware_Dev_Resources/USB_Module/usb6.png)
 随着 AI 视觉应用的快速发展，用户对图像质量、适配性和多场景使用的需求不断提升。
 NeoEyes NE101 的标准 CPI 模组（OV5640）在日常使用中表现稳定，但在 **画质细节、广角成像与灵活性等方面** 仍有一定局限。
 
@@ -91,7 +91,7 @@ NeoEyes NE101 的标准 CPI 模组（OV5640）在日常使用中表现稳定，�
 此外，OV5640是一个集成式的组件除了是硬件本身的参数设计上的区别外，对于开发者而言二次开发空间较小，OV5640必须连接到主板上，由主板的处理器来读取和处理这些原始数据，技术门槛高，需要底层驱动来实现。
 
 ## 多种 USB 模组规格版本
-![SC200AI](https://resources.camthink.ai/wiki/img/hardware-dev-resources/usb-camera-module/usb2.png)
+![SC200AI](/img/Hardware_Dev_Resources/USB_Module/usb2.png)
 >从左到右分别是：SC200AI-137-2M（超广角款）、SC200AI-88-3M（宽角款）、SC200AI-51-4M（标准款）。
 
 我们有提供三种类型的USB模组版本，以此来满足不同场景下的需求
@@ -111,20 +111,20 @@ NeoEyes NE101 的标准 CPI 模组（OV5640）在日常使用中表现稳定，�
 | CPI相机                                         | USB相机（室内固件版本）                             |
 | ----------------------------------------------- | ----------------------------------------------- |
 | HFOV=92° Focus Distance=3m                     | HFOV=137° Focus Distance=2m                    |
-| ![image](https://resources.camthink.ai/wiki/img/hardware-dev-resources/usb-camera-module/image-20251020085837-uhstdxb.png) | ![image](https://resources.camthink.ai/wiki/img/hardware-dev-resources/usb-camera-module/image-20251020085831-0lepsr2.png) |
+| ![image](/img/Hardware_Dev_Resources/USB_Module/image-20251020085837-uhstdxb.png) | ![image](/img/Hardware_Dev_Resources/USB_Module/image-20251020085831-0lepsr2.png) |
 | HFOV=92° Focus Distance=3m                     | HFOV=88° Focus Distance=3m                     |
-| ![image](https://resources.camthink.ai/wiki/img/hardware-dev-resources/usb-camera-module/image-20251020085823-1lpi3d3.png) | ![image](https://resources.camthink.ai/wiki/img/hardware-dev-resources/usb-camera-module/image-20251020085812-1qlfobj.png) |
+| ![image](/img/Hardware_Dev_Resources/USB_Module/image-20251020085823-1lpi3d3.png) | ![image](/img/Hardware_Dev_Resources/USB_Module/image-20251020085812-1qlfobj.png) |
 | HFOV=47° Focus Distance=4m                     | HFOV=51° Focus Distance=4m                     |
-| ![image](https://resources.camthink.ai/wiki/img/hardware-dev-resources/usb-camera-module/image-20251020085803-wfggdqp.png) | ![image](https://resources.camthink.ai/wiki/img/hardware-dev-resources/usb-camera-module/image-20251020085755-zlr6jbj.png) |
+| ![image](/img/Hardware_Dev_Resources/USB_Module/image-20251020085803-wfggdqp.png) | ![image](/img/Hardware_Dev_Resources/USB_Module/image-20251020085755-zlr6jbj.png) |
 
 | CPI相机                                         | USB相机（室外固件版本）                             |
 | ----------------------------------------------- | ----------------------------------------------- |
 | HFOV=92° Focus Distance=3m                     | HFOV=137° Focus Distance=2m                    |
-| ![image](https://resources.camthink.ai/wiki/img/hardware-dev-resources/usb-camera-module/image.png) | ![image](https://resources.camthink.ai/wiki/img/hardware-dev-resources/usb-camera-module/image1.png) |
+| ![image](/img/Hardware_Dev_Resources/USB_Module/image.png) | ![image](/img/Hardware_Dev_Resources/USB_Module/image1.png) |
 | HFOV=92° Focus Distance=3m                     | HFOV=88° Focus Distance=3m                     |
-| ![image](https://resources.camthink.ai/wiki/img/hardware-dev-resources/usb-camera-module/image2.png) | ![image](https://resources.camthink.ai/wiki/img/hardware-dev-resources/usb-camera-module/image3.png) |
+| ![image](/img/Hardware_Dev_Resources/USB_Module/image2.png) | ![image](/img/Hardware_Dev_Resources/USB_Module/image3.png) |
 | HFOV=47° Focus Distance=4m                     | HFOV=51° Focus Distance=4m                     |
-| ![image](https://resources.camthink.ai/wiki/img/hardware-dev-resources/usb-camera-module/image4.png) | ![image](https://resources.camthink.ai/wiki/img/hardware-dev-resources/usb-camera-module/image5.png) |
+| ![image](/img/Hardware_Dev_Resources/USB_Module/image4.png) | ![image](/img/Hardware_Dev_Resources/USB_Module/image5.png) |
 
 > 由对比效果可见，无论室内外场景，USB相机模组的成像效果都要优于OV5640，两款镜头模组图像上调教亦有差异，可根据喜好选择。
 ### USB相机模组选型建议

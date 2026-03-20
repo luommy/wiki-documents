@@ -6,7 +6,7 @@ tags: [开发工具, 模型训练, NE301, 量化部署, 教程]
 
 # 使用 AI Tool Stack 训练和部署 AI 模型
 
-![Automated AI model training process](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/work.png)
+![Automated AI model training process](/img/AIToolStack/work.png)
 
 ## 主要工具与产品
 
@@ -14,7 +14,7 @@ tags: [开发工具, 模型训练, NE301, 量化部署, 教程]
 
 ### AI Tool Stack
 
-![AI Tool Stack](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/an.png)
+![AI Tool Stack](/img/AIToolStack/an.png)
 
 AI Tool Stack 提供以下核心功能模块：
 
@@ -27,7 +27,7 @@ AI Tool Stack完全开源，托管在GitHub上，你可以在这里找到代码�
 
 ### NeoEyes NE301
 
-![NE301](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/ne301-2.png)  
+![NE301](/img/ne301/quick-start/ne301-2.png)  
 CamThink AI Camera NeoEyes NE301支持AI模型的动态部署，因此在本教程中训练完成的模型可以导出NE301可用资源包，在设备的WebUI上进行模型更新，来实现模型的边缘部署，让NeoEyes NE301具备我们我们训练的模型检测能力，来实现边缘AI的持续工作，点击可查看 [NE301](../../0-overview.md)的硬件相关特性
 
 ### 服务器或个人电脑
@@ -40,7 +40,7 @@ AI Tool Stack是开源的并且如果需要训练模型，你需要一台性能�
 
 为了实现NE301相机与AI Tool Stack应用的连接，因为AI Tool Stack内置了MQTT服务，我们将通过NE301内置的MQTT功能与AI Tool Stack的MQTT服务进行连接，来实现NE301数据采集的上传，后续将支持模型的远程更新，因此在开始之前你需要保证NE301可访问到AI Tool Stack服务，AI Tool Stack服务内的MQTT服务要可被外部访问，网络拓扑如下：
 
-![Topological](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/Topological.png)
+![Topological](/img/AIToolStack/Topological.png)
 
 ## 安装说明
 
@@ -110,19 +110,19 @@ docker ps
 
 ## 完整工作流指南
 
-![AI Tool Stack](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/Home.png)
+![AI Tool Stack](/img/AIToolStack/Home.png)
 
 ### 创建项目
 
 进入Web页后，点击「Start Creating Project」按钮或「Al Model Projects」菜单，进入项目管理页面，根据你的需要来构建一个项目用来标注数据和训练模型，进入Al Model Projects页面后，点击「Create New AI Model Project」按钮来创建一个项目，输入你的项目名称和项目描述，点击保存后创建项目，项目创建成功后点击卡片进入项目工作台。
 
-![AI Tool Stack](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/aiproject.png)![AI Tool Stack](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/projectmodal.png)
+![AI Tool Stack](/img/AIToolStack/aiproject.png)![AI Tool Stack](/img/AIToolStack/projectmodal.png)
 
 ### 构建数据集
 
 点击项目进入项目工作台，工作台分为左侧工具、底部快捷键提示、右侧为类管理、标注数据列表、数据集图片管理
 
-![AI Tool Stack](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/projectinfo.png)
+![AI Tool Stack](/img/AIToolStack/projectinfo.png)
 
 #### 1.上传/导入数据集
 
@@ -139,7 +139,7 @@ b.你可以在右上角的「Import Dataset」上传数据集文件，支持COCO
 └── classes.json   # id/name/color
 ```
 
-![AI Tool Stack](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/impdata.png)
+![AI Tool Stack](/img/AIToolStack/impdata.png)
 
 #### 2.让NE301采集图像
 
@@ -147,35 +147,35 @@ b.你可以在右上角的「Import Dataset」上传数据集文件，支持COCO
 
 a.NE301通电，长按2s拍照键开启设备WiFi AP，使用个人电脑或手机连接NE301的WiFi AP，使用192.168.10.10进入NE301 Web UI页面，进入「**System Settings**」页面在「**Communications**」菜单中中选择当前设备可连接的路由WiFi AP，确保NE301设备使用此WiFi可正常访问到部署AI Tool Stack服务，例如路由可范围外部网络及通过IP与本地部署的AI Tool Stack服务连接。
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/wakeup2.jpg)![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/communications.png)
+![](/img/ne301/quick-start/wakeup2.jpg)![](/img/ne301/quick-start/communications.png)
 
 b.配置NE301的MQTT服务，实现NE301通过MQTT上报当前采集的图像数据到AI Tool Stack的项目中，进入NE301的「**Application Management**」的菜单，输入Data Reporting Topic与Server Address信息与AI Tool Stack内置的MQTT服务进行连接，AI Tool Stack可以在项目工作台中顶部的MQTT中获取，如下图所示，确认信息无误后可以点击「**connect**」让NE301连接到AI Tool Stack的指定模型训练项目中
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/MQTT.png)![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/MQTT.png)
+![](/img/ne301/quick-start/MQTT.png)![](/img/AIToolStack/MQTT.png)
 
 c.现在你只需要手动操作NE301侧面的拍摄按键进行图像的抓取，抓取后的图像会自动上传到项目空间中你可以手动拿着NE301在网络允许的范围内采集数据，或者固定NE301后进行数据采集，采集完成图像后你可以对图像进行下一步标注工作。
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/Capture.png)![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/repimage.png)
+![](/img/AIToolStack/Capture.png)![](/img/AIToolStack/repimage.png)
 
 ### 数据标注
 
 > 当前NE301主要适配目标检测模型，我们推荐先以目标检测数据集进行数据集构建。  
 > 在开始标注数据之前需要在右侧类的输入框内添加你所需要的标注类文本、选择此类的标注框颜色，点击保存创建标注类，标注快捷键同常规标注工具，详情可见标注工具台中的快捷键提示，点击底部的「Shortcuts」即可展开说明，其他功能例如删除类、删除标注数据、删除图像、更换功能等按照界面指示操作即可
 
-![AI Tool Stack](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/CreateClass.png)![AI Tool Stack](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/Annotation.png)
+![AI Tool Stack](/img/AIToolStack/CreateClass.png)![AI Tool Stack](/img/AIToolStack/Annotation.png)
 
 ### 模型训练
 
 完成所有数据标注后点击「Train Model」开始训练模型，进入训练界面后，你需要针对当前项目数据集构建新的训练任务，点击「New Training」，配置训练信息，如果你对训练参数不完全了解，我们建议你直接使用默认配置设置即可，高级部分参数无需调整，它们都将以默认值运行，点击「Start Training」开启训练任务，任务启动查看训练过程日志，等待训练结束即可。
 
-![AI Tool Stack](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/train.png)![AI Tool Stack](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/trainfrom.png) ![AI Tool Stack](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/trainlog.png)
+![AI Tool Stack](/img/AIToolStack/train.png)![AI Tool Stack](/img/AIToolStack/trainfrom.png) ![AI Tool Stack](/img/AIToolStack/trainlog.png)
 
 在完成模型训练后，你可以在训练详情中查看日志，以及训练模型的精度表现，并且你可以操作下方几项功能，所有模型文件可以在Model Space中的列表中找到
 
 - Export Model：可导出训练好的.pt模型到本地文件夹
 - Test Model：可上传图像测试当前训练模型的整体检测效果如何，来评估训练成果
 - **Quantize （TFLite & CamThink NE301）：可量化为tflite模型及NE301可用的模型文件包，如果需要部署到NE301设备中，此步骤是必要的**  
-![AI Tool Stack](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/modoltest.png)
+![AI Tool Stack](/img/AIToolStack/modoltest.png)
 
 ### 模型量化
 
@@ -185,7 +185,7 @@ c.现在你只需要手动操作NE301侧面的拍摄按键进行图像的抓取�
 
 模型训练完成后你可以点击「Quantize （TFLite & CamThink NE301）」来构建模型量化任务,在任务弹窗中你可以设置一些量化参数，除了input size参数，其他的我们不建议进行任何改动，**input size参数的设置值我们建议设置 256、416、640中的一个，此参数代表量化后的模型支持的图像输入大小，如果你不想调整，使用默认值即可，我们推荐你设置256，如果你要更好的精度表现请设置416，640下推理性能吃紧，谨慎设置**，点击「Start Quantization」就行，模型会启动量化流程，你仅需要等待量化完成，此过程需要漫长等待，请不要关闭任务窗口，大约需要5-10分钟的时间，待模型量化完成后，你可以看到量化后的NE301模型资源包，点击「Download Model Package」下载它（或者关闭后在模型空间菜单中找到此资源去下载），下一步就可以将模型更新至NE301设备本地。
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/QT.png)![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/startQT.png)![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/QTMdown.png)
+![](/img/AIToolStack/QT.png)![](/img/AIToolStack/startQT.png)![](/img/AIToolStack/QTMdown.png)
 
 ### 模型部署
 
@@ -193,7 +193,7 @@ c.现在你只需要手动操作NE301侧面的拍摄按键进行图像的抓取�
 
 使用下载模型的手机或电脑连接NE301的WiFi，进入NE301 Web UI页面，在Current Model中点击「upload」选取下载的NE301模型文件进行模型更新，等待模型更新后，测试设备模型检测效果，你可以通过NE301管理页面携带的「Model Validation」功能进行测试，或者直接在NE301中预览目标类的检测效果，可以调整Conf和NMS来验证效果如何。
 
-![AI Tool Stack](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/inference-setting.png)![AI Tool Stack](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/loding.png)![AI Tool Stack](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/modolval.png)
+![AI Tool Stack](/img/ne301/quick-start/inference-setting.png)![AI Tool Stack](/img/AIToolStack/loding.png)![AI Tool Stack](/img/AIToolStack/modolval.png)
 
 ## 现有模型量化和部署
 
@@ -206,14 +206,14 @@ c.现在你只需要手动操作NE301侧面的拍摄按键进行图像的抓取�
 - Class Names：填写你的模型类型  
 点击「Upload」上传你的模型，在列表中找到你上传的模型，你可以点击测试来测试此模型的表现。
 
-![AI Tool Stack](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/MSU.png)![AI Tool Stack](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/MSUfrom.png)![AI Tool Stack](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/MSUtest.png)
+![AI Tool Stack](/img/AIToolStack/MSU.png)![AI Tool Stack](/img/AIToolStack/MSUfrom.png)![AI Tool Stack](/img/AIToolStack/MSUtest.png)
 
 模型验证完成后，我们开始对模型进行量化，让模型量化成NE301可部署的模型资源，点击列表的量化按钮，在弹窗中填写Input Size（256、416、640），点击「Start Quantization」按钮，等待量化工作的完成，此过程需要较久，请耐心等待，在完成模型量化后，列表会出现NE301可用的模型资源，可下载此文件并在NE301设备上进行部署，模型部署细节可见[模型部署](#模型部署)
 
-![AI Tool Stack](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/MSUQT.png)![AI Tool Stack](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/MSUQTfrom.png)![AI Tool Stack](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/MSUdown.png)
+![AI Tool Stack](/img/AIToolStack/MSUQT.png)![AI Tool Stack](/img/AIToolStack/MSUQTfrom.png)![AI Tool Stack](/img/AIToolStack/MSUdown.png)
 
 ## 训练到模型量化部署效果一览
 
 下方是我们通过此工具从NE301设备上采集31张图像使用MQTT推送到项目中，并且完成标注，此模型是识别镊子和螺丝刀的检测模型，下方是经过训练和量化后部署到NE301的检测效果，此过程仅花费不到2个小时的时间。
 
-![AI Tool Stack](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-tool-stack/ai-tool-stack/modolrun.png)
+![AI Tool Stack](/img/AIToolStack/modolrun.png)

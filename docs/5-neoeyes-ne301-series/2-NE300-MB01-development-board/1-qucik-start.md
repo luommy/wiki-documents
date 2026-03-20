@@ -31,8 +31,8 @@ NE300系列是专为物联网应用设计的高性能AI智能相机产品线，�
 ### 设备连接
 
 <div style={{display:'flex', gap:'16px', flexWrap:'wrap', justifyContent:'center'}}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/qucik-start/ne301-board.png" alt="NE301主板正面图" style={{width:'100%', maxWidth:'360px', borderRadius:'8px'}} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/qucik-start/ne301-board-2.png" alt="NE301主板接口图" style={{width:'100%', maxWidth:'360px', borderRadius:'8px'}} />
+  <img src="/img/ne301/development-board/quick-start/ne301-board.png" alt="NE301主板正面图" style={{width:'100%', maxWidth:'360px', borderRadius:'8px'}} />
+  <img src="/img/ne301/development-board/quick-start/ne301-board-2.png" alt="NE301主板接口图" style={{width:'100%', maxWidth:'360px', borderRadius:'8px'}} />
 </div>
 
 
@@ -77,7 +77,7 @@ NE300系列是专为物联网应用设计的高性能AI智能相机产品线，�
 注意连接线有J1-J2端的区别，避免接错。镜头可自行调焦，手握镜头两侧（避免指纹印到摄像头导致模糊），正反旋转进行调焦。调焦效果在登入web界面中，进入`功能调试`或者`硬件管理->图像管理`即可实时查看。
 
 <p align="center">
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/qucik-start/imagebackg.png" alt="NE301 镜头模组连接示意" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
+  <img src="/img/ne301/development-board/quick-start/imagebackg.png" alt="NE301 镜头模组连接示意" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
 </p>
 
 #### CV灯板
@@ -85,7 +85,7 @@ NE300系列是专为物联网应用设计的高性能AI智能相机产品线，�
 直插式灯板，左边为ap指示灯，上电初始化完成呈现蓝色；右边为补光灯，在登入web界面中，进入`硬件管理->灯光管理`可以设置补光灯亮度、亮度开关、亮度有效时间段，设置完成后，设备触发抓图时补光灯生效。
 
 <p align="center">
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/qucik-start/cv-board.png" alt="NE301 CV灯板" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
+  <img src="/img/ne301/development-board/quick-start/cv-board.png" alt="NE301 CV灯板" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
 </p>
 
 
@@ -102,7 +102,7 @@ NE300系列是专为物联网应用设计的高性能AI智能相机产品线，�
 #### 灯光状态
 
 <p align="center">
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/qucik-start/light.png" alt="NE301 灯光状态示意" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
+  <img src="/img/ne301/development-board/quick-start/light.png" alt="NE301 灯光状态示意" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
 </p>
 
 
@@ -113,7 +113,7 @@ NE300系列是专为物联网应用设计的高性能AI智能相机产品线，�
 #### 串口使用
 
 <p align="center">
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/qucik-start/uart.png" alt="调试串口接口位置" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
+  <img src="/img/ne301/development-board/quick-start/uart.png" alt="调试串口接口位置" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
 </p>
 
 串口线束接入口（防呆设计接入，参考硬件设计手册）
@@ -122,8 +122,8 @@ NE300系列是专为物联网应用设计的高性能AI智能相机产品线，�
 
 
 <div style={{display:'flex', gap:'16px', flexWrap:'wrap', justifyContent:'center'}}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/qucik-start/ass.png" alt="串口调试助手界面" style={{width:'100%', maxWidth:'360px', borderRadius:'8px'}} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/qucik-start/ass2.png" alt="串口调试输出示例" style={{width:'100%', maxWidth:'360px', borderRadius:'8px'}} />
+  <img src="/img/ne301/development-board/quick-start/ass.png" alt="串口调试助手界面" style={{width:'100%', maxWidth:'360px', borderRadius:'8px'}} />
+  <img src="/img/ne301/development-board/quick-start/ass2.png" alt="串口调试输出示例" style={{width:'100%', maxWidth:'360px', borderRadius:'8px'}} />
 </div>
 
 
@@ -133,7 +133,7 @@ NE300系列是专为物联网应用设计的高性能AI智能相机产品线，�
 可以通过串口后台输入`ifconfig ap info`进行查看WiFi AP，在你的电脑网络中找到对应的SSID连接。
 
 <p align="center">
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/qucik-start/ssid.png" alt="NE301 SSID 搜索示意" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
+  <img src="/img/ne301/development-board/quick-start/ssid.png" alt="NE301 SSID 搜索示意" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
 </p>
 
 
@@ -167,7 +167,7 @@ Web页面上预览画面模糊，大概率是镜头焦距问题，可以手动�
 
 接线细节：
 <p align="center">
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/qucik-start/wiring.png" alt="NE301 接线细节" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
+  <img src="/img/ne301/development-board/quick-start/wiring.png" alt="NE301 接线细节" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
 </p>
 
 ### 异常断电
@@ -175,5 +175,5 @@ Web页面上预览画面模糊，大概率是镜头焦距问题，可以手动�
 使用电池盒供电时，若拨码开关从1拨到NO（可能会误触到），会断开电池盒子的供电，设备处于下电状态，导致设备无法启动，此时重新拨回即可使用。
 
 <p align="center">
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/qucik-start/power-down.png" alt="电池盒拨码开关示意" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
+  <img src="/img/ne301/development-board/quick-start/power-down.png" alt="电池盒拨码开关示意" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
 </p>

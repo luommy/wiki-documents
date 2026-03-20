@@ -27,7 +27,7 @@ tags: [Cat-1 示例, 蜂窝网络, 低功耗抓拍, 4G 通信]
 - LTE Cat 1无线模组
 - 已激活的4G SIM卡
 
-![Cat1模组硬件连接示意图](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/example-cat1/cat1PCBA.png)
+![Cat1模组硬件连接示意图](/img/Overview/NE101/cat1PCBA.png)
 
 ### 软件资源
 
@@ -65,8 +65,8 @@ tags: [Cat-1 示例, 蜂窝网络, 低功耗抓拍, 4G 通信]
 2. 访问设备Web管理界面 http://192.168.1.1
 3. 查看"蜂窝网络"状态信息
 
-![网络状态显示界面1](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/example-cat1/NE101_example_cat1_1.png)
-![网络状态显示界面2](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/example-cat1/NE101_example_cat1_2.png)
+![网络状态显示界面1](/img/NE101_example_cat1_1.png)
+![网络状态显示界面2](/img/NE101_example_cat1_2.png)
 
 #### 4. 数据传输测试
 
@@ -88,17 +88,17 @@ git clone https://github.com/camthink-ai/lowpower_camera.git
 
 使用VS Code打开项目目录：
 
-![工程目录结构示意图](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/example-cat1/NE101_code_dir.png)
+![工程目录结构示意图](/img/NE101_code_dir.png)
 
 #### 3. 编译与部署
 
 1. 执行工程编译：
 
-![编译过程界面](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/example-cat1/NE101_idf_build.png)
+![编译过程界面](/img/NE101_idf_build.png)
 
 2. 烧录生成固件：
 
-![固件烧录界面](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/example-cat1/NE101_idf_flash.png)
+![固件烧录界面](/img/NE101_idf_flash.png)
 
 #### 4. 功能验证
 

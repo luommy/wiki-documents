@@ -28,7 +28,7 @@ tags: [DeepStream, 视频分析, NVIDIA SDK, Jetson Orin, AI 应用]
 - Docker 使用（含 jetson-containers）
 - 常见问题与技巧
 
-![overview](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/software-frameworks-and-tools/deepstream/NG45XX_deepstream_overview.png)
+![overview](/img/NG45XX_deepstream_overview.png)
 
 ---
 
@@ -210,7 +210,7 @@ deepstream-app -c source30_1080p_dec_infer-resnet_tiled_display_int8.txt
 ```
 该命令将弹出视频窗口，实时显示检测结果:
 
-![deepstream_app_5x8](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/software-frameworks-and-tools/deepstream/deepstream_app_1.png)
+![deepstream_app_5x8](/img/deepstream_app_1.png)
 ---
 
 ### 步骤 2：使用 USB 或 CSI 摄像头
@@ -259,7 +259,7 @@ sudo make CUDA_VER=12.6
 ```bash
 ./deepstream-test1-app dstest1_config.yml
 ```
-![deepstream_od](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/software-frameworks-and-tools/deepstream/deepstream_od.png)
+![deepstream_od](/img/deepstream_od.png)
 
 
 更多源码示例，详见 /opt/nvidia/deepstream/deepstream/sources
@@ -294,7 +294,7 @@ network-type=0
 ## 6. 更多其他示例
 
 [deepstream_python_apps](https://github.com/NVIDIA-AI-IOT/deepstream_python_apps/tree/master)
-![deepstream_python](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/software-frameworks-and-tools/deepstream/deepstream_python.png)
+![deepstream_python](/img/deepstream_python.png)
 
 ## 7. 小贴士与故障排查
 

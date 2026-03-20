@@ -22,17 +22,17 @@ tags: [NE301, 烧录指南, 固件, STM32, 软件指南]
 1. 将拨码开关 **#2** 拨到 ON 位置以进入烧录模式。烧录完成后，将其拨回并重新上电（或按 **Reset**）以进入运行模式。
 
    <p align="center">
-     <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/software-guide/system-flashing-and-initialization/flash-mode.png" alt="DIP switch for flashing" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
+     <img src="/img/ne301/development-board/software-guide/sys-flash/flash-mode.png" alt="DIP switch for flashing" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
    </p>
 2. 使用 **4 针适配线**将 **ST-Link** 连接到开发板的 **DEBUG** 接口，然后将 ST-Link 插入电脑。
 
    <p align="center">
-     <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/software-guide/system-flashing-and-initialization/st-link.png" alt="ST-Link wiring" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
+     <img src="/img/ne301/development-board/software-guide/sys-flash/st-link.png" alt="ST-Link wiring" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
    </p>
 3. 通过 USB Type-C 将开发板连接到电脑或电源适配器。
 
    <p align="center">
-     <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/software-guide/system-flashing-and-initialization/type-c.png" alt="Type-C power" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
+     <img src="/img/ne301/development-board/software-guide/sys-flash/type-c.png" alt="Type-C power" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
    </p>
 
    板载 **DEBUG LED 常亮** 表示已进入烧录模式。
@@ -44,12 +44,12 @@ tags: [NE301, 烧录指南, 固件, STM32, 软件指南]
 1. 使用 **3 针杜邦线**将 **ST-Link** 直接连接到 **STM32U0** 接口，然后将 ST-Link 连接到电脑。
 
    <p align="center">
-     <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/software-guide/system-flashing-and-initialization/u0.png" alt="STM32U0 wiring" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
+     <img src="/img/ne301/development-board/software-guide/sys-flash/u0.png" alt="STM32U0 wiring" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
    </p>
 2. 通过 USB Type-C 将开发板连接到电脑或电源适配器。
 
    <p align="center">
-     <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/software-guide/system-flashing-and-initialization/connect.png" alt="Power connection" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
+     <img src="/img/ne301/development-board/software-guide/sys-flash/connect.png" alt="Power connection" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
    </p>
 
 ### 下载固件

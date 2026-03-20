@@ -7,8 +7,8 @@ tags: [NE301, Smart City, Waste Management, Home Assistant, Case Study]
 # Case Study - Urban Waste Bin Overflow Monitoring
 
 <div style={{display: 'flex', gap: '10px', justifyContent: 'center', margin: '20px 0'}}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/header.png" alt="header1" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/header2.png" alt="header2" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+  <img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/header.png" alt="header1" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+  <img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/header2.png" alt="header2" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 </div>
 
 ## 1. Preface
@@ -51,17 +51,17 @@ Connect the WiFI endpoints start with `NE301_<Last 6 MAC digits>`, Input the def
 
 Click Login to see the live view with detailed settings.
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image1.png" alt="image1" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image1.png" alt="image1" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
 Navigate to **System settings** to connect the network access.
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image2.png" alt="image2" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image2.png" alt="image2" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
 Camthink NE301 supports WiFi and Cellular modules. Choose the method to make sure the network access is connected.
 
 Navigate to **Application Management** to configure where to forward the data and pictures.
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image3.png" alt="image3" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image3.png" alt="image3" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
 Input the details of your own mqtt broker or AI tool stack server
 
@@ -77,7 +77,7 @@ Input the details of your own mqtt broker or AI tool stack server
 
 Login Your own AI tool stack server to create a new project
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image4.png" alt="image4" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image4.png" alt="image4" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
 Click **Create New AI Model Project**, Input the name and description:
 
@@ -89,11 +89,11 @@ If you have prepared the images, just upload them to this platform directly for 
 
 Before starting to train the models, create the Class here, in this example, we create two classes to identify whether the trush bin is **Full** level or **Partial** level.
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image5.png" alt="image5" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image5.png" alt="image5" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
 Choose the proper type to tag the object.
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image6.png" alt="image6" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image6.png" alt="image6" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
 Just do it one by one to make sure all the objects are marked correctly.
 
@@ -101,11 +101,11 @@ If you have the datasets already, just upload them here directly
 
 Click '**Train Model**' to start the training.
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image7.png" alt="image7" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image7.png" alt="image7" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
 Click '**New Training**' to create a new task, keep all the default settings.
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image8.png" alt="image8" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image8.png" alt="image8" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
 Then start the training. It will take a little while.
 
@@ -113,23 +113,23 @@ To deploy the model into NE301, we need to quantize it before upload it to the d
 
 Click the **Quantize** button.
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image9.png" alt="image9" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image9.png" alt="image9" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image10.png" alt="image10" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image10.png" alt="image10" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
 Click it to start, just keep the default settings here
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image11.png" alt="image11" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image11.png" alt="image11" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
 It takes a little while to finish it.
 
 The NE301 Model Package (`*.bin`) is the exact quantized model. Click to download it.
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image12.png" alt="image12" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image12.png" alt="image12" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
 You can also test the model here to confirm if all good
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image13.png" alt="image13" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image13.png" alt="image13" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
 ### 3.4 Verify and Deploy the new model.
 
@@ -137,15 +137,15 @@ Let's back to the device to upload the new model.
 
 Click **Upload** button to install it.
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image14.png" alt="image14" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image14.png" alt="image14" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
 When done, the chipsets on the shelf are marked correctly.
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image15.png" alt="image15" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image15.png" alt="image15" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
 You can upload more images to verify the performance.
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image16.png" alt="image16" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image16.png" alt="image16" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
 ### 3.5 Configure the HomeAssistant applications.
 
@@ -153,19 +153,19 @@ To make the data values more valuable for customers, we choose **HomeAssistant**
 
 Open the '**Devices & Services**' to install the MQTT integration.
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image17.png" alt="image17" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image17.png" alt="image17" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
 Click **Add Integration** button to install the MQTT addon.
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image18.png" alt="image18" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image18.png" alt="image18" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
 Just input **MQTT** to search it.
 
 Choose the second one, and input the MQTT broker configured in NE301.
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image19.png" alt="image19" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image19.png" alt="image19" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image20.png" alt="image20" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image20.png" alt="image20" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
 Submit to save it. The MQTT connection is ready.
 
@@ -179,21 +179,21 @@ Then apply the changes by click '**Manually configured MQTT entities**' in **Dev
 
 You will find the Sensor is created correctly.
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image21.png" alt="image21" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image21.png" alt="image21" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
 ## 4. Quick Test
 
 Let's start to monitor the level status of the trash bin. The status will appear with the values correctly.
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image22.png" alt="image22" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image22.png" alt="image22" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image23.png" alt="image23" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image23.png" alt="image23" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image24.png" alt="image24" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image24.png" alt="image24" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
 You can also check it in more details in histories.
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image25.png" alt="image25" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image25.png" alt="image25" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
 HomeAssistant platform supports the other appplications to trigger the alert, you can configure them to achieve the full management.
 
@@ -207,7 +207,7 @@ A: The server in this guide is for internal use. You need to install your own AI
 
 A: You can try the option of Input Size to be 320 during the quantize process.
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image26.png" alt="image26" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image26.png" alt="image26" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
 **Q: How to set the value template in HomeAssistant?**
 

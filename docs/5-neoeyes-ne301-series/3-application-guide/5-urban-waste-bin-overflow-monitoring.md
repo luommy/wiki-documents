@@ -8,8 +8,8 @@ tags: [智慧城市, 垃圾桶监测, AI应用, NE301, 解决方案]
 # 案例-城市垃圾桶满溢监测
 
 <div style={{display: 'flex', gap: '10px', justifyContent: 'center', margin: '20px 0'}}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/header.png" alt="header1" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/header2.png" alt="header2" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+  <img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/header.png" alt="header1" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+  <img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/header2.png" alt="header2" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 </div>
 
 ## 1. 简介
@@ -52,17 +52,17 @@ Home Assistant 是一个免费的开源家庭自动化平台，旨在成为您�
 
 点击登录查看带有详细设置的实时视图。
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image1.png" alt="image1" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image1.png" alt="image1" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
 导航到系统设置 (System settings) 以连接网络。
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image2.png" alt="image2" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image2.png" alt="image2" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
 Camthink NE301 支持 WiFi 和蜂窝模块。选择相应方法以确保网络连接正常。
 
 导航到应用管理 (Application Management) 以配置数据和图片的转发位置。
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image3.png" alt="image3" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image3.png" alt="image3" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
 输入您自己的 MQTT 代理或 AI 工具栈服务器的详细信息：
 
@@ -78,7 +78,7 @@ Camthink NE301 支持 WiFi 和蜂窝模块。选择相应方法以确保网络�
 
 登录您自己的 AI 工具栈服务器以创建新项目。
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image4.png" alt="image4" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image4.png" alt="image4" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
 点击创建新的 AI 模型项目 (Create New AI Model Project)，输入名称和描述。
 
@@ -90,11 +90,11 @@ NE301 拍摄的图片将按配置进行上行传输。
 
 在开始训练模型之前，在这里创建一个类 (Class)。在本例中，我们创建两个类来识别垃圾桶是“满溢 (Full)”还是“部分满 (Partial)”。
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image5.png" alt="image5" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image5.png" alt="image5" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
 选择合适的类型来标记对象。
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image6.png" alt="image6" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image6.png" alt="image6" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
 逐个进行操作，以确保所有对象都被正确标记。
 
@@ -102,11 +102,11 @@ NE301 拍摄的图片将按配置进行上行传输。
 
 点击“训练模型 (Train Model)”开始训练。
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image7.png" alt="image7" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image7.png" alt="image7" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
 点击“新建训练 (New Training)”以创建新任务，保持所有默认设置。
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image8.png" alt="image8" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image8.png" alt="image8" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
 然后开始训练。这需要一点时间。
 
@@ -114,23 +114,23 @@ NE301 拍摄的图片将按配置进行上行传输。
 
 点击量化 (Quantize) 按钮。
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image9.png" alt="image9" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image9.png" alt="image9" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image10.png" alt="image10" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image10.png" alt="image10" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
 点击开始，这里保持默认设置即可。
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image11.png" alt="image11" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image11.png" alt="image11" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
 完成它需要一点时间。
 
 NE301 模型包 (*.bin) 是精确量化的模型。点击下载。
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image12.png" alt="image12" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image12.png" alt="image12" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
 您也可以在这里测试模型，以确认是否一切正常。
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image13.png" alt="image13" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image13.png" alt="image13" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
 ### 3.4 验证并部署新模型
 
@@ -138,15 +138,15 @@ NE301 模型包 (*.bin) 是精确量化的模型。点击下载。
 
 点击上传 (Upload) 按钮进行安装。
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image14.png" alt="image14" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image14.png" alt="image14" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
 完成部署后，垃圾桶的状态被正确标记。
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image15.png" alt="image15" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image15.png" alt="image15" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
 您可以上传更多图片来验证性能。
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image16.png" alt="image16" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image16.png" alt="image16" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
 ### 3.5 配置 HomeAssistant 应用程序
 
@@ -154,19 +154,19 @@ NE301 模型包 (*.bin) 是精确量化的模型。点击下载。
 
 打开“设备与服务 (Devices & Services)”以安装 MQTT 集成。
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image17.png" alt="image17" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image17.png" alt="image17" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
 点击添加集成按钮以安装 MQTT 插件。
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image18.png" alt="image18" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image18.png" alt="image18" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
 只需输入 MQTT 即可搜索到它。
 
 选择第二个，并输入在 NE301 中配置的 MQTT 代理。
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image19.png" alt="image19" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image19.png" alt="image19" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image20.png" alt="image20" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image20.png" alt="image20" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
 提交以保存。MQTT 连接已就绪。
 
@@ -180,21 +180,21 @@ NE301 模型包 (*.bin) 是精确量化的模型。点击下载。
 
 您将发现传感器已正确创建。
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image21.png" alt="image21" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image21.png" alt="image21" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
 ## 4. 快速测试
 
 让我们开始监控垃圾桶的液位状态。状态将正确显示数值。
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image22.png" alt="image22" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image22.png" alt="image22" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image23.png" alt="image23" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image23.png" alt="image23" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image24.png" alt="image24" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image24.png" alt="image24" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
 您还可以在历史记录中查看更详细的信息。
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image25.png" alt="image25" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image25.png" alt="image25" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
 HomeAssistant 平台支持其他应用程序触发警报，您可以对其进行配置以实现全面管理。
 
@@ -208,7 +208,7 @@ A: 本指南中的服务器仅供内部使用。您需要自行安装自己的 A
 
 A: 您可以在量化过程中尝试将输入大小 (Input Size) 选项设置为 320。
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/urban-waste-bin-overflow-monitoring/image26.png" alt="image26" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
+<img src="/img/ne301/application-guide/urban-waste-bin-overflow-monitoring/image26.png" alt="image26" style={{display: "block", margin: "20px auto", maxWidth: "80%", borderRadius: "8px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)"}} />
 
 **Q: 如何在 HomeAssistant 中设置值模板？**
 

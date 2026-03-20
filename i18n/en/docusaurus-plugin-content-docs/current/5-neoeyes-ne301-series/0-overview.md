@@ -13,7 +13,7 @@ import SupportGrid from '@site/src/components/SupportGrid';
 ## Overview
 
 <div align="center">
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/301.png" alt="NeoEyes NE301 camera" width="70%" />
+  <img src="/img/ne301/overview/301.png" alt="NeoEyes NE301 camera" width="70%" />
 </div>
 
 CamThink AI Camera NeoEyes NE301 is a low-power edge AI camera that carries 0.6 TOPS of compute on the STM32N6 MCU. The firmware exposes a built‑in Wi‑Fi AP and a full Web UI so that users can preview AI inference, switch model types, adjust model parameters, and fine-tune other features directly in the browser. The hardware follows a modular design: communication modules, image sensors, power options, and mounting accessories can all be swapped according to the scenario. Rich interface expansion and an open hardware architecture help developers move swiftly from prototype to commercial deployment.
@@ -25,7 +25,7 @@ The camera also supports multiple event-triggered capture mechanisms (PIR, radar
 #### U0 Power-Control Chip
 
 <div align="center" style={{ marginBottom: "1.5rem" }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/U0.png" alt="U0 power controller diagram" width="60%" />
+  <img src="/img/ne301/overview/U0.png" alt="U0 power controller diagram" width="60%" />
 </div>
 
 NeoEyes NE301 adopts the STM32U073Kx power controller to deliver fine-grained energy management:
@@ -76,11 +76,11 @@ NeoEyes NE301 consists of an outer shell, camera modules, main board, communicat
 
 <div style={{ display: "flex", justifyContent: "center", gap: "20px", marginBottom: "20px" }}>
   <div style={{ textAlign: "center", width: "45%" }}>
-    <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/motherboard-front.png" alt="Motherboard Front" style={{ width: "100%", borderRadius: "8px", boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }} />
+    <img src="/img/ne301/overview/motherboard-front.png" alt="Motherboard Front" style={{ width: "100%", borderRadius: "8px", boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }} />
     <p style={{ marginTop: "8px", color: "#888", fontSize: "0.9em" }}>Motherboard Front</p>
   </div>
   <div style={{ textAlign: "center", width: "45%" }}>
-    <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/motherboard-back.png" alt="Motherboard Back" style={{ width: "100%", borderRadius: "8px", boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }} />
+    <img src="/img/ne301/overview/motherboard-back.png" alt="Motherboard Back" style={{ width: "100%", borderRadius: "8px", boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }} />
     <p style={{ marginTop: "8px", color: "#888", fontSize: "0.9em" }}>Motherboard Back</p>
   </div>
 </div>
@@ -277,39 +277,39 @@ The mechanical design reserves sufficient space for add-ons, and official access
 | <img src="https://camthink-ai.github.io/wiki-documents/zh-Hans/img/Overview/NE101/sensor1.png" alt="OS04C10 camera module" width="180" /> | OS04C10 camera module | 1 | 51° / 88° / 137° FOV options (4 m / 3 m / 2 m focus) |
 | <img src="https://camthink-ai.github.io/wiki-documents/zh-Hans/img/Overview/NE101/sensor1.png" alt="SC200AI USB camera module" width="180" /> | SC200AI USB camera module | 1 | 51° / 88° / 137° FOV options (4 m / 3 m / 2 m focus) |
 | <img src="https://camthink-ai.github.io/wiki-documents/zh-Hans/img/Overview/NE101/cat1PCBA.png" alt="Cat.1 module" width="180" /> | Cat.1 module | 1 | Plug-in Cat‑1 module for global or North America variants |
-| <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/poe.png" alt="PoE module" width="180" /> | PoE module | 1 | Optional plug-in PoE module |
+| <img src="/img/ne301/overview/poe.png" alt="PoE module" width="180" /> | PoE module | 1 | Optional plug-in PoE module |
 
 ### Installation Examples
 
 #### Wall Mount
 
-![NE_Series_Bracket_Wall_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_Bracket_Wall_Mount.png)
+![NE_Series_Bracket_Wall_Mount.png](/img/Hardware_Guide/Edge_AI_Camera/BracketsAndUsage/NE_Series_Bracket_Wall_Mount.png)
 
-![NE_Series_Wall_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_Wall_Mount.png)
+![NE_Series_Wall_Mount.png](/img/Hardware_Guide/Edge_AI_Camera/BracketsAndUsage/NE_Series_Wall_Mount.png)
 
 #### Dial Mount
 
-![NE_Series_Bracket_Meter_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_Bracket_Meter_Mount.png)
+![NE_Series_Bracket_Meter_Mount.png](/img/Hardware_Guide/Edge_AI_Camera/BracketsAndUsage/NE_Series_Bracket_Meter_Mount.png)
 
-![NE_Series_Meter_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_Meter_Mount.png)
+![NE_Series_Meter_Mount.png](/img/Hardware_Guide/Edge_AI_Camera/BracketsAndUsage/NE_Series_Meter_Mount.png)
 
 #### Pole Mount
 
-![NE_Series_Bracket_Rod_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_Bracket_Rod_Mount.png)
+![NE_Series_Bracket_Rod_Mount.png](/img/Hardware_Guide/Edge_AI_Camera/BracketsAndUsage/NE_Series_Bracket_Rod_Mount.png)
 
-![NE_Series_Rod_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_Rod_Mount.png)
+![NE_Series_Rod_Mount.png](/img/Hardware_Guide/Edge_AI_Camera/BracketsAndUsage/NE_Series_Rod_Mount.png)
 
 #### Shaft & Ball Mount
 
-![NE_Series_Bracket_ShaftBall_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_Bracket_ShaftBall_Mount.png)
+![NE_Series_Bracket_ShaftBall_Mount.png](/img/Hardware_Guide/Edge_AI_Camera/BracketsAndUsage/NE_Series_Bracket_ShaftBall_Mount.png)
 
-![NE_Series_ShaftBall_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_ShaftBall_Mount.png)
+![NE_Series_ShaftBall_Mount.png](/img/Hardware_Guide/Edge_AI_Camera/BracketsAndUsage/NE_Series_ShaftBall_Mount.png)
 
 #### Base Mount
 
-![NE_Series_Bracket_U_Type_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_Bracket_U_Type_Mount.png)
+![NE_Series_Bracket_U_Type_Mount.png](/img/Hardware_Guide/Edge_AI_Camera/BracketsAndUsage/NE_Series_Bracket_U_Type_Mount.png)
 
-![NE_Series_U_Type_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_U_Type_Mount.png)
+![NE_Series_U_Type_Mount.png](/img/Hardware_Guide/Edge_AI_Camera/BracketsAndUsage/NE_Series_U_Type_Mount.png)
 
 ## Application Scenarios
 

@@ -10,7 +10,7 @@ tags: [安装指南, NE101, 开发套件, 组装说明]
 
 
 <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/dev-kit-installation-guide/Panorama.png" alt="Panorama" style={{ width: '60%' }} />
+  <img src="/img/InstallationGuide/Panorama.png" alt="Panorama" style={{ width: '60%' }} />
 </div>
 
 零件组成部分：
@@ -182,7 +182,7 @@ tags: [安装指南, NE101, 开发套件, 组装说明]
 ③ 十字自攻螺丝（尖尾,碳钢,镀锌）
 ④ 十字自攻螺丝（平尾,碳钢,黑色）
 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/dev-kit-installation-guide/NE101_Guide19.png" alt="NE101_Guide19" style={{ width: '32%' }} />
+  <img src="/img/InstallationGuide/NE101_Guide19.png" alt="NE101_Guide19" style={{ width: '32%' }} />
 </div>
 
 ### 步骤一：上盖部分
@@ -192,9 +192,9 @@ tags: [安装指南, NE101, 开发套件, 组装说明]
 先将密封圈套在上盖里侧的凹槽中，然后将白色透明的X1透镜放入上盖的两个孔中（一个圆形一个正方形），接着将面板背部胶撕开粘到上盖的凹槽中，注意孔位的对齐，同时将透镜也会被固定在面板上，最后使用前撕开面板的保护膜，保证清晰度。
 
 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/dev-kit-installation-guide/NE101_Guide1.png" alt="NE101_Guide1" style={{ width: '32%' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/dev-kit-installation-guide/NE101_Guide2.png" alt="NE101_Guide2" style={{ width: '32%' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/dev-kit-installation-guide/NE101_Guide3.png" alt="NE101_Guide3" style={{ width: '32%' }} />
+  <img src="/img/InstallationGuide/NE101_Guide1.png" alt="NE101_Guide1" style={{ width: '32%' }} />
+  <img src="/img/InstallationGuide/NE101_Guide2.png" alt="NE101_Guide2" style={{ width: '32%' }} />
+  <img src="/img/InstallationGuide/NE101_Guide3.png" alt="NE101_Guide3" style={{ width: '32%' }} />
 </div>
 
 ###  步骤二：中框部分
@@ -203,9 +203,9 @@ tags: [安装指南, NE101, 开发套件, 组装说明]
 
 先将按键安装到中框侧边处，相机图样朝外，然后将压板套在按键上同时穿过两侧的圆柱，最后将用两枚螺丝拧上。请注意，固定按键的螺丝尽量拧紧，否则会出现按键松动或者偏移的情况。
 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/dev-kit-installation-guide/NE101_Guide4.png" alt="NE101_Guide4" style={{ width: '32%' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/dev-kit-installation-guide/NE101_Guide5.png" alt="NE101_Guide5" style={{ width: '32%' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/dev-kit-installation-guide/NE101_Guide6.png" alt="NE101_Guide6" style={{ width: '32%' }} />
+  <img src="/img/InstallationGuide/NE101_Guide4.png" alt="NE101_Guide4" style={{ width: '32%' }} />
+  <img src="/img/InstallationGuide/NE101_Guide5.png" alt="NE101_Guide5" style={{ width: '32%' }} />
+  <img src="/img/InstallationGuide/NE101_Guide6.png" alt="NE101_Guide6" style={{ width: '32%' }} />
 </div>
 
 
@@ -214,7 +214,7 @@ tags: [安装指南, NE101, 开发套件, 组装说明]
 电池盒部分：标准版本为电池供电，通过电池盒内部的螺丝孔与两枚螺丝来和中框进行固定，电池仓连接线用于连接主板背部电源接口。
 
 <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/dev-kit-installation-guide/NE101_Guide7.png" alt="NE101_Guide7" style={{ width: '32%' }} />
+  <img src="/img/InstallationGuide/NE101_Guide7.png" alt="NE101_Guide7" style={{ width: '32%' }} />
 </div>
 
 ### 步骤四：下盖部分
@@ -222,7 +222,7 @@ tags: [安装指南, NE101, 开发套件, 组装说明]
 下盖部分： 将密封圈套在下盖里侧的凹槽中，同时准备好下盖的四个螺丝。
 
 <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/dev-kit-installation-guide/NE101_Guide8.png" alt="NE101_Guide8" style={{ width: '32%' }} />
+  <img src="/img/InstallationGuide/NE101_Guide8.png" alt="NE101_Guide8" style={{ width: '32%' }} />
 </div>
 
 ### 步骤五：主板部分
@@ -234,9 +234,9 @@ tags: [安装指南, NE101, 开发套件, 组装说明]
 首先，将M6镜头支撑座缺口处朝下安装到主板左上角接孔处上，通过点胶的方式将其与主板固定住，然后将镜头模组背面的双面胶撕开粘到支撑座上，同时将防尘垫套在镜头上粘住或者直接粘在前盖面板上，以此来保护镜头。
 
 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/dev-kit-installation-guide/NE101_Guide9-1.png" alt="NE101_Guide9-1" style={{ width: '32%' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/dev-kit-installation-guide/NE101_Guide9-2.png" alt="NE101_Guide9-2" style={{ width: '32%' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/dev-kit-installation-guide/NE101_Guide9-3.png" alt="NE101_Guide9-3" style={{ width: '32%' }} />
+  <img src="/img/InstallationGuide/NE101_Guide9-1.png" alt="NE101_Guide9-1" style={{ width: '32%' }} />
+  <img src="/img/InstallationGuide/NE101_Guide9-2.png" alt="NE101_Guide9-2" style={{ width: '32%' }} />
+  <img src="/img/InstallationGuide/NE101_Guide9-3.png" alt="NE101_Guide9-3" style={{ width: '32%' }} />
 </div>
 
 #### 固定相机模组与灯板
@@ -244,14 +244,14 @@ tags: [安装指南, NE101, 开发套件, 组装说明]
 接着将镜头模组的数据线接入MIPI CSI卡扣中并固定住，此处卡扣是一个拨片，通过上挑和下压来固定模组连接线，最后接着在相机模组下方，将CV灯板的pin角插到主板上，其中圆形的光敏传感器在左，正方形的补光灯在右，都安装好之后可以将模组镜头上的保护膜撕掉。
 
 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/dev-kit-installation-guide/NE101_Guide10-1.png" alt="NE101_Guide10-1" style={{ width: '32%' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/dev-kit-installation-guide/NE101_Guide10-2.png" alt="NE101_Guide10-2" style={{ width: '32%' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/dev-kit-installation-guide/NE101_Guide10-3.png" alt="NE101_Guide10-3" style={{ width: '32%' }} />
+  <img src="/img/InstallationGuide/NE101_Guide10-1.png" alt="NE101_Guide10-1" style={{ width: '32%' }} />
+  <img src="/img/InstallationGuide/NE101_Guide10-2.png" alt="NE101_Guide10-2" style={{ width: '32%' }} />
+  <img src="/img/InstallationGuide/NE101_Guide10-3.png" alt="NE101_Guide10-3" style={{ width: '32%' }} />
 </div>
 
 ——主板部分最终效果：
 <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/dev-kit-installation-guide/NE101_Guide11.png" alt="NE101_Guide11" style={{ width: '32%' }} />
+  <img src="/img/InstallationGuide/NE101_Guide11.png" alt="NE101_Guide11" style={{ width: '32%' }} />
 </div>
 
 > **请注意** ：
@@ -331,7 +331,7 @@ tags: [安装指南, NE101, 开发套件, 组装说明]
 主版部分安装好之后便可以将主板通过四个螺丝固定在中框的螺丝孔中，需注意区分，使用的螺丝是尖尾、碳钢、镀锌的，主板放入到中框的方向需和按键对齐，安装固定过程中可通过外侧按键按压来验证。为了清晰展现主板的固定效果，上一步骤中主板上的相机模组与灯板均已取下，如下图所示。
 
 <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/dev-kit-installation-guide/NE101_Guide12.png" alt="NE101_Guide12" style={{ width: '32%' }} />
+  <img src="/img/InstallationGuide/NE101_Guide12.png" alt="NE101_Guide12" style={{ width: '32%' }} />
 </div>
 
 ### 步骤七：固定电池盒
@@ -339,9 +339,9 @@ tags: [安装指南, NE101, 开发套件, 组装说明]
 固定好主板与中框后，将电池盒的外接线连接到主板背部的电源接口上，如下图所示，然后将两个螺丝通过电池盒内部的螺丝孔与中框锁住，使用的螺丝是尖尾、碳钢、银色的，最后再放入电池，至此中框、主板、电池部分均已固定好。
 
 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/dev-kit-installation-guide/NE101_Guide13.png" alt="NE101_Guide13" style={{ width: '32%' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/dev-kit-installation-guide/NE101_Guide14.png" alt="NE101_Guide14" style={{ width: '32%' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/dev-kit-installation-guide/NE101_Guide15.png" alt="NE101_Guide15" style={{ width: '32%' }} />
+  <img src="/img/InstallationGuide/NE101_Guide13.png" alt="NE101_Guide13" style={{ width: '32%' }} />
+  <img src="/img/InstallationGuide/NE101_Guide14.png" alt="NE101_Guide14" style={{ width: '32%' }} />
+  <img src="/img/InstallationGuide/NE101_Guide15.png" alt="NE101_Guide15" style={{ width: '32%' }} />
 </div>
 
 ### 步骤八：固定上、下盖
@@ -349,14 +349,14 @@ tags: [安装指南, NE101, 开发套件, 组装说明]
 最后，将上、下盖各用四个螺丝与中框的孔对准并拧上，整机即可安装完成。
 
 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/dev-kit-installation-guide/NE101_Guide16.png" alt="NE101_Guide16" style={{ width: '32%' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/dev-kit-installation-guide/NE101_Guide17.png" alt="NE101_Guide17" style={{ width: '32%' }} />
+  <img src="/img/InstallationGuide/NE101_Guide16.png" alt="NE101_Guide16" style={{ width: '32%' }} />
+  <img src="/img/InstallationGuide/NE101_Guide17.png" alt="NE101_Guide17" style={{ width: '32%' }} />
 </div>
 
 > **需注意细节** ：安装时注意上下盖有凸起的圆形部分要和中框凹空部分保持对应，如果反着安装上下盖与中框之间会有缝隙。
 
 <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/dev-kit-installation-guide/NE101_Guide18.png" alt="NE101_Guide18" style={{ width: '32%' }} />
+  <img src="/img/InstallationGuide/NE101_Guide18.png" alt="NE101_Guide18" style={{ width: '32%' }} />
 </div>
 
 至此，您的NE101 Sensing Camera 开发者套件已安装全部完成，您可以开始使用了。具体使用方式与安装部署可见——[快速开始](./1-quick-start.md)。

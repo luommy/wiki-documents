@@ -8,7 +8,7 @@ tags: [NeoEyes NE301, QSC Compliance, Insect Trap Monitoring, Home Assistant, Ap
 
 # Case Study - **AI-Driven QSC For Chain Restaurant**
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_1.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_1.jpg)
 
 ## 1. Preface
 
@@ -41,7 +41,7 @@ In this part, we will show you how to achieve this full usecase step by step.
 
 Firstly, install **Camthink [NE301**](https://www.camthink.ai/product/neoeyes-301/?utm_source=wiki&utm_medium=social&utm_campaign=use_case&utm_content=trapbox-monitor-20260203) with SIM card inside correctly, press and hold the button for 2 or 3 seconds to activate the WiFi.
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_3.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_3.jpg)
 
 ### 3.2 Configure the network and MQTT data forwarding.
 
@@ -51,19 +51,19 @@ Connect the WiFI endpoints start with NE301_`<Last 6 MAC digits>`, Input the def
 - **Default password**: `hicamthink`
 
 
-| ![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_4.jpg) | ![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_5.jpg) |
+| ![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_4.jpg) | ![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_5.jpg) |
 | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
 
 
 Click **Login** to see the live view with detailed settings. Navigate to **System settings** to connect the network access.
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_6.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_6.jpg)
 
 Camthink NE301 supports WiFi and Cellular modules. Choose the method to make sure the network access is connected.
 
 Navigate to **Application Management** to configure where to forward the data and pictures.
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_7.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_7.jpg)
 
 Input the details of your own mqtt broker or AI tool stack server
 
@@ -79,15 +79,15 @@ Input the details of your own mqtt broker or AI tool stack server
 
 Login Your own AI tool stack server to create a new project
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_8.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_8.jpg)
 
 Click **Create New AI Model Project**, Input the name and description:
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_9.jpg)![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_10.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_9.jpg)![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_10.jpg)
 
 Open this project and bind the device for image collection. You will need to create this device first.
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_11.jpg)![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_12.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_11.jpg)![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_12.jpg)
 
 The pictures of the refrigerator captured by NE301 will uplink as configured.
 
@@ -95,11 +95,11 @@ If you have prepared the images, just upload them to this platform directly for 
 
 Before starting to train the models, create the Class here, in this example, we create two classes to identify whether the **Sticky paper** inside the **Insect trap box** is still **Effective** or **Critical-Replacement**.
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_13.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_13.jpg)
 
 Choose the proper type to tag the object.
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_14.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_14.jpg)
 
 Just do it one by one to make sure all the objects are marked correctly.
 
@@ -107,16 +107,16 @@ If you have the datasets already, just upload them here directly
 
 Click '**Train Model**' to start the training.
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_15.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_15.jpg)
 
 Click '**New Training**' to create a new task, keep all the default settings
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_16.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_16.jpg)
 
 Then start the training. It will take a little while.
 
 
-| ![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_17.jpg) | ![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_18.jpg) |
+| ![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_17.jpg) | ![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_18.jpg) |
 | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
 
 
@@ -125,13 +125,13 @@ To deploy the model into NE301, we need to quantize it before upload it to the d
 Click the **Quantize** button.
 
 
-| ![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_19.jpg) | ![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_20.jpg) |
+| ![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_19.jpg) | ![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_20.jpg) |
 | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
 
 
 Click it to start, just keep the default settings here
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_21.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_21.jpg)
 
 It takes a little while to finish it.
 
@@ -139,11 +139,11 @@ The **NE301 Model Package** (*.bin) is the exact quantized model.
 
 Click to download it.
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_22.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_22.jpg)
 
 You can also test the model here to confirm if all good
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_23.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_23.jpg)
 
 ### 3.4 Verify and Deploy the new model.
 
@@ -151,20 +151,20 @@ let's back to the device to upload the new model.
 
 Click Upload button to install it
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_24.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_24.jpg)
 
 
-| ![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_25.jpg) | ![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_26.jpg) |
+| ![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_25.jpg) | ![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_26.jpg) |
 | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
 
 
 When done, the chipsets on the shelf are marked correctly.
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_27.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_27.jpg)
 
 You can upload more images to verify the performance.
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_28.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_28.jpg)
 
 ### 3.5 Configure the HomeAssistant applications.
 
@@ -172,25 +172,25 @@ To make the data values more valuable for customers, we choose HomeAssistant for
 
 Open the 'Devices & Services' to install the MQTT integration.
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_29.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_29.jpg)
 
 Click **Add Integration** button to install the MQTT addon.
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_30.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_30.jpg)
 
 Just input MQTT to search it.
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_31.jpg)![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_32.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_31.jpg)![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_32.jpg)
 
 Choose the second one, and input the mqtt broker configured in NE301
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_33.jpg)![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_34.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_33.jpg)![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_34.jpg)
 
 Submit to save it. The MQTT connection is ready.
 
 In this guide, we will try a new method to create the mqtt devices by Edit the configuration file **/homeassistant/configuration.yaml** directly.
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_35.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_35.jpg)
 
 Here is the configuration details in this guide:
 
@@ -247,21 +247,21 @@ You will need to update the **name**, **state_topic**, the **class** value to yo
 
 Then apply the changes by click '**Manually configured MQTT entities'** in **Developer tools** page directly
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_36.jpg)![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_37.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_36.jpg)![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_37.jpg)
 
 You will find the Sensor is created correctly.
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_38.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_38.jpg)
 
 ## 4. Quick Test
 
 Let's start to monitor the level status of the trash bin. The status will appear with the values correctly
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_39.jpg)![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_40.jpg)![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_41.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_39.jpg)![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_40.jpg)![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_41.jpg)
 
 You can also check it in more details in histories
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_42.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_42.jpg)
 
 HomeAssistant platform supports the other appplications to trigger the alert, you can configure them to achieve the full management.
 
@@ -270,7 +270,7 @@ HomeAssistant platform supports the other appplications to trigger the alert, yo
 - Q: Can I use the same MQTT broker and [Camthink AI Tool Stack](https://github.com/camthink-ai/AIToolStack?utm_source=wiki&utm_medium=social&utm_campaign=use_case&utm_content=trapbox-monitor-20260203) for Model Training and Quantilization? A: The server in this guide is for internal use. You need to install your own AI Tool Stack on your own
 - Q: Since the Chipset is smaller, how to improve the model's performance. A: You can try the option of **Input Size** to be **320** during the quantize process.
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_43.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_43.jpg)
 
 - Q: How to set the value template in HomeAssistant? A: You can visit the HomeAssistant [website](https://www.home-assistant.io/docs/configuration/templating/#using-value-templates-with-mqtt) to get the details about how to use it. Here is an example of NE301's report data:
 

@@ -12,7 +12,7 @@ tags: [YOLOv11, Object Detection, TensorRT, Jetson Orin, Edge AI]
 
 YOLOv11 is the latest-generation object detection model released by Ultralytics, delivering an exceptional balance between speed and accuracy. When deployed locally on NVIDIA Jetson devices (such as Orin Nano, NX, or AGX), YOLOv11 enables efficient, low-latency AI inference optimized for edge environments.
 
-![yolo_overview](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/application-guide/object-detection/yolo_overview.png)
+![yolo_overview](/img/yolo_overview.png)
 
 This guide covers:
 
@@ -207,7 +207,7 @@ cap.release()
 cv2.destroyAllWindows()
 ```
 
-![yolo_od](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/application-guide/object-detection/yolo_od.png)
+![yolo_od](/img/yolo_od.png)
 ---
 
 ## 7. Benchmark Performance Comparison

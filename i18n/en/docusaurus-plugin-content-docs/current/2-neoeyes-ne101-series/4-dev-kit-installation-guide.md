@@ -9,7 +9,7 @@ tags: [NeoEyes NE101, Hardware Installation, Assembly Guide, Developer Kit, Comp
 ## Component Overview
 
 <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/dev-kit-installation-guide/Panorama.png" alt="Panorama" style={{ width: '60%' }} />
+  <img src="/img/InstallationGuide/Panorama.png" alt="Panorama" style={{ width: '60%' }} />
 </div>
 
 Component parts:
@@ -181,7 +181,7 @@ The kit includes four types of screws:
 ③ Phillips Self-tapping Screws (Pointed Tail, Carbon Steel, Galvanized)
 ④ Phillips Self-tapping Screws (Flat Tail, Carbon Steel, Black)
 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/dev-kit-installation-guide/NE101_Guide19.png" alt="NE101_Guide19" style={{ width: '32%' }} />
+  <img src="/img/InstallationGuide/NE101_Guide19.png" alt="NE101_Guide19" style={{ width: '32%' }} />
 </div>
 
 ### Step 1: Top Cover Assembly
@@ -191,9 +191,9 @@ Top cover components: Includes M6 panel, X1 lens (for the light board), four scr
 First, place the sealing ring in the groove on the inside of the top cover, then insert the white transparent X1 lens into the two holes in the top cover (one round and one square). Next, peel off the adhesive backing from the panel and stick it to the groove in the top cover, making sure the holes are aligned. The lens will also be fixed to the panel. Finally, remove the protective film from the front of the panel before use to ensure clarity.
 
 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/dev-kit-installation-guide/NE101_Guide1.png" alt="NE101_Guide1" style={{ width: '32%' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/dev-kit-installation-guide/NE101_Guide2.png" alt="NE101_Guide2" style={{ width: '32%' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/dev-kit-installation-guide/NE101_Guide3.png" alt="NE101_Guide3" style={{ width: '32%' }} />
+  <img src="/img/InstallationGuide/NE101_Guide1.png" alt="NE101_Guide1" style={{ width: '32%' }} />
+  <img src="/img/InstallationGuide/NE101_Guide2.png" alt="NE101_Guide2" style={{ width: '32%' }} />
+  <img src="/img/InstallationGuide/NE101_Guide3.png" alt="NE101_Guide3" style={{ width: '32%' }} />
 </div>
 
 ### Step 2: Middle Frame Assembly
@@ -202,9 +202,9 @@ Middle frame components: NE101_Button, NE101_Sealing Ring, NE101_Pressure Plate.
 
 First, install the button on the side of the middle frame with the camera icon facing outward, then place the pressure plate over the button while passing through the cylinders on both sides, and finally secure it with two screws. Please note that the screws fixing the button should be tightened as much as possible to prevent the button from becoming loose or misaligned.
 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/dev-kit-installation-guide/NE101_Guide4.png" alt="NE101_Guide4" style={{ width: '32%' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/dev-kit-installation-guide/NE101_Guide5.png" alt="NE101_Guide5" style={{ width: '32%' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/dev-kit-installation-guide/NE101_Guide6.png" alt="NE101_Guide6" style={{ width: '32%' }} />
+  <img src="/img/InstallationGuide/NE101_Guide4.png" alt="NE101_Guide4" style={{ width: '32%' }} />
+  <img src="/img/InstallationGuide/NE101_Guide5.png" alt="NE101_Guide5" style={{ width: '32%' }} />
+  <img src="/img/InstallationGuide/NE101_Guide6.png" alt="NE101_Guide6" style={{ width: '32%' }} />
 </div>
 
 ### Step 3: Battery Box Assembly
@@ -212,7 +212,7 @@ First, install the button on the side of the middle frame with the camera icon f
 Battery box components: The standard version is powered by batteries, with the battery box fixed to the middle frame using two screws through the screw holes inside the battery box. The battery compartment connection wire connects to the power interface on the back of the mainboard.
 
 <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/dev-kit-installation-guide/NE101_Guide7.png" alt="NE101_Guide7" style={{ width: '32%' }} />
+  <img src="/img/InstallationGuide/NE101_Guide7.png" alt="NE101_Guide7" style={{ width: '32%' }} />
 </div>
 
 ### Step 4: Bottom Cover Assembly
@@ -220,7 +220,7 @@ Battery box components: The standard version is powered by batteries, with the b
 Bottom cover components: Place the sealing ring in the groove on the inside of the bottom cover and prepare the four screws for the bottom cover.
 
 <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/dev-kit-installation-guide/NE101_Guide8.png" alt="NE101_Guide8" style={{ width: '32%' }} />
+  <img src="/img/InstallationGuide/NE101_Guide8.png" alt="NE101_Guide8" style={{ width: '32%' }} />
 </div>
 
 ### Step 5: Mainboard Assembly
@@ -232,9 +232,9 @@ Mainboard components: Includes M6 lens support base, OV5640 lens module, CV ligh
 First, install the M6 lens support base with the notch facing downward onto the socket in the upper left corner of the mainboard. Secure it to the mainboard using adhesive, then peel off the double-sided tape on the back of the lens module and stick it to the support base. At the same time, place the dust cover over the lens and stick it in place, or directly stick it to the front cover panel to protect the lens.
 
 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/dev-kit-installation-guide/NE101_Guide9-1.png" alt="NE101_Guide9-1" style={{ width: '32%' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/dev-kit-installation-guide/NE101_Guide9-2.png" alt="NE101_Guide9-2" style={{ width: '32%' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/dev-kit-installation-guide/NE101_Guide9-3.png" alt="NE101_Guide9-3" style={{ width: '32%' }} />
+  <img src="/img/InstallationGuide/NE101_Guide9-1.png" alt="NE101_Guide9-1" style={{ width: '32%' }} />
+  <img src="/img/InstallationGuide/NE101_Guide9-2.png" alt="NE101_Guide9-2" style={{ width: '32%' }} />
+  <img src="/img/InstallationGuide/NE101_Guide9-3.png" alt="NE101_Guide9-3" style={{ width: '32%' }} />
 </div>
 
 #### Fixing the Camera Module and Light Board
@@ -242,14 +242,14 @@ First, install the M6 lens support base with the notch facing downward onto the 
 Next, connect the data cable of the lens module to the MIPI CSI clip and secure it. This clip is a flap that secures the module connection cable by lifting up and pressing down. Finally, below the camera module, insert the pins of the CV light board into the mainboard, with the round light sensor on the left and the square fill light on the right. After everything is installed, you can remove the protective film from the module lens.
 
 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/dev-kit-installation-guide/NE101_Guide10-1.png" alt="NE101_Guide10-1" style={{ width: '32%' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/dev-kit-installation-guide/NE101_Guide10-2.png" alt="NE101_Guide10-2" style={{ width: '32%' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/dev-kit-installation-guide/NE101_Guide10-3.png" alt="NE101_Guide10-3" style={{ width: '32%' }} />
+  <img src="/img/InstallationGuide/NE101_Guide10-1.png" alt="NE101_Guide10-1" style={{ width: '32%' }} />
+  <img src="/img/InstallationGuide/NE101_Guide10-2.png" alt="NE101_Guide10-2" style={{ width: '32%' }} />
+  <img src="/img/InstallationGuide/NE101_Guide10-3.png" alt="NE101_Guide10-3" style={{ width: '32%' }} />
 </div>
 
 —Final result of the mainboard assembly:
 <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/dev-kit-installation-guide/NE101_Guide11.png" alt="NE101_Guide11" style={{ width: '32%' }} />
+  <img src="/img/InstallationGuide/NE101_Guide11.png" alt="NE101_Guide11" style={{ width: '32%' }} />
 </div>
 
 > **Please Note**:
@@ -328,7 +328,7 @@ To learn more, see — [Supported Interchangeable Camera Modules](https://wiki.c
 After the mainboard components are installed, you can secure the mainboard to the middle frame using four screws in the screw holes. Note that the screws used are pointed tail, carbon steel, galvanized. The orientation of the mainboard in the middle frame needs to align with the button, and you can verify during installation by pressing the external button. To clearly show the mainboard fixation, the camera module and light board on the mainboard from the previous step have been removed, as shown in the image below.
 
 <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/dev-kit-installation-guide/NE101_Guide12.png" alt="NE101_Guide12" style={{ width: '32%' }} />
+  <img src="/img/InstallationGuide/NE101_Guide12.png" alt="NE101_Guide12" style={{ width: '32%' }} />
 </div>
 
 ### Step 7: Fixing the Battery Box
@@ -336,9 +336,9 @@ After the mainboard components are installed, you can secure the mainboard to th
 After securing the mainboard to the middle frame, connect the external wire of the battery box to the power interface on the back of the mainboard, as shown in the image below. Then secure the battery box to the middle frame using two screws through the screw holes inside the battery box. The screws used are pointed tail, carbon steel, silver. Finally, insert the batteries. At this point, the middle frame, mainboard, and battery components are all secured.
 
 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/dev-kit-installation-guide/NE101_Guide13.png" alt="NE101_Guide13" style={{ width: '32%' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/dev-kit-installation-guide/NE101_Guide14.png" alt="NE101_Guide14" style={{ width: '32%' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/dev-kit-installation-guide/NE101_Guide15.png" alt="NE101_Guide15" style={{ width: '32%' }} />
+  <img src="/img/InstallationGuide/NE101_Guide13.png" alt="NE101_Guide13" style={{ width: '32%' }} />
+  <img src="/img/InstallationGuide/NE101_Guide14.png" alt="NE101_Guide14" style={{ width: '32%' }} />
+  <img src="/img/InstallationGuide/NE101_Guide15.png" alt="NE101_Guide15" style={{ width: '32%' }} />
 </div>
 
 ### Step 8: Securing the Top and Bottom Covers
@@ -346,14 +346,14 @@ After securing the mainboard to the middle frame, connect the external wire of t
 Finally, align the top and bottom covers with the holes in the middle frame and secure each with four screws to complete the assembly.
 
 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/dev-kit-installation-guide/NE101_Guide16.png" alt="NE101_Guide16" style={{ width: '32%' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/dev-kit-installation-guide/NE101_Guide17.png" alt="NE101_Guide17" style={{ width: '32%' }} />
+  <img src="/img/InstallationGuide/NE101_Guide16.png" alt="NE101_Guide16" style={{ width: '32%' }} />
+  <img src="/img/InstallationGuide/NE101_Guide17.png" alt="NE101_Guide17" style={{ width: '32%' }} />
 </div>
 
 > **Important Detail**: When installing, make sure that the raised circular parts of the top and bottom covers correspond to the recessed parts of the middle frame. If installed incorrectly, there will be gaps between the top/bottom covers and the middle frame.
 
 <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/dev-kit-installation-guide/NE101_Guide18.png" alt="NE101_Guide18" style={{ width: '32%' }} />
+  <img src="/img/InstallationGuide/NE101_Guide18.png" alt="NE101_Guide18" style={{ width: '32%' }} />
 </div>
 
 At this point, your NE101 Sensing Camera Developer Kit is fully assembled and ready to use. For specific usage methods and deployment, see — [Quick Start](./1-quick-start.md).

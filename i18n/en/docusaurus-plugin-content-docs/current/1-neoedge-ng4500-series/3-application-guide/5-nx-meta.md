@@ -28,7 +28,7 @@ Nx Meta Platform, developed by Network Optix, is a **core Video Management Syst
 
 Supported devices:
 
-![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/application-guide/nx-meta/NxMeta_support_devices.png)
+![](/img/NG45XX_SOFTWARE/Application/NxMeta_support_devices.png)
 
 ## 2.Environment Preparation
 
@@ -135,39 +135,39 @@ if __name__ == '__main__':
 
 - Once Nx Meta Server is installed on AIBOX, the client will automatically detect servers on the same network. (On first login, set up username and password; default is admin.)
 
-![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/application-guide/nx-meta/NxMeta_Login.png)
+![](/img/NG45XX_SOFTWARE/Application/NxMeta_Login.png)
 
 - Activate free licenses for the AIBOX server.
 
-![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/application-guide/nx-meta/NxMeta_Licenses.png)
+![](/img/NG45XX_SOFTWARE/Application/NxMeta_Licenses.png)
 
 - Register a Meta Cloud account and log in.
 
-![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/application-guide/nx-meta/NxMeta_Cloud.png)
+![](/img/NG45XX_SOFTWARE/Application/NxMeta_Cloud.png)
 
 - Add camera device by entering the RTSP stream exported from AIBOX: rtsp://192.168.231.66:8554/cam
 
-![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/application-guide/nx-meta/NxMeta_Add_Camera.png)
+![](/img/NG45XX_SOFTWARE/Application/NxMeta_Add_Camera.png)
 
 - Configure the camera and enable NX AI Plugins (both CPU and GPU modes are available, see [Nx AI Manager plugin documentation](https://nx.docs.scailable.net/nx-ai-manager/3.-configure-the-nx-ai-manager-plugin)).
 
-![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/application-guide/nx-meta/NxMeta_AI_Manager_Plugins.png)
+![](/img/NG45XX_SOFTWARE/Application/NxMeta_AI_Manager_Plugins.png)
 
 - Enable detection features including Object Detection, Face Detection, Line Crossing, Object Counting, and Loitering Detection. For example, Object Counting will identify and count items in the camera view, provide snapshots, and show pop-up alerts.
 
-![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/application-guide/nx-meta/NxMeta_count.png)
+![](/img/NG45XX_SOFTWARE/Application/NxMeta_count.png)
 
 - Log in to [cloud](https://admin.sclbl.nxvms.com/sites) to monitor device performance and status.
 
-![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/application-guide/nx-meta/NxMeta_data.png)
+![](/img/NG45XX_SOFTWARE/Application/NxMeta_data.png)
 
 - To switch detection types, select Manage Device in camera configuration, enter Nx AI Manager, and switch models (choose corresponding event such as Illegal Dumping, Line Crossing, Loitering Detection, Object Counting).
 
-![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/application-guide/nx-meta/NxMeta_events.png)
+![](/img/NG45XX_SOFTWARE/Application/NxMeta_events.png)
 
 - Configure rule events: right-click on the camera, select "Add Rules", configure Analytics Event, and choose the specific detection event.
 
-![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/application-guide/nx-meta/NxMeta_add_rules.png)
+![](/img/NG45XX_SOFTWARE/Application/NxMeta_add_rules.png)
 
 ## 4. Teachable Machine
 
@@ -177,19 +177,19 @@ if __name__ == '__main__':
 
 - Import sufficient images or videos, then select "Model Trained".
 
-![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/application-guide/nx-meta/NxMeta_Teachable_Machine1.png)
+![](/img/NG45XX_SOFTWARE/Application/NxMeta_Teachable_Machine1.png)
 
 - Choose to export the model: select TensorFlow Lite tab -> Floating point -> Download. After downloading, you will get a zip file.
 
-![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/application-guide/nx-meta/NxMeta_Teachable_Machine2.png)
+![](/img/NG45XX_SOFTWARE/Application/NxMeta_Teachable_Machine2.png)
 
 - Log in to [NxMeta Cloud](https://admin.sclbl.nxvms.com/sites) and upload the model by dragging the zip file.
 
-![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/application-guide/nx-meta/NxMeta_Teachable_Machine3.png)
+![](/img/NG45XX_SOFTWARE/Application/NxMeta_Teachable_Machine3.png)
 
 - After successful import, you can see the uploaded model in the Plugins section of the camera configuration in the Client. Use "add pipeline" to apply the uploaded model.
 
-![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/application-guide/nx-meta/NxMeta_Teachable_Machine4.png)
+![](/img/NG45XX_SOFTWARE/Application/NxMeta_Teachable_Machine4.png)
 
 ## 5. Nx AI Manager Plugins Performance Validation
 
@@ -252,7 +252,7 @@ python3 Utilities/upload_results.py
 | Model-Face-Locator          | 92.52            | Face location, security or attendance                    |
 | Model-Regnet-Y              | 76.22            | Image classification, balance of speed and accuracy      |
 
-![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/application-guide/nx-meta/NxMeta_model.png)
+![](/img/NG45XX_SOFTWARE/Application/NxMeta_model.png)
 
 Stability test results:
 
@@ -260,7 +260,7 @@ Stability test results:
 
 ● Data transfer rate: 428.87 MB/s
 
-![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/application-guide/nx-meta/NxMeta_test_suite.png)
+![](/img/NG45XX_SOFTWARE/Application/NxMeta_test_suite.png)
 
 ## 6. 参考
 

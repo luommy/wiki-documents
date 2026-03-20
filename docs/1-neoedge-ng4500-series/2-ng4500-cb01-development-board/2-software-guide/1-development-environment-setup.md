@@ -145,7 +145,7 @@ sudo cp $HOME/kernel_tegra234-NG45XX-p3768-0000+p3767-0003-nv-super.dtb /boot/dt
 
 1. 点击桌面右上角 **Ethernet** → 选择 **"Wired Settings"**
 
-![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/development-environment-setup/NG45XX_Setting.png)
+![](/img/NG45XX_SOFTWARE/Driver/NG45XX_Setting.png)
 
 2. 在弹出的网络设置窗口中，选择当前的有线网络连接。
 
@@ -165,7 +165,7 @@ sudo cp $HOME/kernel_tegra234-NG45XX-p3768-0000+p3767-0003-nv-super.dtb /boot/dt
    
    - 点击 `Apply` 保存设置。
 
-![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/development-environment-setup/NG45XX_Setting_Network.png)
+![](/img/NG45XX_SOFTWARE/Driver/NG45XX_Setting_Network.png)
 
 4. 配置完成后，重启网络以应用新的设置。
 
@@ -212,10 +212,10 @@ sudo systemctl start xrdp
 
 3. 点击“连接”，输入账号密码
    
-   ![Remote_Desktop_Login](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/development-environment-setup/Remote_Desktop_Login.png)
+   ![Remote_Desktop_Login](/img/Remote_Desktop_Login.png)
 
 4. 如下图，则为说明进入成功
-   ![Remote_Desktop](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/development-environment-setup/Remote_Desktop.png)
+   ![Remote_Desktop](/img/Remote_Desktop.png)
 
     5. 补充：如出现闪退问题，可参考以下步骤进行修改 
 

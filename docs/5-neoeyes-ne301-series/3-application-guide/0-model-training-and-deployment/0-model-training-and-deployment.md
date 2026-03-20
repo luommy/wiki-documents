@@ -230,11 +230,11 @@ make flash-model
 
 <div style={{display: 'grid', gap: '12px', maxWidth: '520px', margin: '0 auto'}}>
   <figure style={{margin: 0, textAlign: 'center'}}>
-    <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/model-training-and-deployment/model-training-and-deployment/ne301-dep.png" alt="NE301 模型部署入口" style={{width: '100%', border: '1px solid #eee', borderRadius: '8px'}} />
+    <img src="/img/ne301/quick-start/ne301-dep.png" alt="NE301 模型部署入口" style={{width: '100%', border: '1px solid #eee', borderRadius: '8px'}} />
     <figcaption>模型部署入口</figcaption>
   </figure>
   <figure style={{margin: 0, textAlign: 'center'}}>
-    <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/model-training-and-deployment/model-training-and-deployment/model-uploading.png" alt="模型上传区域" style={{width: '100%', border: '1px solid #eee', borderRadius: '8px'}} />
+    <img src="/img/ne301/quick-start/model-uploading.png" alt="模型上传区域" style={{width: '100%', border: '1px solid #eee', borderRadius: '8px'}} />
     <figcaption>模型上传区域</figcaption>
   </figure>
 </div>
@@ -243,7 +243,7 @@ make flash-model
 
 <div style={{textAlign: 'center'}}>
   <figure style={{display: 'inline-block', margin: 0, textAlign: 'center'}}>
-    <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/model-training-and-deployment/model-training-and-deployment/change-model.gif" alt="模型替换演示" style={{maxWidth: '640px', width: '100%', border: '1px solid #eee', borderRadius: '8px'}} />
+    <img src="/img/ne301/quick-start/change-model.gif" alt="模型替换演示" style={{maxWidth: '640px', width: '100%', border: '1px solid #eee', borderRadius: '8px'}} />
     <figcaption>模型替换操作演示</figcaption>
   </figure>
 </div>
@@ -252,7 +252,7 @@ make flash-model
 
 <div style={{textAlign: 'center'}}>
   <figure style={{display: 'inline-block', margin: 0, textAlign: 'center'}}>
-    <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/model-training-and-deployment/model-training-and-deployment/ne301-ai-model-import.png" alt="模型固件升级入口" style={{maxWidth: '640px', width: '100%', border: '1px solid #eee', borderRadius: '8px'}} />
+    <img src="/img/ne301/quick-start/ne301-ai-model-import.png" alt="模型固件升级入口" style={{maxWidth: '640px', width: '100%', border: '1px solid #eee', borderRadius: '8px'}} />
     <figcaption>固件升级上传页面</figcaption>
   </figure>
 </div>

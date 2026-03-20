@@ -224,7 +224,7 @@ python dinov_vision_test.py --image test.png --model dinov3_vits16_pretrain_lvd1
 
 输出的 patch_similarity_heatmap.png 热力图，直观反映指定 patch 与其它 patch 的相似性，体现 DINOv3 对空间结构的理解能力。
 
-![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/application-guide/DINOv3/DINOv3_heatmap.png)
+![](/img/NG45XX_SOFTWARE/Application/DINOv3_heatmap.png)
 
 ---
 
@@ -262,7 +262,7 @@ pip install scikit-learn Pillow
 
 将 IMX219 摄像头连接至设备（注意：请确保摄像头排线的金属片朝上）。
 
-![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/application-guide/DINOv3/NG45XX_IMX219.png)
+![](/img/NG45XX_SOFTWARE/NG45XX_IMX219.png)
 
 ### 4.3 获取 DINOv3 源码
 
@@ -429,7 +429,7 @@ python test-dinov3-kmeans.py \
 
 效果展示如下，对视频中的物品进行无监督的识别，可以有效得将实时视频无监督分割 ，无需人工标注即可将视频帧分为前景、背景等。
 
-![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/application-guide/DINOv3/DINOv3_KMeans.gif)
+![](/img/NG45XX_SOFTWARE/Application/DINOv3_KMeans.gif)
 
 ## 5.  参考资源
 

@@ -9,7 +9,7 @@ sidebar_position: 6
 
 # 案例 - **AI加速QSC合规：智能捕虫监测**
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_1.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_1.jpg)
 
 ## 1. 前言
 
@@ -42,7 +42,7 @@ sidebar_position: 6
 
 首先，确保已正确安装插有 SIM 卡的 **Camthink NE301**，长按按钮 2-3 秒以激活 WiFi。
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_3.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_3.jpg)
 
 ### 3.2 配置网络与 MQTT 数据转发
 
@@ -52,19 +52,19 @@ sidebar_position: 6
 - **默认密码**：`hicamthink`
 
 
-| ![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_4.jpg) | ![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_5.jpg) |
+| ![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_4.jpg) | ![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_5.jpg) |
 | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
 
 
 点击 **Login** 查看带有详细设置的实时视图。导航至 **System settings** 连接网络访问。
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_6.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_6.jpg)
 
 Camthink NE301 支持 WiFi 和蜂窝模块。选择合适的方法确保网络畅通。
 
 导航至 **Application Management** 配置数据和图片的转发位置。
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_7.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_7.jpg)
 
 输入您自己的 MQTT 代理或 AI Tool Stack 服务器的详细信息：
 
@@ -80,15 +80,15 @@ Camthink NE301 支持 WiFi 和蜂窝模块。选择合适的方法确保网络�
 
 登录您自己的 AI Tool Stack 服务器以创建新项目。
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_8.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_8.jpg)
 
 点击 **Create New AI Model Project**，输入名称和描述：
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_9.jpg)![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_10.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_9.jpg)![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_10.jpg)
 
 打开此项目并绑定用于图像采集的设备。您需要先创建此设备。
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_11.jpg)![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_12.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_11.jpg)![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_12.jpg)
 
 NE301 拍摄的图片将按配置上传。
 
@@ -96,11 +96,11 @@ NE301 拍摄的图片将按配置上传。
 
 在开始训练模型之前，在此处创建类别（Class）。在本例中，我们创建两个类别来识别**捕虫箱**内的**粘纸**是“**有效（Effective）**”还是“**严重-需更换（Critical-Replacement）**”。
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_13.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_13.jpg)
 
 选择合适的类型来标记对象。
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_14.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_14.jpg)
 
 逐一标记，确保所有对象都标记正确。
 
@@ -108,16 +108,16 @@ NE301 拍摄的图片将按配置上传。
 
 点击“**Train Model**”开始训练。
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_15.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_15.jpg)
 
 点击“**New Training**”创建新任务，保持所有默认设置。
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_16.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_16.jpg)
 
 开始训练。这需要一些时间。
 
 
-| ![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_17.jpg) | ![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_18.jpg) |
+| ![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_17.jpg) | ![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_18.jpg) |
 | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
 
 
@@ -126,23 +126,23 @@ NE301 拍摄的图片将按配置上传。
 点击 **Quantize** 按钮。
 
 
-| ![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_19.jpg) | ![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_20.jpg) |
+| ![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_19.jpg) | ![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_20.jpg) |
 | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
 
 
 点击开始，保持默认设置。
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_21.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_21.jpg)
 
 量化完成后，**NE301 模型包** (*.bin) 即为精确量化的模型。
 
 点击下载。
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_22.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_22.jpg)
 
 您也可以在此处测试模型以确认一切正常。
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_23.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_23.jpg)
 
 ### 3.4 验证并部署新模型
 
@@ -150,20 +150,20 @@ NE301 拍摄的图片将按配置上传。
 
 点击上传按钮进行安装。
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_24.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_24.jpg)
 
 
-| ![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_25.jpg) | ![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_26.jpg) |
+| ![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_25.jpg) | ![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_26.jpg) |
 | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
 
 
 完成后，货架上的芯片组被正确标记。
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_27.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_27.jpg)
 
 您可以上传更多图片来验证性能。
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_28.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_28.jpg)
 
 ### 3.5 配置 HomeAssistant 应用
 
@@ -171,25 +171,25 @@ NE301 拍摄的图片将按配置上传。
 
 打开“配置” -> “设备与服务”以安装 MQTT 集成。
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_29.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_29.jpg)
 
 点击 **添加集成** 按钮，搜索并安装 MQTT。
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_30.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_30.jpg)
 
 直接输入 MQTT 进行搜索。
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_31.jpg)![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_32.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_31.jpg)![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_32.jpg)
 
 选择第二个，并输入在 NE301 中配置的 MQTT 代理信息。
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_33.jpg)![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_34.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_33.jpg)![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_34.jpg)
 
 提交保存。MQTT 连接已就绪。
 
 在本指南中，我们将尝试通过直接编辑配置文件 **/homeassistant/configuration.yaml** 来创建 MQTT 设备。
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_35.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_35.jpg)
 
 以下是本指南中的配置详情：
 
@@ -244,21 +244,21 @@ mqtt:
 
 通过在 **开发者工具** 页面点击“**重新加载手动配置的 MQTT 实体**”来应用更改。
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_36.jpg)![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_37.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_36.jpg)![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_37.jpg)
 
 您会发现传感器已正确创建。
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_38.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_38.jpg)
 
 ## 4. 快速测试
 
 让我们开始监控垃圾箱的状态。状态值将正确显示：
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_39.jpg)![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_40.jpg)![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_41.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_39.jpg)![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_40.jpg)![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_41.jpg)
 
 您还可以在历史记录中查看更多详情：
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_42.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_42.jpg)
 
 HomeAssistant 平台支持其他应用触发告警，您可以对其进行配置以实现全面管理。
 
@@ -269,7 +269,7 @@ HomeAssistant 平台支持其他应用触发告警，您可以对其进行配置
 - **问：由于芯片比货架小，如何提高模型的性能？**  
 答：您可以尝试在量化过程中将 **Input Size** 设置为 **320**。
 
-![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ai-driven-qsc-for-chain-restaurant/image_43.jpg)
+![](/img/ne301/application-guide/6-chain-restaurant-qsc-compliance/image_43.jpg)
 
 - **问：如何在 HomeAssistant 中设置值模板？**  
 答：您可以访问 HomeAssistant [官网](https://www.home-assistant.io/docs/configuration/templating/#using-value-templates-with-mqtt) 获取详细信息。以下是 NE301 上报数据的示例：

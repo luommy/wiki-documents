@@ -13,7 +13,7 @@ import SupportGrid from '@site/src/components/SupportGrid';
 ## 基本介绍
 
 <div align="center">
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/301.png" alt="image" width="70%" />
+  <img src="/img/ne301/overview/301.png" alt="image" width="70%" />
 </div>
 
 CamThink AI Camera NeoEyes NE301 是一款具备AI实时推理能力的低功耗边缘智能相机，采用STM32N6 MCU，具备0.6TOPS算力，固件设计上通过其内置的WIFI AP来连接设备，并以Web UI 交互的方式供用户对设备进行AI推理预览、模型类别替换、模型参数以及其他相关功能进行调试与修改，硬件设计上采用模块化的设计理念，可根据场景需要选配或者更换通讯模组、相机模组、供电策略、部署与安装方式，同时其硬件本身支持丰富的接口扩展，整体开放式的硬件架构可助开发者根据实际需求灵活扩展功能模块，快速完成从原型到商业产品的落地。
@@ -26,7 +26,7 @@ CamThink AI Camera NeoEyes NE301 是一款具备AI实时推理能力的低功耗
 #### U0电源控制芯片设计
 
 <div align="center" style={{ marginBottom: "1.5rem" }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/U0.png" alt="image" width="60%" />
+  <img src="/img/ne301/overview/U0.png" alt="image" width="60%" />
 </div>
 
 
@@ -80,11 +80,11 @@ NeoEyes NE301产品由前盖、镜头模组、主板、通讯模块、电池模�
 
 <div style={{ display: "flex", justifyContent: "center", gap: "20px", marginBottom: "20px" }}>
   <div style={{ textAlign: "center", width: "45%" }}>
-    <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/motherboard-front.png" alt="主板正面" style={{ width: "100%", borderRadius: "8px", boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }} />
+    <img src="/img/ne301/overview/motherboard-front.png" alt="主板正面" style={{ width: "100%", borderRadius: "8px", boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }} />
     <p style={{ marginTop: "8px", color: "#888", fontSize: "0.9em" }}>主板正面</p>
   </div>
   <div style={{ textAlign: "center", width: "45%" }}>
-    <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/motherboard-back.png" alt="主板背面" style={{ width: "100%", borderRadius: "8px", boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }} />
+    <img src="/img/ne301/overview/motherboard-back.png" alt="主板背面" style={{ width: "100%", borderRadius: "8px", boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }} />
     <p style={{ marginTop: "8px", color: "#888", fontSize: "0.9em" }}>主板背面</p>
   </div>
 </div>
@@ -280,39 +280,39 @@ NE301整机产品规格如下：
 | <img src="https://camthink-ai.github.io/wiki-documents/zh-Hans/img/Overview/NE101/sensor1.png" alt="04C10相机模组" width="180" />         | OS04C10 摄像头        | 1    | 支持3种规格：``51° FOV, 4m focus``、``88° FOV, 3m focus ``、``137° FOV, 2m focus``                           |
 | <img src="https://camthink-ai.github.io/wiki-documents/zh-Hans/img/Overview/NE101/sensor1.png" alt="SC200AI USB摄像头模组" width="180" /> | SC200AI USB摄像头模组 | 1    | 支持3种规格：``51° FOV, 4m focus``、``88° FOV , 3m focus``、``137° FOV, 2m focus`` |
 | <img src="https://camthink-ai.github.io/wiki-documents/zh-Hans/img/Overview/NE101/cat1PCBA.png" alt="Cat.1通讯模块" width="180" />        | Cat.1通讯模块         | 1    | 可自行通过主板插槽装配，支持全球版本或北美版本可选                                                              |
-| <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/poe.png" alt="image" width="180" />                                            | POE通讯模块           | 1    | 可自行通过主板插槽装配                                                                                          |
+| <img src="/img/ne301/overview/poe.png" alt="image" width="180" />                                            | POE通讯模块           | 1    | 可自行通过主板插槽装配                                                                                          |
 
 ### 产品安装
 
 #### 壁装支架及安装示意
 
-![NE_Series_Bracket_Wall_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_Bracket_Wall_Mount.png)
+![NE_Series_Bracket_Wall_Mount.png](/img/Hardware_Guide/Edge_AI_Camera/BracketsAndUsage/NE_Series_Bracket_Wall_Mount.png)
 
-![NE_Series_Wall_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_Wall_Mount.png)
+![NE_Series_Wall_Mount.png](/img/Hardware_Guide/Edge_AI_Camera/BracketsAndUsage/NE_Series_Wall_Mount.png)
 
 #### 表盘支架及安装示意
 
-![NE_Series_Bracket_Meter_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_Bracket_Meter_Mount.png)
+![NE_Series_Bracket_Meter_Mount.png](/img/Hardware_Guide/Edge_AI_Camera/BracketsAndUsage/NE_Series_Bracket_Meter_Mount.png)
 
-![NE_Series_Meter_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_Meter_Mount.png)
+![NE_Series_Meter_Mount.png](/img/Hardware_Guide/Edge_AI_Camera/BracketsAndUsage/NE_Series_Meter_Mount.png)
 
 #### 杆件支架及安装示意
 
-![NE_Series_Bracket_Rod_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_Bracket_Rod_Mount.png)
+![NE_Series_Bracket_Rod_Mount.png](/img/Hardware_Guide/Edge_AI_Camera/BracketsAndUsage/NE_Series_Bracket_Rod_Mount.png)
 
-![NE_Series_Rod_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_Rod_Mount.png)
+![NE_Series_Rod_Mount.png](/img/Hardware_Guide/Edge_AI_Camera/BracketsAndUsage/NE_Series_Rod_Mount.png)
 
 #### 三轴球支架及安装示意
 
-![NE_Series_Bracket_ShaftBall_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_Bracket_ShaftBall_Mount.png)
+![NE_Series_Bracket_ShaftBall_Mount.png](/img/Hardware_Guide/Edge_AI_Camera/BracketsAndUsage/NE_Series_Bracket_ShaftBall_Mount.png)
 
-![NE_Series_ShaftBall_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_ShaftBall_Mount.png)
+![NE_Series_ShaftBall_Mount.png](/img/Hardware_Guide/Edge_AI_Camera/BracketsAndUsage/NE_Series_ShaftBall_Mount.png)
 
 #### 座装支架及安装示意
 
-![NE_Series_Bracket_U_Type_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_Bracket_U_Type_Mount.png)
+![NE_Series_Bracket_U_Type_Mount.png](/img/Hardware_Guide/Edge_AI_Camera/BracketsAndUsage/NE_Series_Bracket_U_Type_Mount.png)
 
-![NE_Series_U_Type_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_U_Type_Mount.png)
+![NE_Series_U_Type_Mount.png](/img/Hardware_Guide/Edge_AI_Camera/BracketsAndUsage/NE_Series_U_Type_Mount.png)
 
 
 ## 产品应用

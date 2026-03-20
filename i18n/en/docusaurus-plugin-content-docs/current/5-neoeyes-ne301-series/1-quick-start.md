@@ -11,8 +11,8 @@ tags: [NeoEyes NE301, Quick Start, Edge Inference, STM32N6 AI, User Guide]
 This guide walks through everything you need to get started with NeoEyes NE301—from unpacking and powering on the device to configuring features, deploying models, and managing daily operation.
 
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '24px', justifyContent: 'center', alignItems: 'center', margin: '12px 0' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/ne301-2.png" alt="ne301" style={{ flex: '0 0 auto', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/ne301-1.png" alt="ne301" style={{ flex: '0 0 auto', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/ne301/quick-start/ne301-2.png" alt="ne301" style={{ flex: '0 0 auto', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/ne301/quick-start/ne301-1.png" alt="ne301" style={{ flex: '0 0 auto', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 ## What You Need
@@ -32,8 +32,8 @@ This guide walks through everything you need to get started with NeoEyes NE301�
 Remove the rear cover with a screwdriver, install the batteries according to the tray layout, and wait for the blue LED on the front panel to light up—this indicates the system has booted. Once confirmed, reinstall the rear cover. The basic startup is now complete and you can move on to configuration.
 
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '8px 0 16px' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/wakeup1.jpg" alt="Power-on example" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/wakeup2.jpg" alt="Battery installation" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/ne301/quick-start/wakeup1.jpg" alt="Power-on example" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/ne301/quick-start/wakeup2.jpg" alt="Battery installation" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 ### Connect and Sign In
@@ -52,8 +52,8 @@ NeoEyes NE301 exposes a built-in Wi‑Fi AP with a Web UI for AI inference previ
    The default username is fixed by the system, and the default password is `hicamthink`. You can change it later via **Home → System Settings → Device Password**. Enter the credentials to reach the main dashboard.
 
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '8px 0 16px' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/login-en.png" alt="Login screen" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/login-hicamthink.png" alt="Default password reminder" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/ne301/quick-start/login-en.png" alt="Login screen" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/ne301/quick-start/login-hicamthink.png" alt="Default password reminder" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 After signing in you can adjust configurations and run diagnostics. The following sections describe each module in detail.
@@ -65,9 +65,9 @@ After signing in you can adjust configurations and run diagnostics. The followin
 The first time you connect through a phone or PC, the interface shows a quick guided tour. Afterwards you land on the **Feature Debugging** page where you can switch models, upload new models, and preview edge inference in real time.
 
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '8px 0 16px' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/guidance.png" alt="Guided onboarding" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/AI-off.png" alt="AI disabled" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/AI.png" alt="AI enabled" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/ne301/quick-start/guidance.png" alt="Guided onboarding" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/ne301/quick-start/AI-off.png" alt="AI disabled" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/ne301/quick-start/AI.png" alt="AI enabled" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 ### Low-Latency Inference
@@ -75,7 +75,7 @@ The first time you connect through a phone or PC, the interface shows a quick gu
 NE301 supports millisecond-level real-time inference on video streams, enabling instant AI responses. Through the device Wi‑Fi AP, you can preview the stream locally on the Web UI and verify edge inference synchronously. Inference is enabled by default and can be turned off as needed.
 
 <div style={{ textAlign: 'center', margin: '12px 0' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/inference-setting.png" alt="Inference settings" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/ne301/quick-start/inference-setting.png" alt="Inference settings" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
   </div>
 
 ### Flexible Model Deployment & Replacement
@@ -85,9 +85,9 @@ The Web UI provides one-click model deployment and replacement to make AI applic
 - Out of the box: A YOLOv8 model is preloaded at the factory so you can quickly preview on‑device AI.
 
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '8px 0 16px' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/model-list.png" alt="Model list" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/model-upload.png" alt="Model upload" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/model-uploading.png" alt="Model flashing" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/ne301/quick-start/model-list.png" alt="Model list" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/ne301/quick-start/model-upload.png" alt="Model upload" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/ne301/quick-start/model-uploading.png" alt="Model flashing" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 - Rapid deployment: If you don’t want the default model, you can upload and deploy a new AI model via the Web UI—zero setup and zero code. You can also build a dataset from device snapshots, retrain a scene‑specific model, and redeploy.
@@ -99,7 +99,7 @@ The Web UI provides one-click model deployment and replacement to make AI applic
 The system supports hot-loading inference parameters. Adjust sliders on the Web UI to change thresholds (confidence and NMS) in real time and immediately preview inference results, enabling rapid model tuning.
 
 <div style={{ textAlign: 'center', margin: '12px 0' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/inference-setting.png" alt="Inference parameters" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/ne301/quick-start/inference-setting.png" alt="Inference parameters" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 ### Image-based Model Verification
@@ -108,16 +108,16 @@ Besides real-time streams, you can validate models directly with images. Upload 
 
 <!--
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '8px 0 16px' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/model-pic1.png" alt="Model verification" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/model-pic2.png" alt="Model verification" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/model-pic3.png" alt="Model verification" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/ne301/quick-start/model-pic1.png" alt="Model verification" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/ne301/quick-start/model-pic2.png" alt="Model verification" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/ne301/quick-start/model-pic3.png" alt="Model verification" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 -->
 
 The specific effects are shown below:
 
 <div style={{ textAlign: 'center', margin: '12px 0' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/model-validation.gif" alt="Verification preview" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/ne301/quick-start/model-validation.gif" alt="Verification preview" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 ### AI Preview
@@ -173,7 +173,7 @@ Adjust PIR (Passive Infrared) sensor parameters for your environment (e.g., corr
 - **Configuration Method**: Implemented by configuring the data receiving topic in `Application Management - MQTT/MQTTS`. When the device receives a message on this topic, it executes the corresponding control command based on the message content.
 
 <div style={{ textAlign: 'center', margin: '12px 0' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/remote-control.png" alt="Remote Control" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/ne301/quick-start/remote-control.png" alt="Remote Control" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 The currently supported remote control commands for the latest firmware version are as follows:
@@ -233,8 +233,8 @@ Use scheduled capture when you need periodic uploads without manual intervention
 - Interval mode: Set a capture interval by minutes, hours, or days. At most one interval rule is supported at a time.
 
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '8px 0 16px' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/scheduled-capture.png" alt="Interval capture" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/scheduled-capture2.png" alt="Time schedule" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/ne301/quick-start/scheduled-capture.png" alt="Interval capture" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/ne301/quick-start/scheduled-capture2.png" alt="Time schedule" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 ## Application Management
@@ -255,8 +255,8 @@ Select the protocol (MQTT / MQTTS), fill in the fields below, then click **Save 
   - **Client Key**: Upload the device private key.
 
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '8px 0 16px' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/MQTT.png" alt="MQTT" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/MQTTS.png" alt="MQTTS" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/ne301/quick-start/MQTT.png" alt="MQTT" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/ne301/quick-start/MQTTS.png" alt="MQTTS" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 
@@ -275,9 +275,9 @@ Use the sliders to tune image parameters while watching the preview.
 - **Horizontal flip / Vertical flip**: Correct the orientation for your mounting position.
 
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '8px 0 16px' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/image-management-auto.png" alt="image-management-auto" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/image-management1.png" alt="image-management" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/image-management2.png" alt="image-management" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/ne301/quick-start/image-management-auto.png" alt="image-management-auto" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/ne301/quick-start/image-management1.png" alt="image-management" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/ne301/quick-start/image-management2.png" alt="image-management" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 #### Lighting Control
@@ -291,12 +291,12 @@ Configure the fill light mode according to the scenario:
 > Tip: The fill light is most effective at short range. Disable it in ultra-low-power deployments.
 
 <div style={{ textAlign: 'center', margin: '12px 0' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/lightgif1.gif" alt="lighting-gif" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/ne301/quick-start/lightgif1.gif" alt="lighting-gif" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 
 <div style={{ textAlign: 'center', margin: '12px 0' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/lighting-management.png" alt="auto" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/ne301/quick-start/lighting-management.png" alt="auto" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 ### System Settings: Connectivity, Device, Import/Export
@@ -310,9 +310,9 @@ NeoEyes NE301 supports Wi‑Fi, Cat‑1, and PoE. Configuration options vary by 
 - **Wi‑Fi**: The standard SKU scans nearby networks. Select your SSID, enter credentials, and save. NE301 remembers the most recent network.
 
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '8px 0 16px' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/communications.png" alt="Network configuration" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/wifipwd.png" alt="Wi-Fi password" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/wificonnected.png" alt="Wi-Fi connected" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/ne301/quick-start/communications.png" alt="Network configuration" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/ne301/quick-start/wifipwd.png" alt="Wi-Fi password" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/ne301/quick-start/wificonnected.png" alt="Wi-Fi connected" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 - **Cat‑1**: NeoEyes NE301 Cat‑1 units support licensed networks outside North America. Install a SIM card and configure the cellular settings:
@@ -355,7 +355,7 @@ NeoEyes NE301 supports Wi‑Fi, Cat‑1, and PoE. Configuration options vary by 
   - Always click **Save** after making changes.
 
 <div style={{ textAlign: 'center', margin: '12px 0' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/device-pwd.png" alt="Password management" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/ne301/quick-start/device-pwd.png" alt="Password management" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 ### Import & Export
@@ -393,14 +393,14 @@ Firmware, models, and configuration files can all be imported or exported—usef
 > Always keep the device powered and the browser window open until the import/export process finishes.
 
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '8px 0 16px' }}> 
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/import-firmware.png" alt="Firmware Import" style={{ flex: '1 1 220px', maxWidth: '300px' }} /> 
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/import-firmware2.png" alt="Firmware Upload" style={{ flex: '1 1 220px', maxWidth: '300px' }} /> 
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/import-firmware3.png" alt="Firmware Writing" style={{ flex: '1 1 220px', maxWidth: '300px' }} /> 
+  <img src="/img/ne301/quick-start/import-firmware.png" alt="Firmware Import" style={{ flex: '1 1 220px', maxWidth: '300px' }} /> 
+  <img src="/img/ne301/quick-start/import-firmware2.png" alt="Firmware Upload" style={{ flex: '1 1 220px', maxWidth: '300px' }} /> 
+  <img src="/img/ne301/quick-start/import-firmware3.png" alt="Firmware Writing" style={{ flex: '1 1 220px', maxWidth: '300px' }} /> 
 </div> 
 
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '8px 0 16px' }}> 
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/export-firmware.png" alt="Export" style={{ flex: '1 1 280px', maxWidth: '360px' }} /> 
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/export-firmware2.png" alt="Export Loading" style={{ flex: '1 1 280px', maxWidth: '360px' }} />
+  <img src="/img/ne301/quick-start/export-firmware.png" alt="Export" style={{ flex: '1 1 280px', maxWidth: '360px' }} /> 
+  <img src="/img/ne301/quick-start/export-firmware2.png" alt="Export Loading" style={{ flex: '1 1 280px', maxWidth: '360px' }} />
  </div>
 
 
@@ -417,7 +417,7 @@ This page summarizes the hardware and software status:
 - **Communication**: Wi‑Fi / Cat‑1 / PoE mode currently in use.
 
 <div style={{ textAlign: 'center', margin: '12px 0' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/device-information1.png" alt="Device dashboard" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/ne301/quick-start/device-information1.png" alt="Device dashboard" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 ## Device Reset

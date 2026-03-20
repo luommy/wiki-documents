@@ -37,8 +37,8 @@ Login to the NE301 Web management interface, go to the **"Application Management
 After configuration, click **"Save"**, and the device will attempt to connect to the MQTT server.
 
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '8px 0 16px' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/mqtt-data-interaction/mqtt-data-interaction/mqtt.png" alt="MQTT Configuration" style={{ flex: '1 1 280px', maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/mqtt-data-interaction/mqtt-data-interaction/communication.png" alt="MQTTS Configuration" style={{ flex: '1 1 280px', maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/ne301/application-guide/mqtt-data-interaction/mqtt.png" alt="MQTT Configuration" style={{ flex: '1 1 280px', maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/ne301/application-guide/mqtt-data-interaction/communication.png" alt="MQTTS Configuration" style={{ flex: '1 1 280px', maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 > Switch to MQTTS configuration if encryption is required.
@@ -53,7 +53,7 @@ Open the MQTTX software and click **"+"** to create a new connection:
 4.  Click the **"Connect"** button to connect to the server.
 
 <div style={{ textAlign: 'center', margin: '12px 0' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/mqtt-data-interaction/mqtt-data-interaction/emqx-new-connection.png" alt="MQTTX New Connection" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/ne301/application-guide/mqtt-data-interaction/emqx-new-connection.png" alt="MQTTX New Connection" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 After successful connection, add a subscription:
@@ -63,7 +63,7 @@ After successful connection, add a subscription:
 3.  Click **"Confirm"**.
 
 <div style={{ textAlign: 'center', margin: '12px 0' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/mqtt-data-interaction/mqtt-data-interaction/emqx-sub.png" alt="MQTTX Subscribe Topic" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/ne301/application-guide/mqtt-data-interaction/emqx-sub.png" alt="MQTTX Subscribe Topic" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 ## 3. Trigger Capture and Receive Data
@@ -82,7 +82,7 @@ You can trigger device capture and inference in the following ways:
 When the device completes inference, the MQTTX client will receive a message in JSON format. As shown below:
 
 <div style={{ textAlign: 'center', margin: '12px 0' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/mqtt-data-interaction/mqtt-data-interaction/mqtts-ex.png" alt="Data Reception Example" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="/img/ne301/application-guide/mqtt-data-interaction/mqtts-ex.png" alt="Data Reception Example" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 ## 4. Data Protocol Format Analysis

@@ -13,7 +13,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 ## 产品信息
 
 ## 产品介绍
-![NE101](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/NE101.png)
+![NE101](/img/Overview/NE101/NE101.png)
 
 CamThink Event Camera NeoEyes NE101 是一款基于事件触发抓拍的低功耗智能相机，采用模块化设计理念，具有**超低功耗**的特点。相机支持开发者扩展多种触发拍照方式（PIR/雷达/声音等），可搭配不同传感器模块实现**事件监测图像抓取**根据触发条件自主唤醒并进行图像采集，极大节省功耗。其**开放式硬件架构**允许开发者根据实际需求灵活扩展功能模块，快速完成从原型到商业产品的落地。
 
@@ -26,7 +26,7 @@ CamThink Event Camera NeoEyes NE101 是一款基于事件触发抓拍的低功�
 - **供电方案可选**：默认支持电池仓方案供电，4节AA电池即可工作，也可通过主板Type-C进行有线供电。
 - **硬件开放性**：提供结构设计文件用于DIY外壳（可3D打印）或自定义扩展，提供完整开源固件，具备开箱即用功能：低功耗模式、设备唤醒、MQTT数据传输、补光控制、定时拍摄、图像参数调整、网络管理。开发和烧录请参见[「开发指南」](./2-ne100-mb01-development-board/0-dev-guide.md)
 
-![NE101](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/Module.png)
+![NE101](/img/Overview/NE101/Module.png)
 
 
 ### 超低功耗支持
@@ -44,7 +44,7 @@ CamThink Event Camera NeoEyes NE101 是一款基于事件触发抓拍的低功�
 
 - **开源固件，支持商用**：固件源码完全开源，支持免费商用与二次开发，固件提供图像采集、低功耗管理、数据通信等开箱即用功能，开发者可在此基础上快速扩展应用逻辑，缩短从原型到落地的开发周期。关于固件功能及开发者指引详见：[「超低功耗相机示例」](./3-application-guide/0-low-power-image-acquisition.md)
 
-![Wireless communication](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/Conet.png)
+![Wireless communication](/img/Overview/NE101/Conet.png)
 
 ### 硬件接口扩展
 >NeoEyes NE101支持根据硬件使用场景扩展硬件能力，关于各种物理接口的使用可见[「硬件指南」](./2-ne100-mb01-development-board/1-hardware-guide/0-components-overview.md)
@@ -261,7 +261,7 @@ NE101整机产品规格如下：
 
 ### 产品外形整尺寸
 
-![NE_Series_OutlineSize.png](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/NE_Series_OutlineSize.png)
+![NE_Series_OutlineSize.png](/img/Hardware_Guide/Edge_AI_Camera/BracketsAndUsage/NE_Series_OutlineSize.png)
 
 
 
@@ -273,7 +273,7 @@ NE101整机产品规格如下：
 <AccessoriesTable
   accessories={[
     {
-      image: "https://resources.camthink.ai/wiki/img/Accessories/Battery.png",
+      image: "/img/Accessories/Battery.png",
       name: "电池",
       quantity: "4",
       description: ["常规5号AA电池"]
@@ -288,37 +288,37 @@ NE101整机产品规格如下：
 <AccessoriesTable
   accessories={[
     {
-      image: "https://resources.camthink.ai/wiki/img/Overview/NE101/Bracket/1.png",
+      image: "/img/Overview/NE101/Bracket/1.png",
       name: "底部支架扩展件",
       quantity: "1",
       description: ["适合顶部安装、底部安装扩展使用"]
     },
     {
-      image: "https://resources.camthink.ai/wiki/img/Overview/NE101/Bracket/3.png",
+      image: "/img/Overview/NE101/Bracket/3.png",
       name: "背部支架扩展件",
       quantity: "1",
       description: ["适合壁装相机时扩展使用"]
     },
     {
-      image: "https://resources.camthink.ai/wiki/img/Overview/NE101/Bracket/5.png",
+      image: "/img/Overview/NE101/Bracket/5.png",
       name: "杆件支架",
       quantity: "1",
       description: ["适合复杂场景需要多角度调整相机时根据场景扩展使用，套件包含金属杆*2、转换头*2，金属杆可定制"]
     },
     {
-      image: "https://resources.camthink.ai/wiki/img/Overview/NE101/Bracket/4.png",
+      image: "/img/Overview/NE101/Bracket/4.png",
       name: "表盘支架",
       quantity: "1",
       description: ["适合环境光线影响较少的仪表采集固定安装使用"]
     },
     {
-      image: "https://resources.camthink.ai/wiki/img/Overview/NE101/Bracket/2.png",
+      image: "/img/Overview/NE101/Bracket/2.png",
       name: "水表支架",
       quantity: "-",
       description: ["可提供3D设计文件自行3D打印，非实体支架选配"]
     },
     {
-      image: "https://resources.camthink.ai/wiki/img/Overview/NE101/sensor2.png",
+      image: "/img/Overview/NE101/sensor2.png",
       name: "OV5640相机模组",
       quantity: "1",
       description: [
@@ -330,7 +330,7 @@ NE101整机产品规格如下：
       ]
     },
     {
-      image: "https://resources.camthink.ai/wiki/img/Overview/NE101/sensor1.png",
+      image: "/img/Overview/NE101/sensor1.png",
       name: "SC200AI USB摄像头模组",
       quantity: "1",
       description: [
@@ -341,13 +341,13 @@ NE101整机产品规格如下：
       ]
     },
     {
-      image: "https://resources.camthink.ai/wiki/img/Overview/NE101/wifihalow.png",
+      image: "/img/Overview/NE101/wifihalow.png",
       name: "WiFi-Halow通讯模块",
       quantity: "1",
       description: ["可自行通过主板插槽装配，支持868/915频段版本选择"]
     },
     {
-      image: "https://resources.camthink.ai/wiki/img/Overview/NE101/cat1PCBA.png",
+      image: "/img/Overview/NE101/cat1PCBA.png",
       name: "Cat.1通讯模块",
       quantity: "1",
       description:["可自行通过主板插槽装配，支持全球版本或北美版本可选"]
@@ -359,33 +359,33 @@ NE101整机产品规格如下：
 
 #### 壁装支架及安装示意
 
-![NE_Series_Bracket_Wall_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/NE_Series_Bracket_Wall_Mount.png)
+![NE_Series_Bracket_Wall_Mount.png](/img/Hardware_Guide/Edge_AI_Camera/BracketsAndUsage/NE_Series_Bracket_Wall_Mount.png)
 
-![NE_Series_Wall_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/NE_Series_Wall_Mount.png)
+![NE_Series_Wall_Mount.png](/img/Hardware_Guide/Edge_AI_Camera/BracketsAndUsage/NE_Series_Wall_Mount.png)
 
 #### 表盘支架及安装示意
 
-![NE_Series_Bracket_Meter_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/NE_Series_Bracket_Meter_Mount.png)
+![NE_Series_Bracket_Meter_Mount.png](/img/Hardware_Guide/Edge_AI_Camera/BracketsAndUsage/NE_Series_Bracket_Meter_Mount.png)
 
-![NE_Series_Meter_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/NE_Series_Meter_Mount.png)
+![NE_Series_Meter_Mount.png](/img/Hardware_Guide/Edge_AI_Camera/BracketsAndUsage/NE_Series_Meter_Mount.png)
 
 #### 杆件支架及安装示意
 
-![NE_Series_Bracket_Rod_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/NE_Series_Bracket_Rod_Mount.png)
+![NE_Series_Bracket_Rod_Mount.png](/img/Hardware_Guide/Edge_AI_Camera/BracketsAndUsage/NE_Series_Bracket_Rod_Mount.png)
 
-![NE_Series_Rod_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/NE_Series_Rod_Mount.png)
+![NE_Series_Rod_Mount.png](/img/Hardware_Guide/Edge_AI_Camera/BracketsAndUsage/NE_Series_Rod_Mount.png)
 
 #### 三轴球支架及安装示意
 
-![NE_Series_Bracket_ShaftBall_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/NE_Series_Bracket_ShaftBall_Mount.png)
+![NE_Series_Bracket_ShaftBall_Mount.png](/img/Hardware_Guide/Edge_AI_Camera/BracketsAndUsage/NE_Series_Bracket_ShaftBall_Mount.png)
 
-![NE_Series_ShaftBall_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/NE_Series_ShaftBall_Mount.png)
+![NE_Series_ShaftBall_Mount.png](/img/Hardware_Guide/Edge_AI_Camera/BracketsAndUsage/NE_Series_ShaftBall_Mount.png)
 
 #### 座装支架及安装示意
 
-![NE_Series_Bracket_U_Type_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/NE_Series_Bracket_U_Type_Mount.png)
+![NE_Series_Bracket_U_Type_Mount.png](/img/Hardware_Guide/Edge_AI_Camera/BracketsAndUsage/NE_Series_Bracket_U_Type_Mount.png)
 
-![NE_Series_U_Type_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/NE_Series_U_Type_Mount.png)
+![NE_Series_U_Type_Mount.png](/img/Hardware_Guide/Edge_AI_Camera/BracketsAndUsage/NE_Series_U_Type_Mount.png)
 
 
 ## 产品应用

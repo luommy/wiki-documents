@@ -73,7 +73,7 @@ git clone https://github.com/camthink-ai/lowpower_camera.git
 
 Open the directory in VS Code：
 
-![Project Root Directory](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/example-pir/NE101_code_dir.png)
+![Project Root Directory](/img/NE101_code_dir.png)
 
 #### 3. Configuration
 
@@ -83,26 +83,26 @@ Open the directory in VS Code：
    
    A GPIO configuration example is shown below
 
-![GPIO Setting](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/example-pir/NE101_example_6.png)
+![GPIO Setting](/img/NE101_example_6.png)
 
 2. **Sensitivity Adjustment**：
    - Adjust detection parameters according to the application scenario
 
-![Sensitivity ](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/example-pir/NE101_example_5.png)
+![Sensitivity ](/img/NE101_example_5.png)
 
 #### 4. Compile and deploy the source code
 
 1. Select esp32s3 as the target chip：
 
-![Esp32s3 selection](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/example-pir/NE101_idf_IC.png)
+![Esp32s3 selection](/img/NE101_idf_IC.png)
 
 2. Select the build button to compile the source code：
 
-![Showing build output](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/example-pir/NE101_idf_build.png)
+![Showing build output](/img/NE101_idf_build.png)
 
 3. Select the flash button to upload the generated firmware to the device：
 
-![screenshot showing flashing process](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/example-pir/NE101_idf_flash.png)
+![screenshot showing flashing process](/img/NE101_idf_flash.png)
 
 #### 5. PIR Function Verification
 

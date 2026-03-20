@@ -153,9 +153,9 @@ docker info | grep -i runtime
 ### D. 登陆nvcr.io
 获取 [NGC_API_KEY](https://org.ngc.nvidia.com/setup)
 - Generate API Key
-![NCG_API_KEY](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/software-frameworks-and-tools/docker/NGC_API_KEY.png)
+![NCG_API_KEY](/img/NGC_API_KEY.png)
 - Generate Personal Key
-![Generate_personal_key](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/software-frameworks-and-tools/docker/Generate_personal_key.png)
+![Generate_personal_key](/img/Generate_personal_key.png)
 - docker login
   ```shell
   sudo docker login nvcr.io
@@ -179,7 +179,7 @@ docker run --rm --runtime=nvidia nvcr.io/nvidia/l4t-base:r36.2.0 nvidia-smi
 - 显示 CUDA 版本与 Jetson GPU 信息
 - 确认容器已成功访问 GPU
 
-![docker_nvidia-smi](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/software-frameworks-and-tools/docker/docker_nvidia-smi.png)
+![docker_nvidia-smi](/img/docker_nvidia-smi.png)
 
 **你也可以使用社区维护的 [jetson-containers](https://github.com/dusty-nv/jetson-containers)，快速搭建你的开发环境（推荐）**
 

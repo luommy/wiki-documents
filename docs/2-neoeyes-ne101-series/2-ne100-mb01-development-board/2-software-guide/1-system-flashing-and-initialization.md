@@ -34,7 +34,7 @@ tags: [软件指南, 系统烧录, 固件升级, OTA]
 
 1. 安装串口驱动，启动烧录工具
    
-   ![烧录工具启动界面](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/system-flashing-and-initialization/NE101_flash_tool.png)
+   ![烧录工具启动界面](/img/NE101_flash_tool.png)
 
 2. 配置烧录参数：
    
@@ -48,7 +48,7 @@ tags: [软件指南, 系统烧录, 固件升级, OTA]
    - 再执行START开始烧录
    - 按下重启按键或者拔插usb供电口重启设备
    
-   ![烧录过程界面](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/system-flashing-and-initialization/NE101_flash_tool1.png)
+   ![烧录过程界面](/img/NE101_flash_tool1.png)
 
 ## OTA无线升级指南
 
@@ -65,21 +65,21 @@ tags: [软件指南, 系统烧录, 固件升级, OTA]
    - 导航至"设备维护"→"固件升级"
    - 选择升级文件并上传
    
-   ![OTA升级界面](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/system-flashing-and-initialization/NE101_ota.png)
+   ![OTA升级界面](/img/NE101_ota.png)
 
 3. **等待升级完成**
    
    - 系统自动验证并安装新固件
    - 升级完成后WiFi自动重连
    
-   ![升级进度界面](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/system-flashing-and-initialization/NE101_ota2.png)
+   ![升级进度界面](/img/NE101_ota2.png)
 
 4. **验证版本信息**
    
    - 在设备信息页面确认新版本号
    - 检查各功能模块是否正常
    
-   ![版本信息界面](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/system-flashing-and-initialization/NE101_ota3.png)
+   ![版本信息界面](/img/NE101_ota3.png)
 
 ### 注意事项
 

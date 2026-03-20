@@ -44,7 +44,7 @@ tags: [NE101 应用, 人脸识别, AI 示例, ESP-DL]
 
 使用Type-C数据线将开发板连接至PC
 
-![NE101主板接口示意图](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/application-guide/human-face-detect/NE101_Main_Board2.png)
+![NE101主板接口示意图](/img/NE101_Main_Board2.png)
 
 #### 2. 固件烧录
 
@@ -78,9 +78,9 @@ WhoDetect: 0, bbox: [0.826712, 47, 40, 169, 195], left_eye: [80, 105], left_mout
 2. 观察串口输出的人脸特征点数据
 3. 可尝试移动摄像头，验证动态检测效果
 
-![人脸检测静态示意图](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/application-guide/human-face-detect/NE101_example_human_detect_1.png)
+![人脸检测静态示意图](/img/NE101_example_human_detect_1.png)
 
-![人脸检测动态效果图](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/application-guide/human-face-detect/NE101_example_human_detect.gif)
+![人脸检测动态效果图](/img/NE101_example_human_detect.gif)
 
 ### 源码开发验证流程
 
@@ -94,21 +94,21 @@ git clone https://github.com/camthink-ai/esp-who
 
 1. 使用VS Code打开工程：`examples/human_face_detect`
    
-   ![工程目录结构](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/application-guide/human-face-detect/NE101_human_face_detect_dir.png)
+   ![工程目录结构](/img/NE101_human_face_detect_dir.png)
 
 2. 设置目标芯片为ESP32-S3
    
-   ![芯片选择界面](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/application-guide/human-face-detect/NE101_idf_IC.png)
+   ![芯片选择界面](/img/NE101_idf_IC.png)
 
 #### 3. 编译与烧录
 
 1. 编译工程
    
-   ![编译界面](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/application-guide/human-face-detect/NE101_idf_build.png)
+   ![编译界面](/img/NE101_idf_build.png)
 
 2. 烧录固件
    
-   ![烧录界面](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/application-guide/human-face-detect/NE101_idf_flash.png)
+   ![烧录界面](/img/NE101_idf_flash.png)
 
 #### 4. 功能验证
 

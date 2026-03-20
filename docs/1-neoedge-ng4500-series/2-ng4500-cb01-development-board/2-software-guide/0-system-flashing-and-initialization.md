@@ -35,13 +35,13 @@ sudo apt install -y build-essential git wget curl python3 python3-pip \
 
 2. 连接完成后，将设备上的 `SW1` 拨码开关的第 1 位拨至 `ON`，使设备进入 Recovery 模式。
 
-![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/system-flashing-and-initialization/NG45XX_Recovery_SW1.png)
+![](/img/NG45XX_SOFTWARE/NG45XX_Recovery_SW1.png)
 
 3. 若设备已进入 Recovery 模式，命令输出中会显示带有 **ID 0955:7623** 的 NVIDIA Corp 设备。
    
    > 注：如果没有出现NVidia Corp 设备，说明未正确进入recovery模式，请检查recovery按键拨码和usb线缆
 
-![NG45XX_flash_lsusb](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/system-flashing-and-initialization/NG45XX_flash_lsusb.jpg)
+![NG45XX_flash_lsusb](/img/NG45XX_flash_lsusb.jpg)
 
 ## 烧录镜像包方法
 

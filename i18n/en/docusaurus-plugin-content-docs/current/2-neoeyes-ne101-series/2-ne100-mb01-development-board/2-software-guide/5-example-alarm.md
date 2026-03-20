@@ -56,7 +56,7 @@ If you must use the independent Alarm Interface, a minor hardware modification t
 *   This operation requires soldering tools and some hardware experience.
 *   **Warning**: After modification, GPIO 2 will be connected to both the PIR Interface and the Alarm Interface. Ensure that you do not connect a PIR sensor and an Alarm button simultaneously; otherwise, their signals will interfere with each other, potentially causing short circuits or false triggers.
 
-![ne101-alarm](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/example-alarm/ne101-alarm.png)
+![ne101-alarm](/img/ne101-alarm.png)
 
 ## Firmware Configuration Confirmation
 

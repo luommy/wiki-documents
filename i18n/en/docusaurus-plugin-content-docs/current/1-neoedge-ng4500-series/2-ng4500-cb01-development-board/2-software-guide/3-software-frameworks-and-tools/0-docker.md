@@ -152,9 +152,9 @@ Expected output should include:
 ### D. Log in to nvcr.io (NVIDIA NGC Container Registry)
   Pulling containers from nvcr.io requires a valid [NGC_API_KEY](https://org.ngc.nvidia.com/setup)
 - Generate API Key
-![NCG_API_KEY](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/software-frameworks-and-tools/docker/NGC_API_KEY.png)
+![NCG_API_KEY](/img/NGC_API_KEY.png)
 - Generate Personal Key
-![Generate_personal_key](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/software-frameworks-and-tools/docker/Generate_personal_key.png)
+![Generate_personal_key](/img/Generate_personal_key.png)
 - docker login
   ```shell
   sudo docker login nvcr.io
@@ -178,7 +178,7 @@ Expected Output：
 - Displays CUDA version and Jetson GPU details
 - Confirms that the container has successfully accessed the GPU
 
-![docker_nvidia-smi](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/software-frameworks-and-tools/docker/docker_nvidia-smi.png)
+![docker_nvidia-smi](/img/docker_nvidia-smi.png)
 
 **You can also use the community-maintained [jetson-containers](https://github.com/dusty-nv/jetson-containers) project to quickly set up your development environment (recommended).**
 

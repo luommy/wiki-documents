@@ -79,7 +79,7 @@ git clone https://github.com/camthink-ai/lowpower_camera.git
 
 使用VS Code打开项目目录：
 
-![工程目录结构示意图](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/example-pir/NE101_code_dir.png)
+![工程目录结构示意图](/img/NE101_code_dir.png)
 
 #### 3. 关键配置项
 
@@ -87,26 +87,26 @@ git clone https://github.com/camthink-ai/lowpower_camera.git
    - 使用RTC GPIO支持唤醒功能
    - 避免外部上拉干扰
 
-![GPIO配置示意图](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/example-pir/NE101_example_6.png)
+![GPIO配置示意图](/img/NE101_example_6.png)
 
 2. **灵敏度调节**：
    - 根据应用场景调整检测参数
 
-![灵敏度参数配置](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/example-pir/NE101_example_5.png)
+![灵敏度参数配置](/img/NE101_example_5.png)
 
 #### 4. 编译与部署
 
 1. 选择ESP32-S3目标芯片：
 
-![芯片选择界面](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/example-pir/NE101_idf_IC.png)
+![芯片选择界面](/img/NE101_idf_IC.png)
 
 2. 执行工程编译：
 
-![编译过程界面](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/example-pir/NE101_idf_build.png)
+![编译过程界面](/img/NE101_idf_build.png)
 
 3. 烧录生成固件：
 
-![固件烧录界面](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/example-pir/NE101_idf_flash.png)
+![固件烧录界面](/img/NE101_idf_flash.png)
 
 #### 5. 功能验证
 

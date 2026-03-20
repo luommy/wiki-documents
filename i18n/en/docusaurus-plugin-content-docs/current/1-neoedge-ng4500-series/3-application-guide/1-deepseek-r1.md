@@ -117,7 +117,7 @@ ollama run deepseek-r1:1.5b
 ## 5. Web Interface (Open WebUI)
 
 Open WebUI provides a user-friendly browser-based chat interface.
-![open_webui](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/application-guide/deepseek-r1/open_webui.gif)
+![open_webui](/img/open_webui.gif)
 
 ### Install Open WebUI (using Docker)
 
