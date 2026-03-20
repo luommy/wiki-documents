@@ -58,9 +58,9 @@ tags: [软件示例, UVC, 视频流, 摄像头应用]
    - 访问设备Web管理界面 http://192.168.1.1
    - 验证视频流显示
    
-   ![设备WiFi连接示意图](/img/NE101_wifi_connect.png)
-   ![设备管理界面概览](/img/NE101_web.png)
-   ![UVC视频流](/img/NE101_web_cam.png)
+   ![设备WiFi连接示意图](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/example-uvc/NE101_wifi_connect.png)
+   ![设备管理界面概览](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/example-uvc/NE101_web.png)
+   ![UVC视频流](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/example-uvc/NE101_web_cam.png)
 
 ### 源码开发验证流程
 
@@ -74,27 +74,27 @@ git clone https://github.com/camthink-ai/lowpower_camera.git
 
 使用VS Code打开项目目录：
 
-![工程目录结构示意图](/img/NE101_code_dir.png)
+![工程目录结构示意图](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/example-uvc/NE101_code_dir.png)
 
 #### 3. 关键配置项
 
 打开/main/camera.h文件，使能uvc。
 
-![灵敏度参数配置](/img/NE101_example_uvc1.png)
+![灵敏度参数配置](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/example-uvc/NE101_example_uvc1.png)
 
 #### 4. 编译与部署
 
 1. 选择ESP32-S3目标芯片：
 
-![芯片选择界面](/img/NE101_idf_IC.png)
+![芯片选择界面](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/example-uvc/NE101_idf_IC.png)
 
 2. 执行工程编译：
 
-![编译过程界面](/img/NE101_idf_build.png)
+![编译过程界面](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/example-uvc/NE101_idf_build.png)
 
 3. 烧录生成固件：
 
-![固件烧录界面](/img/NE101_idf_flash.png)
+![固件烧录界面](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/example-uvc/NE101_idf_flash.png)
 
 #### 5. 功能验证
 

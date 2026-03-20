@@ -27,7 +27,7 @@ Orin Nano/NX Core Modules (Orin Nano 4G/8G,Orin NX 8G/16G)fit to carrier board, 
 - 3.5 Phone Jack for Audio Input and Output
 - Terminals for RS485, RS232, CAN, 5V Power Output
 - Terminals for DI *4 and DO *4
-  ![NG45XX_Top_IO_Marker](/img/Hardware_Guide/Edge_AI_Box/HardwareConnection/NG45XX_Top_IO_Marker.png)
+  ![NG45XX_Top_IO_Marker](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/hardware-guide/hardware-connection/NG45XX_Top_IO_Marker.png)
 ### Bottom side Interfaces
 
 - M.2 Key M 2280 for storage, support PCIe *4
@@ -50,7 +50,7 @@ Orin Nano/NX Core Modules (Orin Nano 4G/8G,Orin NX 8G/16G)fit to carrier board, 
 - Power Button Connector
 - Reset Button Connector
 - Power Mode Selection Switch
-  ![NG45XX_Bot_IO_Marker](/img/Hardware_Guide/Edge_AI_Box/HardwareConnection/NG45XX_Bot_IO_Marker.png)
+  ![NG45XX_Bot_IO_Marker](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/hardware-guide/hardware-connection/NG45XX_Bot_IO_Marker.png)
 ### Quick connection guide
 <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px', justifyContent: 'center', alignItems: 'center' }}>
   <img src={useBaseUrl('/img/Hardware_Guide/Edge_AI_Box/HardwareConnection/NG45XX_PCBA_Top_View.jpg')} alt="NG45XX_PCBA_Top_View" style={{ height: '400px', objectFit: 'contain', margin: '0 auto' }} />

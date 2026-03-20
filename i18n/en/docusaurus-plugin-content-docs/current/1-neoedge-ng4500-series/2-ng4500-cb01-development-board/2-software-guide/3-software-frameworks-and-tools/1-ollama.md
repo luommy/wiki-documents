@@ -28,7 +28,7 @@ This guide covers:
 - Optional remote access setup
 - Complete uninstallation procedure
 
-![overview](/img/NG45XX_ollama_overview.png)
+![overview](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/software-frameworks-and-tools/ollama/NG45XX_ollama_overview.png)
 
 ---
 

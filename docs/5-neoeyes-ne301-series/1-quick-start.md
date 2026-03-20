@@ -11,8 +11,8 @@ tags: [快速入门, NE301, 使用教程, AI调试, 配置指南]
 本教程将详细说明NeoEyes NE301如何从0开始上手使用，涵盖内容有：设备安装教程、基本使用、配置功能以及部署应用等。
 
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '24px', justifyContent: 'center', alignItems: 'center', margin: '12px 0' }}>
-  <img src="/img/ne301/quick-start/ne301-2.png" alt="ne301" style={{ flex: '0 0 auto', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
-  <img src="/img/ne301/quick-start/ne301-1.png" alt="ne301" style={{ flex: '0 0 auto', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/ne301-2.png" alt="ne301" style={{ flex: '0 0 auto', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/ne301-1.png" alt="ne301" style={{ flex: '0 0 auto', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 ## 产品准备
@@ -32,8 +32,8 @@ tags: [快速入门, NE301, 使用教程, AI调试, 配置指南]
 使用螺丝刀拆卸NE301后盖，按照电池仓分布安装电池，等待相机前部的蓝色灯光亮起后，表示相机系统已经成功启动，确定好开机顺利后，即可将后盖重新安装回设备，到这里你便完成了设备的基本启动，完成后我们可以进行下一步，对设备进行配置。
 
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '8px 0 16px' }}>
-  <img src="/img/ne301/quick-start/wakeup1.jpg" alt="开机示例" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
-  <img src="/img/ne301/quick-start/wakeup2.jpg" alt="电池安装" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/wakeup1.jpg" alt="开机示例" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/wakeup2.jpg" alt="电池安装" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 ### 设备连接与登录
@@ -55,8 +55,8 @@ tags: [快速入门, NE301, 使用教程, AI调试, 配置指南]
 如果你成功并访问到了设备的Web页面，那么便可进入登录界面,默认用户名为系统内置用户名，不可修改，密码初始化默认为"hicamthink"，可在 `主页菜单栏-系统设置-设备密码`中修改，在输入正确的密码后即可进入主界面。
 
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '8px 0 16px' }}>
-  <img src="/img/ne301/quick-start/login-en.png" alt="登录页面" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
-  <img src="/img/ne301/quick-start/login-hicamthink.png" alt="默认密码提示" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/login-en.png" alt="登录页面" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/login-hicamthink.png" alt="默认密码提示" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 进入到Web界面后，我们来看看如何修改配置和调试，下方将会根据配置类别和主要作用来详细进行说明。
@@ -70,9 +70,9 @@ NeoEyes NE301 AI Camera凭借强大的板载 AI 算力，提供了高性能、�
 手机/PC初次连接设备会进行关键功能的引导步骤，引导之后便是功能主界面——功能调试，在功能调试界面可以调整模型、替换模型、实时AI预览等功能。
 
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '8px 0 16px' }}>
-  <img src="/img/ne301/quick-start/guidance.png" alt="功能引导" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
-  <img src="/img/ne301/quick-start/AI-off.png" alt="AI 关闭" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
-  <img src="/img/ne301/quick-start/AI.png" alt="AI 开启" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/guidance.png" alt="功能引导" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/AI-off.png" alt="AI 关闭" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/AI.png" alt="AI 开启" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 ### 低延迟推理
@@ -80,7 +80,7 @@ NeoEyes NE301 AI Camera凭借强大的板载 AI 算力，提供了高性能、�
 设备支持毫秒级（ms）的视频流实时推理，确保 AI 功能的即时响应。您可以通过设备开启的 WiFi AP，在本地 Web 端实时预览视频流，并同步验证设备端 AI 推理结果(默认AI推理自动开启，可选择关闭)，无需依赖外部云服务，实现极速响应和状态监控。
 
 <div style={{ textAlign: 'center', margin: '12px 0' }}>
-  <img src="/img/ne301/quick-start/inference-setting.png" alt="推理设置" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/inference-setting.png" alt="推理设置" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 ### 灵活的模型部署与替换
@@ -90,16 +90,16 @@ Web UI提供AI模型的一键部署和替换，让 AI 模型应用变得轻而�
 - 开箱即用： 设备出厂预置了一款 YOLOv8 模型，可快速预览设备本地的AI效果。
 
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '8px 0 16px' }}>
-  <img src="/img/ne301/quick-start/model-list.png" alt="模型列表" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
-  <img src="/img/ne301/quick-start/model-upload.png" alt="模型上传" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
-  <img src="/img/ne301/quick-start/model-uploading.png" alt="模型写入" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/model-list.png" alt="模型列表" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/model-upload.png" alt="模型上传" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/model-uploading.png" alt="模型写入" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 - AI模型快速部署： 如果你不想要设备的默认模型，你可以通过 Web 交互界面，以零基础、零代码地上传和部署新的 AI 模型，甚至可以通过设备抓拍的图片持续积累数据集再训练适合场景的专用模型。为此，我们提供了详细的指南，您可以参考——[在STM32N6上训练与部署yolov8](./3-application-guide/0-model-training-and-deployment/0-model-training-and-deployment.md)。
 
 
 <div style={{ textAlign: 'center', margin: '12px 0' }}>
-  <img src="/img/ne301/quick-start/change-model.gif" alt="模型替换" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/change-model.gif" alt="模型替换" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 ### 推理参数热加载
@@ -107,7 +107,7 @@ Web UI提供AI模型的一键部署和替换，让 AI 模型应用变得轻而�
 我们的系统支持推理参数的热加载。这意味着您可以根据不同模型的特性，通过 Web 界面调整滑动条实时改变推理参数（置信度阈值、NMS 阈值），并立即预览画面推理结果的变化，实现AI模型即时调整和验证。
 
 <div style={{ textAlign: 'center', margin: '12px 0' }}>
-  <img src="/img/ne301/quick-start/inference-setting.png" alt="推理参数" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/inference-setting.png" alt="推理参数" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 ### 模型图像即时验证
@@ -116,16 +116,16 @@ Web UI提供AI模型的一键部署和替换，让 AI 模型应用变得轻而�
 
 <!--
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '8px 0 16px' }}>
-  <img src="/img/ne301/quick-start/model-pic1.png" alt="模型验证" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
-  <img src="/img/ne301/quick-start/model-pic2.png" alt="模型验证" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
-  <img src="/img/ne301/quick-start/model-pic3.png" alt="模型验证" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/model-pic1.png" alt="模型验证" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/model-pic2.png" alt="模型验证" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/model-pic3.png" alt="模型验证" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div> 
 -->
 
 具体效果展示如下：
 
 <div style={{ textAlign: 'center', margin: '12px 0' }}>
-  <img src="/img/ne301/quick-start/model-validation.gif" alt="图片验证" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/model-validation.gif" alt="图片验证" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 
@@ -143,8 +143,8 @@ Web UI提供AI模型的一键部署和替换，让 AI 模型应用变得轻而�
   
 
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '8px 0 16px' }}>
-  <img src="/img/ne301/quick-start/scheduled-capture.png" alt="间隔抓拍" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
-  <img src="/img/ne301/quick-start/scheduled-capture2.png" alt="定时抓拍" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/scheduled-capture.png" alt="间隔抓拍" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/scheduled-capture2.png" alt="定时抓拍" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 
@@ -175,7 +175,7 @@ Web UI提供AI模型的一键部署和替换，让 AI 模型应用变得轻而�
 - 配置方式：通过配置`应用管理-MQTT/MQTTS`中数据接受主题实现，当设备接收到该主题的消息时，会根据消息内容执行相应的控制指令。
 
 <div style={{ textAlign: 'center', margin: '12px 0' }}>
-  <img src="/img/ne301/quick-start/remote-control.png" alt="远程控制" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/remote-control.png" alt="远程控制" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 目前最新固件版本支持的远程控制指令如下：
@@ -244,8 +244,8 @@ RTMP 推流功能现在可以通过 Web 界面进行完整配置，同时也保�
 - Client Key：将MQTTS客户端的私钥进行上传，用于加密通信。
 
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '8px 0 16px' }}>
-  <img src="/img/ne301/quick-start/MQTT.png" alt="MQTT" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
-  <img src="/img/ne301/quick-start/MQTTS.png" alt="MQTTS" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/MQTT.png" alt="MQTT" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/MQTTS.png" alt="MQTTS" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 >更多关于MQTT的配置应用说明，请参考[MQTT数据交互](./3-application-guide/2-mqtt-data-interaction/2-mqtt-data-interaction.md)。
@@ -265,9 +265,9 @@ RTMP 推流功能现在可以通过 Web 界面进行完整配置，同时也保�
 - 垂直翻转：画面垂直翻转，用于设备实际安装后成像需要垂直翻转时使用
 
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '8px 0 16px' }}>
-  <img src="/img/ne301/quick-start/image-management-auto.png" alt="灯光自动" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
-  <img src="/img/ne301/quick-start/image-management1.png" alt="灯光管理" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
-  <img src="/img/ne301/quick-start/image-management2.png" alt="灯光管理" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/image-management-auto.png" alt="灯光自动" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/image-management1.png" alt="灯光管理" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/image-management2.png" alt="灯光管理" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 **灯光管理**
@@ -281,12 +281,12 @@ RTMP 推流功能现在可以通过 Web 界面进行完整配置，同时也保�
 > Tips：补光灯效果仅限于近距离场景会比较好，对功耗十分敏感的场景可选择不启用
 
 <div style={{ textAlign: 'center', margin: '12px 0' }}>
-  <img src="/img/ne301/quick-start/lightgif1.gif" alt="灯光变化gif" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/lightgif1.gif" alt="灯光变化gif" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 
 <div style={{ textAlign: 'center', margin: '12px 0' }}>
-  <img src="/img/ne301/quick-start/lighting-management.png" alt="自动控制" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/lighting-management.png" alt="自动控制" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 ### 系统设置：通信、设备、导入导出
@@ -300,9 +300,9 @@ RTMP 推流功能现在可以通过 Web 界面进行完整配置，同时也保�
 - WiFi设置：NeoEyes NE301标准版本自带WiFi，WiFi版本下，可在配置界面中查看当前范围内可检索到的WiFi信号，你可以根据所需连接的WiFi进行选择设置，设备会自动记录WiFi的SSID和密码，如果重复设置NE301连接的WiFi则设备存储的SSID和密码始终是最近一次的。
 
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '8px 0 16px' }}>
-  <img src="/img/ne301/quick-start/communications.png" alt="通信设置" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
-  <img src="/img/ne301/quick-start/wifipwd.png" alt="Wi-Fi 密码" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
-  <img src="/img/ne301/quick-start/wificonnected.png" alt="Wi-Fi 连接" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/communications.png" alt="通信设置" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/wifipwd.png" alt="Wi-Fi 密码" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/wificonnected.png" alt="Wi-Fi 连接" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 - Cat-1网络设置：NE301 Cat-1版本支持进行网络的设置，你需要有所在地区可用的sim卡，当前NE301 Cat-1版本支持除北美地区以外的其他地区使用，下方将会说明如何进行Cat-1网络设置。
@@ -369,7 +369,7 @@ RTMP 推流功能现在可以通过 Web 界面进行完整配置，同时也保�
   - 保存：改动配置后通过点击保存即可生效。
 
 <div style={{ textAlign: 'center', margin: '12px 0' }}>
-  <img src="/img/ne301/quick-start/device-pwd.png" alt="密码配置" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/device-pwd.png" alt="密码配置" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 ### 导入与导出
@@ -402,15 +402,15 @@ RTMP 推流功能现在可以通过 Web 界面进行完整配置，同时也保�
 > 升级或导入配置时请保持供电稳定，操作完成前不要断电或刷新页面。
 
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '8px 0 16px' }}>
-  <img src="/img/ne301/quick-start/import-firmware.png" alt="固件导入" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
-  <img src="/img/ne301/quick-start/import-firmware2.png" alt="上传固件" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
-  <img src="/img/ne301/quick-start/import-firmware3.png" alt="固件烧录" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/import-firmware.png" alt="固件导入" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/import-firmware2.png" alt="上传固件" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/import-firmware3.png" alt="固件烧录" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '8px 0 16px' }}>
-  <img src="/img/ne301/quick-start/export-firmware.png" alt="固件导出" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
-  <img src="/img/ne301/quick-start/export-firmware2.png" alt="固件导出加载" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/export-firmware.png" alt="固件导出" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/export-firmware2.png" alt="固件导出加载" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 
@@ -432,10 +432,10 @@ RTMP 推流功能现在可以通过 Web 界面进行完整配置，同时也保�
 - 通讯：WiFi/Cat-1/POE ，显示设备的通信方式。
 
 <!--<div style={{ textAlign: 'center', margin: '12px 0' }}>
-  <img src="/img/ne301/quick-start/device-information.png" alt="设备信息" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/device-information.png" alt="设备信息" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div> -->
 <div style={{ textAlign: 'center', margin: '12px 0' }}>
-  <img src="/img/ne301/quick-start/device-information1.png" alt="硬件状态" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/device-information1.png" alt="硬件状态" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 ## 设备重置

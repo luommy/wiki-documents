@@ -11,7 +11,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 ## Hardware Specifications
 
-![SC200AI](/img/Hardware_Dev_Resources/USB_Module/usb5.png)
+![SC200AI](https://resources.camthink.ai/wiki/img/hardware-dev-resources/usb-camera-module/usb5.png)
 
 #### **Product Features**   
 This product is a high-performance USB interface camera module, equipped with a 1/2.7-inch 2-megapixel image sensor, supporting 1080P 30fps HD video output.
@@ -64,7 +64,7 @@ This product is a high-performance USB interface camera module, equipped with a 
 
 ## Product Introduction
 This camera module is suitable for the NeoEyes 101 camera.
-![image](/img/Hardware_Dev_Resources/USB_Module/usb6.png)
+![image](https://resources.camthink.ai/wiki/img/hardware-dev-resources/usb-camera-module/usb6.png)
 With the rapid development of AI vision applications, users’ demands for image quality, adaptability, and multi-scenario usage continue to grow.
 The standard CPI module (OV5640) on the NeoEyes NE101 is stable for daily use but still shows limitations in **image detail, wide-angle imaging, and flexibility**.
 
@@ -89,7 +89,7 @@ Note: OV5640 supports macro shooting. The USB module version currently does not 
 Moreover, as an integrated component, OV5640’s design leaves little room for secondary development. It must connect to the main board, which processes raw data directly—resulting in a high technical threshold and requiring low-level drivers.
 
 ## Multiple USB Module Versions
-![SC200AI](/img/Hardware_Dev_Resources/USB_Module/usb2.png)
+![SC200AI](https://resources.camthink.ai/wiki/img/hardware-dev-resources/usb-camera-module/usb2.png)
 >From left to right: SC200AI-137-2M (Super Wide Version), SC200AI-88-3M (Wide Version), SC200AI-51-4M (Standard Version).
 
 We provide three types of USB camera module versions, each tailored for different application needs:
@@ -109,21 +109,21 @@ Below are comparison shots of the CPI OV5640 version and USB camera module versi
 | CPI Camera                                         | USB Camera (Indoor Firmware)                         |
 | -------------------------------------------------- | --------------------------------------------------- |
 | HFOV=92° Focus Distance=3m                         | HFOV=137° Focus Distance=2m                         |
-| ![image](/img/Hardware_Dev_Resources/USB_Module/image-20251020085837-uhstdxb.png) | ![image](/img/Hardware_Dev_Resources/USB_Module/image-20251020085831-0lepsr2.png) |
+| ![image](https://resources.camthink.ai/wiki/img/hardware-dev-resources/usb-camera-module/image-20251020085837-uhstdxb.png) | ![image](https://resources.camthink.ai/wiki/img/hardware-dev-resources/usb-camera-module/image-20251020085831-0lepsr2.png) |
 | HFOV=92° Focus Distance=3m                         | HFOV=88° Focus Distance=3m                          |
-| ![image](/img/Hardware_Dev_Resources/USB_Module/image-20251020085823-1lpi3d3.png) | ![image](/img/Hardware_Dev_Resources/USB_Module/image-20251020085812-1qlfobj.png) |
+| ![image](https://resources.camthink.ai/wiki/img/hardware-dev-resources/usb-camera-module/image-20251020085823-1lpi3d3.png) | ![image](https://resources.camthink.ai/wiki/img/hardware-dev-resources/usb-camera-module/image-20251020085812-1qlfobj.png) |
 | HFOV=47° Focus Distance=4m                         | HFOV=51° Focus Distance=4m                          |
-| ![image](/img/Hardware_Dev_Resources/USB_Module/image-20251020085803-wfggdqp.png) | ![image](/img/Hardware_Dev_Resources/USB_Module/image-20251020085755-zlr6jbj.png) |
+| ![image](https://resources.camthink.ai/wiki/img/hardware-dev-resources/usb-camera-module/image-20251020085803-wfggdqp.png) | ![image](https://resources.camthink.ai/wiki/img/hardware-dev-resources/usb-camera-module/image-20251020085755-zlr6jbj.png) |
 
 
 | CPI Camera                                         | USB Camera (Outdoor Firmware)                        |
 | -------------------------------------------------- | --------------------------------------------------- |
 | HFOV=92° Focus Distance=3m                         | HFOV=137° Focus Distance=2m                         |
-| ![image](/img/Hardware_Dev_Resources/USB_Module/image.png) | ![image](/img/Hardware_Dev_Resources/USB_Module/image1.png) |
+| ![image](https://resources.camthink.ai/wiki/img/hardware-dev-resources/usb-camera-module/image.png) | ![image](https://resources.camthink.ai/wiki/img/hardware-dev-resources/usb-camera-module/image1.png) |
 | HFOV=92° Focus Distance=3m                         | HFOV=88° Focus Distance=3m                          |
-| ![image](/img/Hardware_Dev_Resources/USB_Module/image2.png) | ![image](/img/Hardware_Dev_Resources/USB_Module/image3.png) |
+| ![image](https://resources.camthink.ai/wiki/img/hardware-dev-resources/usb-camera-module/image2.png) | ![image](https://resources.camthink.ai/wiki/img/hardware-dev-resources/usb-camera-module/image3.png) |
 | HFOV=47° Focus Distance=4m                         | HFOV=51° Focus Distance=4m                          |
-| ![image](/img/Hardware_Dev_Resources/USB_Module/image4.png) | ![image](/img/Hardware_Dev_Resources/USB_Module/image5.png) |
+| ![image](https://resources.camthink.ai/wiki/img/hardware-dev-resources/usb-camera-module/image4.png) | ![image](https://resources.camthink.ai/wiki/img/hardware-dev-resources/usb-camera-module/image5.png) |
 
 > As seen in the comparison, the USB camera module offers superior imaging to the OV5640 in both indoor and outdoor scenarios. The image tuning differs for the two lens modules as well—you can choose according to your preference.
 

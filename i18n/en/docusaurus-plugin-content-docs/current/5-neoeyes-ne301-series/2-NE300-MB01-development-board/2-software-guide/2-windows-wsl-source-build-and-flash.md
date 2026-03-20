@@ -45,8 +45,8 @@ Key steps are shown below:
    ```
 
    <div style={{display:'flex', gap:'16px', flexWrap:'wrap', justifyContent:'center'}}>
-     <img src="/img/ne301/windows-wsl-source/lsusb.png" alt="ST-LINK shown in lsusb" style={{width:'100%', maxWidth:'360px', borderRadius:'8px'}} />
-     <img src="/img/ne301/windows-wsl-source/attach.png" alt="usbipd attach example" style={{width:'100%', maxWidth:'360px', borderRadius:'8px'}} />
+     <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/software-guide/windows-wsl-source-build-and-flash/lsusb.png" alt="ST-LINK shown in lsusb" style={{width:'100%', maxWidth:'360px', borderRadius:'8px'}} />
+     <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/software-guide/windows-wsl-source-build-and-flash/attach.png" alt="usbipd attach example" style={{width:'100%', maxWidth:'360px', borderRadius:'8px'}} />
    </div>
 
    - If prompted, reboot Windows and rerun the commands.
@@ -186,7 +186,7 @@ After flashing, reboot the device (Reset or power cycle) and connect to the WiFi
 After connecting a serial console, run `ifconfig wifi ap` to view the output.
 
 <p align="center">
-  <img src="/img/ne301/windows-wsl-source/info.png" alt="Serial debug info" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/software-guide/windows-wsl-source-build-and-flash/info.png" alt="Serial debug info" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
 </p>
 
 ## 7. Special Case

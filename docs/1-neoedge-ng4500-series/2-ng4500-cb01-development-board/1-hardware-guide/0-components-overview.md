@@ -7,7 +7,7 @@ tags: [硬件指南, 组件概览, NG4500 系列, 核心模组, 扩展连接]
 # Components Overview
 ## **Jetson Modules Brief**
 本产品支持的核心模组包括Orin Nano/NX, 及对应的Super版本。Jetson Orin 系列模组因配置不同，性能存在差异。
-![Orin_Parameters_Comparation](/img/Orin_Parameters_Comparation.png)
+![Orin_Parameters_Comparation](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/hardware-guide/components-overview/Orin_Parameters_Comparation.png)
 模组的主要差异，如下几点：  
 
 - Cores数量不同带来的性能差别

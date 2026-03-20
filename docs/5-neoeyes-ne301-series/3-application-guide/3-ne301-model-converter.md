@@ -78,7 +78,7 @@ docker ps
 
 下载并安装 Docker Desktop for Windows，安装后重启计算机。
 
-![](/img/ne301/application-guide/ne301-model-converter/docker-desktop.png)
+![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ne301-model-converter/docker-desktop.png)
 
 *Docker Desktop 运行界面*
 
@@ -155,7 +155,7 @@ http://localhost:8000
 
 看到 [NE301](https://www.camthink.ai/store/ne301/) Model Converter 界面即表示部署成功。
 
-![](/img/ne301/application-guide/ne301-model-converter/web-interface.png)
+![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ne301-model-converter/web-interface.png)
 
 *NE301 Model Converter Web 界面*
 
@@ -214,19 +214,19 @@ zip -r calibration.zip calibration_images/
 1. 点击 **"选择模型文件"**
 2. 选择 `.pt` 或 `.pth` 文件
 
-![](/img/ne301/application-guide/ne301-model-converter/upload-pytorch-model.png)
+![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ne301-model-converter/upload-pytorch-model.png)
 
 *上传 PyTorch 模型文件*
 
 1. （建议）上传 `classes.yaml`
 
-![](/img/ne301/application-guide/ne301-model-converter/upload-class-yaml.png)
+![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ne301-model-converter/upload-class-yaml.png)
 
 *上传类别定义文件*
 
 1. （强烈建议）上传校准数据集 ZIP
 
-![](/img/ne301/application-guide/ne301-model-converter/upload-calibration-dataset.png)
+![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ne301-model-converter/upload-calibration-dataset.png)
 
 *上传校准数据集*
 
@@ -256,7 +256,7 @@ zip -r calibration.zip calibration_images/
 [步骤 4/4] NE301 打包 (70-100%)
 ```
 
-![](/img/ne301/application-guide/ne301-model-converter/conversion-progress.png)
+![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ne301-model-converter/conversion-progress.png)
 
 *实时转换进度显示*
 
@@ -267,7 +267,7 @@ zip -r calibration.zip calibration_images/
 1. 点击 **"Download"**
 2. 文件自动保存到本地
 
-![](/img/ne301/application-guide/ne301-model-converter/download-result.png)
+![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ne301-model-converter/download-result.png)
 
 *下载转换结果*
 
@@ -277,13 +277,13 @@ zip -r calibration.zip calibration_images/
 
 1. 导入模型到 [NE301](https://www.camthink.ai/store/ne301/) 设备
 
-![](/img/ne301/application-guide/ne301-model-converter/upload-model.png)
+![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ne301-model-converter/upload-model.png)
 
 *导入模型到 [NE301](https://www.camthink.ai/store/ne301/) 设备*
 
 1. 上传图片，[NE301](https://www.camthink.ai/store/ne301/) 将自动识别并呈现结果
 
-![](/img/ne301/application-guide/ne301-model-converter/model-verification.png)
+![](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/ne301-model-converter/model-verification.png)
 
 *[NE301](https://www.camthink.ai/store/ne301/) 设备模型验证*
 

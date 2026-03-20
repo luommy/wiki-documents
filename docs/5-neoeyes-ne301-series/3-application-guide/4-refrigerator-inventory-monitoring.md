@@ -35,33 +35,33 @@ Home Assistant是一个免费的开源家庭自动化平台，旨在成为您智
 首先，正确安装camthink NE301，长按按钮2至3秒以激活WiFi。
 
 <div style={{display: 'flex', gap: '10px', justifyContent: 'center', margin: '20px 0'}}>
-  <img src="/img/ne301/application-guide/monitoring/refrigerator1.png" alt="refrigerator1" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
-  <img src="/img/ne301/application-guide/monitoring/refrigerator2.png" alt="refrigerator2" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/refrigerator1.png" alt="refrigerator1" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/refrigerator2.png" alt="refrigerator2" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 </div>
 
 ### 配置网络和MQTT数据转发
 
 连接以 `NE301_<最后6位MAC数字>` 开头的WiFi端点，输入默认IP地址：192.168.10.10
 
-<img src="/img/ne301/application-guide/monitoring/connect.png" alt="connect" style={{display: 'block', margin: '20px auto', maxWidth: '40%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
-<img src="/img/ne301/application-guide/monitoring/login.png" alt="login" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/connect.png" alt="connect" style={{display: 'block', margin: '20px auto', maxWidth: '40%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/login.png" alt="login" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 - **默认用户名**：`admin`
 - **默认密码**：`hicamthink`
 
 点击登录查看带有详细设置的实时视图。
 
-<img src="/img/ne301/application-guide/monitoring/live.png" alt="live" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/live.png" alt="live" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 导航到系统设置以连接网络访问。
 
-<img src="/img/ne301/application-guide/monitoring/system.png" alt="system" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/system.png" alt="system" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 > Camthink NE301支持WiFi和蜂窝模块。选择相应方法以确保网络连接正常。
 
 导航到应用管理以配置数据和图片的转发位置。
 
-<img src="/img/ne301/application-guide/monitoring/application-management.png" alt="application-management" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/application-management.png" alt="application-management" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 输入您自己的MQTT代理或AI工具栈服务器的详细信息：
 - **服务器地址**： MQTT代理的IP地址。
@@ -76,36 +76,36 @@ Home Assistant是一个免费的开源家庭自动化平台，旨在成为您智
 
 登录您自己的AI工具栈服务器以创建新项目。
 
-<img src="/img/ne301/application-guide/monitoring/AI-tool-stack.png" alt="AI-tool-stack" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/AI-tool-stack.png" alt="AI-tool-stack" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 点击创建新的AI模型项目，输入名称和描述：
 
 <div style={{display: 'flex', gap: '10px', justifyContent: 'center', margin: '20px 0'}}>
-  <img src="/img/ne301/application-guide/monitoring/stack1.png" alt="stack1" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
-  <img src="/img/ne301/application-guide/monitoring/stack2.png" alt="stack2" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/stack1.png" alt="stack1" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/stack2.png" alt="stack2" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 </div>
 
 打开此项目并绑定用于图像采集的设备，您需要先创建此设备。
 
 <div style={{display: 'flex', gap: '10px', justifyContent: 'center', margin: '20px 0'}}>
-  <img src="/img/ne301/application-guide/monitoring/stack3.png" alt="stack3" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
-  <img src="/img/ne301/application-guide/monitoring/stack4.png" alt="stack4" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/stack3.png" alt="stack3" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/stack4.png" alt="stack4" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 </div>
 
 NE301拍摄的冰箱图片将按配置进行上行传输。
 如果您已经准备好图像，直接上传到本平台即可进行模型训练。
 
-<img src="/img/ne301/application-guide/monitoring/stack5.png" alt="stack5" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/stack5.png" alt="stack5" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 在开始训练模型之前，在这里创建一个类，我们将其命名为 `Beverage`
 
-<img src="/img/ne301/application-guide/monitoring/stack6.png" alt="stack6" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/stack6.png" alt="stack6" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 选择合适的类型来标记对象。
 
 <div style={{display: 'flex', gap: '10px', justifyContent: 'center', margin: '20px 0'}}>
-  <img src="/img/ne301/application-guide/monitoring/stack7.png" alt="stack7" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
-  <img src="/img/ne301/application-guide/monitoring/stack8.png" alt="stack8" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/stack7.png" alt="stack7" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/stack8.png" alt="stack8" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 </div>
 
 逐个进行操作，以确保所有对象都被正确标记。
@@ -113,37 +113,37 @@ NE301拍摄的冰箱图片将按配置进行上行传输。
 
 点击“训练模型”开始训练。
 
-<img src="/img/ne301/application-guide/monitoring/stack9.png" alt="stack9" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/stack9.png" alt="stack9" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 点击“新建训练”以创建新任务，保持所有默认设置。
 
-<img src="/img/ne301/application-guide/monitoring/stack10.png" alt="stack10" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/stack10.png" alt="stack10" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 然后开始训练。这需要一点时间。
 
 <div style={{display: 'flex', gap: '10px', justifyContent: 'center', margin: '20px 0'}}>
-  <img src="/img/ne301/application-guide/monitoring/stack11.png" alt="stack11" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
-  <img src="/img/ne301/application-guide/monitoring/stack12.png" alt="stack12" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/stack11.png" alt="stack11" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/stack12.png" alt="stack12" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 </div>
 
 要将模型部署到NE301中，我们需要在将其上传到设备之前对其进行量化。点击量化按钮。
 
 <div style={{display: 'flex', gap: '10px', justifyContent: 'center', margin: '20px 0'}}>
-  <img src="/img/ne301/application-guide/monitoring/stack13.png" alt="stack13" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
-  <img src="/img/ne301/application-guide/monitoring/stack14.png" alt="stack14" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/stack13.png" alt="stack13" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/stack14.png" alt="stack14" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 </div>
 
 点击它开始，这里保持默认设置即可。
 
-<img src="/img/ne301/application-guide/monitoring/stack15.png" alt="stack15" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/stack15.png" alt="stack15" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 完成它需要一点时间。NE301模型包（*.bin）是精确量化的模型。点击下载。
 
-<img src="/img/ne301/application-guide/monitoring/stack16.png" alt="stack16" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/stack16.png" alt="stack16" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 您也可以在这里测试模型，以确认是否一切正常。
 
-<img src="/img/ne301/application-guide/monitoring/stack17.png" alt="stack17" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/stack17.png" alt="stack17" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 
 ### 验证并部署新模型
@@ -151,20 +151,20 @@ NE301拍摄的冰箱图片将按配置进行上行传输。
 让我们回到设备上上传新模型。点击上传按钮进行安装。
 
 <div style={{display: 'flex', gap: '10px', justifyContent: 'center', margin: '20px 0'}}>
-  <img src="/img/ne301/application-guide/monitoring/stack18.png" alt="stack18" style={{width: '32%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
-  <img src="/img/ne301/application-guide/monitoring/stack19.png" alt="stack19" style={{width: '32%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
-  <img src="/img/ne301/application-guide/monitoring/stack20.png" alt="stack20" style={{width: '32%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/stack18.png" alt="stack18" style={{width: '32%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/stack19.png" alt="stack19" style={{width: '32%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/stack20.png" alt="stack20" style={{width: '32%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 </div>
 
 完成后，饮料罐标记正确。
 
-<img src="/img/ne301/application-guide/monitoring/stack21.png" alt="stack21" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/stack21.png" alt="stack21" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 您可以上传更多图片来验证性能。
 
 <div style={{display: 'flex', gap: '10px', justifyContent: 'center', margin: '20px 0'}}>
-  <img src="/img/ne301/application-guide/monitoring/stack22.png" alt="stack22" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
-  <img src="/img/ne301/application-guide/monitoring/stack23.png" alt="stack23" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/stack22.png" alt="stack22" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/stack23.png" alt="stack23" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 </div>
 
 ### 配置 HomeAssistant 应用程序
@@ -173,46 +173,46 @@ NE301拍摄的冰箱图片将按配置进行上行传输。
 
 打开“设备与服务”以安装MQTT集成。
 
-<img src="/img/ne301/application-guide/monitoring/stack24.png" alt="stack24" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/stack24.png" alt="stack24" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 点击添加集成按钮以安装MQTT插件。
 
-<img src="/img/ne301/application-guide/monitoring/stack25.png" alt="stack25" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/stack25.png" alt="stack25" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 只需输入MQTT即可搜索到它。
 
 <div style={{display: 'flex', gap: '10px', justifyContent: 'center', margin: '20px 0'}}>
-  <img src="/img/ne301/application-guide/monitoring/stack26.png" alt="stack26" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
-  <img src="/img/ne301/application-guide/monitoring/stack27.png" alt="stack27" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/stack26.png" alt="stack26" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/stack27.png" alt="stack27" style={{width: '48%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 </div>
 
 选择第二个，并输入在NE301中配置的MQTT代理
 
-<img src="/img/ne301/application-guide/monitoring/stack28.png" alt="stack28" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/stack28.png" alt="stack28" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
-<img src="/img/ne301/application-guide/monitoring/stack29.png" alt="stack29" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/stack29.png" alt="stack29" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 提交以保存。MQTT连接已就绪。
 
 创建MQTT设备，以确保数据能够被正确订阅。
 
-<img src="/img/ne301/application-guide/monitoring/stack30.png" alt="stack30" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/stack30.png" alt="stack30" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 其他设置保持默认。
 
-<img src="/img/ne301/application-guide/monitoring/stack31.png" alt="stack31" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/stack31.png" alt="stack31" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 选择类型`数字`并在此处输入实体名称。
 
-<img src="/img/ne301/application-guide/monitoring/stack32.png" alt="stack32" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/stack32.png" alt="stack32" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 保持这些设置为空。
 
-<img src="/img/ne301/application-guide/monitoring/stack33.png" alt="stack33" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/stack33.png" alt="stack33" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 请在此正确输入MQTT的具体细节，尤其是下行和上行主题，以及模板。
 
-<img src="/img/ne301/application-guide/monitoring/stack34.png" alt="stack34" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/stack34.png" alt="stack34" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 ```jinja2
 {{ value_json.ai_result.ai_result.detection_count }}
@@ -220,44 +220,44 @@ NE301拍摄的冰箱图片将按配置进行上行传输。
 有关如何设置值模板的更多详细信息，您可以访问HomeAssist网站或联系我们。
 点击“下一步”并保存。
 
-<img src="/img/ne301/application-guide/monitoring/stack35.png" alt="stack35" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/stack35.png" alt="stack35" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 关于饮料编号的第一个实体创建良好。
 
 让我们创建第二个实体来识别名称。
 
-<img src="/img/ne301/application-guide/monitoring/stack36.png" alt="stack36" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/stack36.png" alt="stack36" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 输入`name`的值模板。
 
-<img src="/img/ne301/application-guide/monitoring/stack37.png" alt="stack37" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/stack37.png" alt="stack37" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 值的模板名称在这里不同。
 ```jinja2
 {{ value_json.ai_result.ai_result.detections[0].class_name }}
 ```
 点击保存更改以保存它。
-<img src="/img/ne301/application-guide/monitoring/stack38.png" alt="stack38" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/stack38.png" alt="stack38" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 刷新页面以正确查看带有值的活动。
-<img src="/img/ne301/application-guide/monitoring/stack39.png" alt="stack39" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/stack39.png" alt="stack39" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 HomeAssistant支持在仪表盘上查看，包括历史记录
-<img src="/img/ne301/application-guide/monitoring/stack40.png" alt="stack40" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/stack40.png" alt="stack40" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 ## 快速测试
 
 咱们拿些饮料来测试一下。
 
-<img src="/img/ne301/application-guide/monitoring/stack41.png" alt="stack41" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/stack41.png" alt="stack41" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 饮料的数量立即改变。
 
-<img src="/img/ne301/application-guide/monitoring/stack42.png" alt="stack42" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/stack42.png" alt="stack42" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 这些数值也会在HomeAssistant平台上更新，客户可以查看所有历史数据。
 
-<img src="/img/ne301/application-guide/monitoring/stack43.png" alt="stack43" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/stack43.png" alt="stack43" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
 
 HomeAssistant平台支持其他应用程序触发警报，你可以对其进行配置以实现全面管理。
 
@@ -271,7 +271,7 @@ HomeAssistant平台支持其他应用程序触发警报，你可以对其进行�
 
 答：我们建议将平板电脑/手机连接到NE301的WiFi，通过此处的按钮进行拍摄。
 
-<img src="/img/ne301/application-guide/monitoring/stack44.png" alt="stack44" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
+<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/refrigerator-inventory-monitoring/stack44.png" alt="stack44" style={{display: 'block', margin: '20px auto', maxWidth: '80%', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)'}} />
  
 **3. 问：如何在HomeAssistant中设置值模板？**
 

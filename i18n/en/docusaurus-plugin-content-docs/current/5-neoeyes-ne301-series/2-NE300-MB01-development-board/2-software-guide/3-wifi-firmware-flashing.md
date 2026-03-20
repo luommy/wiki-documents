@@ -26,7 +26,7 @@ Copy the downloaded `siwg917` firmware file to the **root directory** of the SD 
 Insert the SD card into the card slot of the NE301 development board.
 Connect the serial tool (baud rate 115200), enter the `ls` command in the console to confirm that the system has recognized the SD card and can see the `siwg917` file.
 
-![Check Firmware](/img/ne301/development-board/software-guide/wifi/ls.png)
+![Check Firmware](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/software-guide/wifi-firmware-flashing/ls.png)
 
 ### 3. Execute Flashing Command
 Enter the following command in the serial console to start the upgrade:
@@ -34,7 +34,7 @@ Enter the following command in the serial console to start the upgrade:
 wifiup
 ```
 
-![Execute Flashing](/img/ne301/development-board/software-guide/wifi/wifiup.png)
+![Execute Flashing](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/software-guide/wifi-firmware-flashing/wifiup.png)
 
 ### 4. Wait for Flashing to Complete
 The system will automatically restart and enter the WiFi firmware upgrade mode.
@@ -42,6 +42,6 @@ The system will automatically restart and enter the WiFi firmware upgrade mode.
 
 When you see the prompt "wifi_update ok" similar to the figure below, and the system automatically restarts to enter the working mode, it means the flashing is successful.
 
-![Flashing Complete](/img/ne301/development-board/software-guide/wifi/wait.png)
+![Flashing Complete](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/software-guide/wifi-firmware-flashing/wait.png)
 
 After flashing is complete, you should be able to search for the WiFi hotspot of NE301.

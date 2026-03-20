@@ -212,7 +212,7 @@ python dinov_vision_test.py --image test.png --model dinov3_vits16_pretrain_lvd1
 
 The generated `patch_similarity_heatmap.png` visually reflects the similarity between the selected patch and others, showcasing DINOv3’s understanding of spatial structure.
 
-![](/img/NG45XX_SOFTWARE/Application/DINOv3_heatmap.png)
+![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/application-guide/DINOv3/DINOv3_heatmap.png)
 
 ---
 
@@ -247,7 +247,7 @@ pip install scikit-learn Pillow
 
 Connect the IMX219 camera to the device (ensure the metal contacts on the cable face up).
 
-![](/img/NG45XX_SOFTWARE/NG45XX_IMX219.png)
+![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/application-guide/DINOv3/NG45XX_IMX219.png)
 
 ### 4.3 Obtain DINOv3 Source Code
 
@@ -405,7 +405,7 @@ python test-dinov3-kmeans.py \
 **Example result:**  
 The system can perform unsupervised recognition of objects in the video, segmenting real-time video into foreground and background (or more regions) without manual labeling.
 
-![](/img/NG45XX_SOFTWARE/Application/DINOv3_KMeans.gif)
+![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/application-guide/DINOv3/DINOv3_KMeans.gif)
 
 ## 5.  References
 

@@ -37,7 +37,7 @@ For the detailed configuration, please refer to [Jetson Orin NX Series and Jetso
 
 - Run `gpioinfo` command to query the GPIO mapping and status：
 
-![](/img/NG45XX_SOFTWARE/Driver/NG45XX_GPIO.png)
+![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/driver-installation-and-updates/interface-and-modules-configure/NG45XX_GPIO.png)
 
 - Run `gpioset` as below to control GPIO output：
 
@@ -80,7 +80,7 @@ sudo gpioset --mode=wait gpiochip0 144=0
     - Use Connector 1 to connect to the PC, and Connector 2 to connect to the Jetson RS232 TX/RX.
     - Ensure proper voltage level shifting is applied to prevent hardware damage.
   
-  ![](/img/NG45XX_SOFTWARE/Driver/NG45XX_RS232.png)
+  ![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/driver-installation-and-updates/interface-and-modules-configure/NG45XX_RS232.png)
 
 - RS485
   
@@ -286,20 +286,20 @@ int main(int argc, char* argv[]) {
 - **Enabling and Configuring SPI**
   
   - To start the configuration tool, run this commands：` sudo python /opt/nvidia/jetson-io/jetson-io.py`
-      ![](/img/NG45XX_SOFTWARE/NG45XX_40PIN_SPI1.png)
+      ![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/driver-installation-and-updates/interface-and-modules-configure/NG45XX_40PIN_SPI1.png)
   
   -Select `Configure Jetson 40pin Header`
-      ![](/img/NG45XX_SOFTWARE/NG45XX_40PIN_SPI2.png)
+      ![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/driver-installation-and-updates/interface-and-modules-configure/NG45XX_40PIN_SPI2.png)
   
   - Select `Configure header pins manually`  
-      ![](/img/NG45XX_SOFTWARE/NG45XX_40PIN_SPI3.png)
+      ![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/driver-installation-and-updates/interface-and-modules-configure/NG45XX_40PIN_SPI3.png)
   
   - Click Spacebar and then select SPI1 and SPI3，after which SPI will be enabled
 
-      ![](/img/NG45XX_SOFTWARE/NG45XX_40PIN_SPI4.png)
+      ![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/driver-installation-and-updates/interface-and-modules-configure/NG45XX_40PIN_SPI4.png)
   
   - Return and select `Save and reboot to reconfigure pins`，take effect after reboot.
-      ![](/img/NG45XX_SOFTWARE/NG45XX_40PIN_SPI5.png)
+      ![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/driver-installation-and-updates/interface-and-modules-configure/NG45XX_40PIN_SPI5.png)
 
 - Testing SPI Communication ：
 
@@ -394,7 +394,7 @@ sudo timedatectl set-ntp false
 
 - The following section describes how to initialize and configure the camera module, using `imx219` as an example. The hardware connection is shown below：
   
-  ![](/img/NG45XX_SOFTWARE/NG45XX_IMX219.png)
+  ![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/driver-installation-and-updates/interface-and-modules-configure/NG45XX_IMX219.png)
 
 - Use the `config-by-hardware.py` to enable the camera，The changes will take effect after a reboot.
   

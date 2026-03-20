@@ -14,7 +14,7 @@ tags: [MediaPipe, 姿态估计, Jetson Orin, 人机交互, 边缘计算]
 
 姿态估计广泛应用于手势识别、健身追踪、人机交互等领域。
 
-![mediapipe-series-solutions](/img/mediapipe-series-solutions.gif)
+![mediapipe-series-solutions](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/application-guide/mediapipe/mediapipe-series-solutions.gif)
 
 ---
 
@@ -66,7 +66,7 @@ sudo jetson_clocks
 
 ## 4. 运行姿态估计
 
-![pose](/img/mediapipe_pose_0.png)
+![pose](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/application-guide/mediapipe/mediapipe_pose_0.png)
 
 ```python
 import cv2
@@ -93,12 +93,12 @@ while True:
 cap.release()
 cv2.destroyAllWindows()
 ```
-![mediapipe_pose_1](/img/mediapipe_pose_1.png)
+![mediapipe_pose_1](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/application-guide/mediapipe/mediapipe_pose_1.png)
 ---
 
 ## 5. 手部追踪
 
-![hand](/img/mediapipe_hand_0.png)
+![hand](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/application-guide/mediapipe/mediapipe_hand_0.png)
 
 ```python
 import cv2
@@ -131,7 +131,7 @@ while cap.isOpened():
 cap.release()
 cv2.destroyAllWindows()
 ```
-![hand](/img/mediapipe_hand_1.png)
+![hand](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/application-guide/mediapipe/mediapipe_hand_1.png)
 
 ---
 

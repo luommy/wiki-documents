@@ -12,7 +12,7 @@ tags: [YOLO11, 目标检测, Jetson Orin, TensorRT, 边缘计算]
 
 YOLO11 是 Ultralytics 推出的全新一代目标检测模型，具备出色的速度与精度。在 NVIDIA Jetson 设备（如 Orin Nano / NX / AGX）上本地部署 YOLO11，可实现高效、低延迟的 AI 推理。
 
-![yolo_overview](/img/yolo_overview.png)
+![yolo_overview](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/application-guide/object-detection/yolo_overview.png)
 
 本指南将介绍：
 
@@ -206,7 +206,7 @@ cap.release()
 cv2.destroyAllWindows()
 ```
 
-![yolo_od](/img/yolo_od.png)
+![yolo_od](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/application-guide/object-detection/yolo_od.png)
 ---
 
 ## 7. 基准测试性能对比

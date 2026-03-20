@@ -7,7 +7,7 @@ tags: [NeoEdge NG4500, Hardware Overview, Jetson Orin, Camera Modules, Accessori
 # Components Overview
 ## **Jetson Modules Brief**
 The core modules supported by NG4500-CB01 include Orin Nano/NX, and the corresponding Super version. Jetson Orin series modules have different performance due to different configurations.
-![Orin_Parameters_Comparation](/img/Orin_Parameters_Comparation.png)
+![Orin_Parameters_Comparation](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/hardware-guide/components-overview/Orin_Parameters_Comparation.png)
 The main differences between the modules are as follows:
 
 - Performance differentiations caused by different numbers of Cores.

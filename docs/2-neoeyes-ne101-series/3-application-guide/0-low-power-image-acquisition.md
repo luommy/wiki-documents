@@ -85,15 +85,15 @@ flowchart LR
    
    使用 VS Code 打开工程目录
    
-   ![NE101_code_dir.png](/img/NE101_code_dir.png)
+   ![NE101_code_dir.png](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/application-guide/low-power-image-acquisition/NE101_code_dir.png)
 
 3. **编译**
    
-   ![NE101_idf_build.png](/img/NE101_idf_build.png)
+   ![NE101_idf_build.png](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/application-guide/low-power-image-acquisition/NE101_idf_build.png)
 
 4. **烧录**
    
-   ![NE101_idf_flash.png](/img/NE101_idf_flash.png)
+   ![NE101_idf_flash.png](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/application-guide/low-power-image-acquisition/NE101_idf_flash.png)
 
 ## 软件说明
 
