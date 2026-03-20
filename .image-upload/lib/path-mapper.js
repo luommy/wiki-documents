@@ -23,8 +23,11 @@ function generateRemotePath(docPath, imagePath) {
     throw new Error('docPath and imagePath must be strings');
   }
 
-  // 2. 检测路径遍历攻击
-  if (docPath.includes('..') || imagePath.includes('..')) {
+  // 2. 检测路径遍历攻击（两个参数都不应该包含 ..）
+  if (docPath.includes('..')) {
+    throw new Error('Path traversal detected');
+  }
+  if (imagePath.includes('..')) {
     throw new Error('Path traversal detected');
   }
 
@@ -116,20 +119,19 @@ function removeNumericPrefix(str) {
 }
 
 /**
- * 提取图片路径组件
+ * 提取图片路径组件（简化版 - 只提取文件名）
  *
  * @param {string} imagePath - 图片路径
- * @returns {Object|null} { lastFolder, filename } 或 null
+ * @returns {Object|null} { filename } 或 null
  */
 function extractImageComponents(imagePath) {
-  // 查找 /img/ 在路径中的位置
-  const imgIndex = imagePath.indexOf('/img/');
-  if (imgIndex === -1) {
+  // 只处理以 /img/ 开头的路径
+  if (!imagePath.startsWith('/img/')) {
     return null;
   }
 
   // 获取 /img/ 之后的部分
-  const afterImg = imagePath.substring(imgIndex + 5); // '/img/'.length = 5
+  const afterImg = imagePath.substring(5); // '/img/'.length = 5
 
   // 分割路径
   const parts = afterImg.split('/').filter(p => p.length > 0);
@@ -142,38 +144,20 @@ function extractImageComponents(imagePath) {
   // 获取文件名
   const filename = parts[parts.length - 1];
 
-  // 获取最后一个文件夹（文件名之前）
-  let lastFolder = '';
-  if (parts.length >= 2) {
-    lastFolder = parts[parts.length - 2];
-
-    // 跳过产品 ID
-    const productIds = ['ne301', 'ng4500', 'ne4500', 'ne101'];
-    if (productIds.includes(lastFolder.toLowerCase())) {
-      // 如果最后文件夹是产品 ID，尝试使用前一个文件夹
-      if (parts.length >= 3) {
-        lastFolder = parts[parts.length - 3];
-      } else {
-        lastFolder = '';
-      }
-    }
-  }
-
   return {
-    lastFolder: lastFolder ? encodeURIComponent(lastFolder) : '',
     filename: encodeURIComponent(filename)
   };
 }
 
 /**
- * 构建远程路径
+ * 构建远程路径（简化版 - 不包含图片的 lastFolder）
  *
  * @param {Object} docHierarchy - 文档层级 { directories: string[], filename: string }
- * @param {Object} imageComponents - 图片组件 { lastFolder, filename }
+ * @param {Object} imageComponents - 图片组件 { filename }
  * @returns {string} 远程路径
  */
 function buildRemotePath(docHierarchy, imageComponents) {
-  // 构建路径: /img/ + directories + [filename or lastFolder] + filename
+  // 构建路径: /img/ + directories + [filename] + image_filename
   let parts = ['/img'];
 
   // 添加文档目录层级
@@ -185,49 +169,25 @@ function buildRemotePath(docHierarchy, imageComponents) {
   /**
    * 判断是否应该在路径中包含文档文件名
    *
-   * 业务规则：根据文档层级和图片路径特征决定是否包含文档文件名作为中间路径
+   * 业务规则：根据文档层级决定是否包含文档文件名作为中间路径
    *
-   * 包含文档文件名的 4 种情况：
+   * 包含文档文件名的 2 种情况：
    * 1. 根级别文档 (directories.length === 0)
-   *    - 示例: docs/overview.md -> /img/overview/...
+   *    - 示例: docs/overview.md + /img/test.png -> /img/overview/test.png
    *    - 原因: 根文档没有目录层级，需要文件名作为路径标识
    *
-   * 2. 深层嵌套文档 (directories.length >= 2)
-   *    - 示例: docs/series/board/guide/detail.md -> /img/series/board/guide/detail/...
-   *    - 原因: 层级较深时，文件名提供更精确的路径组织
-   *
-   * 3. 图片没有 lastFolder (imageComponents.lastFolder 为空)
+   * 2. 有目录层级 (directories.length >= 1)
    *    - 示例: docs/series/guide.md + /img/test.png -> /img/series/guide/test.png
-   *    - 原因: 缺少图片文件夹时，用文档文件名补充路径层级
-   *
-   * 4. 单层目录且文件名不重复 (directories.length === 1 且 filename !== imageFilename)
-   *    - 示例: docs/series/guide.md + /img/xxx/architecture/image.png (guide !== image)
-   *    - 原因: 文件名不同时，添加文档文件名避免路径冲突
-   *    - 反例: docs/series/quick-start.md + /img/xxx/quick-start/image.png (不包含，避免 quick-start/quick-start/)
-   *
-   * 不包含的情况：
-   * - 单层目录且文件名会重复 (directories.length === 1 且 filename === imageFilename)
-   *   - 示例: docs/series/quick-start.md + /img/xxx/quick-start/image.png
-   *   - 结果: /img/series/quick-start/image.png (而非 /img/series/quick-start/quick-start/image.png)
+   *    - 示例: docs/series/board/guide.md + /img/test.png -> /img/series/board/guide/test.png
+   *    - 原因: 文件名提供更精确的路径组织，避免图片都放在目录层级下
    */
-  const shouldIncludeDocFilename =
-    docHierarchy.filename && (
-      docHierarchy.directories.length === 0 ||  // 根级别文档
-      docHierarchy.directories.length >= 2 ||   // 深层嵌套
-      !imageComponents.lastFolder ||             // 图片无 lastFolder
-      (docHierarchy.filename !== imageFilenameWithoutExt && docHierarchy.directories.length === 1)  // 单层且不重复
-    );
+  const shouldIncludeDocFilename = docHierarchy.filename ? true : false;
 
   if (shouldIncludeDocFilename) {
     parts.push(docHierarchy.filename);
   }
 
-  // 添加图片的 lastFolder（如果有）
-  if (imageComponents.lastFolder) {
-    parts.push(imageComponents.lastFolder);
-  }
-
-  // 添加文件名
+  // 添加图片文件名
   parts.push(imageComponents.filename);
 
   // 构建最终路径
