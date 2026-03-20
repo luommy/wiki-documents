@@ -28,12 +28,28 @@ function loadConfig() {
 
   // 环境变量替换
   if (config.fileBrowser.username && config.fileBrowser.username.startsWith('${')) {
-    const envVar = config.fileBrowser.username.match(/\${([^}]+)}/)[1];
-    config.fileBrowser.username = process.env[envVar];
+    const match = config.fileBrowser.username.match(/\${([^}]+)}/);
+    if (!match) {
+      throw new Error(`环境变量格式错误: ${config.fileBrowser.username}`);
+    }
+    const envVar = match[1];
+    const envValue = process.env[envVar];
+    if (!envValue) {
+      throw new Error(`环境变量未设置: ${envVar}`);
+    }
+    config.fileBrowser.username = envValue;
   }
   if (config.fileBrowser.password && config.fileBrowser.password.startsWith('${')) {
-    const envVar = config.fileBrowser.password.match(/\${([^}]+)}/)[1];
-    config.fileBrowser.password = process.env[envVar];
+    const match = config.fileBrowser.password.match(/\${([^}]+)}/);
+    if (!match) {
+      throw new Error(`环境变量格式错误: ${config.fileBrowser.password}`);
+    }
+    const envVar = match[1];
+    const envValue = process.env[envVar];
+    if (!envValue) {
+      throw new Error(`环境变量未设置: ${envVar}`);
+    }
+    config.fileBrowser.password = envValue;
   }
 
   return config;
@@ -227,6 +243,35 @@ async function verifyImage(docPath, originalPath, baseUrl, timeout = 5000) {
 }
 
 /**
+ * 并发控制 - 限制同时执行的 Promise 数量
+ *
+ * @param {Array} items - 要处理的项目数组
+ * @param {Function} asyncFn - 异步处理函数
+ * @param {number} concurrency - 并发数量限制
+ * @returns {Promise<Array>} 处理结果数组
+ */
+async function limitConcurrency(items, asyncFn, concurrency = 10) {
+  const results = [];
+  const executing = [];
+
+  for (const item of items) {
+    const promise = asyncFn(item).then(result => {
+      executing.splice(executing.indexOf(promise), 1);
+      return result;
+    });
+
+    results.push(promise);
+    executing.push(promise);
+
+    if (executing.length >= concurrency) {
+      await Promise.race(executing);
+    }
+  }
+
+  return Promise.all(results);
+}
+
+/**
  * 验证单个文档
  *
  * @param {string} docPath - 文档路径
@@ -267,14 +312,21 @@ async function verifyDocument(docPath, config, verbose = false) {
       return result;
     }
 
-    // 对每个图片进行验证
-    for (const originalPath of images) {
-      const verifyResult = await verifyImage(
-        docPath,
-        originalPath,
-        config.fileBrowser.publicBaseUrl
-      );
+    // 并发验证图片（限制并发数为 10）
+    const verifyResults = await limitConcurrency(
+      images,
+      async (originalPath) => {
+        return await verifyImage(
+          docPath,
+          originalPath,
+          config.fileBrowser.publicBaseUrl
+        );
+      },
+      10
+    );
 
+    // 收集结果并更新统计
+    for (const verifyResult of verifyResults) {
       result.images.push(verifyResult);
 
       // 更新统计
@@ -296,26 +348,26 @@ async function verifyDocument(docPath, config, verbose = false) {
       if (verbose) {
         switch (verifyResult.status) {
           case 'success':
-            console.log(`${colors.green}  ✅${colors.reset} ${originalPath}`);
+            console.log(`${colors.green}  ✅${colors.reset} ${verifyResult.originalPath}`);
             break;
           case 'not_found':
-            console.log(`${colors.red}  ❌${colors.reset} ${originalPath}`);
+            console.log(`${colors.red}  ❌${colors.reset} ${verifyResult.originalPath}`);
             console.log(`${colors.red}     状态: 404 Not Found${colors.reset}`);
             break;
           case 'timeout':
-            console.log(`${colors.yellow}  ⏱️ ${colors.reset} ${originalPath}`);
+            console.log(`${colors.yellow}  ⏱️ ${colors.reset} ${verifyResult.originalPath}`);
             console.log(`${colors.yellow}     状态: 请求超时${colors.reset}`);
             break;
           case 'error':
-            console.log(`${colors.yellow}  ⚠️ ${colors.reset} ${originalPath}`);
+            console.log(`${colors.yellow}  ⚠️ ${colors.reset} ${verifyResult.originalPath}`);
             console.log(`${colors.yellow}     错误: ${verifyResult.reason}${colors.reset}`);
             break;
           case 'failed':
-            console.log(`${colors.red}  ❌${colors.reset} ${originalPath}`);
+            console.log(`${colors.red}  ❌${colors.reset} ${verifyResult.originalPath}`);
             console.log(`${colors.red}     状态: ${verifyResult.reason}${colors.reset}`);
             break;
           case 'skipped':
-            console.log(`${colors.gray}  ⊘${colors.reset} ${originalPath}`);
+            console.log(`${colors.gray}  ⊘${colors.reset} ${verifyResult.originalPath}`);
             console.log(`${colors.gray}     原因: ${verifyResult.reason}${colors.reset}`);
             break;
         }
