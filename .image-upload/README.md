@@ -169,12 +169,12 @@ The tool automatically syncs image links between Chinese and English documents:
 
 2. **Check path mapping:**
    ```bash
-   node scripts/upload-images.sh <doc-path> --dry-run
+   ./upload-images.sh <doc-path> --dry-run
    ```
 
 3. **Re-upload if needed:**
    ```bash
-   node scripts/upload-images.sh <doc-path> --force --no-cache
+   ./upload-images.sh <doc-path> --force --no-cache
    ```
 
 **Common causes:**
