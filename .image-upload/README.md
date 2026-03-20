@@ -99,6 +99,11 @@ The tool uses an intelligent path mapping algorithm to preserve document hierarc
 
 ### How It Works
 
+**Workflow:**
+```
+文档路径 → 提取层级 → 移除数字前缀 → 添加图片文件名 → 生成远程路径
+```
+
 **Algorithm Steps:**
 1. Extract document directory structure (excluding `docs/` prefix and filename)
 2. Remove numeric prefixes from each directory level (`1-`, `2-`, `0-` → empty)
@@ -106,34 +111,24 @@ The tool uses an intelligent path mapping algorithm to preserve document hierarc
 4. URL-encode special characters and spaces
 5. Combine: `/img/` + cleaned document dirs + last image folder + filename
 
+### Path Rules
+
+- ✅ **保留完整文档层级** - 完整保留文档目录结构
+- ✅ **移除数字前缀** - 移除所有数字前缀（`1-`, `2-`, `0-`）
+- ✅ **移除图片原始路径的文件夹** - 只使用文档路径，忽略图片原始路径的目录结构
+- ✅ **只保留图片文件名** - 仅保留图片文件名本身
+- ✅ **URL 编码** - 自动编码特殊字符和空格
+- ✅ **路径规范化** - 自动处理多余斜杠
+
 ### Examples
 
-#### 2-Level Document
-```
-Document: docs/1-neoedge-ng4500-series/0-overview.md
-Image:    /img/Overview/NG45xx/NG45XX.png
-Result:   /img/neoedge-ng4500-series/overview/NG45xx/NG45XX.png
-          └─ Remove "1-"    └─ Add "overview" └─ Keep last folder
-```
-
-#### 4-Level Document
-```
-Document: docs/1-series/2-board/2-guide/3-tools/0-docker.md
-Image:    /img/ne301/application-guide/monitoring/image.png
-Result:   /img/series/board/guide/tools/docker/monitoring/image.png
-          └─ Strip all numeric prefixes ────────────────┘
-```
-
-### Path Mapping Rules
-
-| Rule | Example |
-|------|---------|
-| **Remove numeric prefixes** | `1-neoedge-ng4500-series` → `neoedge-ng4500-series` |
-| **Preserve full hierarchy** | 2-5+ level directories fully preserved |
-| **Handle root documents** | `docs/overview.md` → `/img/overview/...` |
-| **Skip product IDs** | `/img/ne301/image.png` → skip `ne301`, use document path only |
-| **URL encoding** | `架构图.png` → `%E6%9E%B6%E6%9E%84%E5%9B%BE.png` |
-| **No double slashes** | Automatic path normalization |
+| 文档路径 | 图片原路径 | 映射后路径 | 说明 |
+|---------|-----------|-----------|------|
+| docs/1-series/0-overview.md | /img/test.png | /img/series/overview/test.png | 2 级文档 |
+| docs/1-series/2-board/0-guide.md | /img/board.png | /img/series/board/guide/board.png | 3 级文档 |
+| docs/1-series/2-board/1-driver/0-wifi.md | /img/wifi.png | /img/series/board/driver/wifi/wifi.png | 4 级文档 |
+| docs/1-neoedge-ng4500-series/0-overview.md | /img/Overview/NG45xx/NG45XX.png | /img/neoedge-ng4500-series/overview/NG45xx/NG45XX.png | 保留原始图片路径的子文件夹 |
+| docs/1-series/2-board/2-guide/3-tools/0-docker.md | /img/ne301/application-guide/monitoring/image.png | /img/series/board/guide/tools/docker/monitoring/image.png | 跳过产品 ID (ne301) |
 
 ### Benefits
 
@@ -161,6 +156,31 @@ The tool automatically syncs image links between Chinese and English documents:
 ```
 
 ## 🔧 Troubleshooting
+
+### Image 404 Errors
+
+**Symptom:** Images return 404 Not Found after upload
+
+**Solution Steps:**
+1. **Verify uploads:**
+   ```bash
+   node scripts/verify-uploads.js <doc-path>
+   ```
+
+2. **Check path mapping:**
+   ```bash
+   node scripts/upload-images.sh <doc-path> --dry-run
+   ```
+
+3. **Re-upload if needed:**
+   ```bash
+   node scripts/upload-images.sh <doc-path> --force --no-cache
+   ```
+
+**Common causes:**
+- Incorrect file path mapping
+- File not uploaded to server
+- URL encoding issues
 
 ### Common Issues
 
