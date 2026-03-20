@@ -40,22 +40,26 @@ NE301 .bin 文件
 
 ### 2.1 系统要求
 
-| 组件 | 要求 |
-|:---|:---|
-| Docker Desktop | 必须安装并运行 |
-| 内存 | 最低 4GB，推荐 8GB |
-| 磁盘空间 | 10GB+（用于 Docker 镜像） |
-| 浏览器 | Chrome / Firefox / Safari / Edge（最新版本） |
+
+| 组件             | 要求                                     |
+| -------------- | -------------------------------------- |
+| Docker Desktop | 必须安装并运行                                |
+| 内存             | 最低 4GB，推荐 8GB                          |
+| 磁盘空间           | 10GB+（用于 Docker 镜像）                    |
+| 浏览器            | Chrome / Firefox / Safari / Edge（最新版本） |
+
 
 ### 2.2 技术栈
 
-| 组件 | 版本 |
-|:---|:---|
-| Python | 3.11/3.12（不支持 3.14） |
-| PyTorch | 2.4.0 |
-| Ultralytics | 8.3.0 |
-| TensorFlow | 2.16.2 |
-| FastAPI | Starlette 0.52.1 |
+
+| 组件          | 版本                  |
+| ----------- | ------------------- |
+| Python      | 3.11/3.12（不支持 3.14） |
+| PyTorch     | 2.4.0               |
+| Ultralytics | 8.3.0               |
+| TensorFlow  | 2.16.2              |
+| FastAPI     | Starlette 0.52.1    |
+
 
 ### 2.3 安装 Docker Desktop
 
@@ -104,7 +108,7 @@ git clone https://github.com/camthink-ai/ne301.git ne301
 ne301-model-converter/
 ├── backend/              # FastAPI 后端
 ├── frontend/             # Web 前端
-├── ne301/               # [NE301](https://www.camthink.ai/store/ne301/) 工具链
+├── ne301/               # NE301工具链
 ├── docker-compose.yml   # 生产部署
 ├── docker-compose.dev.yml   # 开发环境
 └── docker-compose.dev.local.yml  # 本地开发（推荐）
@@ -113,7 +117,7 @@ ne301-model-converter/
 ### 3.2 拉取依赖镜像
 
 ```bash
-# 拉取 [NE301](https://www.camthink.ai/store/ne301/) 工具链镜像（约 1GB）
+# 拉取 NE301 工具链镜像（约 1GB）
 docker pull camthink/ne301-dev:latest
 ```
 
@@ -185,6 +189,7 @@ zip -r calibration.zip calibration_images/
 ```
 
 **最佳实践**：
+
 - ✅ 使用与生产数据相似的图片
 - ✅ 包含各种光照条件、角度
 - ✅ 图片数量 32-100 张
@@ -199,6 +204,7 @@ zip -r calibration.zip calibration_images/
 - **校准数据集**：`example/calibration.zip`（10MB）- ~50 张代表性图片
 
 **模型详情**：
+
 - 训练数据：家居垃圾分类数据集
 - 检测类别：30 个家居物品类别（水果、蔬菜、食品、包装等）
 - 适用场景：智能垃圾分类、库存管理、智慧家居
@@ -212,26 +218,27 @@ zip -r calibration.zip calibration_images/
 
 *上传 PyTorch 模型文件*
 
-3. （建议）上传 `classes.yaml`
+1. （建议）上传 `classes.yaml`
 
 ![](/img/ne301/application-guide/ne301-model-converter/upload-class-yaml.png)
 
 *上传类别定义文件*
 
-4. （强烈建议）上传校准数据集 ZIP
+1. （强烈建议）上传校准数据集 ZIP
 
 ![](/img/ne301/application-guide/ne301-model-converter/upload-calibration-dataset.png)
 
 *上传校准数据集*
 
-
 ### 4.3 选择转换预设
 
-| 预设 | 输入尺寸 | 精度 | 速度 | 适用场景 |
-|:---|:---|:---|:---|:---|
-| **快速** ⭐ | 256×256 | 良好 | 最快 | NE301推荐 |
-| 平衡 | 320×320 | 较好 | 快速 | 质量较好 |
-| 高精度 | 480×480 | 最好 | 较慢 | 高精度要求场景 |
+
+| 预设       | 输入尺寸    | 精度  | 速度  | 适用场景    |
+| -------- | ------- | --- | --- | ------- |
+| **快速** ⭐ | 256×256 | 良好  | 最快  | NE301推荐 |
+| 平衡       | 320×320 | 较好  | 快速  | 质量较好    |
+| 高精度      | 480×480 | 最好  | 较慢  | 高精度要求场景 |
+
 
 **推荐使用"快速"预设**，在速度和精度之间取得最佳平衡，适合大多数边缘应用场景。
 
@@ -274,7 +281,7 @@ zip -r calibration.zip calibration_images/
 
 *导入模型到 [NE301](https://www.camthink.ai/store/ne301/) 设备*
 
-2. 上传图片，[NE301](https://www.camthink.ai/store/ne301/) 将自动识别并呈现结果
+1. 上传图片，[NE301](https://www.camthink.ai/store/ne301/) 将自动识别并呈现结果
 
 ![](/img/ne301/application-guide/ne301-model-converter/model-verification.png)
 
@@ -291,7 +298,6 @@ A: 不是必需的，但**强烈建议提供**。不提供时系统使用 fake �
 **Q: 智能修复功能是什么？**
 
 A: v2.1 新增功能，自动诊断和修复 [NE301](https://www.camthink.ai/store/ne301/) OOM 问题。系统会检测 mpool 配置错误并自动修复，确保模型成功加载。无需用户手动操作。
-
 
 ---
 
@@ -349,5 +355,5 @@ MAX_UPLOAD_SIZE=524288000  # 500MB
 
 ---
 
-**文档版本**: 2.1.0
+**文档版本**: 2.1.0  
 **最后更新**: 2026-03-19

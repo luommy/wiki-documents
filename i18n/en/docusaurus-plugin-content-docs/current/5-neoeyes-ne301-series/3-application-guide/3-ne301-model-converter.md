@@ -40,22 +40,26 @@ NE301 .bin file
 
 ### 2.1 System Requirements
 
-| Component | Requirement |
-|:---|:---|
-| Docker Desktop | Must be installed and running |
-| Memory | Minimum 4GB, recommended 8GB |
-| Disk Space | 10GB+ (for Docker images) |
-| Browser | Chrome / Firefox / Safari / Edge (latest version) |
+
+| Component      | Requirement                                       |
+| -------------- | ------------------------------------------------- |
+| Docker Desktop | Must be installed and running                     |
+| Memory         | Minimum 4GB, recommended 8GB                      |
+| Disk Space     | 10GB+ (for Docker images)                         |
+| Browser        | Chrome / Firefox / Safari / Edge (latest version) |
+
 
 ### 2.2 Tech Stack
 
-| Component | Version |
-|:---|:---|
-| Python | 3.11/3.12 (3.14 not supported) |
-| PyTorch | 2.4.0 |
-| Ultralytics | 8.3.0 |
-| TensorFlow | 2.16.2 |
-| FastAPI | Starlette 0.52.1 |
+
+| Component   | Version                        |
+| ----------- | ------------------------------ |
+| Python      | 3.11/3.12 (3.14 not supported) |
+| PyTorch     | 2.4.0                          |
+| Ultralytics | 8.3.0                          |
+| TensorFlow  | 2.16.2                         |
+| FastAPI     | Starlette 0.52.1               |
+
 
 ### 2.3 Install Docker Desktop
 
@@ -113,7 +117,7 @@ ne301-model-converter/
 ### 3.2 Pull Dependency Images
 
 ```bash
-# Pull [NE301](https://www.camthink.ai/store/ne301/) toolchain image (~1GB)
+# Pull NE301 toolchain image (~1GB)
 docker pull camthink/ne301-dev:latest
 ```
 
@@ -185,6 +189,7 @@ zip -r calibration.zip calibration_images/
 ```
 
 **Best Practices**:
+
 - ✅ Use images similar to production data
 - ✅ Include various lighting conditions and angles
 - ✅ Image count: 32-100
@@ -199,6 +204,7 @@ The project provides a complete set of example files in the `example/` directory
 - **Calibration Dataset**: `example/calibration.zip` (10MB) - ~50 representative images
 
 **Model Details**:
+
 - Training Data: Household trash/recycling dataset
 - Detection Classes: 30 household item categories (fruits, vegetables, food, packaging, etc.)
 - Use Cases: Smart waste sorting, inventory management, smart home
@@ -212,13 +218,13 @@ The project provides a complete set of example files in the `example/` directory
 
 *Upload PyTorch Model File*
 
-3. (Recommended) Upload `classes.yaml`
+1. (Recommended) Upload `classes.yaml`
 
 ![](/img/ne301/application-guide/ne301-model-converter/upload-class-yaml.png)
 
 *Upload Class Definition File*
 
-4. (Strongly Recommended) Upload calibration dataset ZIP
+1. (Strongly Recommended) Upload calibration dataset ZIP
 
 ![](/img/ne301/application-guide/ne301-model-converter/upload-calibration-dataset.png)
 
@@ -226,11 +232,13 @@ The project provides a complete set of example files in the `example/` directory
 
 ### 4.3 Select Conversion Preset
 
-| Preset | Input Size | Accuracy | Speed | Use Case |
-|:---|:---|:---|:---|:---|
-| **Fast** ⭐ | 256×256 | Good | Fastest | NE301 Recommended |
-| Balanced | 320×320 | Better | Fast | Better quality |
-| High Accuracy | 480×480 | Best | Slower | High-precision requirements |
+
+| Preset        | Input Size | Accuracy | Speed   | Use Case                    |
+| ------------- | ---------- | -------- | ------- | --------------------------- |
+| **Fast** ⭐    | 256×256    | Good     | Fastest | NE301 Recommended           |
+| Balanced      | 320×320    | Better   | Fast    | Better quality              |
+| High Accuracy | 480×480    | Best     | Slower  | High-precision requirements |
+
 
 **Recommended: "Fast" preset** for best balance between speed and accuracy, suitable for most edge applications.
 
@@ -273,7 +281,7 @@ After conversion, it's recommended to verify the model on [NE301](https://www.ca
 
 *Import Model to [NE301](https://www.camthink.ai/store/ne301/) Device*
 
-2. Upload an image, and [NE301](https://www.camthink.ai/store/ne301/) will automatically recognize and display the results
+1. Upload an image, and [NE301](https://www.camthink.ai/store/ne301/) will automatically recognize and display the results
 
 ![](/img/ne301/application-guide/ne301-model-converter/model-verification.png)
 
@@ -347,5 +355,5 @@ MAX_UPLOAD_SIZE=524288000  # 500MB
 
 ---
 
-**Document Version**: 2.1.0
+**Document Version**: 2.1.0  
 **Last Updated**: 2026-03-19

@@ -17,3 +17,9 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# 图片上传工具
+.image-upload/.upload-cache.json
+.image-upload/.upload-config.local.json
+.image-upload/.env
+.image-upload/test/fixtures/uploaded/
