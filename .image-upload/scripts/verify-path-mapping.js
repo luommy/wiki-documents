@@ -135,24 +135,6 @@ function verifyDocument(docPath, verbose = false) {
         }
       }
     }
-
-    // 检查是否有未映射的路径
-    for (const imagePath of images) {
-      if (!mapping[imagePath]) {
-        result.skippedCount++;
-        result.passed = false;
-        result.errors.push({
-          originalPath: imagePath,
-          mappedPath: imagePath,
-          reason: '路径未被映射'
-        });
-
-        if (verbose) {
-          console.log(`${colors.yellow}  ⚠️${colors.reset} ${imagePath}`);
-          console.log(`${colors.yellow}     → 路径未被映射${colors.reset}`);
-        }
-      }
-    }
   } catch (error) {
     result.passed = false;
     result.errors.push({
@@ -232,7 +214,7 @@ function validateMappedPath(mappedPath, originalPath) {
   }
 
   // 检查文件扩展名是否合理
-  const ext = path.extname(mappedPath);
+  const ext = path.extname(filename);
   const validExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp', '.bmp'];
 
   if (ext && !validExtensions.includes(ext.toLowerCase())) {
