@@ -193,4 +193,3 @@ git merge rollback-$(date +%Y%m%d)
 
 - [路径映射算法文档](./path-mapping-optimization-proposal.md)
 - [图片上传使用指南](../README.md)
-- [测试文档](../test/README.md)
