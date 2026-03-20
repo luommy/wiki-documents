@@ -30,8 +30,8 @@ Production samples ship with the standard firmware pre-flashed. Manual flashing 
 ### Connecting the Board
 
 <div style={{display:'flex', gap:'16px', flexWrap:'wrap', justifyContent:'center'}}>
-  <img src="/img/ne301/development-board/quick-start/ne301-board.png" alt="NE301 front" style={{width:'100%', maxWidth:'360px', borderRadius:'8px'}} />
-  <img src="/img/ne301/development-board/quick-start/ne301-board-2.png" alt="NE301 IO map" style={{width:'100%', maxWidth:'360px', borderRadius:'8px'}} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/qucik-start/ne301-board.png" alt="NE301 front" style={{width:'100%', maxWidth:'360px', borderRadius:'8px'}} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/qucik-start/ne301-board-2.png" alt="NE301 IO map" style={{width:'100%', maxWidth:'360px', borderRadius:'8px'}} />
 </div>
 
 **Key notes**
@@ -65,7 +65,7 @@ Refer to the [Hardware Connection Guide](./1-hardware-guide/1-hardware-connectio
 Mind the J1/J2 markings on the ribbon cable. Hold both sides of the lens barrel (avoid fingerprints) and rotate to focus. You can verify focus live under **Function Debug** or **Hardware Management → Image Management** on the web UI.
 
 <p align="center">
-  <img src="/img/ne301/development-board/quick-start/imagebackg.png" alt="Camera ribbon connection" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/qucik-start/imagebackg.png" alt="Camera ribbon connection" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
 </p>
 
 #### CV Light Board
@@ -73,7 +73,7 @@ Mind the J1/J2 markings on the ribbon cable. Hold both sides of the lens barrel 
 The plug-in light board exposes an AP indicator on the left (solid blue after boot) and a fill light on the right. Configure brightness, toggle, and time windows under **Hardware Management → Light Control**. Once saved, the fill light fires whenever a capture is triggered.
 
 <p align="center">
-  <img src="/img/ne301/development-board/quick-start/cv-board.png" alt="CV light board" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/qucik-start/cv-board.png" alt="CV light board" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
 </p>
 
 #### SD Card Slot
@@ -87,7 +87,7 @@ Front USB for power/debug, back battery bay, or a plug-in PoE module.
 #### LED States
 
 <p align="center">
-  <img src="/img/ne301/development-board/quick-start/light.png" alt="LED states" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/qucik-start/light.png" alt="LED states" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
 </p>
 
 - Red — Power LED, solid when USB power is present
@@ -97,14 +97,14 @@ Front USB for power/debug, back battery bay, or a plug-in PoE module.
 #### UART Debugging
 
 <p align="center">
-  <img src="/img/ne301/development-board/quick-start/uart.png" alt="UART header" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/qucik-start/uart.png" alt="UART header" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
 </p>
 
 The UART harness is keyed to avoid reversed insertion (see the hardware design guide). Use any serial console at 115200 bps to access the debug shell.
 
 <div style={{display:'flex', gap:'16px', flexWrap:'wrap', justifyContent:'center'}}>
-  <img src="/img/ne301/development-board/quick-start/ass.png" alt="Serial console" style={{width:'100%', maxWidth:'360px', borderRadius:'8px'}} />
-  <img src="/img/ne301/development-board/quick-start/ass2.png" alt="Serial output" style={{width:'100%', maxWidth:'360px', borderRadius:'8px'}} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/qucik-start/ass.png" alt="Serial console" style={{width:'100%', maxWidth:'360px', borderRadius:'8px'}} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/qucik-start/ass2.png" alt="Serial output" style={{width:'100%', maxWidth:'360px', borderRadius:'8px'}} />
 </div>
 
 #### Web Configuration
@@ -112,7 +112,7 @@ The UART harness is keyed to avoid reversed insertion (see the hardware design g
 Each device exposes a Wi-Fi AP named `NE301_${MAC last 6}`. You can also run `ifconfig ap info` over serial to confirm the SSID.
 
 <p align="center">
-  <img src="/img/ne301/development-board/quick-start/ssid.png" alt="SSID search" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/qucik-start/ssid.png" alt="SSID search" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
 </p>
 
 After joining the AP, browse to `192.168.10.10`. The default login is `admin` / `hicamthink`. Change the password under **System Settings → Device Password Management → Login Password**.
@@ -141,7 +141,7 @@ Out-of-focus optics are the most common reason for blurry previews. Adjust the f
 Wiring reference:
 
 <p align="center">
-  <img src="/img/ne301/development-board/quick-start/wiring.png" alt="Wiring details" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/qucik-start/wiring.png" alt="Wiring details" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
 </p>
 
 ### Unexpected Power Loss
@@ -149,5 +149,5 @@ Wiring reference:
 When the board runs off the battery box, flipping DIP switch 1 to **NO** disconnects the pack and powers the system down. Return it to the original position to resume operation.
 
 <p align="center">
-  <img src="/img/ne301/development-board/quick-start/power-down.png" alt="Battery box DIP switch" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/qucik-start/power-down.png" alt="Battery box DIP switch" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
 </p>

@@ -13,7 +13,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 # Product Info
 
 ## 产品简介
-![NG4500](/img/Overview/NG45xx/NG45XX.png)
+![NG4500](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/overview/NG45XX.png)
 
 CamThink NeoEdge NG4500 系列具备强大的边缘计算能力，集成了NVIDIA® Jetson Orin™ NX 或 Nano 核心模块，能够充分释放 Jetson Orin™ 的计算性能。与未支持NVIDIA Super Developer Kit的上一代产品相比，整体**性能提升最高可达1.7倍**。除了支持常见视觉AI应用的部署外，它还能高效运行各种主流生成式AI模型，包括**文本大语言模型（LLMs）、视觉大语言模型（VLMs）、多模态大语言模型（MLLMs）**。此外NG4500支持多种物理接口及可扩展的通信模块（WiFi/4G/5G），能够灵活适配各类边缘计算应用场景的设备间通讯及边缘与云端协同通信，在例如机器人系统、智能车载终端、智慧工厂计算中心以及AI边缘计算网关场景中可广泛应用。其**工业级设计**保障设备在 -25°C 至 60°C 的环境下稳定运行，具备出色的可靠性，可满足多样化的场景需求。
 
@@ -266,7 +266,7 @@ NG4500系列整机产品规格信息如下
 ### 产品尺寸规格
 产品外型和支架的尺寸示意如下：
 
-![NG45_Series_Outline.png](/img/Hardware_Guide/Edge_AI_Box/BracketAndUage/NG45_Series_Outline.png)
+![NG45_Series_Outline.png](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/overview/NG45_Series_Outline.png)
 ### 产品配件
 
 #### 产品基本配件

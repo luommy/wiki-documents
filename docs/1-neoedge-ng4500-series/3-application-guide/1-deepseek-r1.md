@@ -116,7 +116,7 @@ ollama run deepseek-r1:1.5b
 ## 5. 网页界面（Open WebUI）
 
 Open WebUI 提供了基于浏览器的人性化对话界面。
-![open_webui](/img/open_webui.gif)
+![open_webui](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/application-guide/deepseek-r1/open_webui.gif)
 
 ### 安装 Open WebUI（使用 Docker）
 

@@ -8,7 +8,7 @@ tags: [Cinfer, AI推理, 快速入门, Docker, 教程]
 
 # Quick Start
 
-![Cinfer CamThink AI Inference Service](/img/Cinfer/cinfer-home.png)
+![Cinfer CamThink AI Inference Service](https://resources.camthink.ai/wiki/img/ai-application/cinfer-ai-Inference-service/quick-start/cinfer-home.png)
 ## 简介
 Cinfer是CamThink面向开发者社区开放的通用性Vision AI推理软件，它支持用户执行部署Vision AI推理服务以及提供模型管理，并对外提供标准的OpenAPI服务，适合作为视觉应用开发的图像识别AI组件进行集成，用于调用各种模型来完成图像识别，它具有轻量化、简单的特点，适合快速添加模型进行部署和项目集成。
 
@@ -42,7 +42,7 @@ Cinfer是CamThink面向开发者社区开放的通用性Vision AI推理软件，
 ```bash
 git clone https://github.com/camthink-ai/cinfer.git
 ```
-![Cinfer CamThink AI Inference Service](/img/Cinfer/git-clone.png)
+![Cinfer CamThink AI Inference Service](https://resources.camthink.ai/wiki/img/ai-application/cinfer-ai-Inference-service/quick-start/git-clone.png)
 安装成功后进入项目文件夹
 ```bash
 cd cinfer
@@ -70,7 +70,7 @@ cd cinfer
 ./deploy.sh --backend-port 8000 --frontend-port 3000
 ```
 
-![Docker Install](/img/Cinfer/docker-install.png)
+![Docker Install](https://resources.camthink.ai/wiki/img/ai-application/cinfer-ai-Inference-service/quick-start/docker-install.png)
 
 安装完成后即可通过下方地址访问服务：
   - Frontend (Local): http://localhost:3000
@@ -82,20 +82,20 @@ cd cinfer
 ### 快速使用
 #### 1.注册超级管理员
 <p>打开浏览器，输入地址[「http://localhost:3000」](http://localhost:3000)，访问前端项目，进入初始化管理员设置页，在页面中设置项目的管理员账号及密码，设置成功后进行账户登录进入管理页</p>
-![ciner-initialize-account](/img/Cinfer/initialize-account.png)
+![ciner-initialize-account](https://resources.camthink.ai/wiki/img/ai-application/cinfer-ai-Inference-service/quick-start/initialize-account.png)
 #### 2.登录用户
 <p>输入设置好的管理员账号和密码，点击登录进入系统页面</p>
-![ciner-login](/img/Cinfer/login.png)
+![ciner-login](https://resources.camthink.ai/wiki/img/ai-application/cinfer-ai-Inference-service/quick-start/login.png)
 #### 3.进入首页
 <p>登录成功进入Dashboard，这里可以查看服务的资源占用情况</p>
-![ciner-dashboard](/img/Cinfer/dashboard.png)
+![ciner-dashboard](https://resources.camthink.ai/wiki/img/ai-application/cinfer-ai-Inference-service/quick-start/dashboard.png)
 #### 4.查看模型管理
 <p>点击 **Model Management** 菜单，查看模型列表，当前项目内置了一个OCR模型，我们可以进一步测试这个模型来验证服务是否正常，首先我们需要点击此默认模型右侧的「Publish」按钮进行模型发布，先新增一个Toke，查看下方流程</p>
-![ciner-model-management](/img/Cinfer/model-management.png)
-![ciner-model-management](/img/Cinfer/model-management-push.png)
+![ciner-model-management](https://resources.camthink.ai/wiki/img/ai-application/cinfer-ai-Inference-service/quick-start/model-management.png)
+![ciner-model-management](https://resources.camthink.ai/wiki/img/ai-application/cinfer-ai-Inference-service/quick-start/model-management-push.png)
 #### 5.新增接口请求Token
 <p>点击 **Token Management** 菜单，查看Token列表，外部服务必须获取Token才可请求模型接口，点击「Add」按钮，填写表单，输入Token名称，在Model Permissions中下拉选择All Models Selection来设置此Token可访问的模型范围，设置完成后点击「Save」，在弹窗中点击「Copy」按钮复制Token</p>
-![ciner-add-token](/img/Cinfer/add-token.png)
+![ciner-add-token](https://resources.camthink.ai/wiki/img/ai-application/cinfer-ai-Inference-service/quick-start/add-token.png)
 
 ### 服务测试
 
@@ -107,7 +107,7 @@ curl -X 'GET' \
   -H 'x-access-token: YOUR_ACCESS_TOKEN'
 ```
 请求成功后可以查看到当前所有已发布的模型列表信息，你可以进一步通过下方接口来获取模型的详情。
-![ciner-model-list](/img/Cinfer/model-list.png)
+![ciner-model-list](https://resources.camthink.ai/wiki/img/ai-application/cinfer-ai-Inference-service/quick-start/model-list.png)
 **获取模型详情**：接下来我们将调用模型详情接口来获取模型详细信息，<code>model_id</code>用我们前面通过请求模型列表获取到的模型id信息填入，填入你想要查看的模型id，进行下方请求。
 ```bash
 curl -X 'GET' \
@@ -116,7 +116,7 @@ curl -X 'GET' \
   -H 'x-access-token: YOUR_ACCESS_TOKEN'
 ```
 请求成功后，可以查看
-![ciner-model-info](/img/Cinfer/model-info.png)
+![ciner-model-info](https://resources.camthink.ai/wiki/img/ai-application/cinfer-ai-Inference-service/quick-start/model-info.png)
 
 **请求模型推理**：现在通过模型详情接口我们可以知道模型的输入和输出参数是什么，我们可以根据模型所需的输入参数和输出参数来传递图像来请求AI模型进行图像识别，下方是测试curl，我们可以将<code>YOUR_ACCESS_TOKEN</code>进行替换，并且设置inputs参数，填入目标图像地址以及其他参数来进行一次图片AI推理请求。
 ```bash
@@ -135,14 +135,14 @@ curl -X 'POST' \
   }'
 ```
 可以看到下方请求，接口返回了OCR的识别结果以及每一行的文本内容和box相对于图像像素的坐标位置box，你可以在你的应用界面上绘制它。
-![ciner-model-infer](/img/Cinfer/model-infer.png)
-![ciner-model-infer-draw](/img/Cinfer/model-infer-draw.png)
+![ciner-model-infer](https://resources.camthink.ai/wiki/img/ai-application/cinfer-ai-Inference-service/quick-start/model-infer.png)
+![ciner-model-infer-draw](https://resources.camthink.ai/wiki/img/ai-application/cinfer-ai-Inference-service/quick-start/model-infer-draw.png)
 现在你已经完成Cinfer的基本使用教程，可以开始在你的应用程序上对他进行集成。
 
 ### 应用开发
 #### 接口对接
 可以通过 http://localhost:8000/docs 查看API文档，进行应用集成对接
-![ciner-api-doc](/img/Cinfer/api-doc.png)
+![ciner-api-doc](https://resources.camthink.ai/wiki/img/ai-application/cinfer-ai-Inference-service/quick-start/api-doc.png)
 
 #### BeaverIoT集成
 BeaverIoT已经集成了Cinfer推理服务，具体使用详见文档[「Beaveriot Integration」](./3-application-integration/0-beaveriot-integration.md)

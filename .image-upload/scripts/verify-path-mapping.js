@@ -60,6 +60,13 @@ function extractImageReferences(content) {
     images.add(match[1]);
   }
 
+  // 匹配 React 组件属性中的图片路径: image: "path" 或 image: 'path'
+  // 支持 AccessoriesTable 等自定义组件
+  const reactPropRegex = /image:\s*["']([^"']+)["']/gi;
+  while ((match = reactPropRegex.exec(contentWithoutCodeBlocks)) !== null) {
+    images.add(match[1]);
+  }
+
   return Array.from(images);
 }
 
@@ -100,7 +107,9 @@ function verifyDocument(docPath, verbose = false) {
     }
 
     // 对每个图片进行验证
-    const mapping = mapImagePaths(images, docPath);
+    // 将文档路径标准化（移除相对路径前缀），以便 path-mapper 处理
+    const normalizedDocPath = docPath.replace(/^\.\.\//, '').replace(/^\.\//, '');
+    const mapping = mapImagePaths(images, normalizedDocPath);
 
     for (const [originalPath, mappedPath] of Object.entries(mapping)) {
       result.mappedCount++;

@@ -26,7 +26,7 @@ tags: [NE301, WiFi, 固件, 烧录指南, 软件指南]
 将 SD 卡插入 NE301 开发板的卡槽中。
 连接串口工具（波特率 115200），在控制台输入 `ls` 命令，确认系统已经识别到 SD 卡，并且能看到 `siwg917` 文件。
 
-![检查固件](/img/ne301/development-board/software-guide/wifi/ls.png)
+![检查固件](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/software-guide/wifi-firmware-flashing/ls.png)
 
 ### 3. 执行烧录指令
 在串口控制台中输入以下指令开始升级：
@@ -34,7 +34,7 @@ tags: [NE301, WiFi, 固件, 烧录指南, 软件指南]
 wifiup
 ```
 
-![执行烧录](/img/ne301/development-board/software-guide/wifi/wifiup.png)
+![执行烧录](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/software-guide/wifi-firmware-flashing/wifiup.png)
 
 ### 4. 等待烧录完成
 系统会自动重启并进入 WiFi 固件升级模式。
@@ -42,6 +42,6 @@ wifiup
 
 当看到类似下图的提示“wifi_update ok”，并且系统自动重启进入工作模式时，说明烧录成功。
 
-![烧录完成](/img/ne301/development-board/software-guide/wifi/wait.png)
+![烧录完成](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/software-guide/wifi-firmware-flashing/wait.png)
 
 烧录完成后，你应该就能搜索到 NE301 的 WiFi 热点了。

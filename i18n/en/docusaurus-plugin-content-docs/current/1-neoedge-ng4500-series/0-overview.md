@@ -14,7 +14,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 # Product Information
 
 ## Product Introduction
-![NG4500](/img/Overview/NG45xx/NG45XX.png)
+![NG4500](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/overview/NG45XX.png)
 
 CamThink NeoEdge NG4500 series has powerful edge computing capabilities and integrates NVIDIA® Jetson Orin™ NX or Nano core modules, which can fully unleash the computing performance of Jetson Orin™. It achieves **up to 1.7 times performance boost** compared with the previous generation product that does not support NVIDIA® Super Developer Kit. In addition to the support of general visual AI application, it can also efficiently run various mainstream generative AI models, including **Text Large Language Models(LLMs), Vision Large Language Models(VLMs), and Multi-modal Large Language Models(MLLMs)**. Additionally, NG4500 supports a variety of physical interfaces and scalable communication modules (Wi-Fi/4G/5G), and can flexibly adapt to inter-device communication and edge-to-cloud collaborative communication in various edge computing application scenarios such as Robotic systems, Smart Vehicle Terminals, Smart Manufacturing Computing Hub, and Edge AI Computing Gateway. The **industrial-grade design** of NG4500 ensures that the equipment operates robustly ranging from -25°C to 60°C with outstanding reliability, and can meet the needs of diverse scenarios.
 
@@ -267,7 +267,7 @@ NG4500 series edge AI box and carrier board specifications are shown below:
 ### Product Dimension
 Product casing and bracket dimension instruction：
 
-![NG45_Series_Outline.png](/img/Hardware_Guide/Edge_AI_Box/BracketAndUage/NG45_Series_Outline.png)
+![NG45_Series_Outline.png](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/overview/NG45_Series_Outline.png)
 ### Product Accessories
 
 #### Standard Accessories

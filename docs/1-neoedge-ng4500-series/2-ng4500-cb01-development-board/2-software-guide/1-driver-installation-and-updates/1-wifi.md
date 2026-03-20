@@ -162,7 +162,7 @@ $ sudo dmesg | grep rtl
 
 查看网络接口
 
-![RTL8821_wifi_connection1.png](/img/RTL8821_wifi_connection1.png)
+![RTL8821_wifi_connection1.png](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/driver-installation-and-updates/wifi/RTL8821_wifi_connection1.png)
 
 ifconfig查看网络设备
 
