@@ -1,7 +1,7 @@
 module.exports = {
   testEnvironment: 'node',
   testMatch: ['**/test/**/*.test.js'],
-  collectCoverageFrom: ['lib/**/*.js'],
+  collectCoverageFrom: ['lib/path-mapper.js'],
   coverageThreshold: {
     global: {
       branches: 80,

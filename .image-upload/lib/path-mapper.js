@@ -18,6 +18,11 @@ function generateRemotePath(docPath, imagePath) {
     throw new Error('Both docPath and imagePath are required');
   }
 
+  // 类型检查
+  if (typeof docPath !== 'string' || typeof imagePath !== 'string') {
+    throw new Error('docPath and imagePath must be strings');
+  }
+
   // 2. 检测路径遍历攻击
   if (docPath.includes('..') || imagePath.includes('..')) {
     throw new Error('Path traversal detected');
@@ -155,7 +160,7 @@ function extractImageComponents(imagePath) {
   }
 
   return {
-    lastFolder: lastFolder,
+    lastFolder: lastFolder ? encodeURIComponent(lastFolder) : '',
     filename: encodeURIComponent(filename)
   };
 }
@@ -177,12 +182,40 @@ function buildRemotePath(docHierarchy, imageComponents) {
   // 决定是否包含文档文件名
   const imageFilenameWithoutExt = imageComponents.filename.replace(/\.[^.]+$/, '');
 
+  /**
+   * 判断是否应该在路径中包含文档文件名
+   *
+   * 业务规则：根据文档层级和图片路径特征决定是否包含文档文件名作为中间路径
+   *
+   * 包含文档文件名的 4 种情况：
+   * 1. 根级别文档 (directories.length === 0)
+   *    - 示例: docs/overview.md -> /img/overview/...
+   *    - 原因: 根文档没有目录层级，需要文件名作为路径标识
+   *
+   * 2. 深层嵌套文档 (directories.length >= 2)
+   *    - 示例: docs/series/board/guide/detail.md -> /img/series/board/guide/detail/...
+   *    - 原因: 层级较深时，文件名提供更精确的路径组织
+   *
+   * 3. 图片没有 lastFolder (imageComponents.lastFolder 为空)
+   *    - 示例: docs/series/guide.md + /img/test.png -> /img/series/guide/test.png
+   *    - 原因: 缺少图片文件夹时，用文档文件名补充路径层级
+   *
+   * 4. 单层目录且文件名不重复 (directories.length === 1 且 filename !== imageFilename)
+   *    - 示例: docs/series/guide.md + /img/xxx/architecture/image.png (guide !== image)
+   *    - 原因: 文件名不同时，添加文档文件名避免路径冲突
+   *    - 反例: docs/series/quick-start.md + /img/xxx/quick-start/image.png (不包含，避免 quick-start/quick-start/)
+   *
+   * 不包含的情况：
+   * - 单层目录且文件名会重复 (directories.length === 1 且 filename === imageFilename)
+   *   - 示例: docs/series/quick-start.md + /img/xxx/quick-start/image.png
+   *   - 结果: /img/series/quick-start/image.png (而非 /img/series/quick-start/quick-start/image.png)
+   */
   const shouldIncludeDocFilename =
     docHierarchy.filename && (
-      docHierarchy.directories.length === 0 ||  // 根级别文档 (0 dirs)
-      docHierarchy.directories.length >= 2 ||   // 2+ 目录层级
-      !imageComponents.lastFolder ||             // 图片没有 lastFolder
-      (docHierarchy.filename !== imageFilenameWithoutExt && docHierarchy.directories.length === 1)  // 1 目录且文件名不重复
+      docHierarchy.directories.length === 0 ||  // 根级别文档
+      docHierarchy.directories.length >= 2 ||   // 深层嵌套
+      !imageComponents.lastFolder ||             // 图片无 lastFolder
+      (docHierarchy.filename !== imageFilenameWithoutExt && docHierarchy.directories.length === 1)  // 单层且不重复
     );
 
   if (shouldIncludeDocFilename) {
