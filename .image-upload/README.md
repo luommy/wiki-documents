@@ -41,6 +41,18 @@ yarn test-api  # Verify configuration
 ./upload-images.sh docs --force
 ```
 
+### Batch Upload
+
+Use the batch script in project root to upload all images in the `docs` directory:
+
+```bash
+# From project root directory
+./batch-upload-docs.sh              # Upload all docs
+./batch-upload-docs.sh --dry-run    # Preview mode
+./batch-upload-docs.sh --no-cache   # Re-upload without cache
+./batch-upload-docs.sh docs/1-neoedge-ng4500-series  # Upload specific directory
+```
+
 ### Command Options
 
 | Option | Description |
