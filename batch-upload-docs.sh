@@ -5,6 +5,7 @@
 #   ./batch-upload-docs.sh              # 上传所有文档图片
 #   ./batch-upload-docs.sh --dry-run    # 仅预览，不实际上传
 #   ./batch-upload-docs.sh --no-cache   # 忽略缓存，重新上传
+#   ./batch-upload-docs.sh --delay 2    # 每个文件之间延时 2 秒
 #   ./batch-upload-docs.sh docs/1-series # 上传指定目录
 
 set -e
@@ -19,34 +20,46 @@ NC='\033[0m'
 # 默认目标目录
 TARGET_DIR="docs"
 SCRIPT_DIR=".image-upload"
+DELAY=0
 
 # 解析参数
 DRY_RUN=""
 NO_CACHE=""
 FORCE=""
 
-for arg in "$@"; do
-  case $arg in
-    --dry-run|-d) DRY_RUN="--dry-run" ;;
-    --no-cache|-n) NO_CACHE="--no-cache" ;;
-    --force|-f) FORCE="--force" ;;
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --dry-run|-d) DRY_RUN="--dry-run"; shift ;;
+    --no-cache|-n) NO_CACHE="--no-cache"; shift ;;
+    --force|-f) FORCE="--force"; shift ;;
+    --delay)
+      if [[ -n "$2" && "$2" =~ ^[0-9]+$ ]]; then
+        DELAY="$2"
+        shift 2
+      else
+        echo -e "${RED}错误: --delay 需要一个数字参数${NC}"
+        exit 1
+      fi
+      ;;
     -h|--help)
       echo "用法: $0 [选项] [目录]"
       echo ""
       echo "选项:"
-      echo "  --dry-run, -d    仅预览，不实际上传"
-      echo "  --no-cache, -n   忽略缓存，重新上传"
-      echo "  --force, -f      强制上传所有图片"
+      echo "  --dry-run, -d      仅预览，不实际上传"
+      echo "  --no-cache, -n     忽略缓存，重新上传"
+      echo "  --force, -f        强制上传所有图片"
+      echo "  --delay <秒>       每个文件之间延时（秒）"
       echo ""
       echo "示例:"
       echo "  $0                                # 上传所有文档"
       echo "  $0 --dry-run                      # 预览"
+      echo "  $0 --delay 2                      # 每个文件间隔 2 秒"
       echo "  $0 docs/1-neoedge-ng4500-series   # 上传指定目录"
       exit 0
       ;;
-    docs/*) TARGET_DIR="$arg" ;;
+    docs/*) TARGET_DIR="$1"; shift ;;
     *)
-      echo -e "${RED}错误: 未知参数 '$arg'${NC}"
+      echo -e "${RED}错误: 未知参数 '$1'${NC}"
       exit 1
       ;;
   esac
@@ -76,6 +89,7 @@ echo -e "Markdown 文件数: ${GREEN}$TOTAL${NC}"
 [[ -n "$DRY_RUN" ]] && echo -e "${YELLOW}模式: 预览模式${NC}"
 [[ -n "$NO_CACHE" ]] && echo -e "${YELLOW}模式: 忽略缓存${NC}"
 [[ -n "$FORCE" ]] && echo -e "${YELLOW}模式: 强制上传${NC}"
+[[ $DELAY -gt 0 ]] && echo -e "${YELLOW}延时: ${DELAY} 秒/文件${NC}"
 echo ""
 
 # 处理每个文件
@@ -95,6 +109,11 @@ while IFS= read -r file; do
   else
     FAILED=$((FAILED + 1))
     echo -e "\n${RED}✗ 失败: $file${NC}"
+  fi
+
+  # 延时（如果不是最后一个文件）
+  if [[ $DELAY -gt 0 && $COUNT -lt $TOTAL ]]; then
+    sleep "$DELAY"
   fi
 done < <(find "$TARGET_DIR" -name "*.md" -type f | sort)
 
