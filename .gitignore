@@ -23,3 +23,5 @@ yarn-error.log*
 .image-upload/.upload-config.local.json
 .image-upload/.env
 .image-upload/test/fixtures/uploaded/
+.claude
+CLAUDE.md
