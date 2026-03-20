@@ -1,7 +1,7 @@
 # 图片上传路径映射优化设计
 
 **日期**：2026-03-20
-**状态**：设计中
+**状态**：已批准，待实施
 **作者**：Claude Code
 
 ---
@@ -464,12 +464,12 @@ node scripts/verify-uploads.js docs/
 ### 阶段 1：测试和验证（1-2 小时）
 
 **任务**：
-1. ✅ 修复文档路径安全检查（`path-mapper.js`：补充 `docPath` 路径遍历检测）
-2. ✅ 补充端到端测试（`test/e2e-test.js`）
-3. ✅ 补充边界情况测试（`test/edge-cases.test.js`）
-4. ✅ 补充性能测试（`test/performance.test.js`）
-5. ✅ 运行所有测试确保通过
-6. ✅ 验证覆盖率 ≥ 90%
+1. ✅ 修复文档路径安全检查（已完成：`path-mapper.js` 已补充 `docPath` 路径遍历检测，测试通过）
+2. ⬜ 补充端到端测试（`test/e2e-test.js`）
+3. ⬜ 补充边界情况测试（`test/edge-cases.test.js`）
+4. ⬜ 补充性能测试（`test/performance.test.js`）
+5. ⬜ 运行所有测试确保通过
+6. ⬜ 验证覆盖率 ≥ 90%
 
 **验收标准**：
 - 所有测试通过（包括安全测试）
@@ -479,10 +479,10 @@ node scripts/verify-uploads.js docs/
 ### 阶段 2：工具开发（2-3 小时）
 
 **任务**：
-1. ✅ 开发 `scripts/verify-path-mapping.js`
-2. ✅ 开发 `scripts/verify-uploads.js`
-3. ✅ 开发 `scripts/cleanup-old-uploads.js`
-4. ✅ 增强 `scripts/upload-images.js` 的调试模式
+1. ⬜ 开发 `scripts/verify-path-mapping.js`
+2. ⬜ 开发 `scripts/verify-uploads.js`
+3. ⬜ 开发 `scripts/cleanup-old-uploads.js`
+4. ⬜ 增强 `scripts/upload-images.js` 的调试模式
 
 **验收标准**：
 - 工具可正常运行
@@ -492,9 +492,9 @@ node scripts/verify-uploads.js docs/
 ### 阶段 3：文档更新（1 小时）
 
 **任务**：
-1. ✅ 更新 `.image-upload/README.md`
-2. ✅ 创建 `.image-upload/docs/path-mapping-algorithm.md`
-3. ✅ 创建 `.image-upload/docs/migration-guide.md`
+1. ⬜ 更新 `.image-upload/README.md`
+2. ⬜ 创建 `.image-upload/docs/path-mapping-algorithm.md`
+3. ⬜ 创建 `.image-upload/docs/migration-guide.md`
 
 **验收标准**：
 - 文档清晰完整
@@ -504,10 +504,10 @@ node scripts/verify-uploads.js docs/
 ### 阶段 4：清理和迁移（1-2 小时）
 
 **任务**：
-1. ✅ 备份 File Browser 的 `/img/` 目录
-2. ✅ 运行清理脚本（`cleanup-old-uploads.js`）
-3. ✅ 重新上传所有图片（`upload-images.js`）
-4. ✅ 验证所有图片可访问（`verify-uploads.js`）
+1. ⬜ 备份 File Browser 的 `/img/` 目录
+2. ⬜ 运行清理脚本（`cleanup-old-uploads.js`）
+3. ⬜ 重新上传所有图片（`upload-images.js`）
+4. ⬜ 验证所有图片可访问（`verify-uploads.js`）
 
 **验收标准**：
 - 所有图片 URL 可访问
