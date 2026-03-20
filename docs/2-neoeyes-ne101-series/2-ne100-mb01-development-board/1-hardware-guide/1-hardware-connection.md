@@ -18,7 +18,7 @@ tags: [硬件指南, NE100-MB01, 接口定义, GPIO 配置, 传感器连接]
 - USB Camera  Connector
 - LED Board Connector
 - Camera Module Interface
-![NE10X_Top_IO_Marker.png](/img/Hardware_Guide\Edge_AI_Camera/HardwareConnection/NE10X_Top_IO_Marker.png)
+![NE10X_Top_IO_Marker.png](https://resources.camthink.ai/wiki/img/Hardware_Guide/Edge_AI_Camera/HardwareConnection/NE10X_Top_IO_Marker.png)
 
 
 ### Bottom side Interfaces:
@@ -27,7 +27,7 @@ tags: [硬件指南, NE100-MB01, 接口定义, GPIO 配置, 传感器连接]
 - PIR Input Connector
 - Expansioin GPIOs, include UART、I2C、SPI、Power Output
 - Boot Button
-![NE10X_Bot_IO_Marker.png](/img/Hardware_Guide/Edge_AI_Camera/HardwareConnection/NE10X_Bot_IO_Marker.png)
+![NE10X_Bot_IO_Marker.png](https://resources.camthink.ai/wiki/img/Hardware_Guide/Edge_AI_Camera/HardwareConnection/NE10X_Bot_IO_Marker.png)
 
 ## **Demo Kit quick start guide**
 
