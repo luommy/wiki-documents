@@ -78,6 +78,14 @@
 - **影响**：需要工具辅助验证
 - **严重性**：中等
 
+#### 5. 测试失败：文档路径安全检查缺失
+- **现象**：测试 `should reject path traversal in docPath` 失败
+- **原因**：代码只检查 `imagePath` 的路径遍历，未检查 `docPath`
+- **代码位置**：`path-mapper.js` 第 26-29 行
+- **影响**：低（文档路径通常可信，输入来自项目内部）
+- **严重性**：低
+- **修复**：在阶段 1 中补充 `docPath` 路径遍历检查
+
 ---
 
 ## 设计方案
@@ -456,14 +464,15 @@ node scripts/verify-uploads.js docs/
 ### 阶段 1：测试和验证（1-2 小时）
 
 **任务**：
-1. ✅ 补充端到端测试（`test/e2e-test.js`）
-2. ✅ 补充边界情况测试（`test/edge-cases.test.js`）
-3. ✅ 补充性能测试（`test/performance.test.js`）
-4. ✅ 运行所有测试确保通过
-5. ✅ 验证覆盖率 ≥ 90%
+1. ✅ 修复文档路径安全检查（`path-mapper.js`：补充 `docPath` 路径遍历检测）
+2. ✅ 补充端到端测试（`test/e2e-test.js`）
+3. ✅ 补充边界情况测试（`test/edge-cases.test.js`）
+4. ✅ 补充性能测试（`test/performance.test.js`）
+5. ✅ 运行所有测试确保通过
+6. ✅ 验证覆盖率 ≥ 90%
 
 **验收标准**：
-- 所有测试通过
+- 所有测试通过（包括安全测试）
 - 覆盖率达标
 - 无 ESLint 错误
 
