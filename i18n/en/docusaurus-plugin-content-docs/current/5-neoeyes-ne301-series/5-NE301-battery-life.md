@@ -1,6 +1,4 @@
 ---
-id: ne301-battery-life
-title: NE301 Battery Life Info
 description: Comprehensive NE301 power consumption documentation with detailed analysis of WiFi and Cat-1 communication modes, battery life calculation tools, and typical application scenarios to help users understand device power performance and battery longevity.
 keywords: [NE301, power consumption, battery life, edge AI, WiFi, Cat-1, 4G, battery runtime, power analysis]
 tags: [NE301, power consumption, battery life, technical documentation]
@@ -336,14 +334,6 @@ Based on recommended effective capacity of 1750 mAh, common scenario battery lif
 - Excellent power performance under WiFi environment
 - Stable AI inference meeting business requirements
 
-### 3.4 Configuration Recommendations
-
-
-| Scenario Type               | Recommended Configuration | Expected Battery Life | Optimization Suggestions                  |
-| --------------------------- | ------------------------- | --------------------- | ----------------------------------------- |
-| Low-frequency monitoring    | WiFi, 1-5x/day            | 3.9-13.3 years        | Prioritize WiFi, consider solar panel     |
-| Medium-frequency monitoring | Cat-1, 10-20x/day         | 0.5-1.1 years         | Optimize upload frequency, regular checks |
-| High-frequency collection   | WiFi, 20-50x/day          | 0.4-0.9 years         | Compress images, monitor battery status   |
 
 
 ---
