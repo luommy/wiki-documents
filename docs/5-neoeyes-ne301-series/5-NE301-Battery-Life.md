@@ -4,7 +4,7 @@ keywords: [NE301, 功耗说明, 续航计算, 边缘 AI, WiFi, Cat-1, 4G, 电池
 tags: [NE301, 功耗说明, 续航计算, 技术文档]
 ---
 
-# NE301 电池续航信息
+# NE301 Battery Life Info
 
 ## 概览
 
