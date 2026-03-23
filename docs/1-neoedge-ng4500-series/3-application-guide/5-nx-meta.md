@@ -28,7 +28,7 @@ Nx Meta Platform 是由Network Optix开发的**核心视频管理系统（VMS）
 
 支持的设备如下：
 
-![](/img/NG45XX_SOFTWARE/Application/NxMeta_support_devices.png)
+![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/application-guide/nx-meta/NxMeta_support_devices.png)
 
 ## 2.环境准备
 
@@ -135,39 +135,39 @@ if __name__ == '__main__':
 
 - AIBOX安装完成Nx Meta Server后，Client会自动检测同网段下的Server设备，如下图（首次登入时，需要设置账号密码，账号默认admin）
 
-![](/img/NG45XX_SOFTWARE/Application/NxMeta_Login.png)
+![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/application-guide/nx-meta/NxMeta_Login.png)
 
 - 给AIBOX服务端启动免费的Licenses
 
-![](/img/NG45XX_SOFTWARE/Application/NxMeta_Licenses.png)
+![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/application-guide/nx-meta/NxMeta_Licenses.png)
 
 - 注册一个Meta Cloud账户，并登入
 
-![](/img/NG45XX_SOFTWARE/Application/NxMeta_Cloud.png)
+![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/application-guide/nx-meta/NxMeta_Cloud.png)
 
 - 添加摄像头设备，输入上面AIBOX导出的RTSP流：rtsp://192.168.231.66:8554/cam
 
-![](/img/NG45XX_SOFTWARE/Application/NxMeta_Add_Camera.png)
+![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/application-guide/nx-meta/NxMeta_Add_Camera.png)
 
 -  配置摄像头，选择启用NX AI Plugins(存在CPU和GPU的两种方式，[3. Configure the Nx AI Manager plugin | Nx AI Manager Documentation](https://nx.docs.scailable.net/nx-ai-manager/3.-configure-the-nx-ai-manager-plugin))
 
-![](/img/NG45XX_SOFTWARE/Application/NxMeta_AI_Manager_Plugins.png)
+![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/application-guide/nx-meta/NxMeta_AI_Manager_Plugins.png)
 
 - 启用检测包含目标检测、人脸检测、过线检测、目标计数、徘徊检测。以下以目标计数为例（左边会将摄像头中的物品进行识别，并统计次数，抓拍出来进行闪缩提示）：
 
-![](/img/NG45XX_SOFTWARE/Application/NxMeta_count.png)
+![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/application-guide/nx-meta/NxMeta_count.png)
 
 - 登入[cloud](List sites - NxAI Platform](https://admin.sclbl.nxvms.com/sites))，可以监视当前设备的性能参数以及运行状态
 
-![](/img/NG45XX_SOFTWARE/Application/NxMeta_data.png)
+![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/application-guide/nx-meta/NxMeta_data.png)
 
 - 如需切换检测类型，在camera配置中选择Manager Device，进入Nx AI Manager中切换Model（选择对应的event，如Illegal Dumping\Line Crossing\Loitering Detection\Object Counting）
 
-![](/img/NG45XX_SOFTWARE/Application/NxMeta_events.png)
+![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/application-guide/nx-meta/NxMeta_events.png)
 
 - 配置rules事件，右键摄像头，选择“Add Rules”,配置Analytics Event,然后选择具体检测事件
 
-![](/img/NG45XX_SOFTWARE/Application/NxMeta_add_rules.png)
+![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/application-guide/nx-meta/NxMeta_add_rules.png)
 
 ## 4. Teachable Machine（构建模型平台）
 
@@ -177,19 +177,19 @@ if __name__ == '__main__':
 
 - 导入足够多的图片或视频，然后选择Model Trained
 
-![](/img/NG45XX_SOFTWARE/Application/NxMeta_Teachable_Machine1.png)
+![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/application-guide/nx-meta/NxMeta_Teachable_Machine1.png)
 
 - 选择导出模型，选择TensorFlow lite tab -> Floating point -> Download , 下载完成后会获得一个zip的文件
 
-![](/img/NG45XX_SOFTWARE/Application/NxMeta_Teachable_Machine2.png)
+![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/application-guide/nx-meta/NxMeta_Teachable_Machine2.png)
 
 - 登入[NxMeta cloud端](List sites - NxAI Platform](https://admin.sclbl.nxvms.com/sites)，上传模型，直接将压缩包拖入
 
-![](/img/NG45XX_SOFTWARE/Application/NxMeta_Teachable_Machine3.png)
+![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/application-guide/nx-meta/NxMeta_Teachable_Machine3.png)
 
 - 导入成功后，可以从Client端中的摄像头配置Plugins中，从Manager Device看到上传的模型，通过add pipline应用上传的模型
 
-![](/img/NG45XX_SOFTWARE/Application/NxMeta_Teachable_Machine4.png)
+![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/application-guide/nx-meta/NxMeta_Teachable_Machine4.png)
 
 ## 5. Nx AI Manager Plugins 性能验证
 
@@ -252,7 +252,7 @@ python3 Utilities/upload_results.py
 | Model-Face-Locator          | 92.52           | 人脸定位，适合安防或考勤系统  |
 | Model-Regnet-Y              | 76.22           | 图像分类，兼顾精度与速度    |
 
-![](/img/NG45XX_SOFTWARE/Application/NxMeta_model.png)
+![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/application-guide/nx-meta/NxMeta_model.png)
 
 稳定性测试结果：
 
@@ -260,7 +260,7 @@ python3 Utilities/upload_results.py
 
 ● 数据传输速率：428.87 MB/s
 
-![](/img/NG45XX_SOFTWARE/Application/NxMeta_test_suite.png)
+![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/application-guide/nx-meta/NxMeta_test_suite.png)
 
 ## 6. 参考
 

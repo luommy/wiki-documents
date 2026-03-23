@@ -15,7 +15,7 @@ This tutorial will introduce the operation of NE101 event-triggered camera, incl
 ## Product Preparation
 Before starting, please prepare one NE101 camera, four AA batteries, one Phillips screwdriver, and NE101 camera related optional accessories, such as Cat.1 communication module, Wi-Fi Halow communication module. If you do not have NE101 camera yet, you can buy it through our estore, please click[「NE101 Purchase Address」](https://www.camthink.ai).
 
-![NE101](/img/QuickStart/NE101/ne101_1.png)
+![NE101](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/quick-start/ne101_1.png)
 
 ## Product Set Up
 ### Power On the Camera

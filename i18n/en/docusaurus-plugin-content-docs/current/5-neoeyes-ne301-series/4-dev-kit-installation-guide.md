@@ -3,7 +3,7 @@
 ## Component Overview
 
 <div style={{ display: 'flex', justifyContent: 'center', margin: '20px 0' }}>
-  <img src="/img/ne301/dev-kit-installation-guide/ne301-dev-kit.png" alt="Panorama" style={{ width: '100%', maxWidth: '800px', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.15)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/ne301-dev-kit.png" alt="Panorama" style={{ width: '100%', maxWidth: '800px', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.15)' }} />
 </div>
 
 Component Parts:
@@ -183,7 +183,7 @@ The kit includes six types of screws, which differ slightly. Please distinguish 
 ### Step 1: Camera Module
 
 <div style={{ display: 'flex', justifyContent: 'center', margin: '24px 0' }}>
-  <img src="/img/ne301/dev-kit-installation-guide/camera-moudle.jpg" alt="NE301_Camera-Module" style={{ width: '100%', maxWidth: '400px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/camera-moudle.jpg" alt="NE301_Camera-Module" style={{ width: '100%', maxWidth: '400px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
 </div>
 
 The overall effect is shown above, including the Sensor mainboard, auxiliary board, lens, lens fixing screws, M12 lens support base, the spacer needed for the HFOV 137° module, and the mainboard.
@@ -192,9 +192,9 @@ Objective: Secure the lens onto the Sensor board, tightening the lens module scr
 During installation, remember to remove the protective film from the Sensor board to ensure image clarity. Once removed, install the lens onto the Sensor board and tighten the screws.
 
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '24px 0' }}>
-  <img src="/img/ne301/dev-kit-installation-guide/sensor-1.jpg" alt="NE301_Guide1" style={{ flex: '1 1 200px', maxWidth: '30%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
-  <img src="/img/ne301/dev-kit-installation-guide/sensor-2.jpg" alt="NE301_Guide2" style={{ flex: '1 1 200px', maxWidth: '30%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
-  <img src="/img/ne301/dev-kit-installation-guide/sensor-3.jpg" alt="NE301_Guide3" style={{ flex: '1 1 200px', maxWidth: '30%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/sensor-1.jpg" alt="NE301_Guide1" style={{ flex: '1 1 200px', maxWidth: '30%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/sensor-2.jpg" alt="NE301_Guide2" style={{ flex: '1 1 200px', maxWidth: '30%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/sensor-3.jpg" alt="NE301_Guide3" style={{ flex: '1 1 200px', maxWidth: '30%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
 </div>
 
 After installing the camera module, check if the lens is secure and the screws are tightened, then prepare the Sensor auxiliary board.
@@ -203,20 +203,20 @@ The Sensor auxiliary board connects the Sensor board to the mainboard, ensuring 
 > Tips: Pay extra attention to the installation direction of the Sensor board. Incorrect orientation will prevent connection to the mainboard, causing the camera to malfunction.
 
 <div style={{ display: 'flex', justifyContent: 'center', margin: '24px 0' }}>
-  <img src="/img/ne301/dev-kit-installation-guide/sensor-4.jpg" alt="NE301_Guide4" style={{ width: '100%', maxWidth: '500px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/sensor-4.jpg" alt="NE301_Guide4" style={{ width: '100%', maxWidth: '500px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
 </div>
 
 If your lens module is 137° FOV, attach the NE301_M12 spacer to the back of the lens module as shown below:
 
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '24px 0' }}>
-  <img src="/img/ne301/dev-kit-installation-guide/sensor-6.png" alt="NE301_Guide6" style={{ flex: '1 1 250px', maxWidth: '45%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
-  <img src="/img/ne301/dev-kit-installation-guide/sensor-7.jpg" alt="NE301_Guide7" style={{ flex: '1 1 250px', maxWidth: '45%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/sensor-6.png" alt="NE301_Guide6" style={{ flex: '1 1 250px', maxWidth: '45%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/sensor-7.jpg" alt="NE301_Guide7" style={{ flex: '1 1 250px', maxWidth: '45%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
 </div>
 
 The fully assembled lens module is shown below. You will need to remove the protective lens cap before mounting it to the mainboard.
 
 <div style={{ display: 'flex', justifyContent: 'center', margin: '24px 0' }}>
-  <img src="/img/ne301/dev-kit-installation-guide/sensor-5.jpg" alt="NE301_Guide5" style={{ width: '100%', maxWidth: '500px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/sensor-5.jpg" alt="NE301_Guide5" style={{ width: '100%', maxWidth: '500px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
 </div>
 
 ### Step 2: Top Cover Assembly
@@ -224,7 +224,7 @@ The fully assembled lens module is shown below. You will need to remove the prot
 Once the camera module is ready, you can assemble the housing. Below is a diagram of the housing parts.
 
 <div style={{ display: 'flex', justifyContent: 'center', margin: '24px 0' }}>
-  <img src="/img/ne301/dev-kit-installation-guide/panel-1.jpg" alt="NE301_Guide8" style={{ width: '100%', maxWidth: '500px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/panel-1.jpg" alt="NE301_Guide8" style={{ width: '100%', maxWidth: '500px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
 </div>
 
 Start with the top cover, which involves the camera panel.
@@ -235,8 +235,8 @@ First, place the sealing ring in the groove on the inside of the top cover (note
 > Tips: Ensure the white X1 lens is correctly placed before sticking the glass panel.
 
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '24px 0' }}>
-  <img src="/img/ne301/dev-kit-installation-guide/panel-2.jpg" alt="NE301_Guide9" style={{ flex: '1 1 250px', maxWidth: '45%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
-  <img src="/img/ne301/dev-kit-installation-guide/panel-3.jpg" alt="NE101_Guide10" style={{ flex: '1 1 250px', maxWidth: '45%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/panel-2.jpg" alt="NE301_Guide9" style={{ flex: '1 1 250px', maxWidth: '45%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/panel-3.jpg" alt="NE101_Guide10" style={{ flex: '1 1 250px', maxWidth: '45%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
 </div>
 
 ### Step 3: Middle Frame Assembly
@@ -244,17 +244,17 @@ First, place the sealing ring in the groove on the inside of the top cover (note
 Middle frame parts: NE301_Button, NE301_Pressure Plate, two Phillips self-tapping screws (flat tail, carbon steel, black).
 
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '24px 0' }}>
-  <img src="/img/ne301/dev-kit-installation-guide/mid-frame.jpg" alt="NE301_Mid-Frame" style={{ flex: '1 1 250px', maxWidth: '45%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
-  <img src="/img/ne301/dev-kit-installation-guide/side-button.jpg" alt="NE301_Side-Button" style={{ flex: '1 1 250px', maxWidth: '45%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/mid-frame.jpg" alt="NE301_Mid-Frame" style={{ flex: '1 1 250px', maxWidth: '45%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/side-button.jpg" alt="NE301_Side-Button" style={{ flex: '1 1 250px', maxWidth: '45%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
 </div>
 
 As shown above, check the components and align the holes.
 Install the button on the side of the middle frame with the camera icon facing outward. Place the pressure plate over the button, passing through the cylinders on both sides, and secure with two screws. Tighten these screws firmly to prevent button loosening or misalignment. If you have experience with the NE101, this will be even easier!
 
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '24px 0' }}>
-  <img src="/img/InstallationGuide/NE101_Guide4.png" alt="NE301_Guide11" style={{ flex: '1 1 200px', maxWidth: '30%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
-  <img src="/img/InstallationGuide/NE101_Guide5.png" alt="NE301_Guide12" style={{ flex: '1 1 200px', maxWidth: '30%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
-  <img src="/img/InstallationGuide/NE101_Guide6.png" alt="NE301_Guide13" style={{ flex: '1 1 200px', maxWidth: '30%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/NE101_Guide4.png" alt="NE301_Guide11" style={{ flex: '1 1 200px', maxWidth: '30%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/NE101_Guide5.png" alt="NE301_Guide12" style={{ flex: '1 1 200px', maxWidth: '30%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/NE101_Guide6.png" alt="NE301_Guide13" style={{ flex: '1 1 200px', maxWidth: '30%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
 </div>
 
 > Tips: It is best to install the buttons before mounting the mainboard to avoid misalignment.
@@ -264,8 +264,8 @@ Install the button on the side of the middle frame with the camera icon facing o
 Battery box assembly: The standard version is battery-powered. It is fixed to the middle frame using two screws through the holes inside the battery box. The connection wire attaches to the power interface on the back of the mainboard.
 
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '24px 0' }}>
-  <img src="/img/InstallationGuide/NE101_Guide7.png" alt="NE301_Guide14" style={{ flex: '1 1 300px', maxWidth: '45%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
-  <img src="/img/ne301/dev-kit-installation-guide/battery-compartment.jpg" alt="NE301_Guide15" style={{ flex: '1 1 300px', maxWidth: '45%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/NE101_Guide7.png" alt="NE301_Guide14" style={{ flex: '1 1 300px', maxWidth: '45%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/battery-compartment.jpg" alt="NE301_Guide15" style={{ flex: '1 1 300px', maxWidth: '45%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
 </div>
 
 ### Step 5: Bottom Cover Assembly
@@ -273,7 +273,7 @@ Battery box assembly: The standard version is battery-powered. It is fixed to th
 Bottom cover assembly: Place the sealing ring in the groove on the inside of the bottom cover and prepare the four screws.
 
 <div style={{ display: 'flex', justifyContent: 'center', margin: '24px 0' }}>
-  <img src="/img/InstallationGuide/NE101_Guide8.png" alt="NE301_Guide16" style={{ width: '100%', maxWidth: '500px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/NE101_Guide8.png" alt="NE301_Guide16" style={{ width: '100%', maxWidth: '500px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
 </div>
 
 ### Step 6: Mainboard Assembly
@@ -283,14 +283,14 @@ Mainboard parts: Includes M12 lens support base, OS04C10 lens module (assembled 
 Connect the Sensor auxiliary board of the lens module into the mainboard clip. This clip is a flip-type; lift to insert and press down to lock the cable. Finally, plug the CV light board pins into the mainboard below the camera module—the round light sensor on the left and the square fill light on the right. Once secure, remove the protective cap from the lens.
 
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '24px 0' }}>
-  <img src="/img/ne301/dev-kit-installation-guide/cv-board-1.jpg" alt="NE301_Board" style={{ flex: '1 1 200px', maxWidth: '30%', height: '220px', objectFit: 'cover', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
-  <img src="/img/ne301/dev-kit-installation-guide/board.jpg" alt="NE301_Board" style={{ flex: '1 1 200px', maxWidth: '30%', height: '220px', objectFit: 'cover', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/cv-board-1.jpg" alt="NE301_Board" style={{ flex: '1 1 200px', maxWidth: '30%', height: '220px', objectFit: 'cover', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/board.jpg" alt="NE301_Board" style={{ flex: '1 1 200px', maxWidth: '30%', height: '220px', objectFit: 'cover', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
 </div>
 
 The mainboard assembly is shown below:
 
 <div style={{ display: 'flex', justifyContent: 'center', margin: '24px 0' }}>
-  <img src="/img/ne301/dev-kit-installation-guide/cv-board-2.jpg" alt="NE301_Board" style={{ flex: '1 1 200px', maxWidth: '30%', height: '220px', objectFit: 'cover', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/cv-board-2.jpg" alt="NE301_Board" style={{ flex: '1 1 200px', maxWidth: '30%', height: '220px', objectFit: 'cover', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
 </div>
 
 > **Note**:
@@ -341,9 +341,9 @@ Choose the most suitable lens module based on your deployment height, space, and
 After securing the mainboard to the middle frame, connect the battery box wire to the power interface on the back of the mainboard, as shown below. Secure the battery box to the middle frame with two screws (pointed tail, carbon steel, silver) through the internal holes, then insert the batteries.
 
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '24px 0' }}>
-  <img src="/img/ne301/dev-kit-installation-guide/battery-g.jpg" alt="NE301_Battery" style={{ flex: '1 1 200px', maxWidth: '30%', height: '220px', objectFit: 'cover', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
-  <img src="/img/InstallationGuide/NE101_Guide14.png" alt="NE301_Battery" style={{ flex: '1 1 200px', maxWidth: '30%', height: '220px', objectFit: 'cover', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
-  <img src="/img/InstallationGuide/NE101_Guide15.png" alt="NE301_Battery" style={{ flex: '1 1 200px', maxWidth: '30%', height: '220px', objectFit: 'cover', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/battery-g.jpg" alt="NE301_Battery" style={{ flex: '1 1 200px', maxWidth: '30%', height: '220px', objectFit: 'cover', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/NE101_Guide14.png" alt="NE301_Battery" style={{ flex: '1 1 200px', maxWidth: '30%', height: '220px', objectFit: 'cover', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/NE101_Guide15.png" alt="NE301_Battery" style={{ flex: '1 1 200px', maxWidth: '30%', height: '220px', objectFit: 'cover', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
 </div>
 
 The middle frame, mainboard, and battery components are now fully secured.
@@ -353,14 +353,14 @@ The middle frame, mainboard, and battery components are now fully secured.
 Finally, align the top and bottom covers with the middle frame holes and secure each with four screws to complete the assembly.
 
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '24px 0' }}>
-  <img src="/img/ne301/dev-kit-installation-guide/301-1.jpg" alt="NE301_Top_Cover" style={{ flex: '1 1 200px', maxWidth: '30%', height: '220px', objectFit: 'cover', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
-  <img src="/img/ne301/dev-kit-installation-guide/301-2.jpg" alt="NE301_Bottom_Cover" style={{ flex: '1 1 200px', maxWidth: '30%', height: '220px', objectFit: 'cover', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/301-1.jpg" alt="NE301_Top_Cover" style={{ flex: '1 1 200px', maxWidth: '30%', height: '220px', objectFit: 'cover', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/301-2.jpg" alt="NE301_Bottom_Cover" style={{ flex: '1 1 200px', maxWidth: '30%', height: '220px', objectFit: 'cover', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
 </div>
 
 > **Important Detail**: Ensure the raised circular parts of the covers align with the recessed parts of the middle frame. Otherwise, gaps will remain.
 
 <div style={{ display: 'flex', justifyContent: 'center', margin: '24px 0' }}>
-  <img src="/img/InstallationGuide/NE101_Guide18.png" alt="NE301_Top_Bottom_Cover" style={{ width: '100%', maxWidth: '500px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/dev-kit-installation-guide/NE101_Guide18.png" alt="NE301_Top_Bottom_Cover" style={{ width: '100%', maxWidth: '500px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
 </div>
 
 Your NE301 AI Camera Developer Kit is now fully assembled. For usage and deployment, see — [Quick Start](./1-quick-start.md).

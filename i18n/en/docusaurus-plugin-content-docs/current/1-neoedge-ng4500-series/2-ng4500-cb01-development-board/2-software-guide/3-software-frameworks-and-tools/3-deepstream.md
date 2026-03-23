@@ -28,7 +28,7 @@ This guide covers：
 - Docker-based deployment using jetson-containers
 - Troubleshooting and optimization tips
 
-![overview](/img/NG45XX_deepstream_overview.png)
+![overview](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/software-frameworks-and-tools/deepstream/NG45XX_deepstream_overview.png)
 
 ---
 
@@ -210,7 +210,7 @@ deepstream-app -c source30_1080p_dec_infer-resnet_tiled_display_int8.txt
 ```
 This command launches a tiled display showing real-time object detection results from multiple video streams:
 
-![deepstream_app_5x8](/img/deepstream_app_1.png)
+![deepstream_app_5x8](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/software-frameworks-and-tools/deepstream/deepstream_app_1.png)
 ---
 
 ### Step 2: Use USB or CSI Camera
@@ -259,7 +259,7 @@ Run the application:
 ```bash
 ./deepstream-test1-app dstest1_config.yml
 ```
-![deepstream_od](/img/deepstream_od.png)
+![deepstream_od](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/software-frameworks-and-tools/deepstream/deepstream_od.png)
 
 
 For more sample source code, refer to:  /opt/nvidia/deepstream/deepstream/sources
@@ -295,7 +295,7 @@ For more DeepStream + TAO Toolkit integration examples, refer to: https://github
 ## 6. Additional Examples
 
 [deepstream_python_apps](https://github.com/NVIDIA-AI-IOT/deepstream_python_apps/tree/master)
-![deepstream_python](/img/deepstream_python.png)
+![deepstream_python](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/software-frameworks-and-tools/deepstream/deepstream_python.png)
 
 ## 7. Troubleshooting
 | Issue           | Solution                                      |

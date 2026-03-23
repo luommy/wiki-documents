@@ -21,7 +21,7 @@ This guide describes how to achieve low-power image capture and transmission in 
 - LTE Cat 1 Module
 - Activated 4G SIM Card
 
-![Cat1Module](/img/Overview/NE101/cat1PCBA.png)
+![Cat1Module](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/example-cat1/cat1PCBA.png)
 
 ### Software
 
@@ -59,8 +59,8 @@ This guide describes how to achieve low-power image capture and transmission in 
 2. Access the Web UI at http://192.168.1.1
 3. Check the “Cellular Network” status panel
 
-![status panel1](/img/NE101_example_cat1_1.png)
-![status panel2](/img/NE101_example_cat1_2.png)
+![status panel1](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/example-cat1/NE101_example_cat1_1.png)
+![status panel2](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/example-cat1/NE101_example_cat1_2.png)
 
 #### 4. Data Transmission Test
 
@@ -82,17 +82,17 @@ git clone https://github.com/camthink-ai/lowpower_camera.git
 
 Open the directory in VS Code：
 
-![Project Root Directory](/img/NE101_code_dir.png)
+![Project Root Directory](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/example-cat1/NE101_code_dir.png)
 
 #### 3. Compilation and Deployment
 
 1. Select the build button to compile the source code：
 
-![Showing build output](/img/NE101_idf_build.png)
+![Showing build output](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/example-cat1/NE101_idf_build.png)
 
 2. Select the flash button to upload the generated firmware to the device：
 
-![screenshot showing flashing firmware](/img/NE101_idf_flash.png)
+![screenshot showing flashing firmware](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/example-cat1/NE101_idf_flash.png)
 
 #### 4. Verify Network and Data Transmission
 

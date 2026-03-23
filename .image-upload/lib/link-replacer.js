@@ -76,6 +76,21 @@ class LinkReplacer {
     );
     content = content.replace(componentSingleQuoteRegex, `$1'${remoteUrl}'$2`);
 
+    // 4. 替换 React 组件属性: image: "path" 或 image: 'path'
+    // 匹配双引号
+    const reactPropDoubleQuoteRegex = new RegExp(
+      `(image:\\s*)"${escapedPath}"`,
+      'g'
+    );
+    content = content.replace(reactPropDoubleQuoteRegex, `$1"${remoteUrl}"`);
+
+    // 匹配单引号
+    const reactPropSingleQuoteRegex = new RegExp(
+      `(image:\\s*)'${escapedPath}'`,
+      'g'
+    );
+    content = content.replace(reactPropSingleQuoteRegex, `$1'${remoteUrl}'`);
+
     return content;
   }
 }

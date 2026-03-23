@@ -32,20 +32,20 @@ tags: [软件指南, 开发环境, ESP-IDF, VSCode, ESP32-S3]
    - 从[VSCode官网](https://code.visualstudio.com/)下载并安装最新版本
    - 启动VSCode，在扩展市场搜索并安装"Espressif IDF"扩展
    
-   ![VSCode扩展安装示意图](/img/NE101_Setup_idf1.png)
+   ![VSCode扩展安装示意图](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/development-environment-setup/NE101_Setup_idf1.png)
 
 2. **配置ESP-IDF开发环境**
    
    - 使用快捷键`Ctrl+Shift+P`调出命令面板
    - 输入并选择"Configure ESP-IDF extension"命令
    
-   ![命令面板操作示意图](/img/NE101_Setup_idf2.png)
+   ![命令面板操作示意图](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/development-environment-setup/NE101_Setup_idf2.png)
 
 ### 安装模式选择
 
 系统提供三种灵活的安装方式：
 
-![安装模式选择界面](/img/NE101_Setup_idf3.png)
+![安装模式选择界面](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/development-environment-setup/NE101_Setup_idf3.png)
 
 1. **快速安装(EXPRESS)**（推荐方案）
    
@@ -67,12 +67,12 @@ tags: [软件指南, 开发环境, ESP-IDF, VSCode, ESP32-S3]
 
 建议选择**快速安装**模式，并指定v5.1.6版本开始安装：
 
-![版本选择界面](/img/NE101_Setup_idf4.png)
-![安装过程示意图](/img/NE101_Setup_idf5.png)
+![版本选择界面](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/development-environment-setup/NE101_Setup_idf4.png)
+![安装过程示意图](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/development-environment-setup/NE101_Setup_idf5.png)
 
 安装成功后的界面显示：
 
-![安装完成界面](/img/NE101_Setup_idf6.png)
+![安装完成界面](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/development-environment-setup/NE101_Setup_idf6.png)
 
 ## 项目开发流程
 
@@ -91,26 +91,26 @@ git clone https://github.com/camthink-ai/lowpower_camera.git
    - 在VSCode中使用"文件 > 打开文件夹"功能
    - 导航至项目所在目录
    
-   ![项目目录结构](/img/NE101_CodeList.png)
-   ![项目文件浏览](/img/NE101_CodeList1.png)
+   ![项目目录结构](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/development-environment-setup/NE101_CodeList.png)
+   ![项目文件浏览](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/development-environment-setup/NE101_CodeList1.png)
 
 2. **设备配置**
    
    - 在底部状态栏选择正确的COM端口
    - 确保芯片类型选择为"esp32s3"
    
-   ![芯片选择示意图](/img/NE101_idf_IC.png)
+   ![芯片选择示意图](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/development-environment-setup/NE101_idf_IC.png)
 
 3. **编译与烧录操作**
    
    - （可选）运行"menuconfig"命令修改项目配置
    - 点击工具栏的"build"按钮进行项目编译
    
-   ![编译过程示意图](/img/NE101_idf_build.png)
+   ![编译过程示意图](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/development-environment-setup/NE101_idf_build.png)
    
    - 点击"flash"按钮烧录固件到设备
    
-   ![烧录过程示意图](/img/NE101_idf_flash.png)
+   ![烧录过程示意图](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/development-environment-setup/NE101_idf_flash.png)
 
 ## 环境验证
 

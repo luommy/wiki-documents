@@ -21,8 +21,8 @@ NE100系列是专为物联网应用设计的高性能智能相机产品线，其
 
 ### 设备连接
 
-![NE101主板正面图](/img/NE101_Main_Board.png)  
-![NE101主板接口图](/img/NE101_Main_Board2.png)  
+![NE101主板正面图](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/quick-start/NE101_Main_Board.png)  
+![NE101主板接口图](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/quick-start/NE101_Main_Board2.png)  
 
 **使用要点**：
 
@@ -53,14 +53,14 @@ NE100系列是专为物联网应用设计的高性能智能相机产品线，其
    - 手机/电脑连接设备WiFi
    - 访问 http://192.168.1.1
 
-![设备WiFi连接示意图](/img/NE101_wifi_connect.png)
-![设备管理界面概览](/img/NE101_web.png)
+![设备WiFi连接示意图](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/quick-start/NE101_wifi_connect.png)
+![设备管理界面概览](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/quick-start/NE101_web.png)
 
 ### 核心功能配置
 
 #### 图像采集设置
 
-![实时画面预览](/img/NE101_web_cam.png)
+![实时画面预览](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/quick-start/NE101_web_cam.png)
 
 **关键参数**：
 
@@ -76,11 +76,11 @@ NE100系列是专为物联网应用设计的高性能智能相机产品线，其
   - 图像调节：亮度/对比度/饱和度（使用USB模组时无该选项）
   - 画面镜像功能（使用USB模组时无该选项）
 
-![图像调节界面](/img/NE101_web_ImageAdjustment.png)
+![图像调节界面](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/quick-start/NE101_web_ImageAdjustment.png)
 
 #### 拍摄计划配置
 
-![拍摄设置界面](/img/NE101_web_cap_setting.png)
+![拍摄设置界面](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/quick-start/NE101_web_cap_setting.png)
 
 **工作模式**：
 
@@ -91,7 +91,7 @@ NE100系列是专为物联网应用设计的高性能智能相机产品线，其
 
 #### 网络与数据
 
-![网络连接界面](/img/NE101_web_WLANConnection.png)
+![网络连接界面](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/quick-start/NE101_web_WLANConnection.png)
 
 **网络测试(串口连接)**：
 
@@ -100,7 +100,7 @@ NE100系列是专为物联网应用设计的高性能智能相机产品线，其
 ping www.example.com -c 4
 ```
 
-![网络测试示意图](/img/NE101_ping.png)
+![网络测试示意图](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/quick-start/NE101_ping.png)
 
 **数据上报**：
 
@@ -108,8 +108,8 @@ ping www.example.com -c 4
 2. 使用MQTTX工具验证数据流
 3. 查看上报状态
 
-![数据上报配置界面](/img/NE101_web_DataReport.png)
-![MQTT数据流示例](/img/NE101_MQTT.png)
+![数据上报配置界面](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/quick-start/NE101_web_DataReport.png)
+![MQTT数据流示例](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/quick-start/NE101_MQTT.png)
 
 **MQTTX使用说明：**
 
@@ -172,7 +172,7 @@ ping www.example.com -c 4
 3. 确认图像质量（分辨率/曝光/对焦）
 4. 验证数据上传（服务器接收确认，确认接收图像是否正常）
 
-![抓拍成功提示](/img/NE101_cap_success.png)
+![抓拍成功提示](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/quick-start/NE101_cap_success.png)
 
 ## 设备工作模式详解
 
@@ -192,6 +192,6 @@ ping www.example.com -c 4
 - **设备信息**：在管理界面上可以查看MAC地址/固件版本
 - **无线升级**：管理界面上支持OTA固件更新
 
-![OTA升级界面](/img/NE101_ota.png)
+![OTA升级界面](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/quick-start/NE101_ota.png)
 
 > **技术支持**：首次使用建议完成全功能测试。

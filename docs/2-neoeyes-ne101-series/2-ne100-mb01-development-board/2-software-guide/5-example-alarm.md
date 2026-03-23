@@ -62,7 +62,7 @@ tags: [NE101 系列, 报警触发, 问题排查, 硬件方案, 示例代码]
 *   此操作需要焊接工具和一定的硬件操作经验。
 *   **警告**：修改后，GPIO 2 将同时连接到 PIR 接口和 Alarm 接口。请确保不同时接入 PIR 传感器和 Alarm 按钮，否则两者信号会互相干扰，甚至导致短路或误触发。
 
-![ne101-alarm](/img/ne101-alarm.png)
+![ne101-alarm](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/software-guide/example-alarm/ne101-alarm.png)
 
 ## 固件配置确认
 

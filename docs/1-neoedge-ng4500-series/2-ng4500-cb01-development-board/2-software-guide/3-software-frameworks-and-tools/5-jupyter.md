@@ -9,7 +9,7 @@ tags: [JupyterLab, Jetson Orin, 开发环境, Python, 边缘计算]
 
 **JupyterLab** 是一个基于 Web 的下一代交互式开发环境，支持 Python、数据可视化与 AI 应用开发，非常适合 Jetson 平台使用。
 
-![overview](/img/jupyter_overview.png)
+![overview](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/software-frameworks-and-tools/jupyter/jupyter_overview.png)
 
 ---
 
@@ -84,7 +84,7 @@ jupyter-lab --ip=0.0.0.0 --port=8888 --no-browser
 http://<Jetson-IP>:8888/lab
 ```
 
-![jupyter_lab](/img/jupyter_lab.png)
+![jupyter_lab](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/software-frameworks-and-tools/jupyter/jupyter_lab.png)
 
 ---
 

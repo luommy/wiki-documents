@@ -68,7 +68,7 @@ Execute the following command to start `jtop` ：
 jtop
 ```
 
-![jtop](/img/jtop.gif)
+![jtop](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/software-frameworks-and-tools/jtop/jtop.gif)
 
 The interface provides multiple views, navigable via arrow keys or the`Tab` key：
 

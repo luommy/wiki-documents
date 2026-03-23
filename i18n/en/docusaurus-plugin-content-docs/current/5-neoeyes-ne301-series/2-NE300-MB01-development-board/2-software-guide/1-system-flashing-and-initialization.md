@@ -21,17 +21,17 @@ The mainboard contains two MCUs： **stm32n6** and **stm32u0**
 1. Toggle DIP switch **#2** to ON to enter flashing mode. After flashing, switch it back and power-cycle (or press **Reset**) to boot into runtime mode.
 
    <p align="center">
-     <img src="/img/ne301/development-board/software-guide/sys-flash/flash-mode.png" alt="DIP switch for flashing" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
+     <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/software-guide/system-flashing-and-initialization/flash-mode.png" alt="DIP switch for flashing" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
    </p>
 2. Use the **4-pin adapter cable** to connect the **ST-Link** to the board's **DEBUG** header, then plug ST-Link into the PC.
 
    <p align="center">
-     <img src="/img/ne301/development-board/software-guide/sys-flash/st-link.png" alt="ST-Link wiring" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
+     <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/software-guide/system-flashing-and-initialization/st-link.png" alt="ST-Link wiring" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
    </p>
 3. Connect the board to the PC or a power adapter via USB Type-C.
 
    <p align="center">
-     <img src="/img/ne301/development-board/software-guide/sys-flash/type-c.png" alt="Type-C power" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
+     <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/software-guide/system-flashing-and-initialization/type-c.png" alt="Type-C power" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
    </p>
 
    The on-board **DEBUG LED stays solid** to indicate flashing mode.
@@ -43,12 +43,12 @@ The mainboard contains two MCUs： **stm32n6** and **stm32u0**
 1. Use the **3-pin Dupont cable** to connect the **ST-Link** directly to the **STM32U0** header, then attach ST-Link to the PC.
 
    <p align="center">
-     <img src="/img/ne301/development-board/software-guide/sys-flash/u0.png" alt="STM32U0 wiring" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
+     <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/software-guide/system-flashing-and-initialization/u0.png" alt="STM32U0 wiring" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
    </p>
 2. Connect the board to the PC or power adapter via USB Type-C.
 
    <p align="center">
-     <img src="/img/ne301/development-board/software-guide/sys-flash/connect.png" alt="Power connection" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
+     <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/software-guide/system-flashing-and-initialization/connect.png" alt="Power connection" style={{width:'100%', maxWidth:'520px', borderRadius:'8px'}} />
    </p>
 
 ### Download Firmwares

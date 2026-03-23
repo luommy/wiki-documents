@@ -20,39 +20,39 @@ This chapter mainly helps you to use NG4500 series products quickly.
   
   1. Unbox it and confirm that there is no defect in the appearance of the device;
   
-  ![](/img/NG45XX_SOFTWARE/Quickstart/NG4500_QucikStart1.png)
+  ![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/quick-start/NG4500_QucikStart1.png)
   
   2. Remove the back cover;
   
-  ![](/img/NG45XX_SOFTWARE/Quickstart/NG4500_QucikStart2.png)
+  ![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/quick-start/NG4500_QucikStart2.png)
   
   3. Mount the SSD in the M.2 Key M PCIex4 interface of J11 (recommended), or the M.2 Key M PCIex1 interface of J13;
   
-  ![](/img/NG45XX_SOFTWARE/Quickstart/NG4500_QucikStart3.png)
+  ![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/quick-start/NG4500_QucikStart3.png)
   
   4. Mount the Wi-Fi & BT module to the M.2 Key E 2230 of J19 and connect it to the external antenna (Optional);
   
-  ![](/img/NG45XX_SOFTWARE/Quickstart/NG4500_QucikStart4.png)
+  ![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/quick-start/NG4500_QucikStart4.png)
   
   5. Mount the 4G/5G module to the M.2 Key B 2242 of J15, insert the SIM card into the SIM card slot of J18, and connect it to the external antenna (Optional);
   
-  ![](/img/NG45XX_SOFTWARE/Quickstart/NG4500_QucikStart5.png)
+  ![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/quick-start/NG4500_QucikStart5.png)
   
   6. Fix RTC Battery CR1220 to the Holder of BT1 (Optional);
   
-  ![](/img/NG45XX_SOFTWARE/Quickstart/NG4500_QucikStart6.png)
+  ![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/quick-start/NG4500_QucikStart6.png)
   
   7. Installing the core module, first insert the gold finger end into the J1 slot at a 45° angle. Then, press the module downward by hand until the metal locks on both sides automatically engage to ensure secure installation. To remove the module, release the metal locks on both sides first, and then pull the module out.
   
-  ![](/img/NG45XX_SOFTWARE/Quickstart/NG4500_QucikStart8.png)
+  ![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/quick-start/NG4500_QucikStart8.png)
   
   8. After confirming that the installation is complete, re-lock the back cover;
   
-  ![](/img/NG45XX_SOFTWARE/Quickstart/NG4500_QucikStart7.png)
+  ![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/quick-start/NG4500_QucikStart7.png)
   
   9. The diagram below presents an exploded view of the device structure.
   
-  ![](/img/NG45XX_SOFTWARE/Quickstart/NG4500_QucikStart9.png)
+  ![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/quick-start/NG4500_QucikStart9.png)
   
   10. Use the HDMI interface to connect to an external monitor;
   
@@ -86,23 +86,23 @@ After confirming that the device has completed firmware flashing, power on the N
 
 1. Click `Accept License Agreement`, then click next step;
 
-![](/img/NG45XX_SOFTWARE/Driver/NG45XX_System_Configuration_Licenses_1.png)
+![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/quick-start/NG45XX_System_Configuration_Licenses_1.png)
 
 2. Select language, then click next step;
 
-![](/img/NG45XX_SOFTWARE/Driver/NG45XX_System_Configuration_Language_1.png)
+![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/quick-start/NG45XX_System_Configuration_Language_1.png)
 
 3. Set up the keyboard layout, then click next step;
 
-![](/img/NG45XX_SOFTWARE/Driver/NG45XX_System_Configuration_Keyboard_1.png)
+![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/quick-start/NG45XX_System_Configuration_Keyboard_1.png)
 
 4. Set up time zone（for example：`Asia/Shanghai`）, then click next step;
 
-![](/img/NG45XX_SOFTWARE/Driver/NG45XX_System_Configuration_Local_1.png)
+![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/quick-start/NG45XX_System_Configuration_Local_1.png)
 
 5. Set up “your name” and “password”, then click next step;
 
-![](/img/NG45XX_SOFTWARE/Driver/NG45XX_System_Configuration_1.png)
+![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/quick-start/NG45XX_System_Configuration_1.png)
 
 6. Finally, wait for the system installation and restart.
 
@@ -127,7 +127,7 @@ sudo jtop
 
 After running, as shown in the screenshot below, use the keyboard to check the resource usages of the current Jetson device, including CPU, memory, GPU, disk, fan, etc., and confirm the versions of TensorRT, CUDA, etc. currently installed on the system.
 
-![](/img/NG45XX_SOFTWARE/Driver/NG45XX_JTOP.png)
+![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/quick-start/NG45XX_JTOP.png)
 
 ## Model Deployment
 
@@ -152,7 +152,7 @@ The introduction of how to deploy and run the NanoOWL real-time visual reasoning
 
 1. Connect the IMX219 camera to the device (Note: Please ensure that the metal piece of the camera cable is facing upwards).
    
-   ![](/img/NG45XX_SOFTWARE/NG45XX_IMX219.png)
+   ![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/quick-start/NG45XX_IMX219.png)
 
 2. Please follow the steps below to install the required dependencies to ensure the model runs properly.
 
@@ -247,4 +247,4 @@ ls /dev/video*
      - [a face [a nose, an eye, a mouth]]
      - [a table [a keyboard, a pen, a mouse]]
 
-![](/img/NG45XX_SOFTWARE/Driver/NG45XX_Quickstart_NanoOWL.png)
+![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/quick-start/NG45XX_Quickstart_NanoOWL.png)

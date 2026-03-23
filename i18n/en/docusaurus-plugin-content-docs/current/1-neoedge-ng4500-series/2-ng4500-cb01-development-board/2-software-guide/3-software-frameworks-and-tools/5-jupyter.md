@@ -9,7 +9,7 @@ tags: [JupyterLab, AI Development, Python, Web IDE, Jetson Orin]
 
 **JupyterLab** is a next-generation, web-based interactive development environment that supports Python, data visualization, and AI application development. It is especially well-suited for use on the Jetson platform. This guide provides step-by-step instructions on how to install, launch, and configure JupyterLab on Jetson.
 
-![overview](/img/jupyter_overview.png)
+![overview](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/software-frameworks-and-tools/jupyter/jupyter_overview.png)
 
 ---
 
@@ -86,7 +86,7 @@ Launch a web browser and navigate to the following address:
 http://<Jetson-IP>:8888/lab
 ```
 
-![jupyter_lab](/img/jupyter_lab.png)
+![jupyter_lab](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/software-frameworks-and-tools/jupyter/jupyter_lab.png)
 
 ---
 

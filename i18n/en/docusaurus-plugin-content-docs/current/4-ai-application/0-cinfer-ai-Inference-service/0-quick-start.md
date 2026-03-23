@@ -6,7 +6,7 @@ tags: [Cinfer, AI Inference, ONNX Models, Docker, Quick Start]
 
 # Quick Start
 
-![Cinfer CamThink AI Inference Service](/img/Cinfer/cinfer-home.png)
+![Cinfer CamThink AI Inference Service](https://resources.camthink.ai/wiki/img/ai-application/cinfer-ai-Inference-service/quick-start/cinfer-home.png)
 ## Introduction
 Cinfer is a general-purpose Vision AI inference software by CamThink, open to the developer community. It supports deploying Vision AI inference services, provides model management, and exposes standard OpenAPI services. It is suitable for integrating as an image recognition AI component in vision application development, allowing you to call various models for image recognition. It is lightweight and simple, making it ideal for quickly adding models for deployment and project integration.
 
@@ -39,7 +39,7 @@ Clone the project locally
 ```bash
 git clone https://github.com/camthink-ai/cinfer.git
 ```
-![Cinfer CamThink AI Inference Service](/img/Cinfer/git-clone.png)
+![Cinfer CamThink AI Inference Service](https://resources.camthink.ai/wiki/img/ai-application/cinfer-ai-Inference-service/quick-start/git-clone.png)
 After successful installation, enter the project folder
 ```bash
 cd cinfer
@@ -67,7 +67,7 @@ Use the <code>deploy.sh</code> script to install. Run the following command to i
 ./deploy.sh --backend-port 8000 --frontend-port 3000
 ```
 
-![Docker Install](/img/Cinfer/docker-install.png)
+![Docker Install](https://resources.camthink.ai/wiki/img/ai-application/cinfer-ai-Inference-service/quick-start/docker-install.png)
 
 After installation, you can access the service via:
   - Frontend (Local): http://localhost:3000
@@ -79,20 +79,20 @@ After installation, you can access the service via:
 ### Quick Use
 #### 1. Register Super Administrator
 <p>Open a browser and visit ["http://localhost:3000"](http://localhost:3000) to access the frontend project. Enter the initial administrator setup page, set the administrator account and password, then log in to enter the management page.</p>
-![ciner-initialize-account](/img/Cinfer/initialize-account.png)
+![ciner-initialize-account](https://resources.camthink.ai/wiki/img/ai-application/cinfer-ai-Inference-service/quick-start/initialize-account.png)
 #### 2. User Login
 <p>Enter the configured administrator account and password, then click login to enter the system page.</p>
-![ciner-login](/img/Cinfer/login.png)
+![ciner-login](https://resources.camthink.ai/wiki/img/ai-application/cinfer-ai-Inference-service/quick-start/login.png)
 #### 3. Enter the Home Page
 <p>After successful login, you will enter the Dashboard, where you can view the service’s resource usage.</p>
-![ciner-dashboard](/img/Cinfer/dashboard.png)
+![ciner-dashboard](https://resources.camthink.ai/wiki/img/ai-application/cinfer-ai-Inference-service/quick-start/dashboard.png)
 #### 4. View Model Management
 <p>Click the <b>Model Management</b> menu to view the model list. The project currently includes a built-in OCR model. We can further test this model to verify that the service is functioning. First, click the "Publish" button on the right side of this default model to publish it, then create a Token. See the process below.</p>
-![ciner-model-management](/img/Cinfer/model-management.png)
-![ciner-model-management](/img/Cinfer/model-management-push.png)
+![ciner-model-management](https://resources.camthink.ai/wiki/img/ai-application/cinfer-ai-Inference-service/quick-start/model-management.png)
+![ciner-model-management](https://resources.camthink.ai/wiki/img/ai-application/cinfer-ai-Inference-service/quick-start/model-management-push.png)
 #### 5. Create an API Request Token
 <p>Click the <b>Token Management</b> menu to view the token list. External services must obtain a token to request model APIs. Click the "Add" button, fill in the form, and enter the token name. In Model Permissions, select "All Models Selection" from the dropdown to set the models accessible by this token. After setting, click "Save", then click "Copy" in the popup to copy the token.</p>
-![ciner-add-token](/img/Cinfer/add-token.png)
+![ciner-add-token](https://resources.camthink.ai/wiki/img/ai-application/cinfer-ai-Inference-service/quick-start/add-token.png)
 
 ### Service Testing
 
@@ -104,7 +104,7 @@ curl -X 'GET' \
   -H 'x-access-token: YOUR_ACCESS_TOKEN'
 ```
 After a successful request, you can view information about all currently published models. You can further obtain model details through the API below.
-![ciner-model-list](/img/Cinfer/model-list.png)
+![ciner-model-list](https://resources.camthink.ai/wiki/img/ai-application/cinfer-ai-Inference-service/quick-start/model-list.png)
 **Get Model Details**: Next, we will call the model detail API to obtain detailed information. Replace <code>model_id</code> with the model id obtained from the previous list request. Fill in the id of the model you want to view and make the request below.
 ```bash
 curl -X 'GET' \
@@ -113,7 +113,7 @@ curl -X 'GET' \
   -H 'x-access-token: YOUR_ACCESS_TOKEN'
 ```
 Upon success, you can view:
-![ciner-model-info](/img/Cinfer/model-info.png)
+![ciner-model-info](https://resources.camthink.ai/wiki/img/ai-application/cinfer-ai-Inference-service/quick-start/model-info.png)
 
 **Request Model Inference**: Now, using the model detail API, we know the model’s input and output parameters. We can pass an image to request AI inference according to the required inputs and outputs. Below is a test curl. Replace <code>YOUR_ACCESS_TOKEN</code>, set the inputs parameter, fill in the target image URL and other parameters to make an image AI inference request.
 ```bash
@@ -132,14 +132,14 @@ curl -X 'POST' \
   }'
 ```
 As shown below, the API returns the OCR recognition results, including each line of text and the bounding box coordinates relative to the image pixels, which you can draw on your application UI.
-![ciner-model-infer](/img/Cinfer/model-infer.png)
-![ciner-model-infer-draw](/img/Cinfer/model-infer-draw.png)
+![ciner-model-infer](https://resources.camthink.ai/wiki/img/ai-application/cinfer-ai-Inference-service/quick-start/model-infer.png)
+![ciner-model-infer-draw](https://resources.camthink.ai/wiki/img/ai-application/cinfer-ai-Inference-service/quick-start/model-infer-draw.png)
 You have now completed the basic Cinfer tutorial and can start integrating it into your application.
 
 ### Application Development
 #### API Integration
 View the API documentation at http://localhost:8000/docs to integrate with your application.
-![ciner-api-doc](/img/Cinfer/api-doc.png)
+![ciner-api-doc](https://resources.camthink.ai/wiki/img/ai-application/cinfer-ai-Inference-service/quick-start/api-doc.png)
 
 #### BeaverIoT Integration
 BeaverIoT has integrated the Cinfer inference service. See ["Beaveriot Integration"](./3-application-integration/0-beaveriot-integration.md) for details.

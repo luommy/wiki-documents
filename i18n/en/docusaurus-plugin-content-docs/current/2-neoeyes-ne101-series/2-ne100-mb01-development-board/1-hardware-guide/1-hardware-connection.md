@@ -22,7 +22,7 @@
 - PIR Input Connector
 - Expansioin GPIOs, include UART、I2C、SPI、Power Output
 - Boot Button
-![NE10X_Bot_IO_Marker.png](/img/Hardware_Guide/Edge_AI_Camera/HardwareConnection/NE10X_Bot_IO_Marker.png)
+![NE10X_Bot_IO_Marker.png](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/hardware-guide/hardware-connection/NE10X_Bot_IO_Marker.png)
 
 ## **Demo Kit quick start guide**
 

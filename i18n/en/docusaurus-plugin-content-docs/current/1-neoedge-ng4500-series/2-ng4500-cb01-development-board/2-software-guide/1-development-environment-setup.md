@@ -144,7 +144,7 @@ The **Network Configuration** for the AIBOX needs to be completed with the follo
 
 1. Click on the top right corner of the desktop **Ethernet** → select **"Wired Settings"**
 
-![](/img/NG45XX_SOFTWARE/Driver/NG45XX_Setting.png)
+![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/development-environment-setup/NG45XX_Setting.png)
 
 2. In the Network Settings pop-up window, select the current wired network connection.
 
@@ -164,7 +164,7 @@ The **Network Configuration** for the AIBOX needs to be completed with the follo
    
    - Click `Apply` save settings.
 
-![](/img/NG45XX_SOFTWARE/Driver/NG45XX_Setting_Network.png)
+![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/development-environment-setup/NG45XX_Setting_Network.png)
 
 4. When the configuration is complete, reboot the network to apply the new settings.
 
@@ -210,10 +210,10 @@ sudo systemctl start xrdp
 
 3. Click “Connect” and enter your account password.
    
-   ![Remote_Desktop_Login](/img/Remote_Desktop_Login.png)
+   ![Remote_Desktop_Login](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/development-environment-setup/Remote_Desktop_Login.png)
 
 4. The following picture shows that the access is successful:
-   ![Remote_Desktop](/img/Remote_Desktop.png)
+   ![Remote_Desktop](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/development-environment-setup/Remote_Desktop.png)
 
 5.Additional Notes: Resolving Application Crash Issues
 

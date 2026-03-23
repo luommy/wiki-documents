@@ -33,6 +33,12 @@ function extractImages(content) {
     images.add(match[1]);
   }
 
+  // 4. React 组件属性: image: "/img/path" 或 image: '/img/path'
+  const reactPropRegex = /image:\s*["'](\/img\/[^"']+)["']/g;
+  while ((match = reactPropRegex.exec(content)) !== null) {
+    images.add(match[1]);
+  }
+
   return Array.from(images);
 }
 

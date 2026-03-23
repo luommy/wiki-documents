@@ -28,7 +28,7 @@ tags: [Ollama, 大语言模型, Jetson Orin, 边缘计算, AI 推理]
 - 可选的远程访问配置
 - 完整卸载方法
 
-![overview](/img/NG45XX_ollama_overview.png)
+![overview](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/software-guide/software-frameworks-and-tools/ollama/NG45XX_ollama_overview.png)
 
 ---
 

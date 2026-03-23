@@ -15,7 +15,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 ## 产品准备
 在开始前请准备NE101设备、5号AA电池x4、十字螺丝刀x1、以及NE101的相关选配件，例如:Cat-1通讯模块、WiFi-Halow通讯模块，如果你还没有NE101设备，可以通过我们的商城进行获取，请点击[「NE101购买地址」](https://www.camthink.ai)。
 
-![NE101](/img/QuickStart/NE101/ne101_1.png)
+![NE101](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/quick-start/ne101_1.png)
 
 ## 产品使用
 ### 设备开机

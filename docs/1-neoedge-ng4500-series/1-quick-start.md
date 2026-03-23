@@ -20,39 +20,39 @@ tags: [快速入门, 硬件指南, 软件部署, NG4500 系列, 部署指南]
   
   1. 拿到样机后，拆包装后确认样机外观无缺损
   
-  ![](/img/NG45XX_SOFTWARE/Quickstart/NG4500_QucikStart1.png)
+  ![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/quick-start/NG4500_QucikStart1.png)
   
   2. 拆开底部盖板
   
-  ![](/img/NG45XX_SOFTWARE/Quickstart/NG4500_QucikStart2.png)
+  ![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/quick-start/NG4500_QucikStart2.png)
   
   3. 将SSD装配 J11 的M.2 Key M PCIex4 接口（建议），或 J13 的M.2 Key M PCIex1接口
   
-  ![](/img/NG45XX_SOFTWARE/Quickstart/NG4500_QucikStart3.png)
+  ![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/quick-start/NG4500_QucikStart3.png)
   
   4. 将WiFi&BT模组固定到J19的 M.2 Key E 2230，并连接到外接天线（Optional）
   
-  ![](/img/NG45XX_SOFTWARE/Quickstart/NG4500_QucikStart4.png)
+  ![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/quick-start/NG4500_QucikStart4.png)
   
   5. 将4G/5G模组固定到J15的M.2 Key B 2242 ,并将Sim卡插到J18的Sim卡槽 ，并连接到外置天线（Optional）
   
-  ![](/img/NG45XX_SOFTWARE/Quickstart/NG4500_QucikStart5.png)
+  ![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/quick-start/NG4500_QucikStart5.png)
   
   6. 将 RTC Battery CR1220固定到 BT1的 Holder上（Optional）
   
-  ![](/img/NG45XX_SOFTWARE/Quickstart/NG4500_QucikStart6.png)
+  ![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/quick-start/NG4500_QucikStart6.png)
   
   7. 安装核心模组，首先将模组金手指端以45°角插入J1卡槽，然后用手向下按压模组，直到两侧的金属锁扣自动锁定，确保模组牢固安装。如需拆卸模组，需先拨开两侧的金属锁扣，再将模组取出。
   
-  ![](/img/NG45XX_SOFTWARE/Quickstart/NG4500_QucikStart8.png)
+  ![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/quick-start/NG4500_QucikStart8.png)
   
   8. 确认安装完毕后，重新锁好底部盖板
   
-  ![](/img/NG45XX_SOFTWARE/Quickstart/NG4500_QucikStart7.png)   
+  ![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/quick-start/NG4500_QucikStart7.png)   
   
   9. 设备结构的拆解示意图如下所示
   
-  ![](/img/NG45XX_SOFTWARE/Quickstart/NG4500_QucikStart9.png)  
+  ![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/quick-start/NG4500_QucikStart9.png)  
   
   10. HDMI接口连接到外部显示器
   
@@ -86,23 +86,23 @@ tags: [快速入门, 硬件指南, 软件部署, NG4500 系列, 部署指南]
 
 1. 勾选 `接受许可协议`，点击下一步
 
-![](/img/NG45XX_SOFTWARE/Driver/NG45XX_System_Configuration_Licenses_1.png)
+![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/quick-start/NG45XX_System_Configuration_Licenses_1.png)
 
 2. 设置语言，点击下一步
 
-![](/img/NG45XX_SOFTWARE/Driver/NG45XX_System_Configuration_Language_1.png)
+![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/quick-start/NG45XX_System_Configuration_Language_1.png)
 
 3. 设置键盘布局，点击下一步
 
-![](/img/NG45XX_SOFTWARE/Driver/NG45XX_System_Configuration_Keyboard_1.png)
+![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/quick-start/NG45XX_System_Configuration_Keyboard_1.png)
 
 4. 设置时区（例如：`Asia/Shanghai`），点击下一步
 
-![](/img/NG45XX_SOFTWARE/Driver/NG45XX_System_Configuration_Local_1.png)
+![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/quick-start/NG45XX_System_Configuration_Local_1.png)
 
 5. 配置“您的姓名”和“密码”，点击下一步
 
-![](/img/NG45XX_SOFTWARE/Driver/NG45XX_System_Configuration_1.png)
+![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/quick-start/NG45XX_System_Configuration_1.png)
 
 6. 最后，等待系统安装，自动重启
 
@@ -127,7 +127,7 @@ sudo jtop
 
 运行后如下图所示，通过键盘查看当前 Jetson 设备的各种资源使用情况，包括 CPU、内存、GPU、磁盘、风扇等，以及确认目前系统所安装TensorRT、CUDA等版本。
 
-![](/img/NG45XX_SOFTWARE/Driver/NG45XX_JTOP.png)
+![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/quick-start/NG45XX_JTOP.png)
 
 ## 模型部署
 
@@ -152,7 +152,7 @@ sudo jtop
 
 1. 将 IMX219 摄像头连接至设备（注意：请确保摄像头排线的金属片朝上）。
    
-   ![](/img/NG45XX_SOFTWARE/NG45XX_IMX219.png)
+   ![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/quick-start/NG45XX_IMX219.png)
 
 2. 请按照以下步骤安装所需依赖项，以确保模型能够正常运行。
 
@@ -247,4 +247,4 @@ ls /dev/video*
      - [a face [a nose, an eye, a mouth]]
      - [a table [a keyboard, a pen, a mouse]]
 
-![](/img/NG45XX_SOFTWARE/Driver/NG45XX_Quickstart_NanoOWL.png)
+![](https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/quick-start/NG45XX_Quickstart_NanoOWL.png)

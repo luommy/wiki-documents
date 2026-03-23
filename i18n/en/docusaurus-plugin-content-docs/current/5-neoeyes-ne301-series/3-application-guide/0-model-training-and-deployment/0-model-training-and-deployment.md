@@ -225,11 +225,11 @@ Updating the model through the Web UI lets you preview the new model quickly wit
 
 <div style={{display: 'grid', gap: '12px', maxWidth: '520px', margin: '0 auto'}}>
   <figure style={{margin: 0, textAlign: 'center'}}>
-    <img src="/img/ne301/quick-start/ne301-dep.png" alt="NE301 model deployment entry" style={{width: '100%', border: '1px solid #eee', borderRadius: '8px'}} />
+    <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/model-training-and-deployment/model-training-and-deployment/ne301-dep.png" alt="NE301 model deployment entry" style={{width: '100%', border: '1px solid #eee', borderRadius: '8px'}} />
     <figcaption>Model deployment entry</figcaption>
   </figure>
   <figure style={{margin: 0, textAlign: 'center'}}>
-    <img src="/img/ne301/quick-start/model-uploading.png" alt="Model upload area" style={{width: '100%', border: '1px solid #eee', borderRadius: '8px'}} />
+    <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/model-training-and-deployment/model-training-and-deployment/model-uploading.png" alt="Model upload area" style={{width: '100%', border: '1px solid #eee', borderRadius: '8px'}} />
     <figcaption>Model upload area</figcaption>
   </figure>
 </div>
@@ -238,7 +238,7 @@ After the device enables the Wi-Fi AP, open the Web UI and go to **Feature Debug
 
 <div style={{textAlign: 'center'}}>
   <figure style={{display: 'inline-block', margin: 0, textAlign: 'center'}}>
-    <img src="/img/ne301/quick-start/change-model.gif" alt="Model replacement demo" style={{maxWidth: '640px', width: '100%', border: '1px solid #eee', borderRadius: '8px'}} />
+    <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/model-training-and-deployment/model-training-and-deployment/change-model.gif" alt="Model replacement demo" style={{maxWidth: '640px', width: '100%', border: '1px solid #eee', borderRadius: '8px'}} />
     <figcaption>Model replacement demo</figcaption>
   </figure>
 </div>
@@ -247,7 +247,7 @@ Alternatively, open **System Setting → Firmware Upgrade** to upload the model 
 
 <div style={{textAlign: 'center'}}>
   <figure style={{display: 'inline-block', margin: 0, textAlign: 'center'}}>
-    <img src="/img/ne301/quick-start/ne301-ai-model-import.png" alt="Firmware upgrade entry" style={{maxWidth: '640px', width: '100%', border: '1px solid #eee', borderRadius: '8px'}} />
+    <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/model-training-and-deployment/model-training-and-deployment/ne301-ai-model-import.png" alt="Firmware upgrade entry" style={{maxWidth: '640px', width: '100%', border: '1px solid #eee', borderRadius: '8px'}} />
     <figcaption>Firmware upgrade upload page</figcaption>
   </figure>
 </div>
