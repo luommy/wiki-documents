@@ -6,6 +6,12 @@ All notable changes to the CamThink Wiki documentation will be documented in thi
 
 > This changelog reflects updates starting from **2025-12-23**. Major changes prior to this date are not recorded.
 
+## [2026-03-23]
+
+### Added
+- **NE301 Series**: Added comprehensive "NE301 Battery Life Info" documentation with detailed power consumption analysis for WiFi and Cat-1 modes, battery life calculation formulas, temperature impact tables, and real-world application cases (full bilingual support).
+- **Automation**: Implemented automated image upload script with delay functionality for batch processing and image optimization.
+
 ## [2026-03-11]
 
 ### Fixed
