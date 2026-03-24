@@ -84,5 +84,5 @@ The module communicates with the motherboard through the UART interface by J1 in
 
 60*60mm
 <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px', justifyContent: 'center', alignItems: 'center' }}>
-  <img src={useBaseUrl('/img/Hardware_Dev_Resources/Cat_1/cat1PCBA.jpg')} alt="cat1PCBA" style={{ height: '400px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/hardware-dev-resources/cat1-module/cat1PCBA.jpg" alt="cat1PCBA" style={{ height: '400px', objectFit: 'contain', margin: '0 auto' }} />
 </div>

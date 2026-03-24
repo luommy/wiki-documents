@@ -7,8 +7,8 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 The NE100-CM01 is a high-performance development board designed for the NeoEyes series NE101 Vision AI camera. Powered by the ESP32-S3 MCU, it features an ultra-low-power architecture and supports multiple event-triggered image capture modes. This board enables rapid prototyping and customization of IoT camera applications, making it ideal for use cases such as smart agriculture, environmental monitoring, security surveillance, and wildlife observation.
 
 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', justifyContent: 'center', alignItems: 'center' }}>
-  <img src={useBaseUrl('/img/Board/NE100-MB01_1.png')} alt="主板正面" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
-  <img src={useBaseUrl('/img/Board/NE100-MB01_2.png')} alt="主板背面" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/dev-guide/NE100-MB01_1.png" alt="主板正面" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/dev-guide/NE100-MB01_2.png" alt="主板背面" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
 </div>
 
 ## Key Features

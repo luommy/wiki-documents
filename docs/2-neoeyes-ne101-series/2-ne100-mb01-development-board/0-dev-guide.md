@@ -13,8 +13,8 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 NE100-CM01 是为 NeoEyes NE101 系列事件相机设计的高性能开发板。该开发板基于 ESP32-S3 模组，具有超低功耗设计，支持多种触发方式的事件图像采集。此主板能够快速实现物联网相机应用的原型设计和定制化，非常适合智慧农业、环境监测、安防监控和野生动物观察等应用场景。
 
 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', justifyContent: 'center', alignItems: 'center' }}>
-  <img src={useBaseUrl('/img/Board/NE100-MB01_1.png')} alt="主板正面" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
-  <img src={useBaseUrl('/img/Board/NE100-MB01_2.png')} alt="主板背面" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/dev-guide/NE100-MB01_1.png" alt="主板正面" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/dev-guide/NE100-MB01_2.png" alt="主板背面" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
 </div>
 
 ## 核心特性

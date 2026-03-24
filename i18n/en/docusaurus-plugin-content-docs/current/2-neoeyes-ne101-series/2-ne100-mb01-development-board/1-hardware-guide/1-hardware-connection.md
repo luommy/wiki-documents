@@ -1,9 +1,9 @@
-
 # Hardware Connection
+
 ## **Main Board Interfaces Overview**
 
-
 ### Top side Interfaces:
+
 - Type-C for UART and Power Supply
 - MicroSD Slot
 - Reset Button
@@ -12,16 +12,16 @@
 - Uart Port for Debug
 - USB Camera  Connector
 - LED Board Connector
-- Camera Module Interface
-![NE10X_Top_IO_Marker.png](/img/Hardware_Guide\Edge_AI_Camera/HardwareConnection/NE10X_Top_IO_Marker.png)
-
+- FPC Camera Module Connector  
+![NE10X_Top_IO_Marker.png](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/hardware-guide/hardware-connection/NE10X_Top_IO_Marker.png)
 
 ### Bottom side Interfaces:
+
 - Power Input Connector
 - Alarm Input Connector
 - PIR Input Connector
 - Expansioin GPIOs, include UART、I2C、SPI、Power Output
-- Boot Button
+- Boot Button  
 ![NE10X_Bot_IO_Marker.png](https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/ne100-mb01-development-board/hardware-guide/hardware-connection/NE10X_Bot_IO_Marker.png)
 
 ## **Demo Kit quick start guide**
@@ -33,28 +33,45 @@
 - Supply power through the Type-C port or the power connector.
 - After completing the above steps, you may begin the related debugging procedures.
 
-
  **For program and debug, please ref**：[AI Camera System Flashing](../2-software-guide/1-system-flashing-and-initialization.md)
 
 ## **Interfaces description**
 
 ### Peripherals power Ctrl
+
 Before using the camera, ISP, battery level detection, flash, or light sensor, the CAM_PWR pin must be set high to enable their operation. Similarly, the TF_PWR pin must be set high before using the TF card.
-| PIN# | Pin Name | Functions   | Pin Type | Pull Up/Down | Alternate Function |
-| ---- | -------- | ----------- | -------- | ------------ | ------------------ |
-| 16   | CAM_PWR  | GPIO3       | O        | PD 10K       |                    |
-| 35   | TF_PWR   | GPIO42      | O        | PD 100K      |                    |
+
+
+| PIN# | Pin Name | Functions | Pin Type | Pull Up/Down | Alternate Function |
+| ---- | -------- | --------- | -------- | ------------ | ------------------ |
+| 16   | CAM_PWR  | GPIO3     | O        | PD 10K       |                    |
+| 35   | TF_PWR   | GPIO42    | O        | PD 100K      |                    |
+
+
+### USB Camera Connector
+| PIN# | Pin Name  | Functions     | Notes| 
+| ---- | --------- | ------------  | ------------| 
+| 1    | VDD       | Power supply         |Max current 500mA|              
+| 2    | GND       | GND                |Common with signal ground|
+| 3    | DM      | USB Differential (-)      | Needs to match USB2.0|             
+| 4    | DP      | USB Differential (+)      |  Needs to match USB2.0|           
 
 ### PIR GPIOs Defined
-| PIN# | Pin Name | Functions   | Pin Type | Pull Up/Down | Alternate Function |
-| ---- | -------- | ----------- | -------- | ------------ | ------------------ |
-| 1    | VDD      | Power supply| S        |              |                    |
-| 2    | GND      | GND         | S        |              |                    |
-| 3    | Serial_IN| Config Port | I/O/T    |              | GPIO41             |
-| 4    | INT/Dout | AlarmIN     | I/O/T    |              | GPIO2              |
+
+
+| PIN# | Pin Name  | Functions    | Pin Type | Pull Up/Down | Alternate Function |
+| ---- | --------- | ------------ | -------- | ------------ | ------------------ |
+| 1    | VDD       | Power supply | S        |              |                    |
+| 2    | GND       | GND          | S        |              |                    |
+| 3    | Serial_IN | Config Port  | I/O/T    |              | GPIO41             |
+| 4    | INT/Dout  | AlarmIN      | I/O/T    |              | GPIO2              |
+
 
 ### 16Pin GPIOs Expansion
+
 The 16 pins expansion header provide communication interface like uart, I2C,  SPI and GPIOs. Developer can use these interfaces to expand sensor modules like PIR sensor, OLED module as their needed.
+
+
 | PIN# | Pin Name | Functions   | Pin Type | Pull Up/Down | Alternate Function |
 | ---- | -------- | ----------- | -------- | ------------ | ------------------ |
 | 1    | TXD0     | Uart0 TX    | I/O/T    | PU 10K       | GPIO43             |
@@ -74,8 +91,12 @@ The 16 pins expansion header provide communication interface like uart, I2C,  SP
 | 15   | GPIO     | GPIO20      | I/O/T    |              | USB_D+,ADC2_CH9    |
 | 16   | GPIO     | GPIO46      | I/O/T    |              |                    |
 
-### Camera Sensor IOs
+
+### FPC Camera Module Connector
+
 Camera Module OV5640 support 8-bit paralle input interface. The IOs of main board config as below
+
+
 | PIN# | Pin Name  | Functions    | Pin Type | Pull Up/Down | ESP32-S3 PINs |
 | ---- | --------- | ------------ | -------- | ------------ | ------------- |
 | 1    | Null      |              |          |              |               |
@@ -102,39 +123,55 @@ Camera Module OV5640 support 8-bit paralle input interface. The IOs of main boar
 | 22   | CSI_D2    | Data_Bit2    | I        |              | GPIO8         |
 | 23   | Null      |              |          |              |               |
 | 24   | Null      |              |          |              |               |
-> Note: 1. Set the CAM_PWR pin high before use. 
+
+
+> Note: 1. Set the CAM_PWR pin high before use.
 
 ### Flash and Light Sensor IOs
-| PIN# | Pin Name       | Functions    | Pin Type | Pull Up/Down | ESP32-S3 PINs |
-| ---- | -------------- | ------------ | -------- | ------------ | ------------- |
-| 24   | FLASH_LED      | LEDC_PWM     | O        | PD 100K      | GPIO47        |
-| 39   | LIGHT_RESISTOR | ADC          | A        |              | GPIO1         |
+
+
+| PIN# | Pin Name       | Functions | Pin Type | Pull Up/Down | ESP32-S3 PINs |
+| ---- | -------------- | --------- | -------- | ------------ | ------------- |
+| 24   | FLASH_LED      | LEDC_PWM  | O        | PD 100K      | GPIO47        |
+| 39   | LIGHT_RESISTOR | ADC       | A        |              | GPIO1         |
+
+
 > Note: 1. Set the CAM_PWR pin high before use; 2. A light intensity of 0% to 100% corresponds to an output voltage of 0 to 2.5V.
 
 ### TF Card IOs
-| PIN# | Pin Name  | Functions  | Pin Type | Pull Up/Down | ESP32-S3 PINs |
-| ---- | --------- | ---------- | -------- | ------------ | ------------- |
-| 31   | CMD       | SDIO_CMD   | O        | PU 10K       | GPIO38        |
-| 32   | CLK       | SDIO_CLK   | O        | PU 10K       | GPIO39        |
-| 33   | DAT0      | SDIO_DA0   | I        | PU 10K       | GPIO40        |
-| 34   | CD        | SDIO_IRQ   | I        | PU 1M        | GPIO41        |
+
+
+| PIN# | Pin Name | Functions | Pin Type | Pull Up/Down | ESP32-S3 PINs |
+| ---- | -------- | --------- | -------- | ------------ | ------------- |
+| 31   | CMD      | SDIO_CMD  | O        | PU 10K       | GPIO38        |
+| 32   | CLK      | SDIO_CLK  | O        | PU 10K       | GPIO39        |
+| 33   | DAT0     | SDIO_DA0  | I        | PU 10K       | GPIO40        |
+| 34   | CD       | SDIO_IRQ  | I        | PU 1M        | GPIO41        |
+
+
 > Note: 1. Set the TF_PWR pin high before use; 2. Please use MMC 1-bit mode protocol driver; 3. Cannot be used simultaneously with WiFi-Halow and 4G Cat1 modules due to pin conflicts.
 
 ### Other IOs
-| PIN# | Pin Name  | Functions    | Pin Type | Pull Up/Down | ESP32-S3 PINs |
-| ---- | --------- | ------------ | -------- | ------------ | ------------- |
-| 23   | CFG_KEY   | IRQ_IN       | I        | PU 10K       | GPIO21        |
-| 22   | BAT_DET   | ADC          | A        |              | GPIO14        |
+
+
+| PIN# | Pin Name | Functions | Pin Type | Pull Up/Down | ESP32-S3 PINs |
+| ---- | -------- | --------- | -------- | ------------ | ------------- |
+| 23   | CFG_KEY  | IRQ_IN    | I        | PU 10K       | GPIO21        |
+| 22   | BAT_DET  | ADC       | A        |              | GPIO14        |
+
+
 > Note: 1. Before starting battery level detection, the CAM_PWR pin must be set high; 2. The battery level from 0% to 100% corresponds to a voltage range of 1.8 to 3V.
 
 ### Communication Module Pins Header defined
 
-Communication Module is mounted on J11 & J15  Pins Header.  The J11 16 Pins Header provide related signals. The J15 12 Pins Header only for phsical support.
+Communication Module is mounted on J11 & J15  Pins Header.  The J11 16 Pins Header provide related signals. The J15 12 Pins Header only for phsical support.  
 Please note that for IOs sources lack, the IO configuration conflit with some IOs 
 
-### 16 Pins Expansion  Header
+### Expansioin GPIOs(16 Pins)
 
 Detailed information please reference the comparison table.
+
+
 | PIN# | Pin Name   | Functions    | Pin Type | Pull Up/Down | ESP32-S3 PINs          |
 | ---- | ---------- | ------------ | -------- | ------------ | ---------------------- |
 | 1    | VCC_IN     | Power Output | S        |              |                        |
@@ -154,9 +191,11 @@ Detailed information please reference the comparison table.
 | 15   | SPI_CLK    | SPI_CLK      | I/O/T    |              | GPIO39                 |
 | 16   | WIFI_RST   | Reset#low    | I/O/T    |              | GPIO46                 |
 
+
 ### IO Conflict table
 
   If you use the Cat-1 or WiFi-Halow Module,the IOs occupancy by the module should not be used or connected anything on **16 Pins Expansion header**. 
+
 
 | PIN# | Pin Name | Functions   | Cat-1 Module | WiFi-Halow Module |
 | ---- | -------- | ----------- | ------------ | ----------------- |

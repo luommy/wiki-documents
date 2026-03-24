@@ -24,7 +24,7 @@ Camthink Type-C/Type-A 转UART（TTL）通用串口通讯模块。
 ## 采用 CP2102 方案
 
 <div style={{ display: 'flex', justifyContent: 'center', margin: '24px 0' }}>
-  <img src={useBaseUrl('/img/Hardware_Dev_Resources/Serial_Communication_Module/2102.png')} alt="2102" style={{ width: '100%', maxWidth: '500px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/hardware-dev-resources/serial-communication-module/2102.png" alt="2102" style={{ width: '100%', maxWidth: '500px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
 </div>
 
 - 单芯片 Type C（A） 转 UART 数据转换器
@@ -66,14 +66,14 @@ Camthink Type-C/Type-A 转UART（TTL）通用串口通讯模块。
 可通过USB接口连接电脑，通过UART调试NE301开发板，连接示例图如下：
 
 <div style={{ display: 'flex', justifyContent: 'center', margin: '24px 0' }}>
-  <img src={useBaseUrl('/img/Hardware_Dev_Resources/Serial_Communication_Module/serial-communication-moudule.png')} alt="connection" style={{ width: '100%', maxWidth: '500px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/hardware-dev-resources/serial-communication-module/serial-communication-moudule.png" alt="connection" style={{ width: '100%', maxWidth: '500px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
 </div>
 
 > 需注意接线顺序，GND 接 GND，TXD 接 RXD，RXD 接 TXD这种思路。
 
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '24px 0' }}>
-  <img src={useBaseUrl('/img/Hardware_Dev_Resources/Serial_Communication_Module/pin.jpg')} alt="pin" style={{ flex: '1 1 300px', maxWidth: '45%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
-  <img src={useBaseUrl('/img/Hardware_Dev_Resources/Serial_Communication_Module/connection.jpg')} alt="connection" style={{ flex: '1 1 300px', maxWidth: '45%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/hardware-dev-resources/serial-communication-module/pin.jpg" alt="pin" style={{ flex: '1 1 300px', maxWidth: '45%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/hardware-dev-resources/serial-communication-module/connection.jpg" alt="connection" style={{ flex: '1 1 300px', maxWidth: '45%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
 </div>
 
 连接电脑后，需要安装驱动（如已有驱动，可跳过），驱动下载地址：https://www.silabs.com/software-and-tools/usb-to-uart-bridge-vcp-drivers
@@ -96,7 +96,7 @@ Windows 上如果插上设备后设备管理器仍显示未知设备/感叹号�
 NE301开发板调试示例图如下：输入回车可查看相关的控制命令
 
 <div style={{ display: 'flex', justifyContent: 'center', margin: '24px 0' }}>
-  <img src={useBaseUrl('/img/Hardware_Dev_Resources/Serial_Communication_Module/data.png')} alt="data" style={{ width: '100%', maxWidth: '700px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/hardware-dev-resources/serial-communication-module/data.png" alt="data" style={{ width: '100%', maxWidth: '700px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
 </div>
 
 - 上电后看到 AICAM> 即表示 CLI 就绪；输入 help 或 ? 可查看当前固件实际注册的命令。
@@ -117,7 +117,7 @@ NE301开发板调试示例图如下：输入回车可查看相关的控制命令
 - `nn`：查看神经网络相关配置。
 
 <div style={{ display: 'flex', justifyContent: 'center', margin: '24px 0' }}>
-  <img src={useBaseUrl('/img/Hardware_Dev_Resources/Serial_Communication_Module/nn.png')} alt="nn" style={{ width: '100%', maxWidth: '700px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/hardware-dev-resources/serial-communication-module/nn.png" alt="nn" style={{ width: '100%', maxWidth: '700px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
 </div>
 
 - 命令行内置：`Custom/Common/Utils/generic_cmdline.c`

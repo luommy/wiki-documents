@@ -87,5 +87,5 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 - **Dimensions**: 42.0 mm (L) × 30.0 mm (W) × 2.3 mm (H)  
 - **Mounting Holes**: 4 × M2 threaded holes - recommend thermal pad for heat dissipation
 <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px', justifyContent: 'center', alignItems: 'center' }}>
-  <img src={useBaseUrl('/img/Hardware_Dev_Resources/4G_Module/4G_Module.jpg')} alt="4G_Module" style={{ height: '400px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/hardware-dev-resources/4g-module/4G_Module.jpg" alt="4G_Module" style={{ height: '400px', objectFit: 'contain', margin: '0 auto' }} />
 </div>

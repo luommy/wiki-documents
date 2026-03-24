@@ -73,5 +73,5 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 ---
 
 <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px', justifyContent: 'center', alignItems: 'center' }}>
-  <img src={useBaseUrl('/img/Hardware_Dev_Resources/SSD/SSD_TopView.jpg')} alt="SSD_TopView" style={{ height: '400px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/hardware-dev-resources/ssd/SSD_TopView.jpg" alt="SSD_TopView" style={{ height: '400px', objectFit: 'contain', margin: '0 auto' }} />
 </div>

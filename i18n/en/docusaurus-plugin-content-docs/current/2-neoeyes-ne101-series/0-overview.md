@@ -62,8 +62,8 @@ CamThink Event-triggered Camera NeoEyes NE101 is a low-power consumption camera 
 - **Alam Interface**: 2-pin Wafer supports Alarm input.
 - **PIR Interface**：4-pin wafer connector for PIR sensor integration.
 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', justifyContent: 'center', alignItems: 'center' }}>
-  <img src={useBaseUrl('/img/Board/NE100-MB01_1.png')} alt="主板正面" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
-  <img src={useBaseUrl('/img/Board/NE100-MB01_2.png')} alt="主板背面" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/NE100-MB01_1.png" alt="主板正面" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/NE100-MB01_2.png" alt="主板背面" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
 </div>
 
 ### Communication Expansion Solution
@@ -74,8 +74,8 @@ CamThink Event-triggered Camera NeoEyes NE101 is a low-power consumption camera 
 - **Cat.1 Module Specifications**: Quectel EG912UGL, supports LTE FDD/TDD and GSM（global frequency bands expect for North America）, dimension at 60mm x 60mm.
 - **Wi-Fi HaLow Module Specifications**：Quectel FGH100M, compliant with IEEE 802.11ah protocol, using for long-distance low power consumption scenarios, dimension at 60mm x 60mm.
 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', justifyContent: 'center', alignItems: 'center' }}>
-  <img src={useBaseUrl('/img/Overview/NE101/cat1PCBA.jpg')} alt="Cat-1 PCBA" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
-  <img src={useBaseUrl('/img/Overview/NE101/wifihalow.jpg')} alt="WiFi HaLow PCBA" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/cat1PCBA.jpg" alt="Cat-1 PCBA" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/wifihalow.jpg" alt="WiFi HaLow PCBA" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
 </div>
 
 ### Interchangeable Camera Module
@@ -151,8 +151,8 @@ Note: The USB camera module will occupy extra I/O resources. For details, please
 [「Hardware Guide-Hardware Connection-16Pin GPIO Expansion」](./2-ne100-mb01-development-board/1-hardware-guide/1-hardware-connection.md)
 
 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', justifyContent: 'center', alignItems: 'center' }}>
-  <img src={useBaseUrl('https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/sensor1.png')} alt="Cat-1 PCBA" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
-  <img src={useBaseUrl('https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/sensor2.png')} alt="WiFi HaLow PCBA" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/sensor1.png" alt="Cat-1 PCBA" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/sensor2.png" alt="WiFi HaLow PCBA" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
 </div>
 
 ### Applicability and Deployment
@@ -163,9 +163,9 @@ Note: The USB camera module will occupy extra I/O resources. For details, please
 - **Wireless and Outdoor Deployment Support**: NE101 supports battery power supply, low power consumption operation, combined with IP67 protection design, suitable for long-term deployment in various harsh environments.
 - **Flexible Installations**: NE101 supports various installation methods such as wall mounting, desktop mounting, pole installation, etc., and provides a wide range of original brackets and house extension components to meet various deployment needs. Common bracket specifications and main uses can be found in[Product Accessories-Product Optional Accessories](#Product Optional Accessories).
 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px', justifyContent: 'center', alignItems: 'center' }}>
-  <img src={useBaseUrl('https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/1.png')} alt="bracket" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
-  <img src={useBaseUrl('https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/3.png')} alt="bracket" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
-  <img src={useBaseUrl('https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/5.png')} alt="bracket" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/1.png" alt="bracket" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/3.png" alt="bracket" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/5.png" alt="bracket" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
 </div>
 
 ## Product Information
@@ -175,9 +175,9 @@ Note: The USB camera module will occupy extra I/O resources. For details, please
 NE101 camera specifications:
 
 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px', justifyContent: 'center', alignItems: 'center' }}>
-  <img src={useBaseUrl('https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/NE101.png')} alt="NE101" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
-  <img src={useBaseUrl('/img/Overview/NE101/ProductBL.png')} alt="NE101" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
-  <img src={useBaseUrl('/img/Overview/NE101/ProductR.png')} alt="NE101" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/NE101.png" alt="NE101" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/ProductBL.png" alt="NE101" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/ProductR.png" alt="NE101" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
 </div>
 <table style={{ width: '100%', tableLayout: 'fixed' }}>
   <thead>
@@ -415,7 +415,7 @@ items: [
 {
 title: "Crop Growth Monitoring",
 description: "Through timed shooting or triggering by environmental changes, it records the growth status of crops and supports remote monitoring of crop growth. It can last for more than 3 years when shooting 10 times a day, which is especially suitable for remote farmland scenes.",
-image: useBaseUrl("/img/Overview/NE101/zw.jpg")
+image: "https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/zw.jpg"
 },
 {
 title: "Livestock Behavior Analysis",
@@ -474,13 +474,13 @@ image: "https://cdn.prod.website-files.com/6479eab6eb2ed5e597810e9e/67ed59d05b90
     const examples = [
       {
         title: "AI Facial Recognition",
-        image: useBaseUrl("/img/NE101_example_human_detect_1.png"),
+        image: "https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/NE101_example_human_detect_1.png",
         description: "This example shows how to use NE101 to implement a real-time facial recognition use case. You can replace it with other AI scenarios.",
         path: "human-face-detect"
       },
       {
         title: "Low Power Image Collection",
-        image: useBaseUrl("/img/Overview/NE101/lowpower.png"),
+        image: "https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/lowpower.png",
         description: "NE101 supports low-power working mode and maintains 3 years battery life on the setting of 10 shots per day. Its extendability allows the combination of sensors to capture images based on trigger settings. This project provides complete project engineering source code to support developers' secondary development and expansion capabilities.",
         path: "low-power-image-acquisition"
       }

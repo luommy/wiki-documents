@@ -60,7 +60,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 #### **4. 规格尺寸**  
 <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px', justifyContent: 'center', alignItems: 'center' }}>
-  <img src={useBaseUrl('/img/Hardware_Dev_Resources/USB_Module/USB_Module_Size.png')} alt="USB_Module_Size" style={{ height: '400px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/hardware-dev-resources/usb-camera-module/USB_Module_Size.png" alt="USB_Module_Size" style={{ height: '400px', objectFit: 'contain', margin: '0 auto' }} />
 </div>
 
 

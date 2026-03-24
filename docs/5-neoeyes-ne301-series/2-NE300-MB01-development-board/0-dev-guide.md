@@ -13,8 +13,8 @@ import SupportGrid from '@site/src/components/SupportGrid';
 NE300-MB01是为NeoEyes NE300系列AI相机的高性能开发板。该方案基于STM32U0+STM32N6芯片，具有超低功耗设计，可实现视频推理和图像推理功能，支持各种传感器触发实现图像采集和推理。该主板能够快速实现物联网相机应用的原型设计和定制化，非常适合智慧农业、环境监测、安防监控和野生动物观察等应用场景。
 
 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', justifyContent: 'center', alignItems: 'center' }}>
-  <img src={useBaseUrl('/img/ne301/development-board/dev-guide/board1.png')} alt="主板正面" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
-  <img src={useBaseUrl('/img/ne301/development-board/dev-guide/board2.png')} alt="主板背面" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/dev-guide/board1.png" alt="主板正面" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/dev-guide/board2.png" alt="主板背面" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
 </div>
 
 

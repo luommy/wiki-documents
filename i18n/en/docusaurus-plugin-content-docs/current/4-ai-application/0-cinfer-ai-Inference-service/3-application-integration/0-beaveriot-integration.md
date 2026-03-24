@@ -198,7 +198,7 @@ You need to set the MQTT service address on the NeoEyes NE101 configuration page
 #### 2.1 Obtain MQTT Service Info from MQTT Device Integrated
 ![MQTT Info](https://www.milesight.com/beaver-iot/assets/images/mqtt-integration-configuration-a3c400b1708ef0effb5fb69a060889ff.png)
 #### 2.2 Update MQTT Info on NE101. For detailed hardware configuration instructions, see ["NE101 Quick Start"](../../../2-neoeyes-ne101-series/1-quick-start.md)
-![NE101 Config](/img/QuickStart/NE101/ne101_30.png)
+![NE101 Config](https://resources.camthink.ai/wiki/img/ai-application/cinfer-ai-Inference-service/application-integration/beaveriot-integration/ne101_30.png)
 
 ### Image Recognition
 #### 1. Capture Images Using NeoEyes NE101

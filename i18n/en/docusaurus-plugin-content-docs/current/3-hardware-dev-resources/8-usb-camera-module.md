@@ -59,7 +59,7 @@ This product is a high-performance USB interface camera module, equipped with a 
 
 #### **4. Physical Dimensions**  
 <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px', justifyContent: 'center', alignItems: 'center' }}>
-  <img src={useBaseUrl('/img/Hardware_Dev_Resources/USB_Module/USB_Module_Size.png')} alt="USB_Module_Size" style={{ height: '400px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/hardware-dev-resources/usb-camera-module/USB_Module_Size.png" alt="USB_Module_Size" style={{ height: '400px', objectFit: 'contain', margin: '0 auto' }} />
 </div>
 
 ## Product Introduction

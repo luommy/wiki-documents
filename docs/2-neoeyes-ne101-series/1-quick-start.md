@@ -21,10 +21,10 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 ### 设备开机
 使用螺丝刀拆卸NE101后盖，按照电池仓分布安装电池，等待相机前部的**灯光闪烁亮起**后，表示相机已经**系统启动**，将后盖重新安装回设备，到这里你将完成设备的基本启动，完成后我们可以进行下一步，对设备进行配置。
 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '0px', justifyContent: 'center', alignItems: 'center' }}>
-  <img src={useBaseUrl('/img/QuickStart/NE101/ne101_2.png')} alt="bracket" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
-  <img src={useBaseUrl('/img/QuickStart/NE101/ne101_3.png')} alt="bracket" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
-  <img src={useBaseUrl('/img/QuickStart/NE101/ne101_4.png')} alt="bracket" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
-  <img src={useBaseUrl('/img/QuickStart/NE101/ne101_5.png')} alt="bracket" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/quick-start/ne101_2.png" alt="bracket" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/quick-start/ne101_3.png" alt="bracket" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/quick-start/ne101_4.png" alt="bracket" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/quick-start/ne101_5.png" alt="bracket" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
 </div>
 
 ### 设备配置
@@ -32,7 +32,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 #### 1、保证NE101处于开机状态
 你可以手指轻按一下相机右侧的拍照按钮，查看闪光灯是否亮起，如果亮起说明当前机器处于开机状态，如果你是在调试设备，点击拍照按键NE101将会抓取当前页面图像，并通过你配置的MQTT地址上传图像，如果一切配置正常的话，详细配置修改见下方说明。
 <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px', justifyContent: 'center', alignItems: 'center' }}>
-  <img src={useBaseUrl('/img/QuickStart/NE101/ne101_6.png')} alt="bracket" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/quick-start/ne101_6.png" alt="bracket" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
 </div>
 
 #### 2、开启NE101 WiFi AP 并在手机或电脑上寻找到它
@@ -41,9 +41,9 @@ NE101系统正常启动后，你可以在电脑或手机的WiFi AP列表寻找�
 
 
 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0px', justifyContent: 'center', alignItems: 'center' }}>
-  <img src={useBaseUrl('/img/QuickStart/NE101/ne101_7.gif')} alt="bracket" style={{ height: '400px', objectFit: 'contain', margin: '0 auto' }} />
-  <img src={useBaseUrl('/img/QuickStart/NE101/ne101_9.png')} alt="bracket" style={{ height: '200px', objectFit: 'contain', margin: '0 auto' }} />
-  <img src={useBaseUrl('/img/QuickStart/NE101/ne101_10.png')} alt="bracket" style={{ height: '400px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/quick-start/ne101_7.gif" alt="bracket" style={{ height: '400px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/quick-start/ne101_9.png" alt="bracket" style={{ height: '200px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/quick-start/ne101_10.png" alt="bracket" style={{ height: '400px', objectFit: 'contain', margin: '0 auto' }} />
 </div>
 
 #### 3、进行设备配置
@@ -70,7 +70,7 @@ NE101系统正常启动后，你可以在电脑或手机的WiFi AP列表寻找�
    - 水平翻转：画面水平翻转，用于设备实际安装后成像需要水平翻转时使用
    - 垂直翻转：画面垂直翻转，用于设备实际安装后成像需要垂直翻转时使用
 <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px', justifyContent: 'center', alignItems: 'center' }}>
-  <img src={useBaseUrl('/img/QuickStart/NE101/ne101_11.png')} alt="bracket" style={{ height: '400px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/quick-start/ne101_11.png" alt="bracket" style={{ height: '400px', objectFit: 'contain', margin: '0 auto' }} />
 </div>
 
 **抓图设置**
@@ -81,8 +81,8 @@ NE101系统正常启动后，你可以在电脑或手机的WiFi AP列表寻找�
   
 
 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', justifyContent: 'center', alignItems: 'center' }}>
-  <img src={useBaseUrl('/img/QuickStart/NE101/ne101_12.png')} alt="bracket" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
-  <img src={useBaseUrl('/img/QuickStart/NE101/ne101_13.png')} alt="bracket" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/quick-start/ne101_12.png" alt="bracket" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/quick-start/ne101_13.png" alt="bracket" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
 </div>
 
 - 上传模式：是数据上传的时机，默认为即拍即传，抓图后立即上报数据，可切换为定时上传。
@@ -91,14 +91,14 @@ NE101系统正常启动后，你可以在电脑或手机的WiFi AP列表寻找�
 
 
 <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px', justifyContent: 'center', alignItems: 'center' }}>
-  <img src={useBaseUrl('/img/QuickStart/NE101/ne101_29.png')} alt="bracket" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/quick-start/ne101_29.png" alt="bracket" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
 </div>
 
 - Alarm-In抓图：开启功能后支持，硬件主板背部的Alarm-In座子输入信号用于图像抓拍。
   
 
 <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px', justifyContent: 'center', alignItems: 'center' }}>
-  <img src={useBaseUrl('/img/QuickStart/NE101/ne101_18.png')} alt="bracket" style={{ height: '400px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/quick-start/ne101_18.png" alt="bracket" style={{ height: '400px', objectFit: 'contain', margin: '0 auto' }} />
 </div>
 
 
@@ -106,7 +106,7 @@ NE101系统正常启动后，你可以在电脑或手机的WiFi AP列表寻找�
   
   
 <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px', justifyContent: 'center', alignItems: 'center' }}>
-  <img src={useBaseUrl('/img/QuickStart/NE101/ne101_19.png')} alt="bracket" style={{ height: '400px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/quick-start/ne101_19.png" alt="bracket" style={{ height: '400px', objectFit: 'contain', margin: '0 auto' }} />
 </div>
 
 
@@ -124,7 +124,7 @@ NE101系统正常启动后，你可以在电脑或手机的WiFi AP列表寻找�
 - Client Certificate：将MQTTS客户端的证书进行上传，用于验证客户端身份。
 - Client Key：将MQTTS客户端的私钥进行上传，用于加密通信。
 <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px', justifyContent: 'center', alignItems: 'center' }}>
-  <img src={useBaseUrl('/img/QuickStart/NE101/ne101_30.png')} alt="bracket" style={{ height: '400px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/quick-start/ne101_30.png" alt="bracket" style={{ height: '400px', objectFit: 'contain', margin: '0 auto' }} />
 </div>
 
 
@@ -138,7 +138,7 @@ NE101系统正常启动后，你可以在电脑或手机的WiFi AP列表寻找�
 - 固件版本：当前硬件装载的固件版本。
 - 固件更新：点击下方的Browse按钮，可以选择电脑或手机的文件，选取需要升级的镜像文件后，可以点击Upgrade按钮上传进行镜像更新，需要注意**设备更新完成后需要刷新Web页，少数情况需要重新连接NE101的WiFi AP**
 <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px', justifyContent: 'center', alignItems: 'center' }}>
-  <img src={useBaseUrl('/img/QuickStart/NE101/ne101_14.png')} alt="bracket" style={{ height: '400px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/quick-start/ne101_14.png" alt="bracket" style={{ height: '400px', objectFit: 'contain', margin: '0 auto' }} />
 </div>
 
 
@@ -146,7 +146,7 @@ NE101系统正常启动后，你可以在电脑或手机的WiFi AP列表寻找�
 >NE101的网络连接设置，根据所选的通讯方案设置内容有所差异，主要有**WiFi、Cat-1、WiFi-Halow**3种通讯方案可设置，下方详细说明这些通讯方案的设置与使用。
 - **WiFi设置**：NE101标准版本自带WiFi，WiFi版本下，可在配置界面中查看当前范围内可检索到的WiFi信号，你可以根据所需连接的WiFi进行选择设置，设备会自动记录WiFi的SSID和密码，如果重复设置NE101连接的WiFi则设备存储的SSID和密码始终是最近一次的。
 <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px', justifyContent: 'center', alignItems: 'center' }}>
-  <img src={useBaseUrl('/img/QuickStart/NE101/ne101_13.png')} alt="bracket" style={{ height: '400px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/quick-start/ne101_13.png" alt="bracket" style={{ height: '400px', objectFit: 'contain', margin: '0 auto' }} />
 </div>
 - **Cat-1网络设置**：NE101 Cat-1版本支持进行网络的设置，你需要有所在地区可用的sim卡，当前NE101 Cat-1版本支持除北美地区以外的其他地区使用，下方将会说明如何进行Cat-1网络设置。
    - 使用螺丝刀打开NE101的设备前盖。
@@ -157,18 +157,18 @@ NE101系统正常启动后，你可以在电脑或手机的WiFi AP列表寻找�
    会变为connect状态，说明网络正常，然后点击save保存信息。
    - 你可以通过Details按钮来查看网络的详细信息，显示信息可以参考下方图像。
 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '0px', justifyContent: 'center', alignItems: 'center' }}>
-  <img src={useBaseUrl('/img/QuickStart/NE101/ne101_21.png')} alt="bracket" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
-  <img src={useBaseUrl('/img/QuickStart/NE101/ne101_20.png')} alt="bracket" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
-  <img src={useBaseUrl('/img/QuickStart/NE101/ne101_23.png')} alt="bracket" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
-  <img src={useBaseUrl('/img/QuickStart/NE101/ne101_22.png')} alt="bracket" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/quick-start/ne101_21.png" alt="bracket" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/quick-start/ne101_20.png" alt="bracket" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/quick-start/ne101_23.png" alt="bracket" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/quick-start/ne101_22.png" alt="bracket" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
 </div>
 
 
 - **WiFi Halow网络设置**：NE101 WiFi-Halow版本支持进行网络设置，可以通过Refresh按钮刷新当前的WiFi-Halow网关信号，Region下拉选择对应的区域频段，找对所需要的WiFi-Halow SSID进行连接。
 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0px', justifyContent: 'center', alignItems: 'center' }}>
-  <img src={useBaseUrl('/img/QuickStart/NE101/ne101_24.png')} alt="bracket" style={{ height: '200px', objectFit: 'contain', margin: '0 auto' }} />
-  <img src={useBaseUrl('/img/QuickStart/NE101/ne101_25.png')} alt="bracket" style={{ height: '200px', objectFit: 'contain', margin: '0 auto' }} />
-  <img src={useBaseUrl('/img/QuickStart/NE101/ne101_26.png')} alt="bracket" style={{ height: '200px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/quick-start/ne101_24.png" alt="bracket" style={{ height: '200px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/quick-start/ne101_25.png" alt="bracket" style={{ height: '200px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/quick-start/ne101_26.png" alt="bracket" style={{ height: '200px', objectFit: 'contain', margin: '0 auto' }} />
 </div>
 
 ### 设备调试
@@ -250,7 +250,7 @@ NE101系统正常启动后，你可以在电脑或手机的WiFi AP列表寻找�
 即可在MQTTX中接收到设备发送给服务器的MQTTS数据，如下图所示：
 
 <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px', justifyContent: 'center', alignItems: 'center' }}>
-  <img src={useBaseUrl('/img/QuickStart/NE101/ne101_31.png')} alt="bracket" style={{ height: '400px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/quick-start/ne101_31.png" alt="bracket" style={{ height: '400px', objectFit: 'contain', margin: '0 auto' }} />
 </div>
 
 #####  可视化建议
@@ -264,7 +264,7 @@ NE101系统正常启动后，你可以在电脑或手机的WiFi AP列表寻找�
 也可以将image字段中引号包裹的 Base64 数据粘贴至 [Base64图像查看器](https://base64.guru/converter/decode/image) 进行在线预览。
 
 <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px', justifyContent: 'center', alignItems: 'center' }}>
-  <img src={useBaseUrl('/img/QuickStart/NE101/base64.png')} alt="bracket" style={{ height: '400px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/quick-start/base64.png" alt="bracket" style={{ height: '400px', objectFit: 'contain', margin: '0 auto' }} />
 </div>
 
 ### 设备重置
@@ -276,14 +276,14 @@ NE101系统正常启动后，你可以在电脑或手机的WiFi AP列表寻找�
 ### 底部支架扩展件
 找到NE101侧面的螺丝孔，将支架与设备对齐，对齐后使用螺丝进行固定，固定完成后可以旋转支架调整角度，将支架底部与需要固定安装的位置进行螺丝打孔固定。
 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0px', justifyContent: 'center', alignItems: 'center' }}>
-  <img src={useBaseUrl('/img/Overview/NE101/Bracket/1.png')} alt="bracket" style={{ height: '400px', objectFit: 'contain', margin: '0 auto' }} />
-   <img src={useBaseUrl('/img/QuickStart/NE101/ne101_27.png')} alt="bracket" style={{ height: '400px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/quick-start/1.png" alt="bracket" style={{ height: '400px', objectFit: 'contain', margin: '0 auto' }} />
+   <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/quick-start/ne101_27.png" alt="bracket" style={{ height: '400px', objectFit: 'contain', margin: '0 auto' }} />
 </div>
 
 
 ### 背部支架扩展件
 找到NE101侧面的螺丝孔，将支架与设备对齐，对齐后使用螺丝进行固定，找到需要壁挂安装的位置，将支架左右两侧的螺丝孔进行螺丝固定安装。
 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0px', justifyContent: 'center', alignItems: 'center' }}>
-  <img src={useBaseUrl('/img/Overview/NE101/Bracket/3.png')} alt="bracket" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
-  <img src={useBaseUrl('/img/QuickStart/NE101/ne101_28.png')} alt="bracket" style={{ height: '400px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/quick-start/3.png" alt="bracket" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/quick-start/ne101_28.png" alt="bracket" style={{ height: '400px', objectFit: 'contain', margin: '0 auto' }} />
 </div>
