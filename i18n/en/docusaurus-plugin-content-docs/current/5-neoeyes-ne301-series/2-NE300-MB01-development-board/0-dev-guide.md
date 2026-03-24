@@ -15,8 +15,8 @@ import SupportGrid from '@site/src/components/SupportGrid';
 NE300-MB01 is the high-performance development board that powers the NeoEyes NE300 series AI cameras. The reference design combines STM32U0 + STM32N6 MCUs with an ultra-low-power architecture capable of both video and still-image inference. It supports a wide set of trigger sensors for image capture and edge AI pipelines, enabling developers to quickly build proofs of concept and custom IoT camera applications spanning smart agriculture, environmental monitoring, security, and wildlife observation.
 
 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', justifyContent: 'center', alignItems: 'center' }}>
-  <img src={useBaseUrl('https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/dev-guide/board1.png')} alt="Development board front" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
-  <img src={useBaseUrl('https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/dev-guide/board2.png')} alt="Development board back" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/dev-guide/board1.png" alt="Development board front" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/dev-guide/board2.png" alt="Development board back" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
 </div>
 
 ## Key Features

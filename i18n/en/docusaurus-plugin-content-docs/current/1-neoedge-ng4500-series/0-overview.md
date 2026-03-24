@@ -25,19 +25,19 @@ NeoEdge NG4500 series supports NVIDIA® Super Mode, it achieves significant perf
   {[
     {
       title: 'Large Language Models',
-      imageSrc: useBaseUrl('https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/overview/LLM.png'),
+      imageSrc: "https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/overview/LLM.png",
       altText: 'LLM performance boost',
       description: 'LLM performance improvement on NVIDIA Super Developer Kit',
     },
     {
       title: 'Vision Language Models',
-      imageSrc: useBaseUrl('https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/overview/VLM.png'),
+      imageSrc: "https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/overview/VLM.png",
       altText: 'VLM performance boost',
       description: 'VLM performance improvement on  NVIDIA Super Developer Kit',
     },
     {
       title: 'Vision Transformers',
-      imageSrc: useBaseUrl('https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/overview/Vision.png'),
+      imageSrc: "https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/overview/Vision.png",
       altText: 'ViT performance boost',
       description: 'ViT performance improvement on NVIDIA Super Developer Kit',
     }
@@ -75,7 +75,7 @@ NeoEdge NG4500 series supports NVIDIA® Super Mode, it achieves significant perf
 - Pre-install **NVIDIA® JetPack 6.0+ SDK**, including the complete development environment of CUDA, cuDNN, TensorRT, DeepStream, etc. For system features, see [**Jetpack SDK 6.0**](https://developer.nvidia.com/embedded/jetpack-sdk-60). For system programming tutorials, please refer to the[**「System Programming Guide」**](./2-ng4500-cb01-development-board/2-software-guide/0-system-flashing-and-initialization.md)。
 - Supports various mainstream AI frameworks and inference service deployments: TensorFlow/Keras, PyTorch, ONNX Runtime, TensorRT, Ollama, llama.cpp, VLLM, ultralytics, etc.
 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px' }}>
-  <img src={useBaseUrl("https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/overview/Jetpack.png")} style={{ maxHeight: '300px' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/overview/Jetpack.png" style={{ maxHeight: '300px' }} />
 </div>
 
 ### Rich Hardware Interfaces
@@ -88,8 +88,8 @@ NeoEdge NG4500 series supports NVIDIA® Super Mode, it achieves significant perf
 - **3.5mm audio interface**：supports microphone input, voice output.
 - **6×SMA antenna interface**: supports external high-gain antenna.
 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', justifyContent: 'center', alignItems: 'center' }}>
-  <img src={useBaseUrl("https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/overview/Product2.png")} style={{ maxHeight: '300px', width: '100%', objectFit: 'contain' }} />
-  <img src={useBaseUrl("https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/overview/Product1.png")} style={{ maxHeight: '300px', width: '100%', objectFit: 'contain' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/overview/Product2.png" style={{ maxHeight: '300px', width: '100%', objectFit: 'contain' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/overview/Product1.png" style={{ maxHeight: '300px', width: '100%', objectFit: 'contain' }} />
 </div>
 
 
@@ -99,7 +99,7 @@ NeoEdge NG4500 series supports NVIDIA® Super Mode, it achieves significant perf
 - **Compact and sturdy structure**: NG4500 measures at 160mm × 125mm × 75mm with metal casing. It supports multiple installation methods such as **desktop, wall mounting, and DIN-rail installation**.
 - **Environmental adaptability**: **It adopts a fanless design for passive cooling. Wide temperature supported**. Operating temperature ranges from -25°C to 60°C, storage temperature ranges from -40°C to 85°C, adaptable to various industrial environments.
 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px' }}>  
-  <img src={useBaseUrl("https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/overview/Product3.png")} style={{ maxHeight: '300px' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/overview/Product3.png" style={{ maxHeight: '300px' }} />
 </div>
 
 
@@ -429,32 +429,32 @@ Product casing and bracket dimension instruction：
     const examples = [
       { 
         title: "LLM Chatbot", 
-        image: useBaseUrl("https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/overview/OpenWebUI.png"), 
+        image: "https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/overview/OpenWebUI.png", 
         description: "This guide introduce how to use Ollama(lightweight inference engine) to locally deploy DeepSeek-R1 LLM on NVIDIA Jetson Orin devices, realizing offline AI interaction. Easy configuration with high efficiency.", 
         path: "deepseek-r1"
       },
       { 
         title: "Pose Estimation", 
-        image: useBaseUrl("https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/overview/Pose.png"), 
+        image: "https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/overview/Pose.png", 
         description: "This article describes how to use MediaPipe to run real-time pose estimation on the Jetson Orin platform (Nano / NX / AGX), enabling GPU acceleration where supported.", 
         path: "mediapipe"
       },
       { 
         title: "YoLo Object Detection", 
-        image: useBaseUrl("https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/overview/ObjectDetection.png"), 
+        image: "https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/overview/ObjectDetection.png", 
         description: "This tutorial will guide you on how to deploy a YOLOv11 model on the NVIDIA Jetson Orin platform and leverage TensorRT for inference acceleration. Through this process, you will be able to efficiently run YOLOv11 on Jetson Orin for real-time object detection.", 
         path: "object-detection"
       },
       { 
         title: "Dinov3", 
-        image: useBaseUrl("https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/overview/dinov3.png"), 
+        image: "https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/overview/dinov3.png", 
         description: "Meta open-source general vision fundamental model, including the complete pre-trained main network, adapter, training, and evaluation code. It can be directly applied to various mainstream vision tasks such as classification, retrieval, depth estimation, and object detection without fine-tuning through self-supervised learning (SSL) technology. It is suitable for fields such as autonomous driving, remote sensing, security monitoring, and industrial inspection.", 
         path: "dinov3"
       }
       ,
       { 
         title: "Nx Meta Platfrom", 
-        image: useBaseUrl("https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/overview/nx.png"), 
+        image: "https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/overview/nx.png", 
         description: "Nx Meta Platform is a core video management system (VMS) developed by Network Optix, providing comprehensive video management, AI analysis, and cloud service solutions. The platform adopts a modular architecture, supporting integrated deployment from edge computing devices to the cloud.", 
         path: "nx-meta"
       }

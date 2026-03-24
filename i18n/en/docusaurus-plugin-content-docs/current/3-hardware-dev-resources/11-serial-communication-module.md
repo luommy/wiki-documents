@@ -24,7 +24,7 @@ Based on the CP2101 chip, it supports 3.3V logic levels and is compatible with N
 ## Adopting the CP2102 Solution
 
 <div style={{ display: 'flex', justifyContent: 'center', margin: '24px 0' }}>
-  <img src={useBaseUrl('https://resources.camthink.ai/wiki/img/hardware-dev-resources/serial-communication-module/2102.png')} alt="2102" style={{ width: '100%', maxWidth: '500px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/hardware-dev-resources/serial-communication-module/2102.png" alt="2102" style={{ width: '100%', maxWidth: '500px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
 </div>
 
 - Single-chip Type C (A) to UART data converter
@@ -66,14 +66,14 @@ Based on the CP2101 chip, it supports 3.3V logic levels and is compatible with N
 Connect to a computer via the USB port to debug the NE301 development board using UART. A connection example is shown below:
 
 <div style={{ display: 'flex', justifyContent: 'center', margin: '24px 0' }}>
-  <img src={useBaseUrl('https://resources.camthink.ai/wiki/img/hardware-dev-resources/serial-communication-module/serial-communication-moudule.png')} alt="connection" style={{ width: '100%', maxWidth: '500px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/hardware-dev-resources/serial-communication-module/serial-communication-moudule.png" alt="connection" style={{ width: '100%', maxWidth: '500px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
 </div>
 
 > Pay attention to the wiring sequence: GND to GND, TXD to RXD, and RXD to TXD.
 
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '24px 0' }}>
-  <img src={useBaseUrl('https://resources.camthink.ai/wiki/img/hardware-dev-resources/serial-communication-module/pin.jpg')} alt="pin" style={{ flex: '1 1 300px', maxWidth: '45%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
-  <img src={useBaseUrl('https://resources.camthink.ai/wiki/img/hardware-dev-resources/serial-communication-module/connection.jpg')} alt="connection" style={{ flex: '1 1 300px', maxWidth: '45%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/hardware-dev-resources/serial-communication-module/pin.jpg" alt="pin" style={{ flex: '1 1 300px', maxWidth: '45%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/hardware-dev-resources/serial-communication-module/connection.jpg" alt="connection" style={{ flex: '1 1 300px', maxWidth: '45%', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
 </div>
 
 After connecting to the computer, you may need to install drivers (skip if already installed). Driver download address: https://www.silabs.com/software-and-tools/usb-to-uart-bridge-vcp-drivers
@@ -95,7 +95,7 @@ The serial command line is used for debugging, configuration, network connectivi
 An example of NE301 board debugging is shown below: Press Enter to view available control commands.
 
 <div style={{ display: 'flex', justifyContent: 'center', margin: '24px 0' }}>
-  <img src={useBaseUrl('https://resources.camthink.ai/wiki/img/hardware-dev-resources/serial-communication-module/data.png')} alt="data" style={{ width: '100%', maxWidth: '700px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/hardware-dev-resources/serial-communication-module/data.png" alt="data" style={{ width: '100%', maxWidth: '700px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
 </div>
 
 - Seeing `AICAM>` after powering on means the CLI is ready; enter `help` or `?` to view the commands actually registered in the current firmware.
@@ -116,7 +116,7 @@ An example of NE301 board debugging is shown below: Press Enter to view availabl
 - `nn`: View neural network configurations.
 
 <div style={{ display: 'flex', justifyContent: 'center', margin: '24px 0' }}>
-  <img src={useBaseUrl('https://resources.camthink.ai/wiki/img/hardware-dev-resources/serial-communication-module/nn.png')} alt="nn" style={{ width: '100%', maxWidth: '700px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/hardware-dev-resources/serial-communication-module/nn.png" alt="nn" style={{ width: '100%', maxWidth: '700px', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }} />
 </div>
 
 - CLI built-in: `Custom/Common/Utils/generic_cmdline.c`

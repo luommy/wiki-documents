@@ -62,5 +62,5 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
    - Avoid contact between the antenna and metal components to prevent signal degradation.
 
 <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px', justifyContent: 'center', alignItems: 'center' }}>
-  <img src={useBaseUrl('https://resources.camthink.ai/wiki/img/hardware-dev-resources/wifi-module/WiFi_Module.jpg')} alt="WiFi_Module" style={{ height: '400px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/hardware-dev-resources/wifi-module/WiFi_Module.jpg" alt="WiFi_Module" style={{ height: '400px', objectFit: 'contain', margin: '0 auto' }} />
 </div>
