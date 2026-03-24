@@ -91,6 +91,51 @@ class LinkReplacer {
     );
     content = content.replace(reactPropSingleQuoteRegex, `$1'${remoteUrl}'`);
 
+    // 5. 替换 useBaseUrl 格式: src={useBaseUrl("path")} 或 src={useBaseUrl('path')}
+    // 匹配双引号 - 注意要匹配整个 src={useBaseUrl("...")}
+    const useBaseUrlDoubleQuoteRegex = new RegExp(
+      `src=\\{useBaseUrl\\("${escapedPath}"\\)\\}`,
+      'g'
+    );
+    content = content.replace(useBaseUrlDoubleQuoteRegex, `src="${remoteUrl}"`);
+
+    // 匹配单引号 - 注意要匹配整个 src={useBaseUrl('...')}
+    const useBaseUrlSingleQuoteRegex = new RegExp(
+      `src=\\{useBaseUrl\\('${escapedPath}'\\)\\}`,
+      'g'
+    );
+    content = content.replace(useBaseUrlSingleQuoteRegex, `src="${remoteUrl}"`);
+
+    // 6. 替换 imageSrc: useBaseUrl("path") 或 imageSrc: useBaseUrl('path')
+    // 匹配双引号
+    const imageSrcDoubleQuoteRegex = new RegExp(
+      `imageSrc:\\s*useBaseUrl\\("${escapedPath}"\\)`,
+      'g'
+    );
+    content = content.replace(imageSrcDoubleQuoteRegex, `imageSrc: "${remoteUrl}"`);
+
+    // 匹配单引号
+    const imageSrcSingleQuoteRegex = new RegExp(
+      `imageSrc:\\s*useBaseUrl\\('${escapedPath}'\\)`,
+      'g'
+    );
+    content = content.replace(imageSrcSingleQuoteRegex, `imageSrc: "${remoteUrl}"`);
+
+    // 7. 替换 image: useBaseUrl("path") 或 image: useBaseUrl('path')
+    // 匹配双引号
+    const imageDoubleQuoteRegex = new RegExp(
+      `image:\\s*useBaseUrl\\("${escapedPath}"\\)`,
+      'g'
+    );
+    content = content.replace(imageDoubleQuoteRegex, `image: "${remoteUrl}"`);
+
+    // 匹配单引号
+    const imageSingleQuoteRegex = new RegExp(
+      `image:\\s*useBaseUrl\\('${escapedPath}'\\)`,
+      'g'
+    );
+    content = content.replace(imageSingleQuoteRegex, `image: "${remoteUrl}"`);
+
     return content;
   }
 }

@@ -104,5 +104,5 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 ---
 <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px', justifyContent: 'center', alignItems: 'center' }}>
-  <img src={useBaseUrl('/img/Hardware_Dev_Resources/5G_Module/5G_Module.jpg')} alt="5G_Module" style={{ height: '400px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src={useBaseUrl('https://resources.camthink.ai/wiki/img/hardware-dev-resources/5g-module/5G_Module.jpg')} alt="5G_Module" style={{ height: '400px', objectFit: 'contain', margin: '0 auto' }} />
 </div>

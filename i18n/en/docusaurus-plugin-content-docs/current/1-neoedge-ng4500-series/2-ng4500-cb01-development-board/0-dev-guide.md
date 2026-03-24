@@ -13,8 +13,8 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 NG4500-CB01 is a high-performance development carrier board designed for NeoEdge NG4500 series AI edge computing devices. This carrier board is suitable for NVIDIA Jetson Orin series modules (Orin Nano/NX) and is suitable for application scenarios such as machine vision, industrial automation, robotics, and AIoT.
 
 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', justifyContent: 'center', alignItems: 'center' }}>
-  <img src={useBaseUrl('/img/Board/NG4500-CB01_1.png')} alt="front view of the carrier board" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
-  <img src={useBaseUrl('/img/Board/NG4500-CB01_2.png')} alt="back view of the carrier board" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src={useBaseUrl('https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/dev-guide/NG4500-CB01_1.png')} alt="front view of the carrier board" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src={useBaseUrl('https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/ng4500-cb01-development-board/dev-guide/NG4500-CB01_2.png')} alt="back view of the carrier board" style={{ height: '300px', objectFit: 'contain', margin: '0 auto' }} />
 </div>
 
 ## Key Features

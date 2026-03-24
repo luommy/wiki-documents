@@ -318,7 +318,7 @@ The mechanical design reserves sufficient space for add-ons, and official access
 ### Smart City
 
 <div className="scenario-overview" style={{ display: "flex", gap: "16px", alignItems: "center", marginBottom: "20px", flexWrap: "wrap" }}>
-  <img src={useBaseUrl('/img/ne301/scenarios/app-smart-city.png')} alt="Smart city overview" style={{ width: "260px", maxWidth: "100%" }} />
+  <img src={useBaseUrl('https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/app-smart-city.png')} alt="Smart city overview" style={{ width: "260px", maxWidth: "100%" }} />
   <p style={{ flex: "1", margin: 0, lineHeight: 1.6 }}>
     Thanks to μA-level sleep current and strong edge AI, NE301 can stay deployed in city environments for long periods without frequent battery replacement, while keeping data on device for low-latency responses.
   </p>
@@ -334,19 +334,19 @@ The mechanical design reserves sufficient space for add-ons, and official access
         {
           title: "Occupancy detection",
           description: "Triggered by PIR, radar, or other events to monitor public zones, spot illegal parking or clutter, and push instant alerts.",
-          image: useBaseUrl('/img/ne301/scenarios/app-possession-detection.png'),
+          image: useBaseUrl('https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/app-possession-detection.png'),
           imageAlt: "Occupancy detection illustration"
         },
         {
           title: "Unmanned retail",
           description: "Performs edge analytics on customer behavior and product recognition to enable autonomous checkout and anti-theft—even without wired power.",
-          image: useBaseUrl('/img/ne301/scenarios/app-unmanned-retail.png'),
+          image: useBaseUrl('https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/app-unmanned-retail.png'),
           imageAlt: "Unmanned retail illustration"
         },
         {
           title: "Smart advertising",
           description: "Combines traffic analytics with demographic profiling to optimize ad placements. Only inference results are uploaded, saving bandwidth.",
-          image: useBaseUrl('/img/ne301/scenarios/app-smart-advertising-screen.png'),
+          image: useBaseUrl('https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/app-smart-advertising-screen.png'),
           imageAlt: "Smart advertising illustration"
         }
       ]
@@ -357,7 +357,7 @@ The mechanical design reserves sufficient space for add-ons, and official access
 ### Smart Factory
 
 <div className="scenario-overview" style={{ display: "flex", gap: "16px", alignItems: "center", marginBottom: "20px", flexWrap: "wrap" }}>
-  <img src={useBaseUrl('/img/ne301/scenarios/app-smart-factory.png')} alt="Smart factory overview" style={{ width: "260px", maxWidth: "100%" }} />
+  <img src={useBaseUrl('https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/app-smart-factory.png')} alt="Smart factory overview" style={{ width: "260px", maxWidth: "100%" }} />
   <p style={{ flex: "1", margin: 0, lineHeight: 1.6 }}>
     Modular sensors and communication modules make it easy to adapt NE301 to industrial requirements. Local AI inference shortens response time and reduces reliance on upstream networks.
   </p>
@@ -373,13 +373,13 @@ The mechanical design reserves sufficient space for add-ons, and official access
         {
           title: "Safety gear inspection",
           description: "Detects whether workers wear helmets, vests, and other safety gear in real time and raises instant alerts for violations.",
-          image: useBaseUrl('/img/ne301/scenarios/app-industrial-safety.png'),
+          image: useBaseUrl('https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/app-industrial-safety.png'),
           imageAlt: "Industrial PPE inspection illustration"
         },
         {
           title: "Production inspection",
           description: "Monitors production processes and flags anomalies in real time to ensure quality compliance.",
-          image: useBaseUrl('/img/ne301/scenarios/app-industrial-testing.png'),
+          image: useBaseUrl('https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/app-industrial-testing.png'),
           imageAlt: "Production line inspection"
         }
       ]
@@ -390,7 +390,7 @@ The mechanical design reserves sufficient space for add-ons, and official access
 ### Smart Agriculture & Livestock
 
 <div className="scenario-overview" style={{ display: "flex", gap: "16px", alignItems: "center", marginBottom: "20px", flexWrap: "wrap" }}>
-  <img src={useBaseUrl('/img/ne301/scenarios/app-smart-agriculture.png')} alt="Smart agriculture overview" style={{ width: "260px", maxWidth: "100%" }} />
+  <img src={useBaseUrl('https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/app-smart-agriculture.png')} alt="Smart agriculture overview" style={{ width: "260px", maxWidth: "100%" }} />
   <p style={{ flex: "1", margin: 0, lineHeight: 1.6 }}>
     Low power consumption and battery operation suit off-grid farmlands. Periodic capture with edge analytics enables data-driven farming and husbandry.
   </p>
@@ -406,19 +406,19 @@ The mechanical design reserves sufficient space for add-ons, and official access
         {
           title: "Crop growth capture",
           description: "Takes scheduled photos and analyzes plant growth with AI to support precision agriculture.",
-          image: useBaseUrl('/img/ne301/scenarios/app-plant.png'),
+          image: useBaseUrl('https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/app-plant.png'),
           imageAlt: "Crop monitoring illustration"
         },
         {
           title: "Livestock monitoring",
           description: "Tracks animal activity and health, raising alerts when abnormal behavior is detected.",
-          image: useBaseUrl('/img/ne301/scenarios/app-animal.png'),
+          image: useBaseUrl('https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/app-animal.png'),
           imageAlt: "Livestock monitoring illustration"
         },
         {
           title: "Smart feeding",
           description: "Identifies individual pigs and coordinates automatic feeders for accurate dosing or counting.",
-          image: useBaseUrl('/img/ne301/scenarios/app-pig.png'),
+          image: useBaseUrl('https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/app-pig.png'),
           imageAlt: "Smart breeding illustration"
         }
       ]
@@ -429,7 +429,7 @@ The mechanical design reserves sufficient space for add-ons, and official access
 ### Additional Integrations
 
 <div className="scenario-overview" style={{ display: "flex", gap: "16px", alignItems: "center", marginBottom: "20px", flexWrap: "wrap" }}>
-  <img src={useBaseUrl('/img/ne301/scenarios/app-integrated-applications-overview.png')} alt="Integration overview" style={{ width: "260px", maxWidth: "100%" }} />
+  <img src={useBaseUrl('https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/app-integrated-applications-overview.png')} alt="Integration overview" style={{ width: "260px", maxWidth: "100%" }} />
   <p style={{ flex: "1", margin: 0, lineHeight: 1.6 }}>
     The open hardware and rich IO make NE301 easy to integrate into existing systems, widening the scope of edge AI applications.
   </p>
@@ -445,19 +445,19 @@ The mechanical design reserves sufficient space for add-ons, and official access
         {
           title: "Smart doorbells / peepholes",
           description: "Triggered by PIR or radar to capture suspicious visitors and run on-device recognition for home security.",
-          image: useBaseUrl('/img/ne301/scenarios/app-smart-doorball.png'),
+          image: useBaseUrl('https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/app-smart-doorball.png'),
           imageAlt: "Smart doorbell or peephole"
         },
         {
           title: "Production lines",
           description: "Integrates into industrial equipment for real-time video analytics to supervise quality and process flow.",
-          image: useBaseUrl('/img/ne301/scenarios/app-production.png'),
+          image: useBaseUrl('https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/app-production.png'),
           imageAlt: "Production line monitoring"
         },
         {
           title: "In-vehicle systems",
           description: "Monitors driver fatigue and issues timely warnings to improve road safety.",
-          image: useBaseUrl('/img/ne301/scenarios/app-drowsy.png'),
+          image: useBaseUrl('https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/app-drowsy.png'),
           imageAlt: "In-vehicle system monitoring"
         }
       ]

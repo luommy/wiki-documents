@@ -57,5 +57,5 @@ The module communicates with the motherboard through SPI by J1 interface. The in
 60x60 mm
 60*60mm
 <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px', justifyContent: 'center', alignItems: 'center' }}>
-  <img src={useBaseUrl('/img/Hardware_Dev_Resources/WiFi_Halow/wifihalow.jpg')} alt="wifihalow" style={{ height: '400px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src={useBaseUrl('https://resources.camthink.ai/wiki/img/hardware-dev-resources/wifi-halow-module/wifihalow.jpg')} alt="wifihalow" style={{ height: '400px', objectFit: 'contain', margin: '0 auto' }} />
 </div>

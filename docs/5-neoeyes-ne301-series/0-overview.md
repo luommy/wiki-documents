@@ -327,7 +327,7 @@ NeoEyes NE301具备设备本地AI推理能力，同时保留超低功耗的特�
 ### 智慧城市
 
 <div className="scenario-overview" style={{ display: "flex", gap: "16px", alignItems: "center", marginBottom: "20px", flexWrap: "wrap" }}>
-  <img src={useBaseUrl('/img/ne301/scenarios/app-smart-city.png')} alt="智慧城市应用概述" style={{ width: "260px", maxWidth: "100%" }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/app-smart-city.png" alt="智慧城市应用概述" style={{ width: "260px", maxWidth: "100%" }} />
   <p style={{ flex: "1", margin: 0, lineHeight: 1.6 }}>
     NE301 凭借其超低功耗设计（休眠功耗仅7-8μA）和边缘AI计算能力，可在城市环境中长时间部署，无需人力频繁更换电池，同时实时进行本地AI推理，保障数据隐私与低延迟响应。
   </p>
@@ -343,19 +343,19 @@ NeoEyes NE301具备设备本地AI推理能力，同时保留超低功耗的特�
         {
           title: "占有检测",
           description: "通过事件触发抓拍（如 PIR / 雷达）实时监测公共区域，识别位置占用、违规占用及物品堆积，并立即上报告警。",
-          image: useBaseUrl('/img/ne301/scenarios/app-possession-detection.png'),
+          image: "https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/app-possession-detection.png",
           imageAlt: "占有检测"
         },
         {
           title: "无人零售",
           description: "利用边缘 AI 实时分析顾客行为与商品识别，实现自动结算与防盗；在无外接电源场景下仍可保持长期稳定运行。",
-          image: useBaseUrl('/img/ne301/scenarios/app-unmanned-retail.png'),
+          image: "https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/app-unmanned-retail.png",
           imageAlt: "无人零售"
         },
         {
           title: "智慧广告屏",
           description: "结合客流统计与人群属性分析，优化广告投放策略；设备本地处理视频流，仅上传分析结果，大幅节省带宽。",
-          image: useBaseUrl('/img/ne301/scenarios/app-smart-advertising-screen.png'),
+          image: "https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/app-smart-advertising-screen.png",
           imageAlt: "智慧广告屏"
         }
       ]
@@ -366,7 +366,7 @@ NeoEyes NE301具备设备本地AI推理能力，同时保留超低功耗的特�
 ### 智能工厂
 
 <div className="scenario-overview" style={{ display: "flex", gap: "16px", alignItems: "center", marginBottom: "20px", flexWrap: "wrap" }}>
-  <img src={useBaseUrl('/img/ne301/scenarios/app-smart-factory.png')} alt="智能工厂应用概述" style={{ width: "260px", maxWidth: "100%" }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/app-smart-factory.png" alt="智能工厂应用概述" style={{ width: "260px", maxWidth: "100%" }} />
   <p style={{ flex: "1", margin: 0, lineHeight: 1.6 }}>
     NE301 的模块化设计支持灵活更换相机模组与通讯方案，满足工业场景的多样化需求；其边缘AI能力可在本地完成安全装备检测，避免网络延迟，提升响应速度。
   </p>
@@ -382,13 +382,13 @@ NeoEyes NE301具备设备本地AI推理能力，同时保留超低功耗的特�
         {
           title: "安全装备检测",
           description: "实时监测工作人员是否佩戴安全帽、防护服等，发现违规立即告警。",
-          image: useBaseUrl('/img/ne301/scenarios/app-industrial-safety.png'),
+          image: "https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/app-industrial-safety.png",
           imageAlt: "工业安全装备检测"
         },
         {
           title: "生产检测",
           description: "流水线生产过程中，实时监测产品是否符合规范，发现异常及时告警。",
-          image: useBaseUrl('/img/ne301/scenarios/app-industrial-testing.png'),
+          image: "https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/app-industrial-testing.png",
           imageAlt: "流水线生产"
         }
       ]
@@ -399,7 +399,7 @@ NeoEyes NE301具备设备本地AI推理能力，同时保留超低功耗的特�
 ### 智慧农业、畜牧业
 
 <div className="scenario-overview" style={{ display: "flex", gap: "16px", alignItems: "center", marginBottom: "20px", flexWrap: "wrap" }}>
-  <img src={useBaseUrl('/img/ne301/scenarios/app-smart-agriculture.png')} alt="智慧农业与畜牧业应用概述" style={{ width: "260px", maxWidth: "100%" }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/app-smart-agriculture.png" alt="智慧农业与畜牧业应用概述" style={{ width: "260px", maxWidth: "100%" }} />
   <p style={{ flex: "1", margin: 0, lineHeight: 1.6 }}>
     NE301 的低功耗特性与电池供电方案使其适用于无电网覆盖的农业场景，通过周期性抓拍与边缘分析，实现作物与牲畜的智能化管理。
   </p>
@@ -415,19 +415,19 @@ NeoEyes NE301具备设备本地AI推理能力，同时保留超低功耗的特�
         {
           title: "周期性抓拍农作物生长",
           description: "定时拍摄作物图像，通过 AI 分析生长状态，为精准农业提供数据支持。",
-          image: useBaseUrl('/img/ne301/scenarios/app-plant.png'),
+          image: "https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/app-plant.png",
           imageAlt: "周期性抓拍农作物生长"
         },
         {
           title: "畜牧业周期性抓拍",
           description: "监测牲畜活动与健康状况，及时发现异常并联动告警。",
-          image: useBaseUrl('/img/ne301/scenarios/app-animal.png'),
+          image: "https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/app-animal.png",
           imageAlt: "畜牧业周期性抓拍"
         },
         {
           title: "智能养殖",
           description: "识别单头生猪后联动下料器精准投喂或计数，提升养殖效率。",
-          image: useBaseUrl('/img/ne301/scenarios/app-pig.png'),
+          image: "https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/app-pig.png",
           imageAlt: "智能养殖"
         }
       ]
@@ -438,7 +438,7 @@ NeoEyes NE301具备设备本地AI推理能力，同时保留超低功耗的特�
 ### 其它集成
 
 <div className="scenario-overview" style={{ display: "flex", gap: "16px", alignItems: "center", marginBottom: "20px", flexWrap: "wrap" }}>
-  <img src={useBaseUrl('/img/ne301/scenarios/app-integrated-applications-overview.png')} alt="其它集成应用概述" style={{ width: "260px", maxWidth: "100%" }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/app-integrated-applications-overview.png" alt="其它集成应用概述" style={{ width: "260px", maxWidth: "100%" }} />
   <p style={{ flex: "1", margin: 0, lineHeight: 1.6 }}>
     NE301 的开放式硬件架构与丰富接口支持轻松集成到各类设备中，扩展应用边界，满足多场景的定制化需求。
   </p>
@@ -454,19 +454,19 @@ NeoEyes NE301具备设备本地AI推理能力，同时保留超低功耗的特�
         {
           title: "智能门铃 / 猫眼",
           description: "通过 PIR 或雷达传感器触发，抓拍可疑人员并本地识别，保障家庭安全。",
-          image: useBaseUrl('/img/ne301/scenarios/app-smart-doorball.png'),
+          image: "https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/app-smart-doorball.png",
           imageAlt: "智能门铃或猫眼"
         },
         {
           title: "工业产线",
           description: "集成到产线设备，实时视频流 AI 分析，监控生产质量与流程。",
-          image: useBaseUrl('/img/ne301/scenarios/app-production.png'),
+          image: "https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/app-production.png",
           imageAlt: "工业产线监控"
         },
         {
           title: "车载系统",
           description: "检测驾驶员疲劳状态，及时发出警报，提升行车安全。",
-          image: useBaseUrl('/img/ne301/scenarios/app-drowsy.png'),
+          image: "https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/app-drowsy.png",
           imageAlt: "车载系统监测"
         }
       ]

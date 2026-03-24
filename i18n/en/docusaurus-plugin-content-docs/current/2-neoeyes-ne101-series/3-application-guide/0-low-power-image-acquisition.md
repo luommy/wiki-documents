@@ -132,7 +132,7 @@ The following sections will detail the usage for each function.
   - Toggle: Enabled
 - **Reset to Default**
   - Reset image parameters to default values
-    <img src={useBaseUrl('/img/Overview/NE101/Software/1.png')} alt="Image Adjustment" style={{height: "300px", display: "block", margin: "20px auto"}} />
+    <img src={useBaseUrl('https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/application-guide/low-power-image-acquisition/1.png')} alt="Image Adjustment" style={{height: "300px", display: "block", margin: "20px auto"}} />
 
 #### Capture Setting
 
@@ -150,7 +150,7 @@ The following sections will detail the usage for each function.
   - Toggle:Disabled
 - **Enable Capture Button**
   - Toggle: Enabled
-    <img src={useBaseUrl('/img/Overview/NE101/Software/2.png')} alt="Capture Setting" style={{height: "300px", display: "block", margin: "20px auto"}} />
+    <img src={useBaseUrl('https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/application-guide/low-power-image-acquisition/2.png')} alt="Capture Setting" style={{height: "300px", display: "block", margin: "20px auto"}} />
 
 #### Data Report
 
@@ -162,7 +162,7 @@ The following sections will detail the usage for each function.
 - **Username / Password**：Empty
 - **Save**
   - Save and upload the related configuration settings.
-    <img src={useBaseUrl('/img/Overview/NE101/Software/3.png')} alt="Data Report" style={{height: "300px", display: "block", margin: "20px auto"}} />
+    <img src={useBaseUrl('https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/application-guide/low-power-image-acquisition/3.png')} alt="Data Report" style={{height: "300px", display: "block", margin: "20px auto"}} />
 
 #### Device Maintenance
 
@@ -173,7 +173,7 @@ The following sections will detail the usage for each function.
 - **Firmware Version**：`NE_101.1.0.1`
 - **Upgrade Firmware**
   - Upgrade by uploading the firmware file locally.
-    <img src={useBaseUrl('/img/Overview/NE101/Software/4.png')} alt="Device Maintenance" style={{height: "300px", display: "block", margin: "20px auto"}} />
+    <img src={useBaseUrl('https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/application-guide/low-power-image-acquisition/4.png')} alt="Device Maintenance" style={{height: "300px", display: "block", margin: "20px auto"}} />
 
 #### Connection
 
@@ -196,7 +196,7 @@ The following sections will detail the usage for each function.
   - One-click Refresh：Quickly scan for available networks
   - Auto Reconnect：Automatically restore connection after network interruption
 
-<img src={useBaseUrl('/img/Overview/NE101/Software/5.png')} alt="WLAN Connection" style={{height: "300px", display: "block", margin: "20px auto"}} />
+<img src={useBaseUrl('https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/application-guide/low-power-image-acquisition/5.png')} alt="WLAN Connection" style={{height: "300px", display: "block", margin: "20px auto"}} />
 
 #### Sleep Mode
 

@@ -201,7 +201,7 @@ initial_entities:
 ![MQTT Info](https://www.milesight.com/beaver-iot/assets/images/mqtt-integration-configuration-a3c400b1708ef0effb5fb69a060889ff.png)
 #### 2.2 将MQTT信息设置更新到NE101，硬件详细配置使用说明可见[「NE101 Quick Start」](../../../2-neoeyes-ne101-series/1-quick-start.md)
 <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px', justifyContent: 'center', alignItems: 'center' }}>
-  <img src={useBaseUrl('/img/QuickStart/NE101/ne101_30.png')} alt="bracket" style={{ height: '400px', objectFit: 'contain', margin: '0 auto' }} />
+  <img src="https://resources.camthink.ai/wiki/img/ai-application/cinfer-ai-Inference-service/application-integration/beaveriot-integration/ne101_30.png" alt="bracket" style={{ height: '400px', objectFit: 'contain', margin: '0 auto' }} />
 </div>
 
 ### 图像识别

@@ -126,7 +126,7 @@ flowchart LR
   - 开关状态：已开启
 - **恢复默认（Default）按钮**
   - 功能：重置图像参数为默认值
-    <img src={useBaseUrl('/img/Overview/NE101/Software/1.png')} alt="Image Adjustment" style={{height: "300px", display: "block", margin: "20px auto"}} />
+    <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/application-guide/low-power-image-acquisition/1.png" alt="Image Adjustment" style={{height: "300px", display: "block", margin: "20px auto"}} />
 
 #### 拍照设置（Capture Setting）
 
@@ -144,7 +144,7 @@ flowchart LR
   - 开关状态：已关闭
 - **启用拍照按钮（Enable Capture Button）**
   - 开关状态：已开启
-    <img src={useBaseUrl('/img/Overview/NE101/Software/2.png')} alt="Capture Setting" style={{height: "300px", display: "block", margin: "20px auto"}} />
+    <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/application-guide/low-power-image-acquisition/2.png" alt="Capture Setting" style={{height: "300px", display: "block", margin: "20px auto"}} />
 
 #### 数据上报（Data Report）
 
@@ -156,7 +156,7 @@ flowchart LR
 - **Username / Password**：留空
 - **保存按钮（Save）**
   - 保存数据上报相关配置
-    <img src={useBaseUrl('/img/Overview/NE101/Software/3.png')} alt="Data Report" style={{height: "300px", display: "block", margin: "20px auto"}} />
+    <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/application-guide/low-power-image-acquisition/3.png" alt="Data Report" style={{height: "300px", display: "block", margin: "20px auto"}} />
 
 #### 设备维护（Device Maintenance）
 
@@ -167,7 +167,7 @@ flowchart LR
 - **固件版本（Firmware Version）**：`NE_101.1.0.1`
 - **固件升级（Upgrade Firmware）**
   - 通过本地上传固件文件进行升级
-    <img src={useBaseUrl('/img/Overview/NE101/Software/4.png')} alt="Device Maintenance" style={{height: "300px", display: "block", margin: "20px auto"}} />
+    <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/application-guide/low-power-image-acquisition/4.png" alt="Device Maintenance" style={{height: "300px", display: "block", margin: "20px auto"}} />
 
 #### 网络连接（Connection）
 
@@ -190,7 +190,7 @@ flowchart LR
   - 一键刷新：快速扫描可用网络
   - 自动重连：网络中断自动恢复
 
-<img src={useBaseUrl('/img/Overview/NE101/Software/5.png')} alt="WLAN Connection" style={{height: "300px", display: "block", margin: "20px auto"}} />
+<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/application-guide/low-power-image-acquisition/5.png" alt="WLAN Connection" style={{height: "300px", display: "block", margin: "20px auto"}} />
 
 #### 休眠模式（Sleep Mode）
 

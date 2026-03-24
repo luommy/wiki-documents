@@ -39,6 +39,12 @@ function extractImages(content) {
     images.add(match[1]);
   }
 
+  // 5. useBaseUrl hook: useBaseUrl('/img/path') 或 useBaseUrl("/img/path")
+  const useBaseUrlRegex = /useBaseUrl\(["'](\/img\/[^"']+)["']\)/g;
+  while ((match = useBaseUrlRegex.exec(content)) !== null) {
+    images.add(match[1]);
+  }
+
   return Array.from(images);
 }
 
