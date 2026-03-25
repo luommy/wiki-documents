@@ -6,6 +6,12 @@ All notable changes to the CamThink Wiki documentation will be documented in thi
 
 > This changelog reflects updates starting from **2025-12-23**. Major changes prior to this date are not recorded.
 
+## [2026-03-25]
+
+### Added
+- **NeoMind Quick Start Guide**: Published NeoMind Quick Start Guide (full bilingual support), covering installation, device management, dashboard, AI chat, and plugins.
+
+
 ## [2026-03-23]
 
 ### Added
