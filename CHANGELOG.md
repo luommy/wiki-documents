@@ -6,6 +6,11 @@ All notable changes to the CamThink Wiki documentation will be documented in thi
 
 > This changelog reflects updates starting from **2025-12-23**. Major changes prior to this date are not recorded.
 
+## [2026-03-30]
+
+### Added
+- **NE301 RTMP Streaming Guide**: Added a complete RTMP video streaming tutorial for NE301, covering Nginx-RTMP server setup, NE301 stream configuration, VLC playback verification, and recording management (full bilingual support).
+
 ## [2026-03-25]
 
 ### Added
