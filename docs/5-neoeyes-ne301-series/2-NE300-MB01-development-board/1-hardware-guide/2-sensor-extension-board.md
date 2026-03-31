@@ -191,12 +191,12 @@ AICAM> sexp stop
 
 | 传感器 | I2C 地址 | 精度 / 量程 | CLI 调试命令 |
 |--------|----------|-------------|-------------|
-| SHT3x 温湿度 | 0x44 | 温度 ±0.3°C，湿度 ±2%RH | `sexp start ir` 查看数据 |
+| SHT3x 温湿度 | 0x44 | 温度 ±0.3°C，湿度 ±2%RH | `sht3x init` → `sht3x read` → `sht3x deinit` |
 | LTR-31x 环境光 | 0x22 | 16 位 ALS + IR 计数值 | `als init` → `als read` → `als deinit` |
-| LSM6DSR 6 轴 IMU | 0x6a | ±2g~±16g / ±125~±2000dps | 通过 `sexp start ir` 集成查看 |
-| VL53L1X ToF | 0x29 | 短距 1.3m / 长距 4m | `vl53l1x init` → `vl53l1x start` → `vl53l1x status` |
+| LSM6DSR 6 轴 IMU | 0x6a | ±2g~±16g / ±125~±2000dps | `lsm6dsr init` → `lsm6dsr read` → `lsm6dsr deinit` |
+| VL53L1X ToF | 0x29 | 短距 1.3m / 长距 4m | `vl53l1x init` → `vl53l1x start` → `vl53l1x read` |
 | DTS6012M 激光测距 | 0x51 | 远距 ToF 测距 | `dts6012m init` → `dts6012m read` → `dts6012m deinit` |
-| MLX90642 红外热成像 | 0x66 | 32×24 像素，0.02°C/LSB | `mlx90642 init` → `mlx90642 measure` → `mlx90642 dump` |
+| MLX90642 红外热成像 | 0x66 | 32×24 像素，0.02°C/LSB | `mlx90642 init` → `mlx90642 measure` → `mlx90642 deinit` |
 
 **开发者资源**
 
@@ -223,7 +223,7 @@ SensorExt/
 
 <AccessoriesTable accessories={[
   {
-    image: 'https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/hardware-guide/sensor-extension-board/1-IMG_0405.JPG',
+    image: 'https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/hardware-guide/sensor-extension-board/3-IMG_0408.JPG',
     name: '传感器扩展板',
     quantity: '1',
     description: ['预集成 SHT3x、LTR-31x、LSM6DSR、VL53L1X、DTS6012M、MLX90642 六种传感器', '通过 I2C 总线 1 与 NE301 主板通信']

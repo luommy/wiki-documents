@@ -190,12 +190,12 @@ The sensor extension board integrates 6 sensor types covering temperature/humidi
 
 | Sensor | I2C Address | Accuracy / Range | CLI Debug Commands |
 |--------|-------------|-------------------|--------------------|
-| SHT3x temperature/humidity | 0x44 | Temperature ±0.3°C, Humidity ±2%RH | `sexp start ir` to view data |
+| SHT3x temperature/humidity | 0x44 | Temperature ±0.3°C, Humidity ±2%RH | `sht3x init` → `sht3x read` → `sht3x deinit` |
 | LTR-31x ambient light | 0x22 | 16-bit ALS + IR counts | `als init` → `als read` → `als deinit` |
-| LSM6DSR 6-axis IMU | 0x6a | ±2g~±16g / ±125~±2000dps | View via `sexp start ir` |
-| VL53L1X ToF | 0x29 | Short-range 1.3m / Long-range 4m | `vl53l1x init` → `vl53l1x start` → `vl53l1x status` |
+| LSM6DSR 6-axis IMU | 0x6a | ±2g~±16g / ±125~±2000dps | `lsm6dsr init` → `lsm6dsr read` → `lsm6dsr deinit` |
+| VL53L1X ToF | 0x29 | Short-range 1.3m / Long-range 4m | `vl53l1x init` → `vl53l1x start` → `vl53l1x read` |
 | DTS6012M laser ranging | 0x51 | Long-range ToF laser ranging | `dts6012m init` → `dts6012m read` → `dts6012m deinit` |
-| MLX90642 IR thermal imaging | 0x66 | 32×24 pixels, 0.02°C/LSB | `mlx90642 init` → `mlx90642 measure` → `mlx90642 dump` |
+| MLX90642 IR thermal imaging | 0x66 | 32×24 pixels, 0.02°C/LSB | `mlx90642 init` → `mlx90642 measure` → `mlx90642 deinit` |
 
 **Developer Resources**
 
@@ -222,7 +222,7 @@ The sensor extension board demonstrates NE301's environmental sensing capabiliti
 
 <AccessoriesTable accessories={[
   {
-    image: 'https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/hardware-guide/sensor-extension-board/1-IMG_0405.JPG',
+    image: 'https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/hardware-guide/sensor-extension-board/3-IMG_0408.JPG',
     name: 'Sensor Extension Board',
     quantity: '1',
     description: ['Pre-integrated with 6 sensors: SHT3x, LTR-31x, LSM6DSR, VL53L1X, DTS6012M, MLX90642', 'Communicates with NE301 via I2C bus 1']
