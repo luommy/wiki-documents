@@ -6,6 +6,11 @@ All notable changes to the CamThink Wiki documentation will be documented in thi
 
 > This changelog reflects updates starting from **2025-12-23**. Major changes prior to this date are not recorded.
 
+## [2026-03-31]
+
+### Added
+- **NE300-MB01 Sensor Extension Board**: Added a sensor extension board guide covering quick validation of temperature/humidity, ambient light, 6-axis IMU, ToF ranging, laser ranging, and IR thermal imaging sensors, plus TFT display data viewing.
+
 ## [2026-03-30]
 
 ### Added
