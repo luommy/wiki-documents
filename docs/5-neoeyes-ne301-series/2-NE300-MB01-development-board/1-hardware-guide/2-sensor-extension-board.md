@@ -43,7 +43,7 @@ NE301 的传感器扩展基于标准硬件接口和开源驱动，开发者可�
 | 环境光 | LTR-31x | 可见光 + 红外光 16 位检测 | 灯光控制、日间/夜间切换、侵入检测 |
 | 6 轴 IMU | LSM6DSR | 加速度计 + 陀螺仪 + 温度 | 姿态检测、振动监测、跌倒检测 |
 | 短距 ToF | VL53L1X | 激光测距 1.3m（短距）/ 4m（长距） | 人员接近检测、手势识别、防撞预警 |
-| 远距激光 | DTS6012M | d-ToF，18m 量程（12m@160Klux），905nm，FOV<2° | 远距目标检测、距离监测、安防周界 |
+| 远距激光 | DTS6012M | d-ToF，18m 量程（12m@160Klux），905nm，FOV\<2° | 远距目标检测、距离监测、安防周界 |
 | 红外热成像 | MLX90642 | 32×24 像素温度矩阵，±1°C，FOV 110°×75° / 45°×35° | 非接触测温、设备热分布检测、人体检测 |
 | PIR 人体感应 | NP624M-F | 数字双元，抗射频干扰，功耗 5μA，VIN:1.6~3.6V | 人体移动检测、安防入侵、自动照明 |
 | 毫米雷达波 | RKB1161LX1 | 24GHz，UART，功耗 68μA，20×20×1.0mm | 人员检测、存在感知、微动检测 |
@@ -206,7 +206,7 @@ AICAM> sexp stop
 | LTR-31x 环境光 | I2C 0x22 | 16 位 ALS + IR 计数值 | `als init` → `als read` → `als deinit` |
 | LSM6DSR 6 轴 IMU | I2C 0x6a | ±2g~±16g / ±125~±2000dps | `lsm6dsr init` → `lsm6dsr read` → `lsm6dsr deinit` |
 | VL53L1X ToF | I2C 0x29 | 短距 1.3m / 长距 4m | `vl53l1x init` → `vl53l1x start` → `vl53l1x read` |
-| DTS6012M 激光测距 | I2C 0x51 | d-ToF，18m 量程，12m@160Klux，905nm，FOV<2°，21×15×7.87mm | `dts6012m init` → `dts6012m read` → `dts6012m deinit` |
+| DTS6012M 激光测距 | I2C 0x51 | d-ToF，18m 量程，12m@160Klux，905nm，FOV\<2°，21×15×7.87mm | `dts6012m init` → `dts6012m read` → `dts6012m deinit` |
 | MLX90642 红外热成像（广角） | I2C 0x66 | 32×24 像素，FOV 110°×75°，-40~85°C | `mlx90642 init` → `mlx90642 measure` → `mlx90642 deinit` |
 | MLX90642 红外热成像（窄角） | I2C 0x66 | 32×24 像素，FOV 45°×35°，-40~85°C | `mlx90642 init` → `mlx90642 measure` → `mlx90642 deinit` |
 | RKB1161LX1 毫米雷达波 | UART，3.3~5V | 24GHz，功耗 68μA，20×20×1.0mm | 驱动开发中 |
