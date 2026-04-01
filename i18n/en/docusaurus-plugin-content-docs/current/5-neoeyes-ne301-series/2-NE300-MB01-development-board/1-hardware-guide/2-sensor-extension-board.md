@@ -43,7 +43,7 @@ NE301 sensor expansion is built on standard hardware interfaces and open-source 
 | Ambient Light | LTR-31x | Visible + IR 16-bit detection | Lighting control, day/night switching, intrusion detection |
 | 6-axis IMU | LSM6DSR | Accelerometer + Gyroscope + Temperature | Orientation detection, vibration monitoring, fall detection |
 | Short-range ToF | VL53L1X | Laser ranging 1.3m (short) / 4m (long) | Proximity detection, gesture recognition, collision warning |
-| Long-range Laser | DTS6012M | d-ToF, 18m range (12m@160Klux), 905nm, FOV<2° | Remote target detection, distance monitoring, perimeter security |
+| Long-range Laser | DTS6012M | d-ToF, 18m range (12m@160Klux), 905nm, FOV\<2° | Remote target detection, distance monitoring, perimeter security |
 | IR Thermal Imaging | MLX90642 | 32×24 pixel temperature matrix, ±1°C, FOV 110°×75° / 45°×35° | Non-contact temperature measurement, thermal distribution detection, human presence detection |
 | PIR Human Detection | NP624M-F | Digital dual-element, RF interference resistant, 5μA, VIN:1.6~3.6V | Human motion detection, intrusion alarm, automatic lighting |
 | mmWave Radar | RKB1161LX1 | 24GHz, UART, 68μA power consumption, 20×20×1.0mm | Human detection, presence sensing, micro-motion detection |
@@ -206,7 +206,7 @@ The sensor extension board integrates 8 sensor types covering temperature/humidi
 | LTR-31x ambient light | I2C 0x22 | 16-bit ALS + IR counts | `als init` → `als read` → `als deinit` |
 | LSM6DSR 6-axis IMU | I2C 0x6a | ±2g~±16g / ±125~±2000dps | `lsm6dsr init` → `lsm6dsr read` → `lsm6dsr deinit` |
 | VL53L1X ToF | I2C 0x29 | Short-range 1.3m / Long-range 4m | `vl53l1x init` → `vl53l1x start` → `vl53l1x read` |
-| DTS6012M laser ranging | I2C 0x51 | d-ToF, 18m range, 12m@160Klux, 905nm, FOV<2°, 21×15×7.87mm | `dts6012m init` → `dts6012m read` → `dts6012m deinit` |
+| DTS6012M laser ranging | I2C 0x51 | d-ToF, 18m range, 12m@160Klux, 905nm, FOV\<2°, 21×15×7.87mm | `dts6012m init` → `dts6012m read` → `dts6012m deinit` |
 | MLX90642 IR thermal imaging (wide-angle) | I2C 0x66 | 32×24 pixels, FOV 110°×75°, -40~85°C | `mlx90642 init` → `mlx90642 measure` → `mlx90642 deinit` |
 | MLX90642 IR thermal imaging (narrow-angle) | I2C 0x66 | 32×24 pixels, FOV 45°×35°, -40~85°C | `mlx90642 init` → `mlx90642 measure` → `mlx90642 deinit` |
 | RKB1161LX1 mmWave radar | UART, 3.3~5V | 24GHz, 68μA power consumption, 20×20×1.0mm | Driver under development |
