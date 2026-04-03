@@ -6,6 +6,11 @@ All notable changes to the CamThink Wiki documentation will be documented in thi
 
 > This changelog reflects updates starting from **2025-12-23**. Major changes prior to this date are not recorded.
 
+## [2026-04-02]
+
+### Added
+- **NE301 PIR Sensor Integration Guide**: Added a PIR motion sensor integration guide for NE301, covering hardware connection, PIR parameter configuration, MQTT data forwarding, NeoMind platform integration, and troubleshooting (full bilingual support).
+
 ## [2026-03-31]
 
 ### Added
