@@ -10,7 +10,7 @@ tags: [CamThink, Documentation Hub, Edge AI Products, Hardware Platform, Develop
 ---
 
 import Link from '@docusaurus/Link';
-import useBaseUrl from '@docusaurus/useBaseUrl';
+
 import '@site/src/css/docs-home.css';
 import VideoModal from '@site/src/components/VideoModal';
 import VideoCarousel from '@site/src/components/VideoCarousel';
@@ -65,7 +65,7 @@ import VideoCarousel from '@site/src/components/VideoCarousel';
     {/* NE301 */}
     <div className="category-card">
       <Link to="/docs/neoeyes-ne301-series/overview" className="cat-header" style={{background: 'linear-gradient(135deg, #fff1eb 0%, #ace0f9 100%)'}}>
-        <img src="img/ne301/overview/301.png" style={{height: '80px', pointerEvents: 'none'}} alt="NE301" />
+        <img src="https://resources.camthink.ai/wiki/img/ne301/overview/301.png" style={{height: '80px', pointerEvents: 'none'}} alt="NE301" />
       </Link>
       <div className="cat-body">
         <div className="cat-title">NeoEyes NE301</div>
@@ -82,7 +82,7 @@ import VideoCarousel from '@site/src/components/VideoCarousel';
     {/* NE101 */}
     <div className="category-card">
       <Link to="/docs/neoeyes-ne101-series/overview" className="cat-header" style={{background: 'linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)'}}>
-        <img src="img/Overview/NE101/NE101.png" style={{height: '80px', pointerEvents: 'none'}} alt="NE101" />
+        <img src="https://resources.camthink.ai/wiki/img/Overview/NE101/NE101.png" style={{height: '80px', pointerEvents: 'none'}} alt="NE101" />
       </Link>
       <div className="cat-body">
         <div className="cat-title">NeoEyes NE101</div>
@@ -99,7 +99,7 @@ import VideoCarousel from '@site/src/components/VideoCarousel';
     {/* NG4500 */}
     <div className="category-card">
       <Link to="/docs/neoedge-ng4500-series/overview" className="cat-header" style={{background: 'linear-gradient(135deg, #cfd9df 0%, #e2ebf0 100%)'}}>
-        <img src="img/Overview/NG45xx/NG45XX.png" style={{height: '80px', pointerEvents: 'none'}} alt="NG4500" />
+        <img src="https://resources.camthink.ai/wiki/img/Overview/NG45xx/NG45XX.png" style={{height: '80px', pointerEvents: 'none'}} alt="NG4500" />
       </Link>
       <div className="cat-body">
         <div className="cat-title">NeoEdge NG4500</div>
