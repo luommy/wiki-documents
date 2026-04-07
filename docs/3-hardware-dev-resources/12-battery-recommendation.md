@@ -25,7 +25,7 @@ NeoEyes NE101 和 NE301 智能相机默认采用 4 节 AA 电池供电，专为�
 
 AA（5 号）电池是最常见的圆柱形电池规格，直径 14.5mm，高度 50.5mm。根据化学体系不同，AA 电池分为以下几类：
 
-<img src="https://resources.camthink.ai/wiki/img/hardware-dev-resources/battery-recommendation/Batteries_comparison.jpeg" style={{maxWidth: '50%', display: 'block', margin: '0 auto'}} />
+![](https://resources.camthink.ai/wiki/img/hardware-dev-resources/battery-recommendation/Batteries_comparison.jpeg)
 
 | 电池类型 | 标称电压 | 典型容量 (AA) | 可充电 | 特点 |
 |:---|:---|:---|:---:|:---|

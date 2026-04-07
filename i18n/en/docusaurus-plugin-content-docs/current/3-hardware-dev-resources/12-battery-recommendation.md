@@ -25,7 +25,7 @@ This document covers:
 
 AA batteries are the most common cylindrical battery form factor, 14.5mm in diameter and 50.5mm in height. Based on chemistry, AA batteries fall into the following categories:
 
-<img src="https://resources.camthink.ai/wiki/img/hardware-dev-resources/battery-recommendation/Batteries_comparison.jpeg" style={{maxWidth: '50%', display: 'block', margin: '0 auto'}} />
+![](https://resources.camthink.ai/wiki/img/hardware-dev-resources/battery-recommendation/Batteries_comparison.jpeg)
 
 | Battery Type | Nominal Voltage | Typical Capacity (AA) | Rechargeable | Characteristics |
 |:---|:---|:---|:---:|:---|
