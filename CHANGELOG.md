@@ -6,6 +6,11 @@ All notable changes to the CamThink Wiki documentation will be documented in thi
 
 > This changelog reflects updates starting from **2025-12-23**. Major changes prior to this date are not recorded.
 
+## [2026-04-07]
+
+### Added
+- **Battery Selection Guide**: Added a comprehensive battery selection guide for NE101/NE301, covering battery fundamentals (types, parameters, internal resistance), device compatibility, discharge requirements across communication modes (WiFi, Cat-1, WiFi HaLow), and selection recommendations by use case and environment (full bilingual support).
+
 ## [2026-04-02]
 
 ### Added
