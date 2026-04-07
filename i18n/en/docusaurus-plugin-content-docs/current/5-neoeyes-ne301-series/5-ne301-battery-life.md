@@ -224,9 +224,9 @@ CamThink provides an online battery life calculator to help users quickly estima
 - Customizable capture frequency (1-50 times/day)
 - Real-time calculation of battery life and power breakdown
 
-:::info Coming Soon
-**NE301 Battery Calculator will be on board soon!**
-:::
+🔗 **[NE301 Battery Life Calculator](https://www.camthink.ai/tools/battery-calculator/)**
+
+> Use the online calculator to customize communication mode, module version, and capture frequency for real-time battery life estimation.
 
 **Calculation Formula**:
 
