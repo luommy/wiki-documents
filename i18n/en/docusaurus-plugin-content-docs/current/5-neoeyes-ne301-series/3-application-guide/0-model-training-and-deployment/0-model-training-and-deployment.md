@@ -1,10 +1,12 @@
 ---
-description: Learn how to train and deploy YOLOv8 models on NeoEyes NE301. Detailed guide for environment setup, TFLite quantization, and edge deployment on STM32N6 MCU.
-keywords: [YOLOv8 Training, NE301 Deployment, STM32N6 AI, Model Quantization, TFLite, Ultralytics, Edge AI Inference, Computer Vision, Model Export]
-tags: [NE301, YOLOv8, Model Training, AI Deployment, STM32N6]
+slug: /neoeyes-ne301-series/application-guide/model-training
+sidebar_label: Model Training and Deployment
+description: This document details the model training and deployment workflow for the NE301 series AI smart camera. It covers setting up a YOLO training environment, model training, exporting to TFLite format, model quantization and evaluation, and finally deploying the quantized model to the NE301 device using either Makefile build or Web UI upload methods, helping developers achieve efficient edge AI model deployment.
+keywords: [NE301, model training, model deployment, YOLO, TFLite, model quantization, edge AI, AI camera, firmware upload, deep learning]
+tags: [NE301, deep learning, model deployment, AI application, tutorial]
 ---
 
-# Model Training And Deployment
+# Model Training and Deployment
 
 ## 1. Environment Setup
 
@@ -42,14 +44,14 @@ Results saved to /ultralytics/runs/detect/predict
 
 ### 1.4 Install NE301 Project Deployment Environment
 
-To deploy models to NE301 devices, you need to set up the project development environment. Please refer to the [Development Environment Setup](../../2-NE300-MB01-development-board/2-software-guide/0-development-environment-setup.md) document in the project root directory for environment setup.
+To deploy models to the NE301 device, you need to set up the project development environment. Please refer to the [Development Environment Setup](../../2-NE300-MB01-development-board/2-software-guide/0-development-environment-setup.md) document in the project root directory for environment setup.
 
-> Camthink NeoEyes NE301 AI Camera firmware is now fully open source. Learn more from the [NE301 repository](https://github.com/camthink-ai/ne301).
+> Currently, the Camthink NeoEyes NE301 AI Camera firmware is fully open source. To learn more, visit the [NE301 repository](https://github.com/camthink-ai/ne301).
 
-## 2. Training & Exporting Models
+## 2. Train and Export Model
 
 ### 2.1 Train Model (Optional)
-docs\5-neoeyes-ne301-series\3-NE300-MB01-development-board\2-software-guide\0-development-environment-setup.md
+
 ```sh
 # Based on COCO pre-trained model
 yolo detect train data=data.yaml model=yolov8n.pt epochs=100 imgsz=256 device=0
@@ -126,7 +128,7 @@ WARNING: All log messages before absl::InitializeLog() is called are written to 
 W0000 00:00:1760435045.538259     834 tf_tfl_flatbuffer_helpers.cc:365] Ignored output_format.
 W0000 00:00:1760435045.538286     834 tf_tfl_flatbuffer_helpers.cc:368] Ignored drop_control_dependency.
 I0000 00:00:1760435045.567572     834 mlir_graph_optimization_pass.cc:425] MLIR V1 optimization pass is not enabled
-100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 32/32 [00:05<00:00,  5.46it/s]
+100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 32/32 [00:05<00:00,  5.46it/s]
 fully_quantize: 0, inference_type: 6, input_inference_type: UINT8, output_inference_type: INT8
 Quantized model generated: yolov8n_256_quant_pc_ui_od_coco.tflite
 ```
@@ -208,20 +210,20 @@ make pkg-model
 # Build result is in build/ne301_Model_xxx_pkg.bin
 ```
 
-**Step 3: Flash to Device**
+**Step 3: Import Model to Device**
 
-**Method 1: Flash directly to the device**
+Method 1: Flash directly to device
 
 ```sh
 # In project root directory
 make flash-model
 ```
 
-**Method 2: Web UI (Recommended)**
+Method 2: Web UI (Recommended)
 
-Updating the model through the Web UI lets you preview the new model quickly without reflashing the firmware.
+Updating the model through the Web UI allows you to quickly preview model results.
 
-> If you're new to the Web UI features, see the [NE301 Quick Start](../../1-quick-start.md).
+> If you are not yet familiar with the Web UI features, see the [NE301 Quick Start](../../1-quick-start.md).
 
 <div style={{display: 'grid', gap: '12px', maxWidth: '520px', margin: '0 auto'}}>
   <figure style={{margin: 0, textAlign: 'center'}}>
@@ -234,7 +236,7 @@ Updating the model through the Web UI lets you preview the new model quickly wit
   </figure>
 </div>
 
-After the device enables the Wi-Fi AP, open the Web UI and go to **Feature Debugging** on the home page, then click **upload** to replace the model.
+After the device enables the Wi-Fi AP, access the Web UI and click **upload** on the **Feature Debugging** section of the home page to upgrade and replace the model.
 
 <div style={{textAlign: 'center'}}>
   <figure style={{display: 'inline-block', margin: 0, textAlign: 'center'}}>
@@ -243,7 +245,7 @@ After the device enables the Wi-Fi AP, open the Web UI and go to **Feature Debug
   </figure>
 </div>
 
-Alternatively, open **System Setting → Firmware Upgrade** to upload the model binary generated earlier and wait for the device to reload it.
+Alternatively, you can also upload the built model through **System Setting - Firmware Upgrade** and wait for it to load.
 
 <div style={{textAlign: 'center'}}>
   <figure style={{display: 'inline-block', margin: 0, textAlign: 'center'}}>

@@ -1,25 +1,25 @@
 ---
-description: 本文档详细介绍了基于FGH100M设计的Wi-Fi HaLow模块，该模块支持IEEE 802.11ah标准，提供远距离、低功耗的Sub-1 GHz频段通信（868MHz, 915MHz可选），适用于物联网和智能设备场景。内容涵盖主要特性、SPI接口说明及规格尺寸。
-keywords: [Wi-Fi HaLow, 物联网模块, FGH100M, IEEE 802.11ah, 低功耗, 远距离通信, Sub-1 GHz, SPI接口, 硬件开发, 智能设备]
-tags: [Wi-Fi HaLow, 物联网, 无线模块, 硬件资源, SPI]
+sidebar_position: 7
+description: This document describes the Wi-Fi HaLow module based on FGH100M, which complies with the IEEE 802.11ah standard and provides long-range, low-power Sub-1 GHz band communication (868 MHz, 915 MHz optional), suitable for IoT and smart device scenarios. It covers key features, SPI interface description, and dimensions.
+keywords: [Wi-Fi HaLow, IoT Module, FGH100M, IEEE 802.11ah, Low Power, Long Range Communication, Sub-1 GHz, SPI Interface, Hardware Development, Smart Devices]
+tags: [Wi-Fi HaLow, IoT, Wireless Module, Hardware Resources, SPI]
 ---
-
 import AccessoriesTable from '@site/src/components/AccessoriesTable';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
 # Wi-Fi HaLow Module
 
-## 产品特性
-### 方案说明
-此模组基于FGH100M进行设计，FGH100M是IEEE 802.11ah 标准的远距离、低功耗 Wi-Fi HaLow 模块，支持 Sub-1 GHz 频段通信，对应不同国家地区频段会不同，目前可提供868MHz,915MHz两种可选，适用于物联网（IoT）和智能设备场景。
+## Product Features
+### Overview
+This module is designed based on the FGH100M, a long-range, low-power Wi-Fi HaLow module compliant with the IEEE 802.11ah standard. It supports Sub-1 GHz band communication, with available frequency bands varying by region. Currently, 868 MHz and 915 MHz options are available. It is suitable for Internet of Things (IoT) and smart device scenarios.
 
-### 主要特性
+### Key Features
 
 | 1    | Items                  | Description            |
 | ---- | ------------------------ | -------------------------- |
 | 2    | WiFi Protocol            | IEEE 802.11 ah             |
 | 3    | Operating Modes          | AP/STA                     |
-| 4    | Operation Frequencey     | Sub-1 G: 850–950 MHz       |
+| 4    | Operation Frequency     | Sub-1 G: 850–950 MHz       |
 | 5    | Channel Width            | 1 MHz, 2 MHz, 4 MHz, 8 MHz |
 | 7    | Antenna                  | PCB Antenna                |
 | 8    | Communication Interfaces | SPI                        |
@@ -29,9 +29,9 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 | 12   | Dimensions               | 60 x 60 mm                 |
 | 12   | Certifications           | CE/FCC                     |
 
-## 接口说明(J1)
+## Interface Description (J1)
 
-模组通过J1接口，与主板通过SPI进行通讯连接。接口的定义如下：
+The module communicates with the motherboard via SPI through the J1 connector. The pin definitions are as follows:
 
 | PIN# | Pin Name  | Functions          | Pin Type | Pull Up/Down |
 | ---- | --------- | ------------------ | -------- | ------------ |
@@ -52,7 +52,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 | 15   | NC        |                    |          |              |
 | 16   | 3V3       | 3.3 V power supply | POWER    |              |
 
-## 规格尺寸
+## Dimensions
 
 60x60 mm
 60*60mm

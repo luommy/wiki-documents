@@ -43,8 +43,8 @@ The main differences between the modules are as follows:
 
 
  ### Expansion Modules
-- 4G module：[4G Module](../../../3-hardware-dev-resources/3-4g-module.md)
-- 5G module：[5G Module](../../../3-hardware-dev-resources/4-5g-module.md)
+- 4G module：[4G Module](../../../3-hardware-dev-resources/8-4g-module.md)
+- 5G module：[5G Module](../../../3-hardware-dev-resources/10-5g-module.md)
 - Wi-Fi/BT module
  ### Mounts and Enclosures
 

@@ -1,9 +1,9 @@
 ---
+sidebar_position: 10
 description: 本文档详细介绍了5G模块的核心功能与技术规格，包括支持5G NR Sub-6GHz (SA/NSA)、LTE-FDD/TDD、WCDMA/HSPA+等多网络制式，采用M.2 Key B接口，集成L1+L5双频GNSS，支持HPUE增强和工业级设计。内容涵盖产品特性、规格参数、接口配置、电源稳定性及散热管理等使用说明。
 keywords: [5G模块, 5G NR, Sub-6GHz, M.2 Key B, PCIe, USB 3.1, GNSS, HPUE, 硬件开发, 无线通信]
 tags: [5G, 无线模块, M.2接口, 硬件资源, 通信模组]
 ---
-
 import AccessoriesTable from '@site/src/components/AccessoriesTable';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
@@ -24,7 +24,6 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 | **RM520N-CN** | 5G: n41/n78/n79; LTE: B1/B3/B5/B8/B41                        | n41/n78/n79         | L1+L5         |
 
 ---
-
 ## 规格参数
 ### **电气特性**
 | **参数**         | **规格**                      |
@@ -49,7 +48,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 | **USB 3.1 Gen2** | 10 Gbps 速率，兼容 USB 2.0，支持 UVC 协议扩展。              |
 | **(U)SIM**       | 双卡单待，1.8V/3.0V 兼容，支持热插拔（需 AT+QSIMDET 使能）。 |
 
-##  使用说明
+## 使用说明
 1. **接口配置**  
 
    - **PCIe 模式切换**：  
@@ -64,7 +63,6 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
      ```
 
 ---
-
 ## 注意事项
 ### **设计关键点**
 1. **电源稳定性**  
@@ -80,7 +78,6 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
    - 避免与热源相邻，PCB 露铜区域 ≥50%。
 
 ---
-
 ### **安全与维护**
 - **禁止操作**  
   - 避免超声波清洗（损坏晶体），使用酒精擦拭需断电。  
@@ -90,7 +87,6 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
   - 通过 USB 3.1 或 PCIe 接口升级，确保电源稳定（电压 ≥3.3V）。  
 
 ---
-
 **附录**  
 - **机械尺寸**：30.0mm × 52.0mm × 2.3mm（M.2 Key B），散热区域需预留 ≥2.5mm 空间。  
 
@@ -102,6 +98,5 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
   ```
 
 ---
-<div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px', justifyContent: 'center', alignItems: 'center' }}>
-  <img src="https://resources.camthink.ai/wiki/img/hardware-dev-resources/5g-module/5G_Module.jpg" alt="5G_Module" style={{ height: '400px', objectFit: 'contain', margin: '0 auto' }} />
-</div>
+
+![5G_Module](https://resources.camthink.ai/wiki/img/hardware-dev-resources/5g-module/5G_Module.jpg)

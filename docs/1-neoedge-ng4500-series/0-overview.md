@@ -323,14 +323,14 @@ NG4500系列整机产品规格信息如下
     },
     {
       image: "https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/overview/ng45xx_4g.png",
-      name: <a href="../hardware-dev-resources/3-4g-module">4G模块</a>,
+      name: <a href="../hardware-dev-resources/8-4g-module">4G模块</a>,
       quantity: "1",
       description: [
         "Quectel EM05 EM05-G 4G M.2模块，支持欧洲、美国、中国、日本、澳大利亚等主要地区使用"]
     },
     {
       image: "https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/overview/ng45xx_5g.png",
-      name: <a href="../hardware-dev-resources/4-5g-module">5G模块</a>,
+      name: <a href="../hardware-dev-resources/10-5g-module">5G模块</a>,
       quantity: "1",
       description: ["Quectel RM520N-GL 5G M.2模块，支持全球主要地区使用"]
     },

@@ -43,8 +43,8 @@ tags: [硬件指南, 组件概览, NG4500 系列, 核心模组, 扩展连接]
 
   
  ### Expansion modules
-- 4G 模组：[4G Module](../../../3-hardware-dev-resources/3-4g-module.md)
-- 5G 模组：[5G Module](../../../3-hardware-dev-resources/4-5g-module.md)
+- 4G 模组：[4G Module](/docs/hardware-dev-resources/8-4g-module)
+- 5G 模组：[5G Module](/docs/hardware-dev-resources/10-5g-module)
 - WiFi/BT 模组
  ### Mounts and enclosures
 
