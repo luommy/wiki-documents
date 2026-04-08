@@ -6,6 +6,14 @@ All notable changes to the CamThink Wiki documentation will be documented in thi
 
 > This changelog reflects updates starting from **2025-12-23**. Major changes prior to this date are not recorded.
 
+## [2026-04-08]
+
+### Added
+- **NE301 PoE Quick Start Guide**: Added a quick start guide for the NE301 PoE version, covering PoE module hardware introduction and core interfaces (PoE/Type-C/Alarm/RS485), power requirements, hardware connection, Web UI login, PoE network management (status check, IP configuration), typical application scenarios, and troubleshooting (full bilingual support).
+
+### Fixed
+- **NE101/NE301 Components Overview**: Fixed broken anchor and broken link to product overview page in both Chinese and English documentation.
+
 ## [2026-04-07]
 
 ### Added
