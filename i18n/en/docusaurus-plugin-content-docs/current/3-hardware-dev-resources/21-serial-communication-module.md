@@ -1,7 +1,7 @@
 ---
 sidebar_position: 21
 description: This document describes the Camthink Type-C/Type-A to UART (TTL) universal serial communication module. The module uses the CP2102 chip, supports 3.3V logic levels, and is suitable for serial data debugging on NE301 and NE101 development boards. It covers product features, CP2102 solution, wiring instructions, driver installation, and common debugging commands.
-keywords: [serial communication module, UART TTL, CP2101, NE301 debugging, NE101 debugging, hardware development, debugging tool, USB to serial, embedded development, driver installation]
+keywords: [serial communication module, UART TTL, CP2102, NE301 debugging, NE101 debugging, hardware development, debugging tool, USB to serial, embedded development, driver installation]
 tags: [serial communication, debugging tool, hardware resources, development board, CP2102]
 ---
 import useBaseUrl from '@docusaurus/useBaseUrl';

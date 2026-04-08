@@ -19,7 +19,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 ### **Model Comparison**
 | **Model**      | **Supported Bands**                                                 | **HPUE Bands**       | **GNSS**      |
 | ------------- | ------------------------------------------------------------ | ------------------- | ------------- |
-| **RM520N-GL** | 5G: n1/n3/n5/n7/n28/n38/n40/n41/n77/n78/n79;                                             LTE: B1/B3/B5/B7/B8/B20/B28/B38/B40/B41 | n38/n41/n77/n78/n79 | L1+L5 (reserved) |
+| **RM520N-GL** | 5G: n1/n3/n5/n7/n28/n38/n40/n41/n77/n78/n79; LTE: B1/B3/B5/B7/B8/B20/B28/B38/B40/B41 | n38/n41/n77/n78/n79 | L1+L5 (reserved) |
 | **RM520N-EU** | 5G: n1/n3/n7/n28/n41/n77/n78; LTE: B1/B3/B7/B8/B20/B28/B41   | n41/n77/n78         | L1+L5         |
 | **RM520N-CN** | 5G: n41/n78/n79; LTE: B1/B3/B5/B8/B41                        | n41/n78/n79         | L1+L5         |
 
