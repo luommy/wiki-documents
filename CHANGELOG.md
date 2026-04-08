@@ -10,9 +10,17 @@ All notable changes to the CamThink Wiki documentation will be documented in thi
 
 ### Added
 - **NE301 PoE Quick Start Guide**: Added a quick start guide for the NE301 PoE version, covering PoE module hardware introduction and core interfaces (PoE/Type-C/Alarm/RS485), power requirements, hardware connection, Web UI login, PoE network management (status check, IP configuration), typical application scenarios, and troubleshooting (full bilingual support).
+- **Hardware Dev Resources — 9 Sensor/Component Docs**: Added PIR sensor, mmWave radar, ToF laser, thermal array, temperature-humidity sensor, accelerometer-gyroscope, microphone, display screen, and speaker documentation with product overview, specifications, pin definitions, and NE301 application scenarios (full bilingual support).
+
+### Changed
+- **Hardware Dev Resources**: Renumbered all 21 documents for logical sidebar ordering and updated English translations to match.
 
 ### Fixed
-- **NE101/NE301 Components Overview**: Fixed broken anchor and broken link to product overview page in both Chinese and English documentation.
+- **Display Screen**: Fixed third image URL missing `display-screen/` path segment causing 404.
+- **NG4500 Components Overview**: Fixed broken 4G/5G module links after document renumbering.
+- **AI Tool Stack Guide**: Fixed broken anchor link (case-sensitive heading ID).
+- **ToF Laser / Temperature-Humidity Sensor**: Escaped `<` and `>` characters in MDX tables.
+- **Serial Communication Module**: Fixed CP2101→CP2102 typo in keywords.
 
 ## [2026-04-07]
 
