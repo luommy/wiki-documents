@@ -1,7 +1,8 @@
 ---
-description: Hardware specifications and installation guide for M.2 NVMe SSDs compatible with NeoEdge NG4500. Supports PCIe Gen3 x4 for high-speed storage.
-keywords: [NeoEdge NG4500, NVMe SSD, M.2 2280, Storage Expansion, PCIe Gen3 x4, Hardware Specification]
-tags: [NeoEdge NG4500, NVMe SSD, M.2 2280, Hardware Specification, Storage Expansion]
+sidebar_position: 1
+description: This document details the key features, specifications, and usage instructions for M.2 NVMe SSDs, including 256GB to 1TB capacities, PCIe Gen3 x4 NVMe 1.3 interface, 3D TLC NAND flash, high-speed read/write performance (3234 MB/s read, 3099 MB/s write), and reliability features.
+keywords: [SSD, solid state drive, PCIe Gen3, NVMe, M.2 2280, storage, 3D TLC NAND, hardware development, embedded systems, high-speed storage]
+tags: [SSD, solid state drive, PCIe, NVMe, hardware resources]
 ---
 
 import AccessoriesTable from '@site/src/components/AccessoriesTable';
@@ -63,7 +64,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 1. **Physical Installation**:  
    - Power off device, insert SSD into M.2 2280 slot, secure with screw  
 2. **System Configuration**:  
-   - Enable AHCI mode and NVMe drivers，disable power-saving modes in power management for optimal performance  
+   - Enable AHCI mode and NVMe drivers, disable power-saving modes in power management for optimal performance  
 
 ### Precautions
 - **Temperature Control**: Avoid prolonged high-load operation (>70°C), improve chassis cooling  

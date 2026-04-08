@@ -1,15 +1,15 @@
 ---
-description: 本文档详细介绍了Camthink Type-C/Type-A转UART(TTL)通用串口通讯模块。该模块采用CP2101芯片，支持3.3V逻辑电平，适用于NE301、NE101开发板的串口数据调试。内容涵盖产品特性、CP2102方案、接线说明、驱动安装及常用调试命令。
+sidebar_position: 21
+description: 本文档详细介绍了Camthink Type-C/Type-A转UART(TTL)通用串口通讯模块。该模块采用CP2102芯片，支持3.3V逻辑电平，适用于NE301、NE101开发板的串口数据调试。内容涵盖产品特性、CP2102方案、接线说明、驱动安装及常用调试命令。
 keywords: [串口通讯模块, UART TTL, CP2101, NE301调试, NE101调试, 硬件开发, 调试工具, USB转串口, 嵌入式开发, 驱动安装]
 tags: [串口通信, 调试工具, 硬件资源, 开发板, CP2102]
 ---
-
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
 # Serial Communication Module
 
 Camthink Type-C/Type-A 转UART（TTL）通用串口通讯模块。
-采用CP2101芯片，支持3.3V逻辑电平，支持NE301、NE101开发板串口数据调试。
+采用CP2102芯片，支持3.3V逻辑电平，支持NE301、NE101开发板串口数据调试。
 
 > 如果你想对一些开发版进行二次开发或深入程序调试，如 NE301、NE101等，你可以使用这个工具来尝试。
 

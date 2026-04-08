@@ -324,14 +324,14 @@ Product casing and bracket dimension instruction：
     },
     {
       image: "https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/overview/ng45xx_4g.png",
-      name: <a href="../hardware-dev-resources/3-4g-module">4G module</a>,
+      name: <a href="../hardware-dev-resources/8-4g-module">4G module</a>,
       quantity: "1",
       description: [
         "Quectel EM05 EM05-G 4G M.2 module, supports Europe, America, China, Japan, Australia frequency bands."]
     },
     {
       image: "https://resources.camthink.ai/wiki/img/neoedge-ng4500-series/overview/ng45xx_5g.png",
-      name: <a href="../hardware-dev-resources/4-5g-module">5G module</a>,
+      name: <a href="../hardware-dev-resources/10-5g-module">5G module</a>,
       quantity: "1",
       description: ["Quectel RM520N-GL 5G M.2 module, supports global mainstream bands."]
     },
