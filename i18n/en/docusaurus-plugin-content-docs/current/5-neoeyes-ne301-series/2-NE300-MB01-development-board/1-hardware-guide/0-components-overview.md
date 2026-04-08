@@ -165,4 +165,4 @@ Cat-1 cellular modules.
 
 ### Mounting Accessories
 
-A variety of flexible mounts are available. See [Product Installation](../../0-overview.md#产品安装).
+A variety of flexible mounts are available. See [Product Installation](../../0-overview.md#installation-examples).
