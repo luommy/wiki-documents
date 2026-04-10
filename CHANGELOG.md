@@ -6,6 +6,11 @@ All notable changes to the CamThink Wiki documentation will be documented in thi
 
 > This changelog reflects updates starting from **2025-12-23**. Major changes prior to this date are not recorded.
 
+## [2026-04-10]
+
+### Changed
+- **NE301 Product Overview**: Restructured document, streamlined intro, refined 8 core capabilities, merged installation & deployment sections, optimized image layout, fixed broken image paths (bilingual).
+
 ## [2026-04-08]
 
 ### Added

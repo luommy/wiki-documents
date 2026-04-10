@@ -16,136 +16,20 @@ import SupportGrid from '@site/src/components/SupportGrid';
   <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/301.png" alt="NeoEyes NE301 camera" width="70%" />
 </div>
 
-CamThink AI Camera NeoEyes NE301 is a low-power edge AI camera that carries 0.6 TOPS of compute on the STM32N6 MCU. The firmware exposes a built‑in Wi‑Fi AP and a full Web UI so that users can preview AI inference, switch model types, adjust model parameters, and fine-tune other features directly in the browser. The hardware follows a modular design: communication modules, image sensors, power options, and mounting accessories can all be swapped according to the scenario. Rich interface expansion and an open hardware architecture help developers move swiftly from prototype to commercial deployment.
+NeoEyes NE301 is a low-power edge AI camera built on the STM32N6 MCU with 0.6 TOPS of on-device compute. Its modular hardware architecture allows camera, communication, and power components to be swapped on demand, while rich IO expansion and a fully open-source ecosystem help developers move swiftly from prototype to commercial deployment.
 
-The camera also supports multiple event-triggered capture mechanisms (PIR, radar, acoustic, and more). When paired with external sensors, the device can wake up automatically, capture images, and complete edge inference whenever the trigger condition is met, enabling event-driven snapshots with on-device AI processing.
+### Key Capabilities
 
-### Low Power, Performance, and Edge AI
+- **Edge AI inference**: 0.6 TOPS compute with Web UI zero-code model deployment and real-time inference preview; supports YOLOv8 and other models with hot-swap.
+- **Ultra-low power**: 6.1 μA deep-sleep current; up to years of battery life on 4× AA batteries with PIR / radar smart wake-up.
+- **Modular hardware**: Swappable camera modules (CPI / USB, 3 FOV options), communication modules (Wi‑Fi / Cat‑1 / PoE), and power solutions (battery / Type‑C / solar / PoE).
+- **End-to-end AI toolchain**: Open-source AI Tool Stack platform and NeoMind cloud platform — from data collection, annotation, and training to quantization and deployment in ~2 hours.
+- **Sensor expansion ecosystem**: Sensor expansion board supports 9 sensors (PIR, radar, temperature/humidity, ToF, thermal imaging, etc.), OLED / TFT displays, and microphones — plug-and-play.
+- **Multiple connectivity & triggers**: Wi‑Fi 6 / Cat‑1 / PoE with MQTT / RTMP data upload and video streaming; PIR / radar / acoustic / IO / scheduled / MQTT remote / AI detection trigger modes.
+- **Fully open source**: Firmware, sensor drivers, and software platforms are all open-source on GitHub — ready for customization and secondary development.
+- **Web UI device management**: Browser-based configuration, real-time video preview, inference parameter tuning, and config import/export — no SDK integration required.
 
-#### U0 Power-Control Chip
-
-<div align="center" style={{ marginBottom: "1.5rem" }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/U0.png" alt="U0 power controller diagram" width="60%" />
-</div>
-
-NeoEyes NE301 adopts the STM32U073Kx power controller to deliver fine-grained energy management:
-
-- **Dynamic power scaling**: Adjusts MCU and modular peripherals in real time according to the active operating mode to balance performance and consumption.
-- **Smart sleep**: Offers μA-level deep sleep and mA-level full-speed operation, with wake-up latency measured in milliseconds.
-- **Battery life optimization**: Enhances energy efficiency on top of the STM32N6 baseline, significantly extending battery runtime.
-
-#### Performance
-
-| Metric                        | Value                 |
-| ----------------------------- | --------------------- |
-| **Sleep power**               | 7–8 μA (managed by U0)|
-| **Active power**              | 170–180 mA            |
-| **Wi-Fi throughput**          | 50 m @ 4 Mbps         |
-| **Local inference latency**   | 2–3 s                 |
-| **Realtime AI video**         | 720P@25 Hz, 1080P@15 Hz |
-| **Battery runtime (full load)** | 3–4 h               |
-
-> The values above are measured under lab conditions. Please refer to real deployments for actual results.
-
-#### Edge AI Compute
-
-The STM32N6 MCU provides 0.6 TOPS of compute, which is sufficient to run lightweight person detection, gesture recognition, and similar models locally without sending frames to the cloud. By moving workloads to the edge, NeoEyes NE301 lowers cost, latency, and privacy risk compared with traditional “device + server” architectures. Combined with low power design, easy installation, rich expansion, and IP67 protection, the camera fits long-running applications across multiple industries.
-
-### Hardware Highlights
-
-NeoEyes NE301 consists of an outer shell, camera modules, main board, communication module, battery tray, and other functional units. Standardized board-to-board connectors make it simple to swap, upgrade, or customize each module.
-
-- **Layered structure**: The front / middle / rear assemblies can be detached independently, enabling quick maintenance and DIY extensions. Please contact us if you need mechanical drawings.
-- **Flexible mounting**: The enclosure reserves abundant mounting holes and supports multiple brackets or housings. With CamThink [“Product Accessories”](#product-accessories), the camera can be deployed in many scenarios.
-- **Camera choices**: The main board supports CPI and USB sensors, allowing different lenses to be swapped in. See [“Interchangeable Camera Modules”](#interchangeable-camera-modules) for details.
-- **Communication options**: Wi‑Fi and Cat‑1 can be switched according to site requirements. See [“Communication Expansion”](#communication-expansion) for more information.
-- **Power options**: Ships with a battery tray (4× AA). It can also draw power via USB Type‑C, solar panels, or PoE.
-- **Open hardware**: Mechanical files (for 3D printing) and the open-source firmware are available. Out of the box you get low-power modes, wake-up control, MQTT data transfer, fill-light control, scheduled capture, image tuning, and network management. Refer to the “Developer Guide” for build and flashing instructions.
-
-### Hardware Interface Expansion
-
-> NeoEyes NE301 can extend its hardware capability to match different use cases.
-
-- **16-pin IO header**: Provides GPIO, DI, and DO interfaces. Can connect additional sensors to trigger the camera (resource availability depends on communication modules and USB camera usage).
-- **Power connector**: 2-pin power header on the back for the battery tray; USB Type‑C on the front bottom side for wired power (an aperture is required if the enclosure is sealed).
-- **Micro TF slot**: Local storage for images or data.
-- **Debug interfaces**: USB Type‑C and UART are exposed for development and serial debugging.
-- **Lighting**: Built-in fill light and status LED for short-range imaging in dark environments and system indication.
-- **Alarm interface**: 2-pin Wafer connector for alarm inputs.
-- **PIR interface**: 4-pin Wafer connector to attach PIR sensors.
-
-<div style={{ display: "flex", justifyContent: "center", gap: "20px", marginBottom: "20px" }}>
-  <div style={{ textAlign: "center", width: "45%" }}>
-    <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/motherboard-front.png" alt="Motherboard Front" style={{ width: "100%", borderRadius: "8px", boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }} />
-    <p style={{ marginTop: "8px", color: "#888", fontSize: "0.9em" }}>Motherboard Front</p>
-  </div>
-  <div style={{ textAlign: "center", width: "45%" }}>
-    <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/motherboard-back.png" alt="Motherboard Back" style={{ width: "100%", borderRadius: "8px", boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }} />
-    <p style={{ marginTop: "8px", color: "#888", fontSize: "0.9em" }}>Motherboard Back</p>
-  </div>
-</div>
-
-### Communication Expansion
-
-> Wi‑Fi comes standard. An LTE Cat‑1 module can be added by mounting it onto the front-side headers. Swapping communication modules is straightforward.
-
-- **Interface & compatibility**: Standard pin headers located on the front of the main board, recognized without additional drivers.
-- **Cat‑1 specifications**: Quectel EG912U‑GL (global, excluding North America) and EG915Q‑NA (North America) with LTE FDD/TDD and GSM support, 60 mm × 60 mm footprint.
-
-### Interchangeable Camera Modules
-
-#### Supported Camera Options
-
-<table>
-  <colgroup>
-    <col width="12%" />
-    <col width="30%" />
-    <col width="18%" />
-    <col width="18%" />
-    <col width="22%" />
-  </colgroup>
-  <thead>
-    <tr>
-      <th>Type</th>
-      <th>Model</th>
-      <th>Field of View</th>
-      <th>Focus Distance</th>
-      <th>Use Cases</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>CPI camera</td>
-      <td>OS04C10-51-4M <br/>OS04C10-88-3M <br/>OS04C10-137-4M</td>
-      <td>51°<br/>88°<br/>137°</td>
-      <td>4 m<br/>3 m<br/>2 m</td>
-      <td>Standard<br/>Wide angle<br/>Ultra-wide angle</td>
-    </tr>
-   <tr>
-      <td>USB camera</td>
-      <td>SC200AI-51-4M <br/>SC200AI-88-3M <br/>SC200AI-137-4M</td>
-      <td>51°<br/>88°<br/>137°</td>
-      <td>4 m<br/>3 m<br/>2 m</td>
-      <td>Standard<br/>Wide angle<br/>Ultra-wide angle</td>
-    </tr>
-  </tbody>
-</table>
-
-> The standard kit ships with the CPI OS04C10 module. USB modules can be purchased separately.
-
-### Deployment Readiness
-
-> NeoEyes NE301 is designed for outdoor stability and flexible deployment.
-
-- **Tempered-glass lens cover**: Highly transparent glass prevents water accumulation and secures long-term imaging quality outdoors.
-- **Outdoor-grade power & protection**: Battery-powered, low-energy operation plus IP67 ingress protection suits harsh environments.
-- **Flexible mounting**: Supports wall, ceiling, and pole mounting. Original brackets and additional enclosures are available to match different scenarios.
-
-<!-- Additional image slots -->
-
-## Product Specifications
-
-### System Specifications
+## System Specifications
 
 The key specifications of the complete NE301 unit are listed below.
 
@@ -208,7 +92,7 @@ The key specifications of the complete NE301 unit are listed below.
     </tr>
     <tr>
       <td>Connectivity</td>
-      <td>Wi‑Fi 6 / BLE</td>
+      <td>Wi‑Fi 6 / BLE / Ethernet (via PoE module)</td>
     </tr>
     <tr>
       <td>Camera interfaces</td>
@@ -259,11 +143,131 @@ The key specifications of the complete NE301 unit are listed below.
   </tbody>
 </table>
 
-### Enclosure & Accessories
+## Performance & Edge AI
 
-The mechanical design reserves sufficient space for add-ons, and official accessories support multiple mounting scenarios.
+### Low-Power Design
 
-### Product Accessories
+NeoEyes NE301 uses a dual-MCU architecture for fine-grained energy management: the STM32N6 handles AI inference and image processing, while the STM32U073Kx power controller monitors sensors during deep sleep and wakes the system on demand — balancing ultra-low standby with fast response.
+
+<div align="center" style={{ marginBottom: "1.5rem" }}>
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/U0.png" alt="Dual-MCU architecture" width="60%" />
+</div>
+
+| Metric | Value |
+| :--- | :--- |
+| **Deep-sleep current** | 6.1 μA (managed by U0) |
+| **Active current** | 170–180 mA (Wi‑Fi mode) |
+| **Wake-up latency** | Milliseconds (deep sleep to active) |
+| **Battery life** | 4× AA batteries, ~13 years at 1 capture/day |
+
+> Battery life is based on Wi‑Fi mode with 4× AA alkaline batteries (2500 mAh). Actual results may vary by deployment.
+
+### Edge AI Compute
+
+The STM32N6 MCU integrates a Neural-ART™ accelerator delivering 0.6 TOPS — sufficient to run lightweight person detection, gesture recognition, and similar models locally without sending frames to the cloud. By moving workloads to the edge, NE301 lowers cost, latency, and privacy risk compared with traditional "device + server" architectures.
+
+| Metric | Value |
+| :--- | :--- |
+| **NPU compute** | 600 GOPS (0.6 TOPS) |
+| **Local inference latency** | 2–3 s |
+| **Realtime AI video** | 720P @ 25 Hz, 1080P @ 15 Hz |
+| **NPU efficiency** | 3 TOPS/W, no active cooling required |
+| **Pre-installed model** | YOLOv8 Nano (COCO 80-class object detection) |
+
+## Hardware
+
+NeoEyes NE301 consists of an outer shell, camera modules, main board, communication module, and battery tray. All modules connect via standardized board-to-board connectors and can be swapped independently.
+
+<div style={{ display: "flex", justifyContent: "center", gap: "20px", marginBottom: "20px" }}>
+  <div style={{ textAlign: "center", width: "45%" }}>
+    <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/motherboard-front.png" alt="Motherboard Front" style={{ width: "100%", borderRadius: "8px", boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }} />
+    <p style={{ marginTop: "8px", color: "#888", fontSize: "0.9em" }}>Motherboard Front</p>
+  </div>
+  <div style={{ textAlign: "center", width: "45%" }}>
+    <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/motherboard-back.png" alt="Motherboard Back" style={{ width: "100%", borderRadius: "8px", boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }} />
+    <p style={{ marginTop: "8px", color: "#888", fontSize: "0.9em" }}>Motherboard Back</p>
+  </div>
+</div>
+
+### Modular Design
+
+NE301 uses a front / middle / rear layered layout where each functional module can be replaced independently:
+
+- **Camera modules**: CPI and USB sensors with 51° / 88° / 137° FOV options. See [“Interchangeable Camera Modules”](#interchangeable-camera-modules) for details.
+- **Communication modules**: Wi‑Fi, Cat‑1, or PoE Ethernet — hot-swappable. See [“Communication”](#communication) for details.
+- **Power options**: 4× AA batteries (included), USB Type‑C, solar panels, or PoE.
+- **Mounting**: The enclosure reserves abundant mounting holes. See CamThink [“Product Accessories”](#product-accessories) for available brackets. Contact us for mechanical design files (3D-printable).
+- **Open-source firmware**: Fully open-source with out-of-the-box support for low-power modes, wake-up control, MQTT, fill light, scheduled capture, and more. See the “Developer Guide” for build and flashing instructions.
+
+### Hardware Interfaces
+
+The main board provides a rich set of interfaces for external expansion and debugging:
+
+- **16-pin IO**: GPIO, DI, and DO for connecting external sensors to trigger capture (availability depends on communication module and USB camera usage).
+- **Power**: 2-pin battery header on the back; USB Type‑C on the front bottom for wired power (aperture required for sealed enclosures).
+- **Storage**: Micro TF card slot for local images or data.
+- **Debug**: USB Type‑C and UART for serial debugging.
+- **Lighting**: Built-in fill light and status LED.
+- **Alarm / PIR**: 2-pin Alarm input + 4-pin PIR sensor connector.
+
+### Interchangeable Camera Modules
+
+<table>
+  <colgroup>
+    <col width="12%" />
+    <col width="30%" />
+    <col width="18%" />
+    <col width="18%" />
+    <col width="22%" />
+  </colgroup>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Model</th>
+      <th>Field of View</th>
+      <th>Focus Distance</th>
+      <th>Use Cases</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>CPI camera</td>
+      <td>OS04C10-51-4M <br/>OS04C10-88-3M <br/>OS04C10-137-4M</td>
+      <td>51°<br/>88°<br/>137°</td>
+      <td>4 m<br/>3 m<br/>2 m</td>
+      <td>Standard<br/>Wide angle<br/>Ultra-wide angle</td>
+    </tr>
+   <tr>
+      <td>USB camera</td>
+      <td>SC200AI-51-4M <br/>SC200AI-88-3M <br/>SC200AI-137-4M</td>
+      <td>51°<br/>88°<br/>137°</td>
+      <td>4 m<br/>3 m<br/>2 m</td>
+      <td>Standard<br/>Wide angle<br/>Ultra-wide angle</td>
+    </tr>
+  </tbody>
+</table>
+
+> The standard kit ships with the CPI OS04C10 module. USB modules can be purchased separately.
+
+### Communication
+
+> Wi‑Fi comes standard. An LTE Cat‑1 or PoE module can be added by mounting it onto the front-side headers. The PoE module provides both Ethernet connectivity and power delivery. Swapping communication modules is straightforward.
+
+- **Interface & compatibility**: Standard pin headers located on the front of the main board, recognized without additional drivers.
+- **PoE module**: Delivers Ethernet wired connectivity and PoE power in one module, suitable for deployments requiring both network stability and simplified cabling.
+- **Cat‑1 specifications**: Quectel EG912U‑GL (global, excluding North America) and EG915Q‑NA (North America) with LTE FDD/TDD and GSM support, 60 mm × 60 mm footprint.
+
+### Sensor Expansion Board
+
+Connect the Sensor expansion board via the main board expansion header to interface with a variety of external devices:
+
+- **Sensors**: PIR, radar, temperature/humidity, ToF ranging, thermal imaging, and more for environmental awareness and event triggering.
+- **Displays**: OLED / TFT displays for local information display and human-machine interaction.
+- **Microphones**: Audio input for voice capture and acoustic triggering.
+
+> For detailed specifications and driver development, see the [Sensor Expansion Board Guide](./2-NE300-MB01-development-board/1-hardware-guide/2-sensor-extension-board.md).
+
+## Product Accessories
 
 > Optional accessories share the same mounting scheme as NeoEyes NE101. The table below lists the available kits.
 
@@ -272,48 +276,79 @@ The mechanical design reserves sufficient space for add-ons, and official access
 | <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/1.png" alt="Bottom bracket extension" width="180" /> | Bottom bracket extension | 1 | Extends top or bottom installation points |
 | <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/3.png" alt="Back bracket extension" width="180" /> | Back bracket extension | 1 | Adds mounting options for wall installations |
 | <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/5.png" alt="Pole bracket" width="180" /> | Pole bracket | 1 | Adjustable pole mount with two metal rods and adapters (rods can be customized) |
-| <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/Bracket/4.png" alt="Dial bracket" width="180" /> | Dial bracket | 1 | Stable mounting for meters with minimal ambient light interference |
-| <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/Bracket/2.png" alt="Water meter bracket" width="180" /> | Water-meter bracket | – | 3D printable design files available on request |
+| <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/4.png" alt="Dial bracket" width="180" /> | Dial bracket | 1 | Stable mounting for meters with minimal ambient light interference |
+| <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/2.png" alt="Water meter bracket" width="180" /> | Water-meter bracket | – | 3D printable design files available on request |
 | <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/sensor1.png" alt="OS04C10 camera module" width="180" /> | OS04C10 camera module | 1 | 51° / 88° / 137° FOV options (4 m / 3 m / 2 m focus) |
 | <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/sensor1.png" alt="SC200AI USB camera module" width="180" /> | SC200AI USB camera module | 1 | 51° / 88° / 137° FOV options (4 m / 3 m / 2 m focus) |
 | <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/cat1PCBA.jpg" alt="Cat.1 module" width="180" /> | Cat.1 module | 1 | Plug-in Cat‑1 module for global or North America variants |
 | <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/poe.png" alt="PoE module" width="180" /> | PoE module | 1 | Optional plug-in PoE module |
 
-### Installation Examples
+### Deployment
+
+NeoEyes NE301 is designed for outdoor stability and flexible deployment across multiple environments.
+
+- **Tempered-glass lens cover**: Highly transparent glass prevents water accumulation and secures long-term imaging quality outdoors.
+- **Outdoor-grade power & protection**: Battery-powered, low-energy operation plus IP67 ingress protection suits harsh environments. The PoE module provides both Ethernet connectivity and power delivery for deployments requiring wired network stability.
+- **Flexible mounting**: Supports wall, ceiling, and pole mounting. Original brackets and additional enclosures are available to match different scenarios.
 
 #### Wall Mount
 
-![NE_Series_Bracket_Wall_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_Bracket_Wall_Mount.png)
-
-![NE_Series_Wall_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_Wall_Mount.png)
+<div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+  <div style={{ flex: "1 1 45%", textAlign: "center" }}>
+    <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_Bracket_Wall_Mount.png" alt="Wall bracket" style={{ width: "100%", borderRadius: "8px" }} />
+  </div>
+  <div style={{ flex: "1 1 45%", textAlign: "center" }}>
+    <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_Wall_Mount.png" alt="Wall mount example" style={{ width: "100%", borderRadius: "8px" }} />
+  </div>
+</div>
 
 #### Dial Mount
 
-![NE_Series_Bracket_Meter_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_Bracket_Meter_Mount.png)
-
-![NE_Series_Meter_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_Meter_Mount.png)
+<div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+  <div style={{ flex: "1 1 45%", textAlign: "center" }}>
+    <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_Bracket_Meter_Mount.png" alt="Dial bracket" style={{ width: "100%", borderRadius: "8px" }} />
+  </div>
+  <div style={{ flex: "1 1 45%", textAlign: "center" }}>
+    <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_Meter_Mount.png" alt="Dial mount example" style={{ width: "100%", borderRadius: "8px" }} />
+  </div>
+</div>
 
 #### Pole Mount
 
-![NE_Series_Bracket_Rod_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_Bracket_Rod_Mount.png)
-
-![NE_Series_Rod_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_Rod_Mount.png)
+<div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+  <div style={{ flex: "1 1 45%", textAlign: "center" }}>
+    <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_Bracket_Rod_Mount.png" alt="Pole bracket" style={{ width: "100%", borderRadius: "8px" }} />
+  </div>
+  <div style={{ flex: "1 1 45%", textAlign: "center" }}>
+    <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_Rod_Mount.png" alt="Pole mount example" style={{ width: "100%", borderRadius: "8px" }} />
+  </div>
+</div>
 
 #### Shaft & Ball Mount
 
-![NE_Series_Bracket_ShaftBall_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_Bracket_ShaftBall_Mount.png)
-
-![NE_Series_ShaftBall_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_ShaftBall_Mount.png)
+<div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+  <div style={{ flex: "1 1 45%", textAlign: "center" }}>
+    <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_Bracket_ShaftBall_Mount.png" alt="Shaft & ball bracket" style={{ width: "100%", borderRadius: "8px" }} />
+  </div>
+  <div style={{ flex: "1 1 45%", textAlign: "center" }}>
+    <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_ShaftBall_Mount.png" alt="Shaft & ball mount example" style={{ width: "100%", borderRadius: "8px" }} />
+  </div>
+</div>
 
 #### Base Mount
 
-![NE_Series_Bracket_U_Type_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_Bracket_U_Type_Mount.png)
-
-![NE_Series_U_Type_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_U_Type_Mount.png)
+<div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+  <div style={{ flex: "1 1 45%", textAlign: "center" }}>
+    <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_Bracket_U_Type_Mount.png" alt="Base bracket" style={{ width: "100%", borderRadius: "8px" }} />
+  </div>
+  <div style={{ flex: "1 1 45%", textAlign: "center" }}>
+    <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_U_Type_Mount.png" alt="Base mount example" style={{ width: "100%", borderRadius: "8px" }} />
+  </div>
+</div>
 
 ## Application Scenarios
 
-> NeoEyes NE301 delivers on-device AI while maintaining ultra-low power consumption. It fits edge inference, event-triggered capture, and periodic sampling scenarios.
+NeoEyes NE301 delivers on-device AI while maintaining ultra-low power consumption. It fits edge inference, event-triggered capture, and periodic sampling scenarios across multiple industries.
 
 ### Smart City
 

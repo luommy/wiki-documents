@@ -1,4 +1,4 @@
-﻿---
+---
 description: NeoEyes NE301 是一款低功耗边缘 AI 智能相机，搭载 STM32N6 芯片，具备 0.6TOPS 算力。支持 Web UI 调试、模块化扩展（WiFi/Cat-1/POE）及多种传感器触发，适用于智慧城市、工业及农业场景。
 keywords: [NeoEyes NE301, 边缘AI相机, STM32N6, 低功耗相机, 智能视觉, 嵌入式AI, 物联网, 模块化设计, 智慧城市, 工业检测]
 tags: [NE301, AI相机, 边缘计算, 物联网, 智能硬件]
@@ -16,139 +16,20 @@ import SupportGrid from '@site/src/components/SupportGrid';
   <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/301.png" alt="image" width="70%" />
 </div>
 
-CamThink AI Camera NeoEyes NE301 是一款具备AI实时推理能力的低功耗边缘智能相机，采用STM32N6 MCU，具备0.6TOPS算力，固件设计上通过其内置的WIFI AP来连接设备，并以Web UI 交互的方式供用户对设备进行AI推理预览、模型类别替换、模型参数以及其他相关功能进行调试与修改，硬件设计上采用模块化的设计理念，可根据场景需要选配或者更换通讯模组、相机模组、供电策略、部署与安装方式，同时其硬件本身支持丰富的接口扩展，整体开放式的硬件架构可助开发者根据实际需求灵活扩展功能模块，快速完成从原型到商业产品的落地。
+NeoEyes NE301 是一款基于 STM32N6 MCU 的低功耗边缘 AI 智能相机，集成 0.6 TOPS 算力，采用模块化硬件架构，支持相机、通讯、供电等组件按需更换，具备丰富的接口扩展与完全开源的软硬件生态，助力开发者快速完成从原型到商业产品的落地。
 
-此外，Camera 支持开发者扩展多种触发拍照方式（PIR / 雷达 / 声音等），可与不同传感器模块配合，在满足触发条件时自动唤醒并完成图像采集并进行AI推理，实现事件监测式的抓拍与端侧AI处理。
+### 核心能力
 
+- **边缘 AI 推理**：0.6 TOPS 算力，Web UI 零代码模型部署与实时推理预览，支持 YOLOv8 等模型热替换。
+- **超低功耗**：深度休眠仅 6.1 μA，4 节 AA 电池续航可达数年，支持 PIR / 雷达智能唤醒。
+- **模块化硬件**：相机模组（CPI / USB，3 种视角）、通讯模组（WiFi / Cat-1 / PoE）、供电方案（电池 / Type-C / 太阳能 / PoE）均可按需更换。
+- **端到端 AI 工具链**：开源 AI Tool Stack 平台与 NeoMind 云平台，从数据采集、标注、训练到量化部署全流程约 2 小时完成。
+- **传感器扩展生态**：Sensor 扩展板支持 9 种传感器（PIR、雷达、温湿度、ToF、热成像等）、OLED / TFT 显示屏、麦克风，即插即用。
+- **多通讯与多触发**：WiFi 6 / Cat-1 / PoE 多方案通讯，支持 MQTT / RTMP 数据上报与视频推流；PIR / 雷达 / 声音 / IO / 定时 / MQTT 远程 / AI 检测等多触发抓拍。
+- **完整开源**：固件、传感器驱动及软件平台全部开源（GitHub），开发者可自由定制与二次开发。
+- **Web UI 设备管理**：浏览器端完成设备配置、实时视频预览、推理参数调节、配置导入导出，无需 SDK 集成。
 
-### 低功耗、性能与边缘AI计算
-
-#### U0电源控制芯片设计
-
-<div align="center" style={{ marginBottom: "1.5rem" }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/U0.png" alt="image" width="60%" />
-</div>
-
-
-NeoEyes NE301采用STM32U073Kx电源控制芯片，实现能耗的精细化管控：
-
-- **动态功耗调节**：根据不同工作模式实时调整MCU及模块化组件的能耗，以此来平衡性能与功耗。
-- **智能休眠机制**：支持低功耗下的深度休眠(μA级)和全速下的工作(mA级)；且从深度休眠到唤醒为ms级。
-- **电池寿命优化**：通过精准的能耗控制，在原有STM32N6芯片能耗控制下进一步优化，显著延长电池使用寿命。
-
-#### 性能表现
-
-| 指标                           | 参数                  |
-| ------------------------------ | --------------------- |
-| **休眠功耗**             | 7-8μA (U0芯片控制)   |
-| **工作能耗**             | 170-180mA             |
-| **WiFi传输速率**         | 50m @ 4Mbps           |
-| **本地图像推理响应时间** | 2-3秒                 |
-| **AI视频流实时推理**     | 720P@25Hz, 1080P@15Hz |
-| **满载电池工作续航**     | 3-4小时               |
-
-> 注：以上功耗数据为测试理论值，具体请以实际为准。
-
-#### 边缘AI计算
-
-设备MCU采用STM32N6为核心进行开发，其0.6Tops算力足以在本地跑轻量级人物检测、手势识别或者其他类型模型，无需上传云端，因而类似的场景下的应用可以从云端成本的开销下沉到边缘处，其成本、时延和隐私性在很多应用场景中比传统的“设备+服务器”方案更优，结合设备自身的低功耗设计、简易安装部署、丰富的接口扩展、IP67防护等级等特点，可实现在多领域场景下的应用，以实现长时间的连续工作。
-
-### 硬件特性信息
-
-NeoEyes NE301产品由前盖、镜头模组、主板、通讯模块、电池模块等多个功能单元组成。各模块间通过标准化接口连接，便于拆装与维护，支持开发者按需替换、升级或定制特定模块。
-
-* 分层式结构设计：采用前/中/后分离的模块化布局，便于快速拆装与功能扩展，支持用户按需DIY改装。如需获取结构设计文件，请联系我们获取。
-* 多样化安装支持：结构主体预留丰富的安装孔位，兼容多种支架和外壳扩展方案。配合 CamThink 提供的[「产品配件」](#产品配件)，可灵活部署于不同使用场景。
-* 相机模组可选：主板支持CPI、USB相机模组，可更换不同规格的镜头，用于满足不同场景的图像采集需求，相机模组更换和支持规格详见[「可换相机模组」](#可换相机模组)。
-* 通讯方案可选：支持WiFi、Cat-1通讯方案切换，满足不同场景通讯需求，通讯模组更换和支持规格详见[「通讯方案扩展」](#通讯方案扩展)。
-* 供电方案可选：默认支持电池仓方案供电，4节AA电池即可工作，也可通过主板Type-C进行有线供电或者太阳能、POE供电。
-* 硬件开放性：提供结构设计文件用于DIY外壳（可3D打印）或自定义扩展，提供完整开源固件，具备开箱即用功能：低功耗模式、设备唤醒、MQTT数据传输、补光控制、定时拍摄、图像参数调整、网络管理。开发和烧录请参见「开发指南」
-
-### 硬件接口扩展
-
-> NeoEyes NE301支持根据硬件使用场景扩展硬件能力
-
-- **16Pin IO接口**：主板背部预留16pin座子，带有GPIOs、DI、DO等接口，支持接入各种传感器触发拍摄（资源使用取决于通信模块和USB相机的占用情况）。
-- **电源接口**：主板背面留有2pin电源座子，支持电池仓连接供电，主板正面下方带有Type-C接口可支持有线连接直供电（整机使用需要下方开孔引出）。
-- **Micro TF卡槽**：可用于存储扩展，适用于本地图像或数据存储。
-- **调试接口**：Type-C和UART用于开发串口调试使用。
-- **灯光**：补光灯和系统指示灯支持，适合在近距离黑暗环境中采集图像与系统信息提示使用。
-- **Alam接口**：2Pin Wafer支持Alarm输入。
-- **PIR接口**：4Pin Wafer支持PIR传感器连接。
-
-
-
-<div style={{ display: "flex", justifyContent: "center", gap: "20px", marginBottom: "20px" }}>
-  <div style={{ textAlign: "center", width: "45%" }}>
-    <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/motherboard-front.png" alt="主板正面" style={{ width: "100%", borderRadius: "8px", boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }} />
-    <p style={{ marginTop: "8px", color: "#888", fontSize: "0.9em" }}>主板正面</p>
-  </div>
-  <div style={{ textAlign: "center", width: "45%" }}>
-    <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/motherboard-back.png" alt="主板背面" style={{ width: "100%", borderRadius: "8px", boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }} />
-    <p style={{ marginTop: "8px", color: "#888", fontSize: "0.9em" }}>主板背面</p>
-  </div>
-</div>
-
-### 通讯方案扩展
-
-> NeoEyes NE301默认支持WiFi通讯传输数据，支持选用LTE Cat-1通讯模块，模块与主板正面pin座子连接即可支持LTE Cat-1或WiFi-Halow通讯，易于硬件的通讯方案更换和扩展。
-- **接口与兼容性**：标准PIN座连接，位于主板正面，支持免驱动识别。
-- **Cat-1模块规格**：移远EG912U-GL（全球非北美地区）和移远EG915Q-NA（北美地区），支持LTE FDD/TDD和GSM等，尺寸60mm x 60mm。
-
-### 可换相机模组
-
-#### 支持的相机模组规格
-
-<table>
-  <colgroup>
-    <col width="12%" />
-    <col width="30%" />
-    <col width="18%" />
-    <col width="18%" />
-    <col width="22%" />
-  </colgroup>
-  <thead>
-    <tr>
-      <th>类别</th>
-      <th>型号</th>
-      <th>视角</th>
-      <th>适配距离</th>
-      <th>应用场景</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>CPI相机</td>
-      <td>OS04C10-51-4M <br/>OS04C10-88-3M <br/>OS04C10-137-4M</td>
-      <td>51°<br/>88°<br/>137°</td>
-       <td>4m <br/>3m <br/>2m</td>
-      <td>标准角度拍摄 <br/>大角度拍摄<br/>广角拍摄</td>
-    </tr>
-   <tr>
-      <td>USB相机</td>
-      <td>SC200AI-51-4M <br/>SC200AI-88-3M <br/>SC200AI-137-4M</td>
-      <td>51°<br/>88°<br/>137°</td>
-      <td>4m <br/>3m <br/>2m</td>
-      <td>标准角度拍摄 <br/>大角度拍摄<br/>广角拍摄</td>
-    </tr> 
-  </tbody>
-</table>
-
-> 注：整机标配为CPI相机-OS04C10,如需USB相机可额外选购。
-
-### 适用性与部署
-
-> NeoEyes NE301 设计兼顾户外稳定性与灵活部署能力，适用于多种安装环境和场景
-
-- **前盖镜头钢化玻璃**：镜头前盖采用高透光钢化玻璃，具备出色的防雨水积聚能力，保障长期户外拍摄效果稳定。
-- **无线与户外部署支持**：支持电池供电、低功耗运行，结合 IP67 级防护设计，适用于各种恶劣环境中的长期部署。
-- **灵活的安装方式**：支持墙面、顶部、立杆等多种安装方式，提供丰富的原装支架和外壳扩展组件，满足多样部署需求。
-
-<!--补充图片展示-->
-
-## 产品信息
-
-### 产品规格
+## 产品规格
 
 NE301整机产品规格如下：
 
@@ -211,7 +92,7 @@ NE301整机产品规格如下：
     </tr>
     <tr>
       <td>通讯</td>
-      <td>Wi-Fi 6 / BLE</td>
+      <td>Wi-Fi 6 / BLE / 以太网（通过POE模块）</td>
     </tr>
     <tr>
       <td>镜头模组接口</td>
@@ -262,11 +143,131 @@ NE301整机产品规格如下：
   </tbody>
 </table>
 
-### 产品外形与尺寸
+## 性能与边缘AI
 
-本产品在结构和外观上留有设计，提供多种支架配件，支持多种安装方式，可满足多种场景的使用需求。
+### 低功耗设计
 
-### 产品配件
+NeoEyes NE301 采用双 MCU 架构实现精细化能耗管控：STM32N6 作为主控负责 AI 推理与图像处理，STM32U073Kx 作为电源管理芯片在深度休眠模式下持续监测传感器并按需唤醒系统，兼顾超低待机与快速响应。
+
+<div align="center" style={{ marginBottom: "1.5rem" }}>
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/U0.png" alt="双MCU架构" width="60%" />
+</div>
+
+| 指标 | 参数 |
+| :--- | :--- |
+| **深度休眠功耗** | 6.1 μA（U0 芯片控制） |
+| **工作功耗** | 170–180 mA（WiFi 模式） |
+| **唤醒延迟** | 毫秒级（从深度休眠到工作） |
+| **电池续航** | 4 节 AA 电池，1 次/天抓拍可达约 13 年 |
+
+> 注：续航数据基于 WiFi 模式、4 节 AA 碱性电池（2500mAh），具体请以实际部署为准。
+
+### 边缘 AI 计算
+
+设备 MCU 采用 STM32N6 为核心进行开发，集成 Neural-ART™ 加速器，0.6 TOPS 算力足以在本地运行轻量级人物检测、手势识别等模型，无需上传云端。通过将 AI 推理下沉到边缘侧，在成本、时延和隐私性方面相比传统的"设备 + 服务器"方案更优。
+
+| 指标 | 参数 |
+| :--- | :--- |
+| **NPU 算力** | 600 GOPS（0.6 TOPS） |
+| **本地图像推理响应** | 2–3 秒 |
+| **AI 实时视频推理** | 720P @ 25 Hz，1080P @ 15 Hz |
+| **NPU 能效** | 3 TOPS/W，全速运行无需散热 |
+| **预置模型** | YOLOv8 Nano（COCO 80 类目标检测） |
+
+## 硬件介绍
+
+NeoEyes NE301 由前盖、镜头模组、主板、通讯模块、电池模块等功能单元组成，各模块通过标准化接口连接，支持按需拆装与更换。
+
+<div style={{ display: "flex", justifyContent: "center", gap: "20px", marginBottom: "20px" }}>
+  <div style={{ textAlign: "center", width: "45%" }}>
+    <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/motherboard-front.png" alt="主板正面" style={{ width: "100%", borderRadius: "8px", boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }} />
+    <p style={{ marginTop: "8px", color: "#888", fontSize: "0.9em" }}>主板正面</p>
+  </div>
+  <div style={{ textAlign: "center", width: "45%" }}>
+    <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/motherboard-back.png" alt="主板背面" style={{ width: "100%", borderRadius: "8px", boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }} />
+    <p style={{ marginTop: "8px", color: "#888", fontSize: "0.9em" }}>主板背面</p>
+  </div>
+</div>
+
+### 模块化设计
+
+NE301 采用前/中/后分离的模块化布局，各功能模块均可独立更换：
+
+- **相机模组**：支持 CPI、USB 相机，提供 51°/88°/137° 三种视角可选，详见[「可换相机模组」](#可换相机模组)。
+- **通讯模组**：支持 WiFi、Cat-1、PoE 以太网切换，详见[「通讯方案」](#通讯方案)。
+- **供电方案**：4 节 AA 电池（标配）、USB Type-C 有线供电、太阳能、PoE 供电。
+- **安装扩展**：结构主体预留丰富安装孔位，配合 CamThink [「产品配件」](#产品配件)可灵活部署。如需结构设计文件（可 3D 打印），请联系我们获取。
+- **开源固件**：完整开源，开箱即用低功耗模式、设备唤醒、MQTT 传输、补光控制、定时拍摄等功能。开发和烧录请参见「开发指南」。
+
+### 硬件接口
+
+主板提供丰富的接口用于外部扩展与调试：
+
+- **16Pin IO**：GPIOs、DI、DO 等接口，支持接入外部传感器触发拍摄（资源取决于通讯模块和 USB 相机占用情况）。
+- **电源**：背面 2pin 电池仓供电；正面下方 Type-C 有线供电（整机密封需开孔引出）。
+- **存储**：Micro TF 卡槽，用于本地图像或数据存储。
+- **调试**：USB Type-C 和 UART 串口调试。
+- **灯光**：补光灯和系统指示灯。
+- **Alarm / PIR**：2Pin Alarm 输入 + 4Pin PIR 传感器接口。
+
+### 可换相机模组
+
+<table>
+  <colgroup>
+    <col width="12%" />
+    <col width="30%" />
+    <col width="18%" />
+    <col width="18%" />
+    <col width="22%" />
+  </colgroup>
+  <thead>
+    <tr>
+      <th>类别</th>
+      <th>型号</th>
+      <th>视角</th>
+      <th>适配距离</th>
+      <th>应用场景</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>CPI相机</td>
+      <td>OS04C10-51-4M <br/>OS04C10-88-3M <br/>OS04C10-137-4M</td>
+      <td>51°<br/>88°<br/>137°</td>
+       <td>4m <br/>3m <br/>2m</td>
+      <td>标准角度拍摄 <br/>大角度拍摄<br/>广角拍摄</td>
+    </tr>
+   <tr>
+      <td>USB相机</td>
+      <td>SC200AI-51-4M <br/>SC200AI-88-3M <br/>SC200AI-137-4M</td>
+      <td>51°<br/>88°<br/>137°</td>
+      <td>4m <br/>3m <br/>2m</td>
+      <td>标准角度拍摄 <br/>大角度拍摄<br/>广角拍摄</td>
+    </tr>
+  </tbody>
+</table>
+
+> 注：整机标配为CPI相机-OS04C10,如需USB相机可额外选购。
+
+### 通讯方案
+
+> NeoEyes NE301默认支持WiFi通讯传输数据，支持选用LTE Cat-1通讯模块或POE模块，POE模块可同时提供以太网有线连接与供电，模块与主板正面pin座子连接即可支持以太网、LTE Cat-1或WiFi-Halow通讯，易于硬件的通讯方案更换和扩展。
+
+- **接口与兼容性**：标准PIN座连接，位于主板正面，支持免驱动识别。
+- **POE模块**：通过POE扩展模块实现以太网有线连接与POE供电一体化，适用于对网络稳定性和供电便捷性要求较高的部署场景。
+- **Cat-1模块规格**：移远EG912U-GL（全球非北美地区）和移远EG915Q-NA（北美地区），支持LTE FDD/TDD和GSM等，尺寸60mm x 60mm。
+
+### Sensor 扩展板
+
+通过主板扩展接口连接 Sensor 扩展板，可对接多种外部设备：
+
+- **传感器**：PIR、雷达、温湿度、ToF 测距、热成像等多种传感器，实现环境感知与事件触发。
+- **显示屏**：OLED / TFT 显示屏，支持本地信息展示与人机交互。
+- **麦克风**：音频输入，支持语音采集与声学触发。
+
+> 传感器扩展板详细规格与驱动开发请参见[「Sensor 扩展板指南」](./2-NE300-MB01-development-board/1-hardware-guide/2-sensor-extension-board.md)。
+
+## 产品配件
 
 > NE301产品系列支持选配安装，结构安装同NE101，具体配件如下
 
@@ -275,54 +276,79 @@ NE301整机产品规格如下：
 | <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/1.png" alt="底部支架扩展件" width="180" />      | 底部支架扩展件        | 1    | 适合顶部安装、底部安装扩展使用                                                                                  |
 | <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/3.png" alt="背部支架扩展件" width="180" />      | 背部支架扩展件        | 1    | 适合壁装相机时扩展使用                                                                                          |
 | <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/5.png" alt="杆件支架" width="180" />            | 杆件支架              | 1    | 适合复杂场景需要多角度调整相机时根据场景扩展使用，套件包含金属杆*2、转换头*2，金属杆可定制                    |
-| <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/Bracket/4.png" alt="表盘支架" width="180" />            | 表盘支架              | 1    | 适合环境光线影响较少的仪表采集固定安装使用                                                                      |
-| <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/Bracket/2.png" alt="水表支架" width="180" />            | 水表支架              | -    | 可提供3D设计文件自行3D打印，非实体支架选配                                                                      |
+| <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/4.png" alt="表盘支架" width="180" />            | 表盘支架              | 1    | 适合环境光线影响较少的仪表采集固定安装使用                                                                      |
+| <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/2.png" alt="水表支架" width="180" />            | 水表支架              | -    | 可提供3D设计文件自行3D打印，非实体支架选配                                                                      |
 | <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/sensor1.png" alt="04C10相机模组" width="180" />         | OS04C10 摄像头        | 1    | 支持3种规格：``51° FOV, 4m focus``、``88° FOV, 3m focus ``、``137° FOV, 2m focus``                           |
 | <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/sensor1.png" alt="SC200AI USB摄像头模组" width="180" /> | SC200AI USB摄像头模组 | 1    | 支持3种规格：``51° FOV, 4m focus``、``88° FOV , 3m focus``、``137° FOV, 2m focus`` |
 | <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne101-series/overview/cat1PCBA.jpg" alt="Cat.1通讯模块" width="180" />        | Cat.1通讯模块         | 1    | 可自行通过主板插槽装配，支持全球版本或北美版本可选                                                              |
 | <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/poe.png" alt="image" width="180" />                                            | POE通讯模块           | 1    | 可自行通过主板插槽装配                                                                                          |
 
-### 产品安装
+### 部署与安装
+
+NeoEyes NE301 设计兼顾户外稳定性与灵活部署能力，适用于多种安装环境和场景。
+
+- **前盖镜头钢化玻璃**：镜头前盖采用高透光钢化玻璃，具备出色的防雨水积聚能力，保障长期户外拍摄效果稳定。
+- **无线与户外部署支持**：支持电池供电、低功耗运行，结合 IP67 级防护设计，适用于各种恶劣环境中的长期部署；通过POE模块可同时获得以太网有线连接与供电，满足对网络稳定性要求较高的场景。
+- **灵活的安装方式**：支持墙面、顶部、立杆等多种安装方式，提供丰富的原装支架和外壳扩展组件，满足多样部署需求。
 
 #### 壁装支架及安装示意
 
-![NE_Series_Bracket_Wall_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_Bracket_Wall_Mount.png)
-
-![NE_Series_Wall_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_Wall_Mount.png)
+<div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+  <div style={{ flex: "1 1 45%", textAlign: "center" }}>
+    <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_Bracket_Wall_Mount.png" alt="壁装支架" style={{ width: "100%", borderRadius: "8px" }} />
+  </div>
+  <div style={{ flex: "1 1 45%", textAlign: "center" }}>
+    <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_Wall_Mount.png" alt="壁装安装示意" style={{ width: "100%", borderRadius: "8px" }} />
+  </div>
+</div>
 
 #### 表盘支架及安装示意
 
-![NE_Series_Bracket_Meter_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_Bracket_Meter_Mount.png)
-
-![NE_Series_Meter_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_Meter_Mount.png)
+<div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+  <div style={{ flex: "1 1 45%", textAlign: "center" }}>
+    <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_Bracket_Meter_Mount.png" alt="表盘支架" style={{ width: "100%", borderRadius: "8px" }} />
+  </div>
+  <div style={{ flex: "1 1 45%", textAlign: "center" }}>
+    <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_Meter_Mount.png" alt="表盘安装示意" style={{ width: "100%", borderRadius: "8px" }} />
+  </div>
+</div>
 
 #### 杆件支架及安装示意
 
-![NE_Series_Bracket_Rod_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_Bracket_Rod_Mount.png)
-
-![NE_Series_Rod_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_Rod_Mount.png)
+<div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+  <div style={{ flex: "1 1 45%", textAlign: "center" }}>
+    <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_Bracket_Rod_Mount.png" alt="杆件支架" style={{ width: "100%", borderRadius: "8px" }} />
+  </div>
+  <div style={{ flex: "1 1 45%", textAlign: "center" }}>
+    <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_Rod_Mount.png" alt="杆件安装示意" style={{ width: "100%", borderRadius: "8px" }} />
+  </div>
+</div>
 
 #### 三轴球支架及安装示意
 
-![NE_Series_Bracket_ShaftBall_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_Bracket_ShaftBall_Mount.png)
-
-![NE_Series_ShaftBall_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_ShaftBall_Mount.png)
+<div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+  <div style={{ flex: "1 1 45%", textAlign: "center" }}>
+    <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_Bracket_ShaftBall_Mount.png" alt="三轴球支架" style={{ width: "100%", borderRadius: "8px" }} />
+  </div>
+  <div style={{ flex: "1 1 45%", textAlign: "center" }}>
+    <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_ShaftBall_Mount.png" alt="三轴球安装示意" style={{ width: "100%", borderRadius: "8px" }} />
+  </div>
+</div>
 
 #### 座装支架及安装示意
 
-![NE_Series_Bracket_U_Type_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_Bracket_U_Type_Mount.png)
-
-![NE_Series_U_Type_Mount.png](https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_U_Type_Mount.png)
-
+<div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+  <div style={{ flex: "1 1 45%", textAlign: "center" }}>
+    <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_Bracket_U_Type_Mount.png" alt="座装支架" style={{ width: "100%", borderRadius: "8px" }} />
+  </div>
+  <div style={{ flex: "1 1 45%", textAlign: "center" }}>
+    <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/overview/NE_Series_U_Type_Mount.png" alt="座装安装示意" style={{ width: "100%", borderRadius: "8px" }} />
+  </div>
+</div>
 
 ## 产品应用
 
-
-
-
-### 产品使用场景
-
-NeoEyes NE301具备设备本地AI推理能力，同时保留超低功耗的特点，可适用于边缘计算与推理、场景触发、周期采样等的视觉类AI应用,以下为场景使用示例。
+NeoEyes NE301 凭借本地 AI 推理能力与超低功耗设计，适用于边缘计算与推理、事件触发、周期采样等视觉类 AI 应用，以下为场景使用示例。
 
 ### 智慧城市
 
@@ -478,7 +504,6 @@ NeoEyes NE301具备设备本地AI推理能力，同时保留超低功耗的特�
 
 - [模型训练与部署](./3-application-guide/0-model-training-and-deployment/0-model-training-and-deployment.md)
 
-
 <!--链接到应用指南-->
 
 <!-- NE301可满足多类场景需求，最本质的优势是支持本地AI推理，以下是典型应用案例，每个案例提供完整且详细的部署过程，助您快速上手应用完成实际项目落地
@@ -515,10 +540,3 @@ Alarm 报警触发
 ## 技术支持
 <SupportGrid />
 <!--Discord、GIthub issue-->
-
-
-
-
-
-
-
