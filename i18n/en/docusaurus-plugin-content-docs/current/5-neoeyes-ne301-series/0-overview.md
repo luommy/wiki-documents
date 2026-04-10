@@ -23,10 +23,10 @@ NeoEyes NE301 is a low-power edge AI camera built on the STM32N6 MCU with 0.6 TO
 - **Edge AI inference**: 0.6 TOPS compute with Web UI zero-code model deployment and real-time inference preview; supports YOLOv8 and other models with hot-swap.
 - **Ultra-low power**: 6.1 μA deep-sleep current; up to years of battery life on 4× AA batteries with PIR / radar smart wake-up.
 - **Modular hardware**: Swappable camera modules (CPI / USB, 3 FOV options), communication modules (Wi‑Fi / Cat‑1 / PoE), and power solutions (battery / Type‑C / solar / PoE).
-- **End-to-end AI toolchain**: Open-source AI Tool Stack — from data collection, annotation, and training to quantization and deployment in ~2 hours.
+- **End-to-end AI toolchain**: Open-source AI Tool Stack platform and NeoMind cloud platform — from data collection, annotation, and training to quantization and deployment in ~2 hours.
 - **Sensor expansion ecosystem**: Sensor expansion board supports 9 sensors (PIR, radar, temperature/humidity, ToF, thermal imaging, etc.), OLED / TFT displays, and microphones — plug-and-play.
 - **Multiple connectivity & triggers**: Wi‑Fi 6 / Cat‑1 / PoE with MQTT / RTMP data upload and video streaming; PIR / radar / acoustic / IO / scheduled / MQTT remote / AI detection trigger modes.
-- **Fully open source**: Firmware, sensor drivers, and AI Tool Stack are all open-source on GitHub — ready for customization and secondary development.
+- **Fully open source**: Firmware, sensor drivers, and software platforms are all open-source on GitHub — ready for customization and secondary development.
 - **Web UI device management**: Browser-based configuration, real-time video preview, inference parameter tuning, and config import/export — no SDK integration required.
 
 ## System Specifications
