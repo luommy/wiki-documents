@@ -6,6 +6,11 @@ All notable changes to the CamThink Wiki documentation will be documented in thi
 
 > This changelog reflects updates starting from **2025-12-23**. Major changes prior to this date are not recorded.
 
+## [2026-04-13]
+
+### Added
+- **NE101/NE301 Solar Power Solution**: Solar panel + 7AH battery kit for unlimited 24/7 continuous capture, covering BOM, hardware connection, power consumption analysis, and high-frequency capture scenarios (full bilingual support).
+
 ## [2026-04-10]
 
 ### Changed

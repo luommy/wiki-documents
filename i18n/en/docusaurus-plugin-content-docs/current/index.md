@@ -35,8 +35,15 @@ import VideoCarousel from '@site/src/components/VideoCarousel';
   {/* ================= Latest Updates ================= */}
   <h2 className="docs-section-title">Latest Docs</h2>
   <div className="latest-docs-grid">
-    <Link to="/docs/neoeyes-ne301-series/quick-start" className="update-card">
+    <Link to="/docs/hardware-dev-resources/solar-power-solution" className="update-card">
       <span className="update-badge">NEW</span>
+      <div className="update-title">NE101/NE301 Solar Power Solution</div>
+      <div className="update-meta">
+        <span>New Doc</span>
+        <span>• 2026-04-13</span>
+      </div>
+    </Link>
+    <Link to="/docs/neoeyes-ne301-series/quick-start" className="update-card">
       <div className="update-title">NeoEyes NE301 Quick Start</div>
       <div className="update-meta">
         <span>Doc Update</span>
@@ -48,13 +55,6 @@ import VideoCarousel from '@site/src/components/VideoCarousel';
       <div className="update-meta">
         <span>Hot Topic</span>
         <span>• 2025-11-09</span>
-      </div>
-    </Link>
-    <Link to="/docs/neoedge-ng4500-series/ng4500-cb01-development-board/dev-guide" className="update-card">
-      <div className="update-title">NG4500 Carrier Board Hardware Interface Reference</div>
-      <div className="update-meta">
-        <span>Hardware</span>
-        <span>• 2025-09-20</span>
       </div>
     </Link>
   </div>
