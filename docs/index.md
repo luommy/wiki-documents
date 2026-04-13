@@ -35,8 +35,15 @@ import VideoCarousel from '@site/src/components/VideoCarousel';
   {/* ================= Latest Updates ================= */}
   <h2 className="docs-section-title">最新文档</h2>
   <div className="latest-docs-grid">
-    <Link to="/docs/neoeyes-ne301-series/quick-start" className="update-card">
+    <Link to="/docs/hardware-dev-resources/solar-power-solution" className="update-card">
       <span className="update-badge">NEW</span>
+      <div className="update-title">NE101/NE301 太阳能供电持续抓拍方案</div>
+      <div className="update-meta">
+        <span>新增文档</span>
+        <span>• 2026-04-13</span>
+      </div>
+    </Link>
+    <Link to="/docs/neoeyes-ne301-series/quick-start" className="update-card">
       <div className="update-title">NeoEyes NE301 快速入门</div>
       <div className="update-meta">
         <span>文档更新</span>
@@ -48,13 +55,6 @@ import VideoCarousel from '@site/src/components/VideoCarousel';
       <div className="update-meta">
         <span>热门主题</span>
         <span>• 2025-11-09</span>
-      </div>
-    </Link>
-    <Link to="/docs/neoedge-ng4500-series/ng4500-cb01-development-board/dev-guide" className="update-card">
-      <div className="update-title">NG4500 载板硬件接口定义参考</div>
-      <div className="update-meta">
-        <span>硬件资料</span>
-        <span>• 2025-09-20</span>
       </div>
     </Link>
   </div>
