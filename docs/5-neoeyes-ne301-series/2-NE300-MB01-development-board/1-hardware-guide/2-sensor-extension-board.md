@@ -257,6 +257,7 @@ SensorExt/
     description: ['0.96" OLED（I2C，128×64）/ 1.14" TFT（SPI，135×240）/ 1.54" TFT（SPI，240×240）', 'OLED 低功耗适合文字展示，TFT 支持热成像伪彩色渲染']
   },
   {
+    image: 'https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/hardware-guide/sensor-extension-board/speaker-302008ZA.JPG',
     name: '喇叭（可选）',
     quantity: '1',
     description: ['HDK-302008ZA-3C13，动圈式，30×20mm', '额定功率 1.5W，阻抗 8Ω±15%，灵敏度 90dB（0.5W/0.1m），频率范围 Fo–20KHz']
