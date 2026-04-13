@@ -257,6 +257,7 @@ The sensor extension board demonstrates NE301's environmental sensing capabiliti
     description: ['0.96" OLED (I2C, 128×64) / 1.14" TFT (SPI, 135×240) / 1.54" TFT (SPI, 240×240)', 'OLED low power for text display, TFT supports thermal imaging pseudo-color rendering']
   },
   {
+    image: 'https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/NE300-MB01-development-board/hardware-guide/sensor-extension-board/speaker-302008ZA.JPG',
     name: 'Speaker (optional)',
     quantity: '1',
     description: ['HDK-302008ZA-3C13, dynamic type, 30×20mm', 'Rated power 1.5W, impedance 8Ω±15%, sensitivity 90dB (0.5W/0.1m), frequency range Fo–20KHz']
