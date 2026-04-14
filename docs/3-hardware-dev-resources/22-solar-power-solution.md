@@ -127,7 +127,7 @@ xychart-beta
 ## 4. 效果演示
 
 <video controls width="100%">
-  <source src="https://resources.camthink.ai/wiki/img/hardware-dev-resources/solar-power-solution/solar-short.mp4" type="video/mp4"></source>
+  <source src="https://resources.camthink.ai/wiki/img/hardware-dev-resources/solar-power-solution/solar-short.mov" type="video/mp4"></source>
   您的浏览器不支持视频播放。
 </video>
 
