@@ -35,8 +35,15 @@ import VideoCarousel from '@site/src/components/VideoCarousel';
   {/* ================= Latest Updates ================= */}
   <h2 className="docs-section-title">Latest Docs</h2>
   <div className="latest-docs-grid">
-    <Link to="/docs/hardware-dev-resources/solar-power-solution" className="update-card">
+    <Link to="/docs/ai-application/neomind/ai-agent-and-extension-solutions" className="update-card">
       <span className="update-badge">NEW</span>
+      <div className="update-title">AI Agent and Extensions Solutions</div>
+      <div className="update-meta">
+        <span>New Doc</span>
+        <span>• 2026-04-16</span>
+      </div>
+    </Link>
+    <Link to="/docs/hardware-dev-resources/solar-power-solution" className="update-card">
       <div className="update-title">NE101/NE301 Solar Power Solution</div>
       <div className="update-meta">
         <span>New Doc</span>
@@ -48,13 +55,6 @@ import VideoCarousel from '@site/src/components/VideoCarousel';
       <div className="update-meta">
         <span>Doc Update</span>
         <span>• 2026-01-04</span>
-      </div>
-    </Link>
-    <Link to="/docs/neoedge-ng4500-series/application-guide/deepseek-r1" className="update-card">
-      <div className="update-title">DeepSeek R1 Local Deployment Guide</div>
-      <div className="update-meta">
-        <span>Hot Topic</span>
-        <span>• 2025-11-09</span>
       </div>
     </Link>
   </div>
