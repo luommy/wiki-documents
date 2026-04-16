@@ -35,8 +35,15 @@ import VideoCarousel from '@site/src/components/VideoCarousel';
   {/* ================= Latest Updates ================= */}
   <h2 className="docs-section-title">最新文档</h2>
   <div className="latest-docs-grid">
-    <Link to="/docs/hardware-dev-resources/solar-power-solution" className="update-card">
+    <Link to="/docs/ai-application/neomind/ai-agent-and-extension-solutions" className="update-card">
       <span className="update-badge">NEW</span>
+      <div className="update-title">AI Agent 与插件解决方案</div>
+      <div className="update-meta">
+        <span>新增文档</span>
+        <span>• 2026-04-16</span>
+      </div>
+    </Link>
+    <Link to="/docs/hardware-dev-resources/solar-power-solution" className="update-card">
       <div className="update-title">NE101/NE301 太阳能供电持续抓拍方案</div>
       <div className="update-meta">
         <span>新增文档</span>
@@ -48,13 +55,6 @@ import VideoCarousel from '@site/src/components/VideoCarousel';
       <div className="update-meta">
         <span>文档更新</span>
         <span>• 2025-12-28</span>
-      </div>
-    </Link>
-    <Link to="/docs/neoedge-ng4500-series/application-guide/deepseek-r1" className="update-card">
-      <div className="update-title">DeepSeek R1 本地化部署指南</div>
-      <div className="update-meta">
-        <span>热门主题</span>
-        <span>• 2025-11-09</span>
       </div>
     </Link>
   </div>

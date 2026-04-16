@@ -6,6 +6,11 @@ All notable changes to the CamThink Wiki documentation will be documented in thi
 
 > This changelog reflects updates starting from **2025-12-23**. Major changes prior to this date are not recorded.
 
+## [2026-04-16]
+
+### Added
+- **AI Agent and Extensions Solutions**: YOLO Inference plugin (edge ONNX detection) and AI Agent (LLM-powered analysis) for person/object detection with notification push on NeoMind, supporting NE101/NE301 smart cameras (full bilingual support).
+
 ## [2026-04-13]
 
 ### Added
