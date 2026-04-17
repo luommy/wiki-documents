@@ -35,8 +35,15 @@ import VideoCarousel from '@site/src/components/VideoCarousel';
   {/* ================= Latest Updates ================= */}
   <h2 className="docs-section-title">最新文档</h2>
   <div className="latest-docs-grid">
-    <Link to="/docs/ai-application/neomind/ai-agent-and-extension-solutions" className="update-card">
+    <Link to="/docs/ai-application/neomind/ocr-solution" className="update-card">
       <span className="update-badge">NEW</span>
+      <div className="update-title">OCR 通用文字识别方案</div>
+      <div className="update-meta">
+        <span>新增文档</span>
+        <span>• 2026-04-17</span>
+      </div>
+    </Link>
+    <Link to="/docs/ai-application/neomind/ai-agent-and-extension-solutions" className="update-card">
       <div className="update-title">AI Agent 与插件解决方案</div>
       <div className="update-meta">
         <span>新增文档</span>
@@ -48,13 +55,6 @@ import VideoCarousel from '@site/src/components/VideoCarousel';
       <div className="update-meta">
         <span>新增文档</span>
         <span>• 2026-04-13</span>
-      </div>
-    </Link>
-    <Link to="/docs/neoeyes-ne301-series/quick-start" className="update-card">
-      <div className="update-title">NeoEyes NE301 快速入门</div>
-      <div className="update-meta">
-        <span>文档更新</span>
-        <span>• 2025-12-28</span>
       </div>
     </Link>
   </div>
