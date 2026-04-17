@@ -6,6 +6,11 @@ All notable changes to the CamThink Wiki documentation will be documented in thi
 
 > This changelog reflects updates starting from **2025-12-23**. Major changes prior to this date are not recorded.
 
+## [2026-04-17]
+
+### Added
+- **OCR Solution**: NeoMind OCR plugin for general text recognition from images, covering plugin installation, dashboard configuration, trigger testing, and AI Chat natural language queries, supporting NE101/NE301 (full bilingual support).
+
 ## [2026-04-16]
 
 ### Added
