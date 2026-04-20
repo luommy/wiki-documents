@@ -1,0 +1,42 @@
+---
+description: Firmware release history, download resources, and user development case studies for CamThink products including NeoEyes NE301, NE101, and NeoEdge NG4500.
+keywords: [Release Notes, firmware update, firmware download, dev cases, NE301, NE101, NG4500, CamThink]
+tags: [Release Notes, firmware, download, dev cases]
+sidebar_position: 1
+---
+
+# What's new
+
+This page summarizes firmware release history, download resources, and community development cases across CamThink product lines.
+
+<!-- Download rule: all download links point to the corresponding GitHub Release page. Format: [⬇️](GitHub Release URL) -->
+
+## NeoEyes NE101
+
+| Firmware | Release Date | Changes | Download |
+|:---------|:-------------|:--------|:-------:|
+| v1.7 | 2026-01-27 | <ul style={{margin:0}}><li>Add UVC camera HDR setting</li><li>Merge PIR and Alarm into a single firmware (switchable via Web UI)</li><li>Fix high resolution switching issue</li><li>Fix PIR/Alarm repeated false wake-ups</li><li>Fix HaLow WiFi region configuration selection issue</li><li>Web UI improvements</li></ul> | [⬇️](https://github.com/camthink-ai/lowpower_camera/releases/tag/v1.7) |
+| v1.6 | 2025-11-25 | <ul style={{margin:0}}><li>Add camera resolution configuration to Web UI</li><li>Fix OTA upgrade failure</li></ul> | [⬇️](https://github.com/camthink-ai/lowpower_camera/releases/tag/v1.6) |
+| v1.5 | 2025-11-18 | <ul style={{margin:0}}><li>Initial release with PIR / ALARMIN modes</li><li>FCC (915MHz) and CE (868MHz) variants available</li></ul> | [⬇️](https://github.com/camthink-ai/lowpower_camera/releases/tag/v1.5) |
+
+## NeoEyes NE301
+
+| Firmware | Release Date | Changes | Download |
+|:---------|:-------------|:--------|:-------:|
+| v20260213 | 2026-02-13 | <ul style={{margin:0}}><li>Add AWS HTTP upload support with SigV4 signature</li><li>Add EG912U GL Cat.1 modem network interface</li><li>Upgrade ST EdgeAI runtime to v2.2</li><li>Add YuNet face detection and YOLO D object detection models</li><li>OTA module improvements</li></ul> | [⬇️](https://github.com/camthink-ai/ne301/releases/tag/v20260213_main) |
+| v20260213<br />（EdgeAI branch） | 2026-02-13 | <ul style={{margin:0}}><li>Add YOLO11n model support</li><li>Support PSRAM 64Mb</li></ul> | [⬇️](https://github.com/camthink-ai/ne301/releases/tag/v20260213_stedgeai-v2.2) |
+| V20260120 | 2026-01-20 | <ul style={{margin:0}}><li>Initial release</li><li>Object detection (YOLOv2/v5/v8, SSD, YOLOX), face detection (BlazeFace), pose estimation (MoveNet), semantic segmentation (DeepLab v3) models</li><li>WiFi / Cat.1 / PoE connectivity</li><li>RTMP / MQTT streaming</li><li>Web UI device management</li></ul> | [⬇️](https://github.com/camthink-ai/ne301/releases/tag/V20260120) |
+
+## NeoMind
+
+| Version | Release Date | Changes | Download |
+|:--------|:-------------|:--------|:-------:|
+| v0.6.9 | 2026-04-16 | <ul style={{margin:0}}><li>Add transform aggregated tool for LLM-driven data transform</li><li>Fix Agent cache invalidation, context compaction, and tool result formatting</li><li>Fix anti-hallucination handling for tool results</li></ul> | [⬇️](https://github.com/camthink-ai/NeoMind/releases/tag/v0.6.9) |
+| v0.6.8 | 2026-04-15 | <ul style={{margin:0}}><li>Simplify LLM thinking control, unify thinking display in multi-round conversations</li><li>Expose virtual metrics to LLM and add write_metric action</li><li>Harden OTA update flow (fix done state, dual dialog, version sync)</li><li>Fix rule builder extension support</li><li>Reuse session-level tool result cache</li></ul> | [⬇️](https://github.com/camthink-ai/NeoMind/releases/tag/v0.6.8) |
+| v0.6.7 | 2026-04-14 | <ul style={{margin:0}}><li>Performance optimizations: paginated storage queries, concurrent query limits, batched frontend state updates</li><li>Fix updater download progress stuck and Windows URL error</li><li>Improve LLM vision detection and Agent thinking panel UX</li></ul> | [⬇️](https://github.com/camthink-ai/NeoMind/releases/tag/v0.6.7) |
+
+## User Cases
+
+| Case | Product | Description | Source Code |
+|:-----|:--------|:-----------|:------:|
+| AWS S3 Image Upload | NeoEyes NE101 | <ul style={{margin:0}}><li>HTTPS connection via HTTP Client</li><li>AWS SigV4 signature authentication with pre-signed URL generation</li><li>Shell commands to initialize (region/bucket/AK/SK) and upload captured images to S3</li><li>Timestamped file naming (capture_YYYYMMDD_HHMMSS.jpg)</li><li>Built-in CA certificates (ISRG X1 / GlobalSign R3 / DigiCert G2)</li></ul> | [⬇️](https://fsx.camthink.ai/files/wiki/dev-demo/aws_capture.zip) |
