@@ -11,6 +11,9 @@ All notable changes to the CamThink Wiki documentation will be documented in thi
 ### Added
 - **Release Notes**: New "What's new" page consolidating firmware release history, download resources, and user development cases across all CamThink product lines (NE101, NE301, NeoMind), with links to GitHub Release pages and source code downloads (full bilingual support).
 
+### Improved
+- **4G Cat.1 Module**: Upgraded communication interface from UART to USB, transfer rate improved from 0.5 Mbps to 2.5-3.17 Mbps for video transmission support, with legacy UART pinout preserved (full bilingual support).
+
 ## [2026-04-17]
 
 ### Added
