@@ -6,6 +6,11 @@ All notable changes to the CamThink Wiki documentation will be documented in thi
 
 > This changelog reflects updates starting from **2025-12-23**. Major changes prior to this date are not recorded.
 
+## [2026-04-20]
+
+### Added
+- **Release Notes**: New "What's new" page consolidating firmware release history, download resources, and user development cases across all CamThink product lines (NE101, NE301, NeoMind), with links to GitHub Release pages and source code downloads (full bilingual support).
+
 ## [2026-04-17]
 
 ### Added
