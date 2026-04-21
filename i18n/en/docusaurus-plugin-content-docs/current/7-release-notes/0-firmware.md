@@ -1,11 +1,13 @@
 ---
+id: firmware
+slug: /7-release-notes/firmware
 description: Firmware release history, download resources, and user development case studies for CamThink products including NeoEyes NE301, NE101, and NeoEdge NG4500.
 keywords: [Release Notes, firmware update, firmware download, dev cases, NE301, NE101, NG4500, CamThink]
 tags: [Release Notes, firmware, download, dev cases]
 sidebar_position: 1
 ---
 
-# What's new
+# Firmware
 
 This page summarizes firmware release history, download resources, and community development cases across CamThink product lines.
 
@@ -39,4 +41,5 @@ This page summarizes firmware release history, download resources, and community
 
 | Case | Product | Description | Source Code |
 |:-----|:--------|:-----------|:------:|
-| AWS S3 Image Upload | NeoEyes NE101 | <ul style={{margin:0}}><li>HTTPS connection via HTTP Client</li><li>AWS SigV4 signature authentication with pre-signed URL generation</li><li>Shell commands to initialize (region/bucket/AK/SK) and upload captured images to S3</li><li>Timestamped file naming (capture_YYYYMMDD_HHMMSS.jpg)</li><li>Built-in CA certificates (ISRG X1 / GlobalSign R3 / DigiCert G2)</li></ul> | [⬇️](https://fsx.camthink.ai/files/wiki/dev-demo/aws_capture.zip) |
+| AWS S3 Image Upload | NeoEyes NE301 | <ul style={{margin:0}}><li>HTTPS connection via HTTP Client</li><li>AWS SigV4 signature authentication with pre-signed URL generation</li><li>Shell commands to initialize (region/bucket/AK/SK) and upload captured images to S3</li><li>Timestamped file naming (capture_YYYYMMDD_HHMMSS.jpg)</li><li>Built-in CA certificates (ISRG X1 / GlobalSign R3 / DigiCert G2)</li></ul> | [⬇️](https://fsx.camthink.ai/files/wiki/dev-demo/aws_capture.zip) |
+| Arduino Camera Web Server | NeoEyes NE101 | <ul style={{margin:0}}><li>Based on ESP32 Arduino framework with esp_camera and esp_http_server libraries</li><li>OV5640 camera pin configuration tailored for NE101 hardware</li><li>Built-in WiFi HTTP server for remote photo capture and MJPEG video streaming</li><li>Browser-based Web UI for camera preview and parameter adjustment</li><li>Auto-detect PSRAM for optimized image quality and frame buffering</li><li>Support ESP32 / ESP32-S2 / ESP32-S3 platforms</li></ul> | [⬇️](https://resources.camthink.ai/wiki/dev-demo/CameraWebServer.zip) |

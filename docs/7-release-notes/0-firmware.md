@@ -1,11 +1,13 @@
 ---
+id: firmware
+slug: /7-release-notes/firmware
 description: CamThink 产品固件版本发布历史、下载资源及用户开发案例源码下载。涵盖 NeoEyes NE301、NE101、NeoEdge NG4500 等产品线。
 keywords: [Release Notes, 固件更新, 固件下载, 开发案例, NE301, NE101, NG4500, CamThink]
 tags: [Release Notes, 固件, 下载, 开发案例]
 sidebar_position: 1
 ---
 
-# What's new
+# Firmware
 
 本页面汇总 CamThink 各产品线的版本发布历史、下载资源及社区开发案例。
 
@@ -39,4 +41,5 @@ sidebar_position: 1
 
 | 案例名称 | 适用产品 | 说明 | 源码下载 |
 |:---------|:---------|:-----|:-------:|
-| AWS S3 图片上传 | NeoEyes NE101 | <ul style={{margin:0}}><li>基于 HTTP Client 实现 HTTPS 连接</li><li>集成 AWS SigV4 签名认证，生成预签名 URL</li><li>通过 shell 命令初始化（region/bucket/AK/SK）并上传拍摄图片到 S3</li><li>自动生成带时间戳的文件名（capture_YYYYMMDD_HHMMSS.jpg）</li><li>内置 ISRG X1 / GlobalSign R3 / DigiCert G2 CA 证书</li></ul> | [⬇️](https://fsx.camthink.ai/files/wiki/dev-demo/aws_capture.zip) |
+| AWS S3 图片上传 | NeoEyes NE301 | <ul style={{margin:0}}><li>基于 HTTP Client 实现 HTTPS 连接</li><li>集成 AWS SigV4 签名认证，生成预签名 URL</li><li>通过 shell 命令初始化（region/bucket/AK/SK）并上传拍摄图片到 S3</li><li>自动生成带时间戳的文件名（capture_YYYYMMDD_HHMMSS.jpg）</li><li>内置 ISRG X1 / GlobalSign R3 / DigiCert G2 CA 证书</li></ul> | [⬇️](https://fsx.camthink.ai/files/wiki/dev-demo/aws_capture.zip) |
+| Arduino Camera Web Server | NeoEyes NE101 | <ul style={{margin:0}}><li>基于 ESP32 Arduino 框架，使用 esp_camera 与 esp_http_server 库</li><li>适配 NE101 的 OV5640 摄像头引脚配置</li><li>内置 WiFi HTTP 服务器，支持远程拍照与 MJPEG 视频流</li><li>浏览器端 Web UI，支持摄像头预览与参数调节</li><li>自动检测 PSRAM 以优化图像质量与帧缓冲</li><li>支持 ESP32 / ESP32-S2 / ESP32-S3 平台</li></ul> | [⬇️](https://resources.camthink.ai/wiki/dev-demo/CameraWebServer.zip) |

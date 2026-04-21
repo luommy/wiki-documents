@@ -35,8 +35,15 @@ import VideoCarousel from '@site/src/components/VideoCarousel';
   {/* ================= Latest Updates ================= */}
   <h2 className="docs-section-title">最新文档</h2>
   <div className="latest-docs-grid">
-    <Link to="/docs/ai-application/neomind/ocr-solution" className="update-card">
+    <Link to="/docs/7-release-notes/hardware" className="update-card">
       <span className="update-badge">NEW</span>
+      <div className="update-title">硬件变更历史</div>
+      <div className="update-meta">
+        <span>新增文档</span>
+        <span>• 2026-04-21</span>
+      </div>
+    </Link>
+    <Link to="/docs/ai-application/neomind/ocr-solution" className="update-card">
       <div className="update-title">OCR 通用文字识别方案</div>
       <div className="update-meta">
         <span>新增文档</span>
@@ -48,13 +55,6 @@ import VideoCarousel from '@site/src/components/VideoCarousel';
       <div className="update-meta">
         <span>新增文档</span>
         <span>• 2026-04-16</span>
-      </div>
-    </Link>
-    <Link to="/docs/hardware-dev-resources/solar-power-solution" className="update-card">
-      <div className="update-title">NE101/NE301 太阳能供电持续抓拍方案</div>
-      <div className="update-meta">
-        <span>新增文档</span>
-        <span>• 2026-04-13</span>
       </div>
     </Link>
   </div>
