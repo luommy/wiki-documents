@@ -6,6 +6,14 @@ All notable changes to the CamThink Wiki documentation will be documented in thi
 
 > This changelog reflects updates starting from **2025-12-23**. Major changes prior to this date are not recorded.
 
+## [2026-04-21]
+
+### Added
+- **Hardware Revision History**: Main board PCB revision records for NE101 (V1.0–V2.0), NE301 (V1.0–V1.3), and NG4500 (V1.0–V1.1) (full bilingual support).
+
+### Changed
+- **Firmware Release Notes**: Restructured page, added Arduino Camera Web Server user case for NE101, corrected AWS S3 case product mapping (full bilingual support).
+
 ## [2026-04-20]
 
 ### Added
