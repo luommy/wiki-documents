@@ -6,6 +6,11 @@ All notable changes to the CamThink Wiki documentation will be documented in thi
 
 > This changelog reflects updates starting from **2025-12-23**. Major changes prior to this date are not recorded.
 
+## [2026-04-22]
+
+### Added
+- **NE101 WiFi HaLow Solution**: HaLowLink gateway setup, WiFi HaLow network configuration, MQTT image data integration, and platform verification (full bilingual support).
+
 ## [2026-04-21]
 
 ### Added
