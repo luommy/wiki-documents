@@ -35,8 +35,15 @@ import VideoCarousel from '@site/src/components/VideoCarousel';
   {/* ================= Latest Updates ================= */}
   <h2 className="docs-section-title">Latest Docs</h2>
   <div className="latest-docs-grid">
-    <Link to="/docs/neoeyes-ne101-series/application-guide/wifihalow-solution" className="update-card">
+    <Link to="/docs/ai-application/neomind/face-recognition" className="update-card">
       <span className="update-badge">NEW</span>
+      <div className="update-title">Face Recognition Solution</div>
+      <div className="update-meta">
+        <span>New Doc</span>
+        <span>• 2026-04-23</span>
+      </div>
+    </Link>
+    <Link to="/docs/neoeyes-ne101-series/application-guide/wifihalow-solution" className="update-card">
       <div className="update-title">WiFi HaLow Solution</div>
       <div className="update-meta">
         <span>New Doc</span>
