@@ -6,6 +6,11 @@ All notable changes to the CamThink Wiki documentation will be documented in thi
 
 > This changelog reflects updates starting from **2025-12-23**. Major changes prior to this date are not recorded.
 
+## [2026-04-23]
+
+### Added
+- **Face Recognition Solution**: NeoMind Face Recognition plugin for face detection and identity recognition, covering plugin installation, dashboard configuration, face registration, recognition testing, history review, and AI Chat natural language queries, supporting NE101/NE301 smart cameras (full bilingual support).
+
 ## [2026-04-22]
 
 ### Added
