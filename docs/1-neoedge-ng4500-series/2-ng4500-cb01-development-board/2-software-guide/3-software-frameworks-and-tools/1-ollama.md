@@ -1,4 +1,3 @@
-
 ---
 description: 本指南讲解如何在 NVIDIA Jetson Orin 设备上安装、更新、配置和卸载 Ollama。支持本地运行 LLMs 推理，具备 CUDA 加速能力并针对 Jetson 硬件优化。
 keywords: [Ollama, NVIDIA Jetson, Orin Nano, 大语言模型, LLM 推理, CUDA 加速, 边缘 AI, 模型管理]

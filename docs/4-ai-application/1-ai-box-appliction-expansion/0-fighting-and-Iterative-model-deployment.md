@@ -1,4 +1,3 @@
-
 ---
 description: 本指南介绍如何利用 NeoEdge AI 边缘计算盒（NG4500 系列）部署“打架与跌倒” AI 模型。涵盖系统整体架构、固件安装及 VMS 视频管理系统的配置流程。
 keywords: [AI 边缘计算盒, NG4500, 打架检测, 跌倒检测, VMS 配置, IPC 部署, 行为识别, 边缘 AI 应用, 智能监控, 安全防护]
@@ -20,7 +19,6 @@ tags: [AI应用, 行为分析, 边缘计算, 安全监控, NG4500]
   <img src="https://resources.camthink.ai/wiki/img/ai-application/ai-box-appliction-expansion/fighting-and-Iterative-model-deployment/ipc.png" alt="ipc" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
   <img src="https://resources.camthink.ai/wiki/img/ai-application/ai-box-appliction-expansion/fighting-and-Iterative-model-deployment/box.png" alt="box" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
-
 
 ## 整体架构
 
@@ -74,7 +72,6 @@ AIBOX 算法固件包下载地址：[msaibox_arm64_1.0.0.1-r1-c1.deb](https://re
 
 输入AI BOX 用户名和密码,是初始化BOX设备时设置的.
 
-
 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '8px 0 16px' }}>
   <img src="https://resources.camthink.ai/wiki/img/ai-application/ai-box-appliction-expansion/fighting-and-Iterative-model-deployment/login.png" alt="login" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
   <img src="https://resources.camthink.ai/wiki/img/ai-application/ai-box-appliction-expansion/fighting-and-Iterative-model-deployment/login2.png" alt="login" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
@@ -96,7 +93,6 @@ AIBOX 算法固件包下载地址：[msaibox_arm64_1.0.0.1-r1-c1.deb](https://re
   <img src="https://resources.camthink.ai/wiki/img/ai-application/ai-box-appliction-expansion/fighting-and-Iterative-model-deployment/dpkg.png" alt="dpkg" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
   <img src="https://resources.camthink.ai/wiki/img/ai-application/ai-box-appliction-expansion/fighting-and-Iterative-model-deployment/systemctl.png" alt="systemctl" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
-
 
 ## VMS端应用配置与BOX连接
 
@@ -134,7 +130,6 @@ AIBOX 算法固件包下载地址：[msaibox_arm64_1.0.0.1-r1-c1.deb](https://re
   <img src="https://resources.camthink.ai/wiki/img/ai-application/ai-box-appliction-expansion/fighting-and-Iterative-model-deployment/parameter-configuration.png" alt="vms-install" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
-
 ### 步骤四：事件&报警
 
 本步骤用于配置触发算法识别了会执行什么动作、动作执行具体是怎么样的以及执行后的报警显示配置，是基于UI显示上的触发动作。
@@ -167,7 +162,6 @@ AIBOX 算法固件包下载地址：[msaibox_arm64_1.0.0.1-r1-c1.deb](https://re
   <img src="https://resources.camthink.ai/wiki/img/ai-application/ai-box-appliction-expansion/fighting-and-Iterative-model-deployment/ipc-front-end-deployment2.png" alt="ipc-front-end-deployment" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
-
 ## 效果展示
 
 **视频1（斗殴检测）：** 展示园区场景中识别斗殴行为、上报告警并联动设备的全流程。
@@ -193,9 +187,6 @@ AIBOX 算法固件包下载地址：[msaibox_arm64_1.0.0.1-r1-c1.deb](https://re
     style={{ maxWidth: '640px', width: '100%', height: '360px', border: 'none', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }}
   />
 </div>
-
-
-
 
 ## FAQ
 
