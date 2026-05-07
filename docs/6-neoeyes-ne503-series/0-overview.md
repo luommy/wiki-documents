@@ -511,10 +511,6 @@ NeoEyes NE503 凭借 20 TOPS 本地算力、容器化微服务架构和丰富的
 
 ## 产品资源
 
-### 产品教程
-
-- [快速入门](./1-quick-start.md)
-
 ### 开发者资源
 
 - Python / C++ / Go SDK（MediaClient、InferenceClient、DeviceClient）

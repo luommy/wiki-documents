@@ -511,10 +511,6 @@ With 20 TOPS local computing power, containerized microservice architecture, and
 
 ## Resources
 
-### Product Tutorials
-
-- [Quick Start](./1-quick-start.md)
-
 ### Developer Resources
 
 - Python / C++ / Go SDK (MediaClient, InferenceClient, DeviceClient)
