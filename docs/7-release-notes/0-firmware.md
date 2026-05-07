@@ -17,6 +17,7 @@ sidebar_position: 1
 
 | 固件版本 | 发布日期 | 更新内容 | 下载 |
 |:-----|:---------|:---------|:----:|
+| v1.8 | 2026-05-07 | <ul style={{margin:0}}><li>新增 Webhook 推送通知</li><li>新增设备配置导入/导出功能</li><li>新增定时锚点拍摄（Interval Anchor Time），支持基于锚点的间隔调度</li><li>新增 Ping API 网络连通测试、Debug 调试模块（含 Web 调试日志和控制台命令）及 ISP 选择</li><li>新增 Verizon 运营商 Context 3 支持</li><li>升级 esp_modem 至 v2.0.1，修复 Verizon PPP 连接问题</li><li>优化定时拍摄为滚动 24h 窗口（不再以午夜重置，避免跨午夜调度跳跃）</li><li>扩展 MQTT/平台凭据字段长度（64→128），Web UI 输入限制同步更新</li><li>扩展澳大利亚 S1G WiFi 频段支持</li><li>修复相机 JPEG 队列内存及闪光灯/预热时序问题</li><li>修复 HaLow WiFi CE 模块信号差问题</li><li>修复电池 ADC 采样和上报频率异常</li><li>修复按钮拍照不稳定问题（增加 1s 延迟避免按键状态不稳）</li></ul> | [⬇️](https://github.com/camthink-ai/lowpower_camera/releases/tag/v1.8(hw-v1.2)) |
 | v1.7 | 2026-01-27 | <ul style={{margin:0}}><li>新增 UVC 相机 HDR 设置</li><li>合并 PIR 与 Alarm 为同一固件（通过 Web 配置切换）</li><li>修复高分辨率切换异常</li><li>修复 PIR/Alarm 多次误唤醒</li><li>修复 HaLow WiFi 区域配置选择问题</li><li>Web UI 优化</li></ul> | [⬇️](https://github.com/camthink-ai/lowpower_camera/releases/tag/v1.7) |
 | v1.6 | 2025-11-25 | <ul style={{margin:0}}><li>Web UI 新增相机分辨率配置</li><li>修复 OTA 升级失败问题</li></ul> | [⬇️](https://github.com/camthink-ai/lowpower_camera/releases/tag/v1.6) |
 | v1.5 | 2025-11-18 | <ul style={{margin:0}}><li>初始发布版本，支持 PIR / ALARMIN 模式</li><li>提供 FCC（915MHz）和 CE（868MHz）版本</li></ul> | [⬇️](https://github.com/camthink-ai/lowpower_camera/releases/tag/v1.5) |
