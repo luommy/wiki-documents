@@ -6,6 +6,11 @@ All notable changes to the CamThink Wiki documentation will be documented in thi
 
 > This changelog reflects updates starting from **2025-12-23**. Major changes prior to this date are not recorded.
 
+## [2026-05-07]
+
+### Added
+- **NeoEyes NE503 Product Overview**: Edge AI smart camera documentation based on Hailo-15H SoC with 20 TOPS NPU, covering specifications, AI inference pipeline, imaging system, hardware architecture, software stack, and application scenarios for smart security, industrial inspection, and AIoT (full bilingual support).
+
 ## [2026-04-23]
 
 ### Added
