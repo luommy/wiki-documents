@@ -35,8 +35,15 @@ import VideoCarousel from '@site/src/components/VideoCarousel';
   {/* ================= Latest Updates ================= */}
   <h2 className="docs-section-title">最新文档</h2>
   <div className="latest-docs-grid">
-    <Link to="/docs/ai-application/neomind/face-recognition" className="update-card">
+    <Link to="/docs/neoeyes-ne503-series/overview" className="update-card">
       <span className="update-badge">NEW</span>
+      <div className="update-title">NeoEyes NE503 产品概述</div>
+      <div className="update-meta">
+        <span>新增文档</span>
+        <span>• 2026-05-07</span>
+      </div>
+    </Link>
+    <Link to="/docs/ai-application/neomind/face-recognition" className="update-card">
       <div className="update-title">人脸识别方案</div>
       <div className="update-meta">
         <span>新增文档</span>
