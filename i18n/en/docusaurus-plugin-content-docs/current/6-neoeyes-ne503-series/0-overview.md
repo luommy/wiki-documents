@@ -5,7 +5,6 @@ tags: [NE503, AI camera, edge computing, smart IPC, AIoT]
 ---
 
 import ApplicationScenarios from '@site/src/components/ApplicationScenarios';
-import useBaseUrl from '@docusaurus/useBaseUrl';
 import SupportGrid from '@site/src/components/SupportGrid';
 
 # Product Information
@@ -13,7 +12,7 @@ import SupportGrid from '@site/src/components/SupportGrid';
 ## Overview
 
 <div align="center">
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/overview/ne503-main.png" alt="NeoEyes NE503" width="70%" />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/overview/ne503-architecture.png" alt="NeoEyes NE503" width="100%" />
 </div>
 
 NeoEyes NE503 is an edge AI smart camera based on the **Hailo-15H SoC**, featuring a 20 TOPS NPU and a Sony IMX678 4K imaging system. NE503 completes the full closed loop from image capture and AI inference to event output and business linkage within a single device, significantly reducing the deployment complexity of edge intelligence solutions. It combines the professional imaging capabilities of an AI Camera with the open edge computing platform attributes—supporting containerized application deployment, multi-model concurrent inference, and RTSP / Event Bus protocol integration for visual application and edge AI secondary development scenarios.
@@ -164,7 +163,6 @@ The hardware encoder supports dual-format H.264/H.265 encoding at 4K@30fps, pair
 
 ### Low-Light Imaging
 
-<!-- TODO: Replace with AI-ISP low-light comparison image (Left: Standard ISP / Right: AI-ISP) -->
 <div align="center">
   <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/overview/ai-isp-comparison.png" alt="AI-ISP Low-Light Comparison" width="80%" />
 </div>
@@ -173,14 +171,12 @@ AI-ISP delivers clear color images even in extremely low-light environments, wit
 
 ## Imaging System
 
-<!-- TODO: Replace with sensor + lens combination photo -->
 <div align="center" style={{ marginBottom: "1.5rem" }}>
   <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/overview/imaging-module.png" alt="Imaging Module" width="60%" />
 </div>
 
 The NE503 imaging system consists of a Sony IMX678 image sensor and a Foctek AF0832D09 motorized zoom lens. The 1/1.8" sensor matches the 1/1.8" lens target surface, balancing edge image quality with optical coverage for smart security, campus management, and long-range recognition scenarios.
 
-<!-- TODO: Replace with wide-angle/telephoto FOV comparison image -->
 <div align="center" style={{ marginBottom: "1.5rem" }}>
   <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/overview/fov-comparison.png" alt="Wide/Telephoto FOV Comparison" width="80%" />
 </div>

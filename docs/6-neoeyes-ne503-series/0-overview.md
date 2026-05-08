@@ -5,7 +5,6 @@ tags: [NE503, AI摄像头, 边缘计算, 智能IPC, AIoT]
 ---
 
 import ApplicationScenarios from '@site/src/components/ApplicationScenarios';
-import useBaseUrl from '@docusaurus/useBaseUrl';
 import SupportGrid from '@site/src/components/SupportGrid';
 
 # Product Information
@@ -13,7 +12,7 @@ import SupportGrid from '@site/src/components/SupportGrid';
 ## 基本介绍
 
 <div align="center">
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/overview/ne503-main.png" alt="NeoEyes NE503" width="70%" />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/overview/ne503-architecture.png" alt="NeoEyes NE503" width="100%" />
 </div>
 
 NeoEyes NE503 是一款基于 **Hailo-15H SoC** 的边缘 AI 智能相机，搭载 20 TOPS NPU 与 Sony IMX678 4K 成像系统。NE503 在单一设备内完成从图像采集、AI 推理到事件输出与业务联动的完整闭环，大幅降低边缘智能方案的部署复杂度。它兼具 AI Camera 的专业成像能力与开放边缘计算平台的属性——支持容器化应用部署、多模型并发推理及 RTSP / Event Bus 等协议对接，面向视觉应用与边缘 AI 的二次开发场景。
@@ -164,7 +163,6 @@ NE503 搭载 Hailo-15H SoC，集成 Hailo NPU 提供 20 TOPS（INT8）算力，�
 
 ### 低照度成像
 
-<!-- TODO: 替换为 AI-ISP 低照度对比图（左：普通 ISP / 右：AI-ISP） -->
 <div align="center">
   <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/overview/ai-isp-comparison.png" alt="AI-ISP 低照度对比" width="80%" />
 </div>
@@ -173,14 +171,12 @@ AI-ISP 在极低照度环境下仍可输出清晰彩色画面，12-bit AI 降噪
 
 ## 成像系统
 
-<!-- TODO: 替换为传感器+镜头组合实物图 -->
 <div align="center" style={{ marginBottom: "1.5rem" }}>
   <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/overview/imaging-module.png" alt="成像模组" width="60%" />
 </div>
 
 NE503 的成像系统由 Sony IMX678 图像传感器与福光 AF0832D09 电动变焦镜头组成，1/1.8" 传感器与 1/1.8" 镜头靶面匹配，兼顾边缘画质与光学覆盖，适配智能安防、园区管理、远距离识别等场景。
 
-<!-- TODO: 替换为广角/长焦视场对比图 -->
 <div align="center" style={{ marginBottom: "1.5rem" }}>
   <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/overview/fov-comparison.png" alt="广角/长焦视场对比" width="80%" />
 </div>
