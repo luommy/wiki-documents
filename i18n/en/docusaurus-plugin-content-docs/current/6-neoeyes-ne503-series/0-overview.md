@@ -19,15 +19,15 @@ NeoEyes NE503 is an edge AI smart camera based on the **Hailo-15H SoC**, featuri
 
 ### Core Capabilities
 
-- **Edge AI Closed-Loop Decision Making**: The 20 TOPS NPU local computing power supports multi-model concurrent inference, completing image analysis, event judgment, and structured result output directly on the device. It achieves front-end intelligent closed-loop without cloud backhaul, suitable for scenarios with high requirements for real-time performance and data privacy.
+- **On-Device AI Inference Loop**: 20 TOPS (INT8) NPU supports multi-model concurrent inference. Image capture, analysis, and structured output run entirely on-device with zero cloud dependency, meeting low-latency and data localization requirements.
 
-- **Professional 4K Imaging**: The Sony IMX678 sensor paired with Gen2 AI-ISP and a motorized zoom lens supports 4K encoding and &lt;0.01 LUX full-color night vision, balancing HDR, low-light performance, and multi-model concurrent inference for both wide-angle monitoring and long-range recognition.
+- **4K Professional Imaging System**: Sony IMX678 (1/1.8") + Gen2 AI-ISP + motorized zoom lens (F1.6), supporting 4K@30fps H.265 encoding and &lt;0.01 LUX full-color night vision. Maintains image quality under HDR, low-light, and concurrent inference workloads, balancing wide-angle coverage and long-range recognition.
 
-- **Containerized Application Platform**: Based on the containerd container runtime, third-party AI applications are deployed via OCI images with secure sandbox isolation ensuring no interference between applications. Models and business applications can be independently deployed and upgraded per platform specifications. Algorithm companies, solution providers, and OEM manufacturers can quickly customize industry solutions on a unified platform, breaking hardware vendor lock-in.
+- **Containerized Application Platform**: Built on containerd runtime with OCI image deployment and sandbox isolation. Models and applications can be independently deployed and upgraded. Algorithm vendors, integrators, and OEMs build industry solutions on a unified platform, avoiding vendor lock-in.
 
-- **Deliverable Product Capability**: NE503 integrates imaging, inference, alarm linkage, protocol output, and operations management into one device, with complete capabilities from development verification to project delivery. IP66 protection with PoE single-cable power supply, combined with a web management console, enables direct commercial deployment.
+- **Industrial-Grade All-in-One Delivery**: Imaging, inference, alarm linkage, protocol output, and operations management integrated in a single device. IP66 protection + PoE 802.3AT power + Web console, supporting the full lifecycle from development validation to commercial deployment.
 
-- **Full-Stack Open Toolchain**: Provides Python / C++ / Go multi-language SDKs, the aipc-cli command-line tool, and RESTful APIs to meet different development integration approaches. The modular HAL architecture decouples platform services from underlying hardware, supporting smooth migration across SoC platforms and reducing long-term maintenance costs.
+- **Full-Stack Developer Toolchain**: Python / C++ / Go SDKs + aipc-cli + RESTful APIs for diverse integration approaches. Modular HAL decouples software from hardware, enabling smooth cross-SoC platform migration.
 
 ## Product Specifications
 

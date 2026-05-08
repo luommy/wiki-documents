@@ -64,20 +64,6 @@ import VideoCarousel from '@site/src/components/VideoCarousel';
         <span>• 2026-04-22</span>
       </div>
     </Link>
-    <Link to="/docs/7-release-notes/hardware" className="update-card">
-      <div className="update-title">硬件变更历史</div>
-      <div className="update-meta">
-        <span>新增文档</span>
-        <span>• 2026-04-21</span>
-      </div>
-    </Link>
-    <Link to="/docs/ai-application/neomind/ocr-solution" className="update-card">
-      <div className="update-title">OCR 通用文字识别方案</div>
-      <div className="update-meta">
-        <span>新增文档</span>
-        <span>• 2026-04-17</span>
-      </div>
-    </Link>
   </div>
 
   {/* ================= Quick Access (Product Series) ================= */}
