@@ -6,6 +6,11 @@ All notable changes to the CamThink Wiki documentation will be documented in thi
 
 > This changelog reflects updates starting from **2025-12-23**. Major changes prior to this date are not recorded.
 
+## [2026-05-08]
+
+### Added
+- **NeoEyes NE503 Quick Start Guide**: Step-by-step deployment guide covering device installation, first-time connection and configuration, camera verification, AI application deployment (NX Witness example), AI model management, system integration, device management, and maintenance (full bilingual support).
+
 ## [2026-05-07]
 
 ### Added
