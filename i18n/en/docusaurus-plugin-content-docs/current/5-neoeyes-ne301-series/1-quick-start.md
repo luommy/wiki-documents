@@ -259,44 +259,41 @@ Select the protocol (MQTT / MQTTS), fill in the fields below, then click **Save 
   <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/MQTTS.png" alt="MQTTS" style={{ flex: '1 1 280px', maxWidth: '360px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
-
-
 > For more information about MQTT configuration and application, please refer to [MQTT Data Interaction](./3-application-guide/2-mqtt-data-interaction/2-mqtt-data-interaction.md).
 
 ### Hardware Management
 
-#### Image Settings
+Hardware Management consists of two modules — **Image Management** and **Lighting Management** — for adjusting camera parameters and fill light settings.
 
-Use the sliders to tune image parameters while watching the preview.
+#### Image Management
 
-- **Auto**: When enabled, the OS04C10 module automatically adjusts exposure and tone to optimize the image; manual sliders are disabled.
-- **Brightness**: Range 0–100.
-- **Contrast**: Range 0–100.
-- **Horizontal flip / Vertical flip**: Correct the orientation for your mounting position.
+Configure camera orientation and capture parameters. The top of the page shows the camera module connection status.
 
-<div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '8px 0 16px' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/image-management-auto.png" alt="image-management-auto" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/image-management1.png" alt="image-management" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/image-management2.png" alt="image-management" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
-</div>
+- **Camera configuration**
+  - **Flip Horizontal**: Mirror the image horizontally; useful when the physical mounting requires a horizontal correction.
+  - **Flip Vertical**: Mirror the image vertically; useful when the physical mounting requires a vertical correction.
 
-#### Lighting Control
-
-Configure the fill light mode according to the scenario:
-
-- **Custom schedule**: Define a time range (for example 20:00–06:00); the fill light stays on during that range.
-- **Auto on during work**: Default setting. The fill light turns on when the device wakes to capture or stream, then turns off while idle.
-- **Always off**: Keeps the fill light disabled to save power.
-
-> Tip: The fill light is most effective at short range. Disable it in ultra-low-power deployments.
+- **Capture configuration**
+  - **Skip frames**: Number of frames to skip before capturing, default 30. Helps obtain a stable image.
+  - **Resolution**: Capture resolution. Supported values: 1280×720, 1920×1080, 2688×1520.
+  - **JPEG quality**: JPEG image quality, default 80. Higher quality produces larger files; images exceeding 1 MB are automatically uploaded in chunks, which increases transfer time.
 
 <div style={{ textAlign: 'center', margin: '12px 0' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/lightgif1.gif" alt="lighting-gif" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/image-management.png" alt="Image Management" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
+#### Lighting Management
+
+**Work Supplement Light** — choose a fill light mode based on your deployment:
+
+- **Always On**: The fill light stays on continuously.
+- **Custom**: Define a time range (for example 20:00–06:00); the fill light stays on during that range.
+- **Always Off**: The fill light is always off.
+
+> Tip: The fill light is most effective at short range. Choose **Always Off** in power-sensitive deployments.
 
 <div style={{ textAlign: 'center', margin: '12px 0' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/lighting-management.png" alt="auto" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/lighting-management.png" alt="Lighting Management" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 ### System Settings: Connectivity, Device, Import/Export

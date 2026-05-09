@@ -250,43 +250,39 @@ RTMP 推流功能现在可以通过 Web 界面进行完整配置，同时也保�
 
 >更多关于MQTT的配置应用说明，请参考[MQTT数据交互](./3-application-guide/2-mqtt-data-interaction/2-mqtt-data-interaction.md)。
 
-
 ### 硬件管理
 
-**图像设置：你可以根据实际的场景需求来调整硬件参数，同时观察相机画面效果的变化。**
+硬件管理包含图像管理和灯光管理两个模块，用于调整相机参数和补光灯配置。
 
-**图像管理**
+#### 图像管理
 
-自动按钮（Auto）：点击开启后OS04C10相机模组会依据画面效果自动调整画面参数以此来优化图像效果，无法通过手动拖动来调整画面的明亮度与对比度，或者直接在右侧输入目标数值。
+用于配置相机的画面方向和抓拍参数，页面顶部显示相机模组的连接状态。
 
-- 明亮度：0-100可调节
-- 对比度：0-100可调节
-- 水平翻转：画面水平翻转，用于设备实际安装后成像需要水平翻转时使用
-- 垂直翻转：画面垂直翻转，用于设备实际安装后成像需要垂直翻转时使用
+- Camera configuration（相机配置）
+  - Flip Horizontal：水平翻转画面，适用于设备实际安装后成像需要水平翻转的场景
+  - Flip Vertical：垂直翻转画面，适用于设备实际安装后成像需要垂直翻转的场景
 
-<div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'center', margin: '8px 0 16px' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/image-management-auto.png" alt="灯光自动" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/image-management1.png" alt="灯光管理" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/image-management2.png" alt="灯光管理" style={{ flex: '1 1 220px', maxWidth: '300px', width: '100%', height: 'auto', borderRadius: '6px', background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
-</div>
-
-**灯光管理**
-
-补光灯模式：支持自定义时间、工作时自动补光、常关三种模式，请根据你的实际使用场景设置此配置。
-
-- 自定义时间：为定义时间范围内开启（如20:00-6:00），时间范围内常开
-- 工作时自动补光：默认即为工作时自动补光，依据设备是否被唤醒进行工作（图像、视频流）来启动补光灯，其余时间关闭
-- 常关模式：补光灯常关，无论什么时候，补光灯均不开启
-
-> Tips：补光灯效果仅限于近距离场景会比较好，对功耗十分敏感的场景可选择不启用
+- Capture configuration（抓拍配置）
+  - Skip frames：跳帧数，默认值 30，用于控制抓拍前跳过的帧数以获取稳定画面
+  - Resolution：抓拍分辨率，支持 1280x720、1920x1080、2688x1520 三档可选
+  - JPEG quality：JPEG 图像质量，默认值 80。质量越高图像越大，超过 1M 时将自动分块上传，上传时间会相应延长
 
 <div style={{ textAlign: 'center', margin: '12px 0' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/lightgif1.gif" alt="灯光变化gif" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/image-management.png" alt="图像管理" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
+#### 灯光管理
+
+Work Supplement Light（补光灯模式）：支持以下三种模式，请根据实际使用场景选择。
+
+- Always On：补光灯常开
+- Custom：自定义时间段开启（如 20:00-6:00），时间范围内常开
+- Always Off：补光灯常关
+
+> Tips：补光灯效果仅限于近距离场景比较明显，对功耗敏感的场景建议选择 Always Off
 
 <div style={{ textAlign: 'center', margin: '12px 0' }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/lighting-management.png" alt="自动控制" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/quick-start/lighting-management.png" alt="灯光管理" style={{ maxWidth: '480px', width: '100%', height: 'auto', borderRadius: '6px', boxShadow: '0 1px 4px rgba(0,0,0,.12)' }} />
 </div>
 
 ### 系统设置：通信、设备、导入导出
