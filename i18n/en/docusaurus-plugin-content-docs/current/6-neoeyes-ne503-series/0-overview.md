@@ -118,7 +118,7 @@ NE503 core specifications are as follows:
     </tr>
     <tr>
       <td>Expansion Interfaces</td>
-      <td>RS-485 / Wiegand / Audio I/O / Radar / Fill Light</td>
+      <td>RS-485 / Wiegand\* / Audio I/O\* / Radar\* / Fill Light</td>
     </tr>
     <tr>
       <td rowSpan="2">Software Platform</td>
@@ -131,6 +131,8 @@ NE503 core specifications are as follows:
     </tr>
   </tbody>
 </table>
+
+\* Planned feature, availability subject to future firmware updates.
 
 ## Performance &amp; Edge AI
 
@@ -299,20 +301,22 @@ The interface board manages all peripherals and communication interfaces through
 | Alarm IN × 2 | J1/J2, MCU PB13/PB14, High/Open = 0, Low/Short = 1 |
 | Alarm OUT × 2 | J2, Relay output (MCU PB15) + Level output (MCU PA8) |
 | RS-485 | J2 (ITS version), MCU UART3 (PC4/PC5), Enable PB1 |
-| Wiegand | J1 (ITS version), Data0/Data1, MCU PC6/PC7 |
-| Audio | Line-In / Line-Out, J1, NAU88C10 codec |
+| Wiegand\* | J1 (ITS version), Data0/Data1, MCU PC6/PC7 |
+| Audio\* | Line-In / Line-Out, J1, NAU88C10 codec |
 | Ethernet | 100M LAN, supports PoE 802.3AT power supply |
 | Fill Light | Standard: IR dual-channel PWM (J5); Enhanced: White + IR PWM (J6) |
 | IR-CUT | J7, H-EN / L-OFF, MCU PB8, supports auto / day / night three modes |
 | Light Sensor | J8, Photoresistor ADC sampling, MCU PA1 |
-| Radar Interface | J4 (ITS radar version), 5V/12V selectable power + UART direct to Processor Board (SoC GPIO4/GPIO6) |
+| Radar Interface\* | J4 (ITS radar version), 5V/12V selectable power + UART direct to Processor Board (SoC GPIO4/GPIO6) |
+
+\* Planned feature, availability subject to future firmware updates.
 
 #### MCU Management
 
 | Item | Specification |
 |------|---------------|
 | MCU | Cortex-M4 × 2 @ 200 MHz, communicates with Processor Board via UART0 |
-| Management Scope | Motorized lens, fill light, IR-CUT, heater, fan, Alarm IO, Wiegand, RS-485, light sensor |
+| Management Scope | Motorized lens, fill light, IR-CUT, heater, fan, Alarm IO, Wiegand\*, RS-485, light sensor |
 | EEPROM | AT24C02D (I2C1), stores configuration data |
 | Temperature Sensors | TMP1075DSGR (I2C1, Processor Board) + LMT87DCK (Interface Board, MCU PB2 ADC) |
 | Thermal Control | 12V fan driver (MCU PB9, reserved) + 12V heater driver (MCU PA15, reserved) |

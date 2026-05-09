@@ -118,7 +118,7 @@ NE503 整机核心规格如下：
     </tr>
     <tr>
       <td>扩展接口</td>
-      <td>RS-485 / 韦根 / 音频 I/O / 雷达 / 补光灯</td>
+      <td>RS-485 / 韦根\* / 音频 I/O\* / 雷达\* / 补光灯</td>
     </tr>
     <tr>
       <td rowSpan="2">软件平台</td>
@@ -131,6 +131,8 @@ NE503 整机核心规格如下：
     </tr>
   </tbody>
 </table>
+
+\* 规划预留，具体支持时间请关注后续版本更新。
 
 ## 性能与边缘 AI
 
@@ -299,20 +301,22 @@ NE503 采用**核心处理板**与 **AI-PC 接口板**双板结构，通过板�
 | Alarm IN × 2 | J1/J2，MCU PB13/PB14，High/Open = 0，Low/Short = 1 |
 | Alarm OUT × 2 | J2，继电器输出（MCU PB15）+ 电平输出（MCU PA8） |
 | RS-485 | J2（ITS 版本），MCU UART3（PC4/PC5），使能 PB1 |
-| 韦根 | J1（ITS 版本），Data0/Data1，MCU PC6/PC7 |
-| 音频 | Line-In / Line-Out，J1，NAU88C10 编解码器 |
+| 韦根\* | J1（ITS 版本），Data0/Data1，MCU PC6/PC7 |
+| 音频\* | Line-In / Line-Out，J1，NAU88C10 编解码器 |
 | 以太网 | 100M LAN，支持 PoE 802.3AT 供电 |
 | 补光灯 | 常规版：红外双路 PWM（J5）；加强版：白光 + 红外 PWM（J6） |
 | IR-CUT | J7，H-EN / L-OFF，MCU PB8，支持 auto / day / night 三模式 |
 | 光敏采样 | J8，光敏电阻 ADC 采样，MCU PA1 |
-| 雷达接口 | J4（ITS 雷达版本），电源 5V/12V 可选 + UART 直连核心处理板（SoC GPIO4/GPIO6） |
+| 雷达接口\* | J4（ITS 雷达版本），电源 5V/12V 可选 + UART 直连核心处理板（SoC GPIO4/GPIO6） |
+
+\* 规划预留，具体支持时间请关注后续版本更新。
 
 #### MCU 管理
 
 | 项目 | 规格 |
 |------|------|
 | MCU | Cortex-M4 × 2 @ 200 MHz，通过 UART0 与核心处理板通信 |
-| 管理范围 | 电动镜头、补光灯、IR-CUT、加热器、风扇、Alarm IO、韦根、RS-485、光敏采样 |
+| 管理范围 | 电动镜头、补光灯、IR-CUT、加热器、风扇、Alarm IO、韦根\*、RS-485、光敏采样 |
 | EEPROM | AT24C02D（I2C1），存储配置信息 |
 | 温度传感器 | TMP1075DSGR（I2C1，核心处理板）+ LMT87DCK（接口板，MCU PB2 ADC） |
 | 温控 | 12V 风扇驱动（MCU PB9，预留）+ 12V 加热器驱动（MCU PA15，预留） |
