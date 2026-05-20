@@ -174,14 +174,10 @@ AI-ISP delivers clear color images even in extremely low-light environments, wit
 ## Imaging System
 
 <div align="center" style={{ marginBottom: "1.5rem" }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/overview/imaging-module.png" alt="Imaging Module" width="60%" />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/overview/imaging-module.jpg" alt="Imaging Module" width="60%" />
 </div>
 
-The NE503 imaging system consists of a Sony IMX678 image sensor and a Foctek AF0832D09 motorized zoom lens. The 1/1.8" sensor matches the 1/1.8" lens target surface, balancing edge image quality with optical coverage for smart security, campus management, and long-range recognition scenarios.
-
-<div align="center" style={{ marginBottom: "1.5rem" }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/overview/fov-comparison.png" alt="Wide/Telephoto FOV Comparison" width="80%" />
-</div>
+The NE503 imaging system pairs a Sony IMX678 (1/1.8") image sensor with a Foctek AF0832D09 motorized zoom lens. The sensor and lens share a matched 1/1.8" target surface, minimizing edge sharpness falloff. The lens covers 10.2mm (H 44.5°) to 29.5mm (H 14.5°), enabling a single unit to handle both wide-area surveillance and distant detail identification, with motorized zoom for on-site adjustment. The F1.6 wide aperture, combined with AI-ISP low-light enhancement, maintains image quality in dark and backlit conditions.
 
 ### Sensor
 
@@ -253,8 +249,6 @@ The NE503 imaging system consists of a Sony IMX678 image sensor and a Foctek AF0
   </tbody>
 </table>
 
-- F1.6 large aperture combined with HDR and low-light capability improves imaging stability in dark and backlit scenes.
-- Motorized zoom supports dual-mode deployment: "panoramic observation + remote target lock."
 - Lens TV distortion: approximately -9.1% at wide end, 1.8% at telephoto end.
 
 ### Lens Drive &amp; Image Stabilization

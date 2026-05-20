@@ -174,14 +174,10 @@ AI-ISP 在极低照度环境下仍可输出清晰彩色画面，12-bit AI 降噪
 ## 成像系统
 
 <div align="center" style={{ marginBottom: "1.5rem" }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/overview/imaging-module.png" alt="成像模组" width="60%" />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/overview/imaging-module.jpg" alt="成像模组" width="60%" />
 </div>
 
-NE503 的成像系统由 Sony IMX678 图像传感器与福光 AF0832D09 电动变焦镜头组成，1/1.8" 传感器与 1/1.8" 镜头靶面匹配，兼顾边缘画质与光学覆盖，适配智能安防、园区管理、远距离识别等场景。
-
-<div align="center" style={{ marginBottom: "1.5rem" }}>
-  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/overview/fov-comparison.png" alt="广角/长焦视场对比" width="80%" />
-</div>
+NE503 成像系统由 Sony IMX678（1/1.8"）图像传感器与福光 AF0832D09 电动变焦镜头组成，传感器与镜头靶面 1:1 匹配，边缘画质无明显衰减。镜头覆盖 10.2mm（H 44.5°）至 29.5mm（H 14.5°）焦距段，单机即可完成广角全景监控与远端细节识别，电动变焦支持现场按需切换。F1.6 大光圈配合 AI-ISP 低照增强，在暗光和逆光场景下仍保持成像质量。
 
 ### 传感器
 
@@ -253,8 +249,6 @@ NE503 的成像系统由 Sony IMX678 图像传感器与福光 AF0832D09 电动�
   </tbody>
 </table>
 
-- F1.6 大光圈配合 HDR 与低照能力，改善暗光和逆光场景成像稳定性。
-- 电动变焦适合「全景观察 + 远端锁定」双模式部署。
 - 镜头 TV 畸变：广角端约 -9.1%，长焦端约 1.8%。
 
 ### 镜头驱动与图像稳定
