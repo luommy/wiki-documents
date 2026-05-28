@@ -8,6 +8,9 @@ All notable changes to the CamThink Wiki documentation will be documented in thi
 
 ## [2026-05-28]
 
+### Added
+- **NeoEyes NE503 Hardware Guide**: Complete hardware interface documentation covering core processing board (Hailo15H) and AI-PC interface board (STM32G0B0RET6) pin definitions, chip specifications, and hardware block diagram (full bilingual support).
+
 ### Updated
 - **NE301 Verified Models**: Updated verified model list with new test results, added meter reading detection model, fixed table formatting, and revised deployment instructions (full bilingual support).
 
