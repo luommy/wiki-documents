@@ -6,6 +6,11 @@ All notable changes to the CamThink Wiki documentation will be documented in thi
 
 > This changelog reflects updates starting from **2025-12-23**. Major changes prior to this date are not recorded.
 
+## [2026-05-28]
+
+### Updated
+- **NE301 Verified Models**: Updated verified model list with new test results, added meter reading detection model, fixed table formatting, and revised deployment instructions (full bilingual support).
+
 ## [2026-05-08]
 
 ### Added
