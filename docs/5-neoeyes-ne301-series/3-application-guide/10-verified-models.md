@@ -1,0 +1,75 @@
+---
+description: NE301 已验证模型，涵盖通用目标检测、人员检测、姿态估计和仪表读数检测共 7 个模型，包含验证效果对比图和模型包下载链接，帮助用户快速选择和部署适合场景的 AI 模型。
+keywords: [NE301, 模型验证, YOLOv8, YOLO11, 目标检测, 姿态估计, ST YOLO-X, 边缘AI, TFLite]
+tags: [NE301, 模型部署, 目标检测, 姿态估计, 边缘AI]
+---
+
+# NE301 Verified Models
+
+NE301 基于 STM32N6 NPU，支持 TFLite Int8 量化模型推理。下表列出所有经过实际设备验证的模型。
+
+## 硬件约束
+
+| 参数 | 值 | 参数 | 值 |
+|:-----|:----|:-----|:----|
+| NPU | STM32N6，TFLite Int8 | 最大分辨率 | 480×480 |
+| 输入格式 | uint8, RGB888 | 模型存储 | 10 MB（2 个分区，各 5MB） |
+| 同时加载 | 1 个模型 | 输出量化 | `_uf`=float32, `_ui`=int8 |
+
+
+---
+
+> **下载文件说明**：
+> - **tflite** — 原始 TFLite 权重文件，可用于二次开发或模型分析
+> - **json** — NE301 模型配置文件，定义输入规格、后处理类型和推理参数
+> - **bin** — NE301 专用 OTA 固件包，通过 Web 界面直接上传即可部署
+
+## 1. 通用目标检测（COCO 80 类）
+
+支持人、车、动物、家具等 80 个类别检测。`_uf` 精度更高，`_ui` 速度快约 10%。
+
+| 架构 | 尺寸 | 量化 | 大小 | 验证效果 | 模型文件 | OTA 包 | License |
+|:-----|:----:|:----:|:----:|:----:|:---------|:------:|:------:|
+| YOLOv8n | 256×256 | _uf | 3.2MB | <div style={{display:'flex',gap:'8px',alignItems:'start'}}><img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/verified-model-list/yolov8n_256_quant_pc_uf_od_coco-output.jpg" style={{width:'140px',borderRadius:'6px',flexShrink:0}} /><div style={{fontSize:'0.85em',lineHeight:'1.6'}}><div><span style={{color:'#4caf50'}}>●</span> zebra 95%</div><div style={{color:'#888',marginTop:'4px'}}>1 detection</div></div></div> | <a href="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/verified-model-list/yolov8n_256_quant_pc_uf_od_coco.tflite" style={{background:'#e3f2fd',padding:'2px 8px',borderRadius:'4px',fontSize:'0.8em',textDecoration:'none',margin:'2px',display:'inline-block'}}>tflite</a><a href="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/verified-model-list/yolov8n_256_quant_pc_uf_od_coco.json" style={{background:'#f3e5f5',padding:'2px 8px',borderRadius:'4px',fontSize:'0.8em',textDecoration:'none',margin:'2px',display:'inline-block'}}>json</a> | <a href="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/verified-model-list/yolov8n_256_quant_pc_uf_od_coco_pkg.bin" style={{background:'#e8f5e9',padding:'2px 8px',borderRadius:'4px',fontSize:'0.8em',textDecoration:'none',margin:'2px',display:'inline-block'}}>bin</a> | AGPL-3.0 |
+| YOLOv8n | 256×256 | _ui | 3.2MB | <div style={{display:'flex',gap:'8px',alignItems:'start'}}><img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/verified-model-list/yolov8n_256_quant_pc_ui_od_coco-output.jpg" style={{width:'140px',borderRadius:'6px',flexShrink:0}} /><div style={{fontSize:'0.85em',lineHeight:'1.6'}}><div><span style={{color:'#4caf50'}}>●</span> zebra 95%</div><div style={{color:'#888',marginTop:'4px'}}>1 detection</div></div></div> | <a href="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/verified-model-list/yolov8n_256_quant_pc_ui_od_coco.tflite" style={{background:'#e3f2fd',padding:'2px 8px',borderRadius:'4px',fontSize:'0.8em',textDecoration:'none',margin:'2px',display:'inline-block'}}>tflite</a><a href="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/verified-model-list/yolov8n_256_quant_pc_ui_od_coco.json" style={{background:'#f3e5f5',padding:'2px 8px',borderRadius:'4px',fontSize:'0.8em',textDecoration:'none',margin:'2px',display:'inline-block'}}>json</a> | <a href="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/verified-model-list/yolov8n_256_quant_pc_ui_od_coco_pkg.bin" style={{background:'#e8f5e9',padding:'2px 8px',borderRadius:'4px',fontSize:'0.8em',textDecoration:'none',margin:'2px',display:'inline-block'}}>bin</a> | AGPL-3.0 |
+| ST YOLO-X | 480×480 | int8 | 2.4MB | <div style={{display:'flex',gap:'8px',alignItems:'start'}}><img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/verified-model-list/st_yolo_x_nano_480_1.0_0.25_3_int8-output.jpg" style={{width:'140px',borderRadius:'6px',flexShrink:0}} /><div style={{fontSize:'0.85em',lineHeight:'1.6'}}><div><span style={{color:'#4caf50'}}>●</span> person 99.9%</div><div><span style={{color:'#4caf50'}}>●</span> person 99.9%</div><div><span style={{color:'#4caf50'}}>●</span> person 99.8%</div><div><span style={{color:'#ff9800'}}>●</span> person 80%</div><div style={{color:'#888',marginTop:'4px'}}>4 detections</div></div></div> | <a href="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/verified-model-list/st_yolo_x_nano_480_1.0_0.25_3_int8.tflite" style={{background:'#e3f2fd',padding:'2px 8px',borderRadius:'4px',fontSize:'0.8em',textDecoration:'none',margin:'2px',display:'inline-block'}}>tflite</a><a href="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/verified-model-list/st_yolo_x_nano_480_1.0_0.25_3_int8.json" style={{background:'#f3e5f5',padding:'2px 8px',borderRadius:'4px',fontSize:'0.8em',textDecoration:'none',margin:'2px',display:'inline-block'}}>json</a> | <a href="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/verified-model-list/st_yolo_x_nano_480_1.0_0.25_3_int8_pkg.bin" style={{background:'#e8f5e9',padding:'2px 8px',borderRadius:'4px',fontSize:'0.8em',textDecoration:'none',margin:'2px',display:'inline-block'}}>bin</a> | SLA0044 |
+
+## 2. 人员检测
+
+仅检测"人"这一类别，后处理更轻量。
+
+| 架构 | 尺寸 | 量化 | 大小 | 验证效果 | 模型文件 | OTA 包 | License |
+|:-----|:----:|:----:|:----:|:----:|:---------|:------:|:------:|
+| YOLOv8n | 256×256 | _uf | 3.1MB | <div style={{display:'flex',gap:'8px',alignItems:'start'}}><img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/verified-model-list/yolov8n_256_quant_pc_uf_od_coco-person-st-output.jpg" style={{width:'140px',borderRadius:'6px',flexShrink:0}} /><div style={{fontSize:'0.85em',lineHeight:'1.6'}}><div><span style={{color:'#4caf50'}}>●</span> person 90%</div><div style={{color:'#888',marginTop:'4px'}}>1 detection</div></div></div> | <a href="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/verified-model-list/yolov8n_256_quant_pc_uf_od_coco-person-st.tflite" style={{background:'#e3f2fd',padding:'2px 8px',borderRadius:'4px',fontSize:'0.8em',textDecoration:'none',margin:'2px',display:'inline-block'}}>tflite</a><a href="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/verified-model-list/yolov8n_256_quant_pc_uf_od_coco-person-st.json" style={{background:'#f3e5f5',padding:'2px 8px',borderRadius:'4px',fontSize:'0.8em',textDecoration:'none',margin:'2px',display:'inline-block'}}>json</a> | <a href="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/verified-model-list/yolov8n_256_quant_pc_uf_od_coco-person-st_pkg.bin" style={{background:'#e8f5e9',padding:'2px 8px',borderRadius:'4px',fontSize:'0.8em',textDecoration:'none',margin:'2px',display:'inline-block'}}>bin</a> | AGPL-3.0 |
+| YOLO11n | 256×256 | _uf | 3.0MB | <div style={{display:'flex',gap:'8px',alignItems:'start'}}><img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/verified-model-list/yolo11n_256_quant_pc_uf_od_coco-person-st-output.jpg" style={{width:'140px',borderRadius:'6px',flexShrink:0}} /><div style={{fontSize:'0.85em',lineHeight:'1.6'}}><div><span style={{color:'#4caf50'}}>●</span> person 92%</div><div style={{color:'#888',marginTop:'4px'}}>1 detection</div></div></div> | <a href="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/verified-model-list/yolo11n_256_quant_pc_uf_od_coco-person-st.tflite" style={{background:'#e3f2fd',padding:'2px 8px',borderRadius:'4px',fontSize:'0.8em',textDecoration:'none',margin:'2px',display:'inline-block'}}>tflite</a><a href="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/verified-model-list/yolo11n_256_quant_pc_uf_od_coco-person-st.json" style={{background:'#f3e5f5',padding:'2px 8px',borderRadius:'4px',fontSize:'0.8em',textDecoration:'none',margin:'2px',display:'inline-block'}}>json</a> | <a href="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/verified-model-list/yolo11n_256_quant_pc_uf_od_coco-person-st_pkg.bin" style={{background:'#e8f5e9',padding:'2px 8px',borderRadius:'4px',fontSize:'0.8em',textDecoration:'none',margin:'2px',display:'inline-block'}}>bin</a> | AGPL-3.0 |
+
+## 3. 姿态估计
+
+每个检测到的人体输出 17 个关键点（COCO keypoint 格式），适用于动作识别、姿态分析等场景。
+
+| 架构 | 尺寸 | 量化 | 大小 | 验证效果 | 模型文件 | OTA 包 | License |
+|:-----|:----:|:----:|:----:|:----:|:---------|:------:|:------:|
+| YOLOv8n Pose | 256×256 | _uf | 3.4MB | <div style={{display:'flex',gap:'8px',alignItems:'start'}}><img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/verified-model-list/yolov8n_256_quant_pc_uf_pose_coco-st-output.jpg" style={{width:'140px',borderRadius:'6px',flexShrink:0}} /><div style={{fontSize:'0.85em',lineHeight:'1.6'}}><div><span style={{color:'#4caf50'}}>●</span> pose 1 · 87% · 17 keys</div><div><span style={{color:'#4caf50'}}>●</span> pose 2 · 81% · 17 keys</div><div><span style={{color:'#ff9800'}}>●</span> pose 3 · 77% · 17 keys</div><div style={{color:'#888',marginTop:'4px'}}>3 poses</div></div></div> | <a href="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/verified-model-list/yolov8n_256_quant_pc_uf_pose_coco-st.tflite" style={{background:'#e3f2fd',padding:'2px 8px',borderRadius:'4px',fontSize:'0.8em',textDecoration:'none',margin:'2px',display:'inline-block'}}>tflite</a><a href="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/verified-model-list/yolov8n_256_quant_pc_uf_pose_coco-st.json" style={{background:'#f3e5f5',padding:'2px 8px',borderRadius:'4px',fontSize:'0.8em',textDecoration:'none',margin:'2px',display:'inline-block'}}>json</a> | <a href="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/verified-model-list/yolov8n_256_quant_pc_uf_pose_coco-st_pkg.bin" style={{background:'#e8f5e9',padding:'2px 8px',borderRadius:'4px',fontSize:'0.8em',textDecoration:'none',margin:'2px',display:'inline-block'}}>bin</a> | AGPL-3.0 |
+
+## 4. 仪表读数检测
+
+检测仪表盘上的数字（0-9），适用于水表、电表、气表等读数识别场景。
+
+| 架构 | 尺寸 | 量化 | 大小 | 验证效果 | 模型文件 | OTA 包 | License |
+|:-----|:----:|:----:|:----:|:----:|:---------|:------:|:------:|
+| YOLOv8n | 256×256 | _ui | 3.1MB | <div style={{display:'flex',gap:'8px',alignItems:'start'}}><img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/verified-model-list/yolov8n_256_quant_pc_ui_od_meter-output.jpg" style={{width:'140px',borderRadius:'6px',flexShrink:0}} /><div style={{fontSize:'0.85em',lineHeight:'1.6'}}><div><span style={{color:'#4caf50'}}>●</span> "0" 81%</div><div><span style={{color:'#4caf50'}}>●</span> "0" 74%</div><div><span style={{color:'#ff9800'}}>●</span> "0" 57%</div><div><span style={{color:'#ff9800'}}>●</span> "0" 33%</div><div><span style={{color:'#f44336'}}>●</span> "3" 43%</div><div><span style={{color:'#f44336'}}>●</span> "5" 30%</div><div><span style={{color:'#f44336'}}>●</span> "5" 21%</div><div style={{color:'#888',marginTop:'4px'}}>7 detections</div></div></div> | <a href="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/verified-model-list/yolov8n_256_quant_pc_ui_od_meter.tflite" style={{background:'#e3f2fd',padding:'2px 8px',borderRadius:'4px',fontSize:'0.8em',textDecoration:'none',margin:'2px',display:'inline-block'}}>tflite</a><a href="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/verified-model-list/yolov8n_256_quant_pc_ui_od_meter.json" style={{background:'#f3e5f5',padding:'2px 8px',borderRadius:'4px',fontSize:'0.8em',textDecoration:'none',margin:'2px',display:'inline-block'}}>json</a> | <a href="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/verified-model-list/yolov8n_256_quant_pc_ui_od_meter_pkg.bin" style={{background:'#e8f5e9',padding:'2px 8px',borderRadius:'4px',fontSize:'0.8em',textDecoration:'none',margin:'2px',display:'inline-block'}}>bin</a> | AGPL-3.0 |
+
+---
+
+## 模型部署
+
+表格中提供两类下载文件：
+
+- **tflite + json**：适用于二次开发，需要自行编译为固件包后部署，详见 [模型训练与部署指南](./0-model-training-and-deployment/0-model-training-and-deployment.md)
+- **bin**：NE301 OTA 固件包，可直接上传到设备使用，详见 [快速入门](../1-quick-start.md)。也可通过 Web UI 首页 **功能调试（Feature Debugging）** → **upload** 或 **系统设置（System Setting）→ 固件升级（Firmware Upgrade）** 上传
+
+> 更多模型正在适配中，请期待。自定义模型编译可参考 [模型训练与部署指南](./0-model-training-and-deployment/0-model-training-and-deployment.md)。
+
+---
+
+**文档版本**：v1.2 · **最后更新**：2026-05-28

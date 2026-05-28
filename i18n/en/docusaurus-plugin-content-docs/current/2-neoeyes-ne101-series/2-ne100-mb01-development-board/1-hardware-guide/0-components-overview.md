@@ -29,7 +29,7 @@ Key Features:
 
 ### OV5640 Module
 
-OV5640 sensor with a maximum resolution of 2592×1944 and a 1/4-inch optical format. It offers two lens options with D-FOV 120° and 77°, and supports two focus configurations: macro capture and standard focus, selectable based on application needs.
+OV5640 sensor with a maximum resolution of 2592×1944 and a 1/4-inch optical format. It offers two lens options with D-FOV 120° and 60°, and supports two focus configurations: macro capture and standard focus, selectable based on application needs.
 
 | Item                 | Description                       | Note       |
 | :------------------- | :-------------------------------- | :--------- |

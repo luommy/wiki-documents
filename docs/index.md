@@ -35,8 +35,15 @@ import VideoCarousel from '@site/src/components/VideoCarousel';
   {/* ================= Latest Updates ================= */}
   <h2 className="docs-section-title">最新文档</h2>
   <div className="latest-docs-grid">
-    <Link to="/docs/neoeyes-ne503-series/quick-start" className="update-card">
+    <Link to="/docs/neoeyes-ne301-series/application-guide/verified-models" className="update-card">
       <span className="update-badge">NEW</span>
+      <div className="update-title">NE301 Verified Models</div>
+      <div className="update-meta">
+        <span>更新文档</span>
+        <span>• 2026-05-28</span>
+      </div>
+    </Link>
+    <Link to="/docs/neoeyes-ne503-series/quick-start" className="update-card">
       <div className="update-title">NeoEyes NE503 快速入门</div>
       <div className="update-meta">
         <span>新增文档</span>
@@ -55,13 +62,6 @@ import VideoCarousel from '@site/src/components/VideoCarousel';
       <div className="update-meta">
         <span>新增文档</span>
         <span>• 2026-04-23</span>
-      </div>
-    </Link>
-    <Link to="/docs/neoeyes-ne101-series/application-guide/wifihalow-solution" className="update-card">
-      <div className="update-title">WiFi HaLow 解决方案</div>
-      <div className="update-meta">
-        <span>新增文档</span>
-        <span>• 2026-04-22</span>
       </div>
     </Link>
   </div>
