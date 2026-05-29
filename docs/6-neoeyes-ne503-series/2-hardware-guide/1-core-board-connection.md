@@ -1,6 +1,6 @@
 ---
-description: NE503 核心处理板（Hailo15H）硬件接口引脚定义，涵盖 DDR4、eMMC、QSPI Flash、传感器、音频、TF 卡等 16 个接口的完整 IO 配置。
-keywords: [NE503, Hailo15H, 核心处理板, IO配置, 引脚定义, DDR4, eMMC, IMX678, 硬件连接]
+description: NE503 核心处理板（Hailo15H）硬件接口引脚定义，涵盖 LPDDR4、eMMC、QSPI Flash、传感器、音频、TF 卡等 16 个接口的完整 IO 配置。
+keywords: [NE503, Hailo15H, 核心处理板, IO配置, 引脚定义, LPDDR4, eMMC, IMX678, 硬件连接]
 tags: [NE503, 核心处理板, IO配置, Hailo15H]
 ---
 
@@ -12,7 +12,7 @@ tags: [NE503, 核心处理板, IO配置, Hailo15H]
 
 | # | 功能 | 说明 |
 |:---|:---|:---|
-| 1 | DDR4 | 8 GB |
+| 1 | LPDDR4 | 8 GB |
 | 2 | eMMC | SDINBDA6-64G-H |
 | 3 | SPI NOR Flash | 8 MB，IS25WP064D-JKLE |
 | 4 | 温度传感器 | TMP1075DSGR |
@@ -31,9 +31,9 @@ tags: [NE503, 核心处理板, IO配置, Hailo15H]
 
 ## 存储与内存
 
-### DDR4（MT53E2G32D4DE-046 WT:C）
+### LPDDR4（MT53E2G32D4DE-046 WT:C）
 
-8 GB LPDDR4，266 Mb/s，8.5 GB/s 单通道带宽。
+8 GB LPDDR4，4266 Mb/s，8.5 GB/s 单通道带宽。
 
 | 引脚 | 功能 |
 |:---|:---|
@@ -88,7 +88,13 @@ tags: [NE503, 核心处理板, IO配置, Hailo15H]
 
 ## 传感器与 I2C 设备
 
-以下 I2C 设备共用总线资源，注意地址分配情况。
+以下 I2C 设备按总线分配，同一总线上的设备通过不同从设备地址区分。
+
+| I2C 总线 | 设备 | 从设备地址 |
+|:---------|:-----|:----------|
+| I2C0 | IMX678（图像传感器）、NAU88C10（Audio 编解码器） | 0x10、0x1A |
+| I2C1 | TMP1075（温度传感器）、AT24C02D（EEPROM）、PI6CG18201（PCIe 时钟） | 0x49、0x50、0x6A |
+| I2C2 | LSM6DSR（陀螺仪） | 0x6A |
 
 ### 温度传感器（TMP1075DSGR）
 
@@ -119,7 +125,7 @@ tags: [NE503, 核心处理板, IO配置, Hailo15H]
 
 ### 图像传感器（IMX678）
 
-从设备地址 **0x50**，1/1.8 英寸 4K CMOS，60fps 全像素输出。
+从设备地址 **0x10**，1/1.8 英寸 4K CMOS，60fps 全像素输出。
 
 | 引脚 | 功能 |
 |:---|:---|
@@ -144,7 +150,16 @@ tags: [NE503, 核心处理板, IO配置, Hailo15H]
 
 | 引脚 | 功能 | 备注 |
 |:---|:---|:---|
-| RMII_RXD0 | ETH_RMII_RXD0 | 支持 PoE 802.3AT 供电 |
+| RMII_RXD0 | ETH_RMII_RXD0 | — |
+| RMII_RXD1 | ETH_RMII_RXD1 | — |
+| RMII_RX_ER | ETH_RMII_RXD2 | SoC 引脚复用名 |
+| RMII_CRS_DV | ETH_RMII_RXD3 | SoC 引脚复用名 |
+| RX_CLK | ETH_RMII_RX_CLK | RMII 参考时钟 50 MHz |
+| RMII_TXD0 | ETH_RMII_TXD0 | — |
+| RMII_TXD1 | ETH_RMII_TXD1 | — |
+| RMII_TX_EN | ETH_RMII_TXD2 | SoC 引脚复用名 |
+| MDIO | ETH_MDIO | — |
+| MDC | ETH_MDC | — |
 
 ### UART0（调试串口）
 
@@ -170,11 +185,11 @@ tags: [NE503, 核心处理板, IO配置, Hailo15H]
 
 雷达模组通过 UART2 连接。
 
-| 引脚 | 功能 |
-|:---|:---|
-| H_GPIO_6 | GPIO 输入/输出 |
-| H_GPIO_4 | GPIO 输入/输出 |
-| SAFETY_FATAL | 安全故障信号 |
+| 引脚 | 功能 | 备注 |
+|:---|:---|:---|
+| H_GPIO_4 | UART2_TX | 可复用为 GPIO |
+| H_GPIO_6 | UART2_RX | 可复用为 GPIO，与 I2C2_SDA 共用引脚 |
+| SAFETY_FATAL | 安全故障信号 | — |
 
 ## 系统控制
 
@@ -195,7 +210,7 @@ SoC BootMode\[0:1\] 配置：
 
 ### LENS Driver（AN41908A-VBA）
 
-电动变焦与自动对焦镜头驱动，SPI 接口。
+电动变焦与自动对焦镜头驱动，SPI 接口（与 QSPI Flash 共享 SPI 总线，通过不同片选区分）。
 
 | 引脚 | 功能 |
 |:---|:---|
@@ -204,7 +219,7 @@ SoC BootMode\[0:1\] 配置：
 | H_SPI_DQ2 | FLASH_DQ2 |
 | H_SPI_DQ3 | FLASH_DQ3 |
 | H_SPI_CLK | FLASH_CLK |
-| H_SPI_CS0 | FLASH_CS1 |
+| H_SPI_CS1 | FLASH_CS1 |
 
 ### 复位芯片（SN74LVC1G14DCK）
 

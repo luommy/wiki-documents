@@ -62,7 +62,7 @@ NE503 整机核心规格如下：
     </tr>
     <tr>
       <td>内存 / 存储</td>
-      <td>8 GB LPDDR4 / 64 GB eMMC，支持 TF Card 与 M.2 SSD 扩展</td>
+      <td>8 GB LPDDR4 / 64 GB eMMC，支持 TF Card 与 M.2 SSD 扩展（M.2 暂未支持）</td>
     </tr>
     <tr>
       <td>视频编码</td>
@@ -109,7 +109,7 @@ NE503 整机核心规格如下：
     </tr>
     <tr>
       <td>工作温度</td>
-      <td>-30°C – +60°C</td>
+      <td>-40°C – +60°C</td>
     </tr>
     <tr>
       <td rowSpan="2">外部接口</td>
@@ -279,7 +279,7 @@ NE503 采用**核心处理板**与 **AI-PC 接口板**双板结构，通过板�
 | 视频编码 | H.264 / H.265 硬件编码，4K@30fps |
 | SPI Flash | 8 MB（QSPI 4-bit） |
 | TF Card | SDIO0，支持高速 / UHS-I（J11 TF 卡座 + J12 FPC 座） |
-| SSD 扩展 | M.2 KEY M（PCIe 3.0，2 Lanes） |
+| SSD 扩展 | M.2 KEY M（PCIe 3.0，2 Lanes）⚠️ 暂未支持 |
 | 相机接口 | J3 FPC 连接器，MIPI CSI-2（4 Lanes），I2C0 + GPIO |
 | 板载器件 | 陀螺仪（LSM6DSR，I2C2） |
 | 调试 | SoC Debug UART1（1.8V） |

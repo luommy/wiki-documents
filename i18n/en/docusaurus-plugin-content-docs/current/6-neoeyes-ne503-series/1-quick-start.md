@@ -38,7 +38,7 @@ The following items must be provided by the user:
 The NE503 serves as both a smart IPC and an edge computing platform. Consider both surveillance coverage and AI inference performance when choosing the installation spot:
 
 - **Surveillance coverage**: Select a position that covers the target area. Note the lens field of view (wide-angle: 44.5° horizontal, telephoto: 14.5°)
-- **Environmental requirements**: IP66 rated, supports -30°C to +60°C operating temperature, suitable for outdoor installation
+- **Environmental requirements**: IP66 rated, supports -40°C to +60°C operating temperature, suitable for outdoor installation
 - **Cable planning**: Ensure the Ethernet cable from the PoE switch or router reaches the installation location
 
 ### 2. Wall-Mount Installation
@@ -288,7 +288,7 @@ Go to **Settings → Storage**:
 
 ![](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/quick-start/qs-settings-storage.png)
 
-The NE503 has built-in 64GB eMMC for system and application data. To expand storage, use a TF card (UHS-I supported) or M.2 SSD (PCIe 3.0 x 2 Lanes). Clean up or expand when storage usage exceeds 80%.
+The NE503 has built-in 64GB eMMC for system and application data. To expand storage, use a TF card (UHS-I supported). The M.2 SSD (PCIe 3.0 x 2 Lanes) interface is not yet supported and will be enabled via a future firmware update. Clean up or expand when storage usage exceeds 80%.
 
 ---
 

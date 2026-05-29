@@ -129,13 +129,13 @@ SPI interface for motorized zoom and autofocus lens control. The MCU-side LENS D
 
 | Pin | Function | Note |
 |:---|:---|:---|
-| PB9 | FAN_EN (Fan enable) | 12V, shared with heater, auto-switching by temperature threshold |
+| PB9 | FAN_EN (Fan enable) | 12V |
 
 ### Heater
 
 | Pin | Function | Note |
 |:---|:---|:---|
-| PB9 | Heater drive (shared enable pin with fan) | 12V, shared PB9 with fan |
+| PA15 | HEAT_EN (Heater enable) | 12V |
 
 ## Debug & Control
 
@@ -151,7 +151,7 @@ SPI interface for motorized zoom and autofocus lens control. The MCU-side LENS D
 | Pin | Function |
 |:---|:---|
 | PA10 | USART1_RX (Receive) |
-| PA9 | USART1_TX (Transmit) |
+| PA9 | USART1_TX (Transmit) | Mutually exclusive with Alarm_OUT1, only one can be used at a time |
 
 ### Board Reset
 
