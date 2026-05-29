@@ -62,7 +62,7 @@ NE503 core specifications are as follows:
     </tr>
     <tr>
       <td>Memory / Storage</td>
-      <td>8 GB LPDDR4 / 64 GB eMMC, supports TF Card and M.2 SSD expansion</td>
+      <td>8 GB LPDDR4 / 64 GB eMMC, supports TF Card and M.2 SSD expansion (M.2 not yet supported)</td>
     </tr>
     <tr>
       <td>Video Encoding</td>
@@ -109,7 +109,7 @@ NE503 core specifications are as follows:
     </tr>
     <tr>
       <td>Operating Temperature</td>
-      <td>-30°C to +60°C</td>
+      <td>-40°C to +60°C</td>
     </tr>
     <tr>
       <td rowSpan="2">External Interfaces</td>
@@ -279,7 +279,7 @@ The Processor Board integrates the SoC, NPU, memory, storage, video encoding, an
 | Video Encoding | H.264 / H.265 hardware encoding, 4K@30fps |
 | SPI Flash | 8 MB (QSPI 4-bit) |
 | TF Card | SDIO0, supports High Speed / UHS-I (J11 TF card slot + J12 FPC connector) |
-| SSD Expansion | M.2 KEY M (PCIe 3.0, 2 Lanes) |
+| SSD Expansion | M.2 KEY M (PCIe 3.0, 2 Lanes) ⚠️ Not yet supported |
 | Camera Interface | J3 FPC connector, MIPI CSI-2 (4 Lanes), I2C0 + GPIO |
 | Onboard Devices | Gyroscope (LSM6DSR, I2C2) |
 | Debug | SoC Debug UART1 (1.8V) |
