@@ -10,7 +10,7 @@ dotenv.config();
 
 const WEIGHTS = '/Users/harryhua/Documents/GitHub/ne301/Model/weights';
 const MODELS_BIN = '/Users/harryhua/Documents/GitHub/ne301/models-bin';
-const REMOTE_BASE = '/wiki/img/neoeyes-ne301-series/application-guide/verified-model-list';
+const REMOTE_BASE = '/img/neoeyes-ne301-series/application-guide/verified-model-list';
 
 const MODELS = [
   'yolov8n_256_quant_pc_uf_od_coco',
