@@ -36,7 +36,7 @@ Key device parameters for each physical module in NE503:
 
 | Type | Chip Model | Specifications |
 |:---|:---|:---|
-| MCU | STM32G0B0RET6 | Arm Cortex-M0+, 64 MHz, 128 KB Flash, 36 KB RAM |
+| MCU | STM32G0B0RET6 | Arm Cortex-M0+, 64 MHz, 512 KB Flash, 144 KB RAM |
 | Temperature Sensor | LMT87DCK | Analog output temperature sensor, -50°C ~ 150°C |
 | Lens Driver | AN41908A-VBA | AF auto-zoom and autofocus, SPI interface |
 | Audio Codec | NAU88C10 | I2S interface audio codec (SoC-controlled, not MCU-managed) |

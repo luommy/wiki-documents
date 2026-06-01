@@ -36,7 +36,7 @@ NE503 各物理模组的主要器件参数如下：
 
 | 类型 | 芯片型号 | 规格参数 |
 |:---|:---|:---|
-| MCU | STM32G0B0RET6 | Arm Cortex-M0+，64 MHz，128 KB Flash，36 KB RAM |
+| MCU | STM32G0B0RET6 | Arm Cortex-M0+，64 MHz，512 KB Flash，144 KB RAM |
 | 温度传感器 | LMT87DCK | 模拟输出温度传感器，-50°C ~ 150°C |
 | 镜头驱动 | AN41908A-VBA | AF 自动变焦与自动对焦，SPI 接口 |
 | 音频编解码器 | NAU88C10 | I2S 接口音频编解码器（SoC 控制，非 MCU 管理） |
