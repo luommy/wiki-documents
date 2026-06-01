@@ -1,24 +1,24 @@
 ---
-description: NE503 hardware specifications including Hailo15H SoC, LPDDR4, eMMC, QSPI Flash, image sensor, IMU, Ethernet PHY, and other core chip parameters, with hardware block diagram.
-keywords: [NE503, hardware specifications, Hailo15H, IMX678, LPDDR4, LSM6DSR, chip parameters, hardware block diagram]
+description: NE503 hardware specifications with chip-level parameters for Hailo15H SoC, LPDDR4, eMMC, QSPI Flash, image sensor, IMU, Ethernet PHY, and other core modules.
+keywords: [NE503, hardware specifications, Hailo15H, IMX678, LPDDR4, LSM6DSR, chip parameters]
 tags: [NE503, hardware specifications, chip parameters, hardware reference]
 ---
 
 # Hardware Specifications
 
-## Product Model
+## Introduction
+
+NE503 features a dual-board architecture with a core processing board (Hailo15H SoC) and an interface board (STM32G0B0RET6 MCU). For details, see [Core Board](./1-core-board-connection.md) and [Interface Board](./2-aipc-board-connection.md).
 
 | Product Model | Description |
 |:---|:---|
-| NE5038-PX4 | Hailo15H + eMMC 64GB + LPDDR4 8GB, AF 4X Zoom |
+| NE5038-PX4 | Hailo15H + eMMC 64GB + LPDDR4 8GB, AF 4x zoom |
 
-![NE503 Hardware Block Diagram](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/hardware-guide/specifications/hardware-block-diagram.png)
+## Module-Level Specifications
 
-NE503 adopts a **core processing board** (Hailo15H) and **AI-PC interface board** (STM32G0B0RET6) dual-board architecture, interconnected via board-to-board connectors. The core processing board hosts the SoC, NPU, memory, storage, and imaging subsystems; the AI-PC interface board integrates an independent MCU to manage external IO, power, and peripheral control.
+Key device parameters for each physical module in NE503:
 
-## Chip-Level Specifications
-
-The main component parameters of the NE503 core processing board and AI-PC interface board are as follows:
+### Core Processing Board
 
 | Type | Chip Model | Specifications |
 |:---|:---|:---|
@@ -28,11 +28,38 @@ The main component parameters of the NE503 core processing board and AI-PC inter
 | QSPI Flash | IS25WP064D-JKLE | 8 MB, Quad SPI protocol, standby current 8 µA, erase cycles > 100,000 |
 | Temperature Sensor | TMP1075DSGR | 12-bit resolution, 0.0625°C, I2C interface |
 | EEPROM | AT24C02D | 2 Kb (256 × 8), I2C interface, standby current < 1 µA, 1,000,000 write cycles |
-| Image Sensor | IMX678-AAQR1-C | 1/1.8-inch 4K CMOS image sensor, up to 60fps 4K full-pixel output |
-| PCIe Clock Generator | PI6CG18201 | 25 MHz, full-output operating current (IDD) 15 mA, low jitter PCIe Gen4: 0.3 ps |
+| PCIe Clock Generator | PI6CG18201 | 25 MHz, full-output operating current (IDD) 15 mA, low-jitter PCIe Gen4: 0.3 ps |
 | Ethernet PHY | LAN8720AI | 10/100M Ethernet PHY, IO voltage 1.6V ~ 3.6V |
 | Inertial Measurement Unit (IMU) | LSM6DSR | Integrated 3-axis digital accelerometer (programmable, max ±16 g) and 3-axis digital gyroscope (up to ±4000 dps) |
-| Operating Environment | — | -40 ~ 60°C, 0 ~ 95% non-condensing |
+
+### Interface Board
+
+| Type | Chip Model | Specifications |
+|:---|:---|:---|
+| MCU | STM32G0B0RET6 | Arm Cortex-M0+, 64 MHz, 512 KB Flash, 144 KB RAM |
+| Temperature Sensor | LMT87DCK | Analog output temperature sensor, -50°C ~ 150°C |
+| Lens Driver | AN41908A-VBA | AF auto-zoom and autofocus, SPI interface |
+| Audio Codec | NAU88C10 | I2S interface audio codec (SoC-controlled, not MCU-managed) |
+
+### External Modules
+
+| Type | Chip Model | Specifications |
+|:---|:---|:---|
+| Image Sensor | IMX678-AAQR1-C | 1/1.8-inch 4K CMOS image sensor, up to 60fps 4K full-pixel output |
+
+### Light Board (Independent Module)
+
+| Type | Description |
+|:---|:---|
+| Dual-Light Board | White + Red LED, PWM dimming, connected to interface board via connector |
+| IR Light Board | Near-IR + Far-IR LED, PWM dimming, connected to interface board via connector |
+
+## Operating Environment
+
+| Parameter | Specification |
+|:---|:---|
+| Operating Temperature | -40 ~ 60°C |
+| Relative Humidity | 0 ~ 95% non-condensing |
 
 ## Version History
 

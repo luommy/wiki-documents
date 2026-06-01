@@ -21,13 +21,13 @@ NeoEyes NE503 是一款基于 **Hailo-15H SoC** 的边缘 AI 智能相机，搭�
 
 - **端侧 AI 闭环推理**：20 TOPS（INT8）NPU 支持多模型并发推理，图像采集、分析与结构化输出全程在设备端完成，零云端依赖，满足低延迟与数据本地化要求。
 
-- **4K 专业成像系统**：Sony IMX678（1/1.8"）+ Gen2 AI-ISP + 电动变焦镜头（F1.6），支持 4K@30fps H.265 编码与 &lt;0.01 LUX 全彩夜视，在 HDR、低照及并发推理负载下保持成像质量，兼顾广角覆盖与远端识别。
+- **4K 专业成像系统**：Sony IMX678（1/1.8"）+ Hailo Gen2 AI-ISP + AF 自动变焦镜头（F1.6），支持 4K@30fps H.265 编码与 &lt;0.01 LUX 全彩夜视，在 HDR、低照及并发推理负载下保持成像质量，兼顾广角覆盖与远端识别。
 
 - **容器化应用平台**：基于 containerd 运行时，OCI 标准镜像部署，沙箱隔离。模型与应用可独立部署升级，算法供应商、集成商与 OEM 厂商基于统一底座构建行业方案，避免供应商锁定。
 
-- **工业级一体化交付**：成像、推理、告警联动、协议输出与运维管理集成于单机。IP66 防护 + PoE 802.3AT 供电 + Web 控制台，支持从开发验证到商业部署全流程。
+- **工业级一体化交付**：成像、推理、告警联动、协议输出与运维管理集成于单机。IP67 防护 + PoE 802.3AT 供电 + Web 控制台，支持从开发验证到商业部署全流程。
 
-- **全栈开发者工具链**：Python / C++ / Go SDK + aipc-cli + RESTful API，适配多种接入方式。模块化 HAL 解耦软硬件，支持跨 SoC 平台平滑迁移。
+- **全栈开发者工具链**：Python SDK + aipc-cli + RESTful API，适配多种接入方式。模块化 HAL 解耦软硬件，支持跨 SoC 平台平滑迁移。
 
 ## 产品总览规格
 
@@ -58,7 +58,7 @@ NE503 整机核心规格如下：
     </tr>
     <tr>
       <td>NPU</td>
-      <td>Hailo NPU，20 TOPS @ INT8，支持 4bit 量化扩展</td>
+      <td>Hailo NPU，20 TOPS @ INT8</td>
     </tr>
     <tr>
       <td>内存 / 存储</td>
@@ -70,7 +70,7 @@ NE503 整机核心规格如下：
     </tr>
     <tr>
       <td>系统功耗</td>
-      <td>&lt; 8W（典型负载）</td>
+      <td>5–6W（典型负载）</td>
     </tr>
     <tr>
       <td rowSpan="3">成像系统</td>
@@ -79,11 +79,11 @@ NE503 整机核心规格如下：
     </tr>
     <tr>
       <td>镜头模组</td>
-      <td>福光 AF0832D09，电动变焦 10.2–29.5mm，F1.6–F1.7</td>
+      <td>AF 自动变焦 8–32mm，F1.6</td>
     </tr>
     <tr>
       <td>ISP</td>
-      <td>Gen2 AI-ISP，&lt;0.01 LUX 全彩夜视</td>
+      <td>Hailo Gen2 AI-ISP，&lt;0.01 LUX 全彩夜视</td>
     </tr>
     <tr>
       <td rowSpan="3">网络与协议</td>
@@ -92,7 +92,7 @@ NE503 整机核心规格如下：
     </tr>
     <tr>
       <td>视频协议</td>
-      <td>RTSP / ONVIF（规划）</td>
+      <td>RTSP</td>
     </tr>
     <tr>
       <td>数据协议</td>
@@ -105,7 +105,7 @@ NE503 整机核心规格如下：
     </tr>
     <tr>
       <td>防护等级</td>
-      <td>IP66</td>
+      <td>IP67</td>
     </tr>
     <tr>
       <td>工作温度</td>
@@ -118,7 +118,7 @@ NE503 整机核心规格如下：
     </tr>
     <tr>
       <td>扩展接口</td>
-      <td>RS-485 / 韦根\* / 音频 I/O\* / 雷达\* / 补光灯</td>
+      <td>RS-485 / 补光灯接口</td>
     </tr>
     <tr>
       <td rowSpan="2">软件平台</td>
@@ -131,8 +131,6 @@ NE503 整机核心规格如下：
     </tr>
   </tbody>
 </table>
-
-\* 规划预留，具体支持时间请关注后续版本更新。
 
 ## 性能与边缘 AI
 
@@ -155,13 +153,13 @@ NE503 搭载 Hailo-15H SoC，集成 Hailo NPU 提供 20 TOPS（INT8）算力，�
 
 ### 视频编码能力
 
-硬件编码器支持 4K@30fps 的 H.264/H.265 双格式编码，配合 Gen2 AI-ISP 实现 &lt;0.01 LUX 极低照度全彩夜视，12-bit AI 降噪无需重新训练模型即可适配不同场景。
+硬件编码器支持 4K@30fps 的 H.264/H.265 双格式编码，配合 Hailo Gen2 AI-ISP 实现 &lt;0.01 LUX 极低照度全彩夜视，AI 降噪无需重新训练模型即可适配不同场景。
 
 | 指标 | 参数 |
 |------|------|
 | 编码格式 | H.264 / H.265 硬件编码，支持 CBR / VBR 码率控制 |
 | RTSP 码流 | 主码流 / 子码流 / 三码流 |
-| AI 降噪 | 12-bit AI 降噪，无需重新训练模型即可适配不同场景 |
+| AI 降噪 | AI 降噪，无需重新训练模型即可适配不同场景 |
 
 ### 低照度成像
 
@@ -169,7 +167,7 @@ NE503 搭载 Hailo-15H SoC，集成 Hailo NPU 提供 20 TOPS（INT8）算力，�
   <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/overview/ai-isp-comparison.png" alt="AI-ISP 低照度对比" width="80%" />
 </div>
 
-AI-ISP 在极低照度环境下仍可输出清晰彩色画面，12-bit AI 降噪自适应不同光照条件。结合 IR-CUT 滤光片自动切换和补光灯控制，实现 24/7 全天候成像。
+AI-ISP 在极低照度环境下仍可输出清晰彩色画面，AI 降噪自适应不同光照条件。结合 IR-CUT 滤光片自动切换和补光灯控制，实现 24/7 全天候成像。
 
 ## 成像系统
 
@@ -177,44 +175,15 @@ AI-ISP 在极低照度环境下仍可输出清晰彩色画面，12-bit AI 降噪
   <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/overview/imaging-module.jpg" alt="成像模组" width="60%" />
 </div>
 
-NE503 成像系统由 Sony IMX678（1/1.8"）图像传感器与福光 AF0832D09 电动变焦镜头组成，传感器与镜头靶面 1:1 匹配，边缘画质无明显衰减。镜头覆盖 10.2mm（H 44.5°）至 29.5mm（H 14.5°）焦距段，单机即可完成广角全景监控与远端细节识别，电动变焦支持现场按需切换。F1.6 大光圈配合 AI-ISP 低照增强，在暗光和逆光场景下仍保持成像质量。
+NE503 成像系统由 Sony IMX678（1/1.8"）图像传感器与 AF 自动变焦镜头组成，传感器与镜头靶面 1:1 匹配，边缘画质无明显衰减。镜头覆盖 8mm（H 45.1°）至 32mm（H 14.7°）焦距段，单机即可完成广角全景监控与远端细节识别，AF 自动变焦支持现场按需切换。F1.6 大光圈配合 AI-ISP 低照增强，在暗光和逆光场景下仍保持成像质量。
 
 ### 传感器
 
-<table>
-  <thead>
-    <tr>
-      <th>参数</th>
-      <th>规格</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>传感器型号</td>
-      <td>Sony IMX678-AAQR1-C</td>
-    </tr>
-    <tr>
-      <td>靶面尺寸</td>
-      <td>1/1.8 英寸，对角线 8.86mm</td>
-    </tr>
-    <tr>
-      <td>有效像素</td>
-      <td>3856(H) × 2180(V)，推荐记录像素 3840 × 2160（4K UHD）</td>
-    </tr>
-    <tr>
-      <td>像素尺寸</td>
-      <td>2.0μm × 2.0μm</td>
-    </tr>
-    <tr>
-      <td>输出接口</td>
-      <td>MIPI CSI-2，RAW10 / RAW12</td>
-    </tr>
-    <tr>
-      <td>HDR</td>
-      <td>Digital Overlap HDR / Dual Gain HDR</td>
-    </tr>
-  </tbody>
-</table>
+| 参数 | 规格 |
+|------|------|
+| 传感器 | Sony IMX678，1/1.8" CMOS |
+| 有效像素 | 3840 × 2160（4K UHD） |
+| HDR | Digital Overlap / Dual Gain HDR |
 
 ### 镜头
 
@@ -227,35 +196,27 @@ NE503 成像系统由 Sony IMX678（1/1.8"）图像传感器与福光 AF0832D09 
   </thead>
   <tbody>
     <tr>
-      <td>镜头型号</td>
-      <td>福光 AF0832D09.ICR1(4K)</td>
-    </tr>
-    <tr>
       <td>焦距范围</td>
-      <td>10.2mm（广角）– 29.5mm（长焦）</td>
+      <td>8mm（广角）– 32mm（长焦）</td>
     </tr>
     <tr>
-      <td>相对孔径</td>
-      <td>F1.6（W）– F1.7（T）</td>
+      <td>最大光圈</td>
+      <td>F1.6</td>
     </tr>
     <tr>
       <td>视场角</td>
-      <td>水平 44.5°（W）/ 14.5°（T）；对角线 52°（W）/ 16.6°（T）</td>
+      <td>水平 45.1°（W）/ 14.7°（T）；对角线 52.8°（W）/ 16.8°（T）；垂直 24.6°（W）/ 8.4°（T）</td>
     </tr>
     <tr>
       <td>机电能力</td>
-      <td>Zoom / Focus 步进电机，DC-Iris 自动光圈，IR-Cut 电磁切换</td>
+      <td>AF 自动对焦与自动变焦，P-Iris 自动光圈，IR-Cut 电磁切换</td>
     </tr>
   </tbody>
 </table>
 
-- 镜头 TV 畸变：广角端约 -9.1%，长焦端约 1.8%。
-
 ### 镜头驱动与图像稳定
 
-NE503 采用 AN41908A 驱动芯片，支持 MFZ（手动变焦）/ AF（自动对焦）兼容镜头，光学变焦范围 1x – 2.88x。控制方式支持 SoC SPI（默认）或 MCU SPI 双版本可选，独立 MCU 控制保障镜头归零和限位保护的可靠性。
-
-板载陀螺仪 LSM6DSR（I2C2）支持 EIS 电子防抖，配合电动变焦与自动对焦，在变焦远端仍可保持画面稳定。
+NE503 支持 AF 自动对焦与自动变焦，光学变焦范围 4x。控制方式支持 SoC SPI（默认）或 MCU SPI 双版本可选，独立 MCU 控制保障镜头归零和限位保护的可靠性。板载陀螺仪支持 EIS 电子防抖，在变焦远端仍可保持画面稳定。
 
 ## 硬件架构
 
@@ -263,67 +224,50 @@ NE503 采用 AN41908A 驱动芯片，支持 MFZ（手动变焦）/ AF（自动�
   <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/overview/hardware-architecture.png" alt="硬件架构总览" width="80%" />
 </div>
 
-NE503 采用**核心处理板**与 **AI-PC 接口板**双板结构，通过板对板连接器互联。核心处理板承载 SoC、NPU、内存及成像子系统，负责全部计算与 AI 推理任务；AI-PC 接口板集成独立 MCU、外部 IO 及电源管理电路，即使核心处理板异常，镜头归零、补光控制和 IO 保护等底层功能依然正常工作。
+NE503 采用**核心处理板**与**接口板**双板结构，通过板对板连接器互联。核心处理板承载 SoC、NPU、内存及成像子系统，负责全部计算与 AI 推理任务；接口板集成独立 MCU、外部 IO 及电源管理电路，即使核心处理板异常，镜头归零、补光控制和 IO 保护等底层功能依然正常工作。
 
 ### 核心处理板
 
-核心处理板集成 SoC、NPU、内存、存储、视频编码及相机接口，承载全部计算与 AI 推理任务：
+核心处理板集成 SoC、NPU、内存、存储及相机接口，承载全部计算与 AI 推理任务：
 
 | 项目 | 规格 |
 |------|------|
 | SoC | Hailo-15H，Cortex-A53 × 4 @ 1.3 GHz |
-| NPU | Hailo NPU，20 TOPS @ INT8，支持 4bit 量化扩展 |
-| DSP | 256 MACs @ 700 MHz，350 GOPS |
+| NPU | Hailo NPU，20 TOPS @ INT8 |
+| DSP | 350 GOPS |
 | 内存 | 8 GB LPDDR4 |
 | 存储 | 64 GB eMMC |
-| 视频编码 | H.264 / H.265 硬件编码，4K@30fps |
-| SPI Flash | 8 MB（QSPI 4-bit） |
-| TF Card | SDIO0，支持高速 / UHS-I（J11 TF 卡座 + J12 FPC 座） |
-| SSD 扩展 | M.2 KEY M（PCIe 3.0，2 Lanes）⚠️ 暂未支持 |
-| 相机接口 | J3 FPC 连接器，MIPI CSI-2（4 Lanes），I2C0 + GPIO |
-| 板载器件 | 陀螺仪（LSM6DSR，I2C2） |
-| 调试 | SoC Debug UART1（1.8V） |
+| SSD 扩展 | M.2 KEY M（PCIe 3.0）⚠️ 暂未支持 |
 
-### AI-PC 接口板
+### 接口板
 
-接口板通过独立 MCU（Cortex-M4 × 2 @ 200 MHz）管理全部外设与通信接口，通过 UART0 与核心处理板通信，并集成整机电能输入与分配电路。
+接口板通过独立 MCU（Arm Cortex-M0+，64 MHz）管理全部外设与通信接口，通过 UART0 与核心处理板通信，并集成整机电能输入与分配电路。以太网 PHY 和 TF 卡座等 SoC 接口也通过连接器引至接口板。
 
 #### 外部接口
 
 | 项目 | 规格 |
 |------|------|
-| Alarm IN × 2 | J1/J2，MCU PB13/PB14，High/Open = 0，Low/Short = 1 |
-| Alarm OUT × 2 | J2，继电器输出（MCU PB15）+ 电平输出（MCU PA8） |
-| RS-485 | J2（ITS 版本），MCU UART3（PC4/PC5），使能 PB1 |
-| 韦根\* | J1（ITS 版本），Data0/Data1，MCU PC6/PC7 |
-| 音频\* | Line-In / Line-Out，J1，NAU88C10 编解码器 |
+| Alarm I/O | 报警输入 × 2 + 报警输出 × 2（继电器 + 电平） |
+| RS-485 | 串行通信总线 |
 | 以太网 | 100M LAN，支持 PoE 802.3AT 供电 |
-| 补光灯 | 常规版：红外双路 PWM（J5）；加强版：白光 + 红外 PWM（J6） |
-| IR-CUT | J7，H-EN / L-OFF，MCU PB8，支持 auto / day / night 三模式 |
-| 光敏采样 | J8，光敏电阻 ADC 采样，MCU PA1 |
-| 雷达接口\* | J4（ITS 雷达版本），电源 5V/12V 可选 + UART 直连核心处理板（SoC GPIO4/GPIO6） |
-
-\* 规划预留，具体支持时间请关注后续版本更新。
+| TF Card | 支持 UHS-I 高速存储卡 |
+| 补光灯接口 | 可接红外/白光补光灯 |
 
 #### MCU 管理
 
 | 项目 | 规格 |
 |------|------|
-| MCU | Cortex-M4 × 2 @ 200 MHz，通过 UART0 与核心处理板通信 |
-| 管理范围 | 电动镜头、补光灯、IR-CUT、加热器、风扇、Alarm IO、韦根\*、RS-485、光敏采样 |
-| EEPROM | AT24C02D（I2C1），存储配置信息 |
-| 温度传感器 | TMP1075DSGR（I2C1，核心处理板）+ LMT87DCK（接口板，MCU PB2 ADC） |
-| 温控 | 12V 风扇驱动（MCU PB9，预留）+ 12V 加热器驱动（MCU PA15，预留） |
-| RTC | MCU VBAT 外接法拉电容，MCU 维持 RTC 并同步至核心处理板 |
-| 指示灯 | 系统状态 LED（蓝色，GPIO24）+ 网络状态 LED（绿色，PHY）+ SYS-LED（MCU PD9） |
-| 调试 | MCU ST-LINK（J13）/ UART（J14） |
+| MCU | Arm Cortex-M0+ @ 64 MHz |
+| 管理范围 | AF 镜头、补光灯、IR-CUT、加热器、风扇、Alarm IO、RS-485、光敏采样 |
+| 温控 | 12V 风扇（预留）+ 12V 加热器（预留） |
+| RTC | 法拉电容断电保持 |
 
 #### 供电
 
 | 项目 | 规格 |
 |------|------|
 | 供电方式 | DC 12V 适配器 或 PoE 802.3AT（一线供电） |
-| 系统功耗 | &lt; 8W（典型负载） |
+| 系统功耗 | 5–6W（典型负载） |
 
 ## 系统架构
 
@@ -468,7 +412,7 @@ NeoEyes NE503 凭借 20 TOPS 本地算力、容器化微服务架构和丰富的
         },
         {
           title: "多传感器融合",
-          description: "通过 RS-485、Alarm IO、雷达接口等对接外部传感器，结合边缘 AI 推理实现多维度环境感知与联动控制。",
+          description: "通过 RS-485、Alarm IO 等对接外部传感器，结合边缘 AI 推理实现多维度环境感知与联动控制。",
           image: "https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/overview/app-sensor.png",
           imageAlt: "多传感器融合"
         }
@@ -507,7 +451,7 @@ NeoEyes NE503 凭借 20 TOPS 本地算力、容器化微服务架构和丰富的
 
 ### 开发者资源
 
-- Python / C++ / Go SDK（MediaClient、InferenceClient、DeviceClient）
+- Python SDK（MediaClient、InferenceClient、DeviceClient）
 - aipc-cli 命令行管理工具
 - RESTful API（Bearer Token 认证）
 - Hailo Dataflow Compiler 模型编译工具
