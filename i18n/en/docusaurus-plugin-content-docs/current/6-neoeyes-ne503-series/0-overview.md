@@ -21,13 +21,13 @@ NeoEyes NE503 is an edge AI smart camera based on the **Hailo-15H SoC**, featuri
 
 - **On-Device AI Inference Loop**: 20 TOPS (INT8) NPU supports multi-model concurrent inference. Image capture, analysis, and structured output run entirely on-device with zero cloud dependency, meeting low-latency and data localization requirements.
 
-- **4K Professional Imaging System**: Sony IMX678 (1/1.8") + Gen2 AI-ISP + motorized zoom lens (F1.6), supporting 4K@30fps H.265 encoding and &lt;0.01 LUX full-color night vision. Maintains image quality under HDR, low-light, and concurrent inference workloads, balancing wide-angle coverage and long-range recognition.
+- **4K Professional Imaging System**: Sony IMX678 (1/1.8") + Hailo Gen2 AI-ISP + AF auto-zoom lens (F1.6), supporting 4K@30fps H.265 encoding and &lt;0.01 LUX full-color night vision. Maintains image quality under HDR, low-light, and concurrent inference workloads, balancing wide-angle coverage and long-range recognition.
 
 - **Containerized Application Platform**: Built on containerd runtime with OCI image deployment and sandbox isolation. Models and applications can be independently deployed and upgraded. Algorithm vendors, integrators, and OEMs build industry solutions on a unified platform, avoiding vendor lock-in.
 
-- **Industrial-Grade All-in-One Delivery**: Imaging, inference, alarm linkage, protocol output, and operations management integrated in a single device. IP66 protection + PoE 802.3AT power + Web console, supporting the full lifecycle from development validation to commercial deployment.
+- **Industrial-Grade All-in-One Delivery**: Imaging, inference, alarm linkage, protocol output, and operations management integrated in a single device. IP67 protection + PoE 802.3AT power + Web console, supporting the full lifecycle from development validation to commercial deployment.
 
-- **Full-Stack Developer Toolchain**: Python / C++ / Go SDKs + aipc-cli + RESTful APIs for diverse integration approaches. Modular HAL decouples software from hardware, enabling smooth cross-SoC platform migration.
+- **Full-Stack Developer Toolchain**: Python SDK + aipc-cli + RESTful APIs for diverse integration approaches. Modular HAL decouples software from hardware, enabling smooth cross-SoC platform migration.
 
 ## Product Specifications
 
@@ -58,7 +58,7 @@ NE503 core specifications are as follows:
     </tr>
     <tr>
       <td>NPU</td>
-      <td>Hailo NPU, 20 TOPS @ INT8, supports 4-bit quantization extension</td>
+      <td>Hailo NPU, 20 TOPS @ INT8</td>
     </tr>
     <tr>
       <td>Memory / Storage</td>
@@ -70,7 +70,7 @@ NE503 core specifications are as follows:
     </tr>
     <tr>
       <td>System Power</td>
-      <td>&lt; 8W (typical load)</td>
+      <td>5–6W (typical load)</td>
     </tr>
     <tr>
       <td rowSpan="3">Imaging System</td>
@@ -79,11 +79,11 @@ NE503 core specifications are as follows:
     </tr>
     <tr>
       <td>Lens Module</td>
-      <td>Foctek AF0832D09, motorized zoom 10.2–29.5mm, F1.6–F1.7</td>
+      <td>AF auto-zoom 8–32mm, F1.6</td>
     </tr>
     <tr>
       <td>ISP</td>
-      <td>Gen2 AI-ISP, &lt;0.01 LUX full-color night vision</td>
+      <td>Hailo Gen2 AI-ISP, &lt;0.01 LUX full-color night vision</td>
     </tr>
     <tr>
       <td rowSpan="3">Network &amp; Protocols</td>
@@ -92,7 +92,7 @@ NE503 core specifications are as follows:
     </tr>
     <tr>
       <td>Video Protocol</td>
-      <td>RTSP / ONVIF (planned)</td>
+      <td>RTSP</td>
     </tr>
     <tr>
       <td>Data Protocol</td>
@@ -105,7 +105,7 @@ NE503 core specifications are as follows:
     </tr>
     <tr>
       <td>Protection Rating</td>
-      <td>IP66</td>
+      <td>IP67</td>
     </tr>
     <tr>
       <td>Operating Temperature</td>
@@ -118,7 +118,7 @@ NE503 core specifications are as follows:
     </tr>
     <tr>
       <td>Expansion Interfaces</td>
-      <td>RS-485 / Wiegand\* / Audio I/O\* / Radar\* / Fill Light</td>
+      <td>RS-485 / Fill Light Interface</td>
     </tr>
     <tr>
       <td rowSpan="2">Software Platform</td>
@@ -131,8 +131,6 @@ NE503 core specifications are as follows:
     </tr>
   </tbody>
 </table>
-
-\* Planned feature, availability subject to future firmware updates.
 
 ## Performance &amp; Edge AI
 
@@ -155,13 +153,13 @@ NE503 is powered by the Hailo-15H SoC with an integrated Hailo NPU delivering 20
 
 ### Video Encoding
 
-The hardware encoder supports dual-format H.264/H.265 encoding at 4K@30fps, paired with Gen2 AI-ISP for &lt;0.01 LUX ultra-low-light full-color night vision. The 12-bit AI denoising adapts to different scenes without retraining models.
+The hardware encoder supports dual-format H.264/H.265 encoding at 4K@30fps, paired with Hailo Gen2 AI-ISP for &lt;0.01 LUX ultra-low-light full-color night vision. The AI denoising adapts to different scenes without retraining models.
 
 | Metric | Parameter |
 |--------|-----------|
 | Encoding Format | H.264 / H.265 hardware encoding, supports CBR / VBR rate control |
 | RTSP Streams | Main stream / Sub stream / Third stream |
-| AI Denoising | 12-bit AI denoising, adapts to different scenes without model retraining |
+| AI Denoising | AI denoising, adapts to different scenes without model retraining |
 
 ### Low-Light Imaging
 
@@ -169,7 +167,7 @@ The hardware encoder supports dual-format H.264/H.265 encoding at 4K@30fps, pair
   <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/overview/ai-isp-comparison.png" alt="AI-ISP Low-Light Comparison" width="80%" />
 </div>
 
-AI-ISP delivers clear color images even in extremely low-light environments, with 12-bit AI denoising that adapts to varying illumination conditions. Combined with automatic IR-CUT filter switching and fill light control, it achieves 24/7 all-weather imaging.
+AI-ISP delivers clear color images even in extremely low-light environments, with AI denoising that adapts to varying illumination conditions. Combined with automatic IR-CUT filter switching and fill light control, it achieves 24/7 all-weather imaging.
 
 ## Imaging System
 
@@ -177,44 +175,15 @@ AI-ISP delivers clear color images even in extremely low-light environments, wit
   <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/overview/imaging-module.jpg" alt="Imaging Module" width="60%" />
 </div>
 
-The NE503 imaging system pairs a Sony IMX678 (1/1.8") image sensor with a Foctek AF0832D09 motorized zoom lens. The sensor and lens share a matched 1/1.8" target surface, minimizing edge sharpness falloff. The lens covers 10.2mm (H 44.5°) to 29.5mm (H 14.5°), enabling a single unit to handle both wide-area surveillance and distant detail identification, with motorized zoom for on-site adjustment. The F1.6 wide aperture, combined with AI-ISP low-light enhancement, maintains image quality in dark and backlit conditions.
+The NE503 imaging system pairs a Sony IMX678 (1/1.8") image sensor with an AF auto-zoom lens. The sensor and lens share a matched 1/1.8" target surface, minimizing edge sharpness falloff. The lens covers 8mm (H 45.1°) to 32mm (H 14.7°), enabling a single unit to handle both wide-area surveillance and distant detail identification, with AF auto-zoom for on-site adjustment. The F1.6 wide aperture, combined with AI-ISP low-light enhancement, maintains image quality in dark and backlit conditions.
 
 ### Sensor
 
-<table>
-  <thead>
-    <tr>
-      <th>Parameter</th>
-      <th>Specification</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>Sensor Model</td>
-      <td>Sony IMX678-AAQR1-C</td>
-    </tr>
-    <tr>
-      <td>Target Surface</td>
-      <td>1/1.8 inch, diagonal 8.86mm</td>
-    </tr>
-    <tr>
-      <td>Effective Pixels</td>
-      <td>3856(H) × 2180(V), recommended recording pixels 3840 × 2160 (4K UHD)</td>
-    </tr>
-    <tr>
-      <td>Pixel Size</td>
-      <td>2.0μm × 2.0μm</td>
-    </tr>
-    <tr>
-      <td>Output Interface</td>
-      <td>MIPI CSI-2, RAW10 / RAW12</td>
-    </tr>
-    <tr>
-      <td>HDR</td>
-      <td>Digital Overlap HDR / Dual Gain HDR</td>
-    </tr>
-  </tbody>
-</table>
+| Parameter | Specification |
+|------|------|
+| Sensor | Sony IMX678, 1/1.8" CMOS |
+| Effective Pixels | 3840 × 2160 (4K UHD) |
+| HDR | Digital Overlap / Dual Gain HDR |
 
 ### Lens
 
@@ -227,35 +196,27 @@ The NE503 imaging system pairs a Sony IMX678 (1/1.8") image sensor with a Foctek
   </thead>
   <tbody>
     <tr>
-      <td>Lens Model</td>
-      <td>Foctek AF0832D09.ICR1(4K)</td>
-    </tr>
-    <tr>
       <td>Focal Length</td>
-      <td>10.2mm (wide) – 29.5mm (telephoto)</td>
+      <td>8mm (wide) – 32mm (telephoto)</td>
     </tr>
     <tr>
-      <td>Relative Aperture</td>
-      <td>F1.6 (W) – F1.7 (T)</td>
+      <td>Max Aperture</td>
+      <td>F1.6</td>
     </tr>
     <tr>
       <td>Field of View</td>
-      <td>Horizontal 44.5° (W) / 14.5° (T); Diagonal 52° (W) / 16.6° (T)</td>
+      <td>Horizontal 45.1° (W) / 14.7° (T); Diagonal 52.8° (W) / 16.8° (T); Vertical 24.6° (W) / 8.4° (T)</td>
     </tr>
     <tr>
       <td>Electromechanical</td>
-      <td>Zoom / Focus stepper motors, DC-Iris auto aperture, IR-Cut electromagnetic switching</td>
+      <td>AF autofocus and auto-zoom, P-Iris auto aperture, IR-Cut electromagnetic switching</td>
     </tr>
   </tbody>
 </table>
 
-- Lens TV distortion: approximately -9.1% at wide end, 1.8% at telephoto end.
+### Lens Drive & Image Stabilization
 
-### Lens Drive &amp; Image Stabilization
-
-NE503 uses the AN41908A driver IC, supporting MFZ (Manual Focus Zoom) / AF (Auto Focus) compatible lenses with an optical zoom range of 1x – 2.88x. Control modes support SoC SPI (default) or MCU SPI dual-version options. Independent MCU control ensures reliable lens homing and limit protection.
-
-The onboard gyroscope LSM6DSR (I2C2) supports EIS electronic image stabilization. Combined with motorized zoom and auto focus, it maintains image stability even at the telephoto end.
+The onboard gyroscope supports EIS electronic image stabilization. Combined with AF auto-zoom and auto focus, it maintains image stability even at the telephoto end.
 
 ## Hardware Architecture
 
@@ -263,67 +224,50 @@ The onboard gyroscope LSM6DSR (I2C2) supports EIS electronic image stabilization
   <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/overview/hardware-architecture.png" alt="Hardware Architecture Overview" width="80%" />
 </div>
 
-NE503 features a dual-board structure with a **Processor Board** and an **AI-PC Interface Board**, interconnected via board-to-board connectors. The Processor Board carries the SoC, NPU, memory, and imaging subsystem, handling all computing and AI inference tasks. The AI-PC Interface Board integrates an independent MCU, external IO, and power management circuitry. Even if the Processor Board fails, underlying functions such as lens homing, fill light control, and IO protection continue to operate normally.
+NE503 features a dual-board structure with a **Processor Board** and an **Interface Board**, interconnected via board-to-board connectors. The Processor Board carries the SoC, NPU, memory, and imaging subsystem, handling all computing and AI inference tasks. The Interface Board integrates an independent MCU, external IO, and power management circuitry. Even if the Processor Board fails, underlying functions such as lens homing, fill light control, and IO protection continue to operate normally.
 
 ### Processor Board
 
-The Processor Board integrates the SoC, NPU, memory, storage, video encoding, and camera interface, handling all computing and AI inference tasks:
+The Processor Board integrates the SoC, NPU, memory, storage, and camera interface, handling all computing and AI inference tasks:
 
 | Item | Specification |
 |------|---------------|
 | SoC | Hailo-15H, Cortex-A53 × 4 @ 1.3 GHz |
-| NPU | Hailo NPU, 20 TOPS @ INT8, supports 4-bit quantization extension |
-| DSP | 256 MACs @ 700 MHz, 350 GOPS |
+| NPU | Hailo NPU, 20 TOPS @ INT8 |
+| DSP | 350 GOPS |
 | Memory | 8 GB LPDDR4 |
 | Storage | 64 GB eMMC |
-| Video Encoding | H.264 / H.265 hardware encoding, 4K@30fps |
-| SPI Flash | 8 MB (QSPI 4-bit) |
-| TF Card | SDIO0, supports High Speed / UHS-I (J11 TF card slot + J12 FPC connector) |
-| SSD Expansion | M.2 KEY M (PCIe 3.0, 2 Lanes) ⚠️ Not yet supported |
-| Camera Interface | J3 FPC connector, MIPI CSI-2 (4 Lanes), I2C0 + GPIO |
-| Onboard Devices | Gyroscope (LSM6DSR, I2C2) |
-| Debug | SoC Debug UART1 (1.8V) |
+| SSD Expansion | M.2 KEY M (PCIe 3.0) ⚠️ Not yet supported |
 
-### AI-PC Interface Board
+### Interface Board
 
-The interface board manages all peripherals and communication interfaces through an independent MCU (Cortex-M4 × 2 @ 200 MHz), communicating with the Processor Board via UART0, and integrates the system power input and distribution circuitry.
+The interface board manages all peripherals and communication interfaces through an independent MCU (Arm Cortex-M0+, 64 MHz), communicating with the Processor Board via UART0, and integrates the system power input and distribution circuitry. SoC interfaces such as the Ethernet PHY and TF card slot are also routed to the interface board via board-to-board connectors.
 
 #### External Interfaces
 
 | Item | Specification |
 |------|---------------|
-| Alarm IN × 2 | J1/J2, MCU PB13/PB14, High/Open = 0, Low/Short = 1 |
-| Alarm OUT × 2 | J2, Relay output (MCU PB15) + Level output (MCU PA8) |
-| RS-485 | J2 (ITS version), MCU UART3 (PC4/PC5), Enable PB1 |
-| Wiegand\* | J1 (ITS version), Data0/Data1, MCU PC6/PC7 |
-| Audio\* | Line-In / Line-Out, J1, NAU88C10 codec |
+| Alarm I/O | Alarm input × 2 + Alarm output × 2 (relay + level) |
+| RS-485 | Serial communication bus |
 | Ethernet | 100M LAN, supports PoE 802.3AT power supply |
-| Fill Light | Standard: IR dual-channel PWM (J5); Enhanced: White + IR PWM (J6) |
-| IR-CUT | J7, H-EN / L-OFF, MCU PB8, supports auto / day / night three modes |
-| Light Sensor | J8, Photoresistor ADC sampling, MCU PA1 |
-| Radar Interface\* | J4 (ITS radar version), 5V/12V selectable power + UART direct to Processor Board (SoC GPIO4/GPIO6) |
-
-\* Planned feature, availability subject to future firmware updates.
+| TF Card | Supports UHS-I high-speed storage cards |
+| Fill Light Interface | Supports IR/white fill light connection |
 
 #### MCU Management
 
 | Item | Specification |
 |------|---------------|
-| MCU | Cortex-M4 × 2 @ 200 MHz, communicates with Processor Board via UART0 |
-| Management Scope | Motorized lens, fill light, IR-CUT, heater, fan, Alarm IO, Wiegand\*, RS-485, light sensor |
-| EEPROM | AT24C02D (I2C1), stores configuration data |
-| Temperature Sensors | TMP1075DSGR (I2C1, Processor Board) + LMT87DCK (Interface Board, MCU PB2 ADC) |
-| Thermal Control | 12V fan driver (MCU PB9, reserved) + 12V heater driver (MCU PA15, reserved) |
-| RTC | MCU VBAT with external supercapacitor, MCU maintains RTC and syncs to Processor Board |
-| Status LEDs | System status LED (blue, GPIO24) + Network status LED (green, PHY) + SYS-LED (MCU PD9) |
-| Debug | MCU ST-LINK (J13) / UART (J14) |
+| MCU | Arm Cortex-M0+ @ 64 MHz |
+| Management Scope | AF lens, fill light, IR-CUT, heater, fan, Alarm IO, RS-485, light sensor |
+| Thermal Control | 12V fan (reserved) + 12V heater (reserved) |
+| RTC | Supercapacitor power-fail retention |
 
 #### Power Supply
 
 | Item | Specification |
 |------|---------------|
 | Power Supply | DC 12V adapter or PoE 802.3AT (single-cable) |
-| System Power | &lt; 8W (typical load) |
+| System Power | 5–6W (typical load) |
 
 ## Software Architecture
 
@@ -468,7 +412,7 @@ With 20 TOPS local computing power, containerized microservice architecture, and
         },
         {
           title: "Multi-Sensor Fusion",
-          description: "Connect external sensors via RS-485, Alarm IO, radar interfaces, and other channels. Combined with edge AI inference, achieve multi-dimensional environmental perception and linkage control.",
+          description: "Connect external sensors via RS-485, Alarm IO, and other channels. Combined with edge AI inference, achieve multi-dimensional environmental perception and linkage control.",
           image: "https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/overview/app-sensor.png",
           imageAlt: "Multi-Sensor Fusion"
         }
@@ -507,7 +451,7 @@ With 20 TOPS local computing power, containerized microservice architecture, and
 
 ### Developer Resources
 
-- Python / C++ / Go SDK (MediaClient, InferenceClient, DeviceClient)
+- Python SDK (MediaClient, InferenceClient, DeviceClient)
 - aipc-cli command-line management tool
 - RESTful API (Bearer Token authentication)
 - Hailo Dataflow Compiler model compilation tool

@@ -18,7 +18,7 @@ This guide walks you through the first deployment of the NE503: unboxing and ins
 
 | Component | Qty | Description |
 |-----------|-----|-------------|
-| NE503 main unit | 1 | Core processing board and interface board, IP66 rated |
+| NE503 main unit | 1 | Core processing board and interface board, IP67 rated |
 | Wall-mount screw pack | 1 | Mounting screws and hardware |
 
 ### Prerequisites
@@ -37,8 +37,8 @@ The following items must be provided by the user:
 
 The NE503 serves as both a smart IPC and an edge computing platform. Consider both surveillance coverage and AI inference performance when choosing the installation spot:
 
-- **Surveillance coverage**: Select a position that covers the target area. Note the lens field of view (wide-angle: 44.5° horizontal, telephoto: 14.5°)
-- **Environmental requirements**: IP66 rated, supports -40°C to +60°C operating temperature, suitable for outdoor installation
+- **Surveillance coverage**: Select a position that covers the target area. Note the lens field of view (wide-angle: 45.1° horizontal, telephoto: 14.7°)
+- **Environmental requirements**: IP67 rated, supports -40°C to +60°C operating temperature, suitable for outdoor installation
 - **Cable planning**: Ensure the Ethernet cable from the PoE switch or router reaches the installation location
 
 ### 2. Wall-Mount Installation
@@ -46,9 +46,11 @@ The NE503 serves as both a smart IPC and an edge computing platform. Consider bo
 1. Secure the wall-mount bracket to the mounting surface (wall / pole / ceiling) using the included screw pack
 2. Align the NE503 with the bracket and tighten the mounting screws
 
+> Pole and ceiling mounting scenarios require additional bracket accessories, sold separately.
+
 ### 3. Power Supply and Boot
 
-The NE503 supports two power supply methods, with power consumption &lt; 8W (typical load):
+The NE503 supports two power supply methods, with power consumption 5–6W (typical load):
 
 | Method | Connection | Use Case |
 |--------|------------|----------|
@@ -120,11 +122,11 @@ Go to the **Media** page, which has two tabs: **Media** and **Control**.
 
 ![](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/quick-start/qs-media.png)
 
-**Control tab**: Provides the lens control panel, including optical zoom (1x – 2.88x), manual/auto focus, IR-CUT filter switching (auto/day/night), and fill light control. After zooming, click auto focus to ensure a sharp image.
+**Control tab**: Provides the lens control panel, including optical zoom (4x), manual/auto focus, IR-CUT filter switching (auto/day/night), and fill light control. After zooming, click auto focus to ensure a sharp image.
 
 ![](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/quick-start/qs-media-control.png)
 
-> Wide-angle (10.2mm) is for panoramic surveillance; telephoto (29.5mm) is for long-range identification (e.g., license plates, faces).
+> Wide-angle (8mm) is for panoramic surveillance; telephoto (32mm) is for long-range identification (e.g., license plates, faces).
 
 ### 2. RTSP Stream Verification
 
@@ -331,7 +333,7 @@ The process manager lists all running processes on the device, displaying PID, n
 | Web Console | `http://<device-ip>:8080` | Web Login | `admin` / `password` |
 | SSH Login | `root` / `root` | Default IP | `10.0.0.1` |
 | RTSP Main Stream | `rtsp://<device-ip>:8554/main` | RTSP Sub Stream | `rtsp://<device-ip>:8554/sub` |
-| RTSP Third Stream | `rtsp://<device-ip>:8554/third` | Power Supply | PoE 802.3AT or DC 12V, &lt; 8W |
+| RTSP Third Stream | `rtsp://<device-ip>:8554/third` | Power Supply | PoE 802.3AT or DC 12V, 5–6W |
 
 ### aipc-cli Command Reference
 
