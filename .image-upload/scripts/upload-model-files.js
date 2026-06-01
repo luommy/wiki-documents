@@ -6,7 +6,7 @@ const dotenv = require('dotenv');
 const axios = require('axios');
 const https = require('https');
 
-dotenv.config();
+dotenv.config({ path: path.join(__dirname, '../.env') });
 
 const WEIGHTS = '/Users/harryhua/Documents/GitHub/ne301/Model/weights';
 const MODELS_BIN = '/Users/harryhua/Documents/GitHub/ne301/models-bin';
@@ -22,6 +22,7 @@ const MODELS = [
   'yolov8n_256_quant_pc_uf_od_coco-person-st',
   'yolo11n_256_quant_pc_uf_od_coco-person-st',
   'yolov8n_256_quant_pc_uf_pose_coco-st',
+  'yolov11n_256_quant_pc_uf_pose_coco-st',
 ];
 
 const PUBLIC_BASE = 'https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/verified-model-list';
