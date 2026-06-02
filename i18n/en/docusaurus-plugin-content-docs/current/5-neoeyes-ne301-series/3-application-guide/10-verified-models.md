@@ -1,7 +1,7 @@
 ---
-description: Verified models for NE301, covering 9 models across general object detection, person detection, pose estimation, and meter reading detection, with verification result images and download links to help users quickly select and deploy AI models for their scenarios.
-keywords: [NE301, model verification, YOLOv8, YOLO11, object detection, pose estimation, ST YOLO-X, edge AI, TFLite]
-tags: [NE301, model deployment, object detection, pose estimation, edge AI]
+description: Verified models for NE301, covering 10 models across general object detection, person detection, pose estimation, instance segmentation, and meter reading detection, with verification result images and download links to help users quickly select and deploy AI models for their scenarios.
+keywords: [NE301, model verification, YOLOv8, YOLO11, object detection, pose estimation, instance segmentation, ST YOLO-X, edge AI, TFLite]
+tags: [NE301, model deployment, object detection, pose estimation, instance segmentation, edge AI]
 ---
 
 # NE301 Verified Models
@@ -61,6 +61,14 @@ Detects digits (0-9) on meter displays, suitable for water, electricity, and gas
 |:-------------|:----:|:-----:|:----:|:--------------------|:-----------:|:-----------:|:------:|
 | YOLOv8n | 256×256 | _ui | 3.1MB | <div style={{display:'flex',gap:'8px',alignItems:'start'}}><img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/verified-model-list/yolov8n_256_quant_pc_ui_od_meter-output.jpg" style={{width:'140px',borderRadius:'6px',flexShrink:0}} /><div style={{fontSize:'0.85em',lineHeight:'1.6'}}><div><span style={{color:'#4caf50'}}>●</span> "0" 81%</div><div><span style={{color:'#4caf50'}}>●</span> "0" 74%</div><div><span style={{color:'#ff9800'}}>●</span> "0" 57%</div><div><span style={{color:'#ff9800'}}>●</span> "0" 33%</div><div><span style={{color:'#f44336'}}>●</span> "3" 43%</div><div><span style={{color:'#f44336'}}>●</span> "5" 30%</div><div><span style={{color:'#f44336'}}>●</span> "5" 21%</div><div style={{color:'#888',marginTop:'4px'}}>7 detections</div></div></div> | <a href="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/verified-model-list/yolov8n_256_quant_pc_ui_od_meter.tflite" style={{background:'#e3f2fd',padding:'2px 8px',borderRadius:'4px',fontSize:'0.8em',textDecoration:'none',margin:'2px',display:'inline-block'}}>tflite</a><a href="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/verified-model-list/yolov8n_256_quant_pc_ui_od_meter.json" style={{background:'#f3e5f5',padding:'2px 8px',borderRadius:'4px',fontSize:'0.8em',textDecoration:'none',margin:'2px',display:'inline-block'}}>json</a> | <a href="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/verified-model-list/yolov8n_256_quant_pc_ui_od_meter_pkg.bin" style={{background:'#e8f5e9',padding:'2px 8px',borderRadius:'4px',fontSize:'0.8em',textDecoration:'none',margin:'2px',display:'inline-block'}}>bin</a> | AGPL-3.0 |
 
+## 5. Instance Segmentation (COCO 80 Classes)
+
+Outputs pixel-level segmentation masks (32×32) for each detected object on top of object detection, suitable for fine-grained segmentation scenarios.
+
+| Architecture | Size | Quant | Size | Verification Result | Model Files | OTA Package | License |
+|:-------------|:----:|:-----:|:----:|:--------------------|:-----------:|:-----------:|:------:|
+| YOLOv8n Seg | 256×256 | _ui | 3.6MB | <div style={{display:'flex',gap:'8px',alignItems:'start'}}><img src="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/verified-model-list/yolov8n_256_quant_pc_ui_iseg_coco-output.jpg" style={{width:'140px',borderRadius:'6px',flexShrink:0}} /><div style={{fontSize:'0.85em',lineHeight:'1.6'}}><div><span style={{color:'#4caf50'}}>●</span> person 86%</div><div><span style={{color:'#4caf50'}}>●</span> person 83%</div><div><span style={{color:'#ff9800'}}>●</span> person 77%</div><div><span style={{color:'#ff9800'}}>●</span> person 73%</div><div style={{color:'#888',marginTop:'4px'}}>4 segments</div></div></div> | <a href="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/verified-model-list/yolov8n_256_quant_pc_ui_iseg_coco.tflite" style={{background:'#e3f2fd',padding:'2px 8px',borderRadius:'4px',fontSize:'0.8em',textDecoration:'none',margin:'2px',display:'inline-block'}}>tflite</a><a href="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/verified-model-list/yolov8n_256_quant_pc_ui_iseg_coco.json" style={{background:'#f3e5f5',padding:'2px 8px',borderRadius:'4px',fontSize:'0.8em',textDecoration:'none',margin:'2px',display:'inline-block'}}>json</a> | <a href="https://resources.camthink.ai/wiki/img/neoeyes-ne301-series/application-guide/verified-model-list/yolov8n_256_quant_pc_ui_iseg_coco_pkg.bin" style={{background:'#e8f5e9',padding:'2px 8px',borderRadius:'4px',fontSize:'0.8em',textDecoration:'none',margin:'2px',display:'inline-block'}}>bin</a> | AGPL-3.0 |
+
 ---
 
 ## Model Deployment
@@ -74,4 +82,4 @@ Two types of files are available for download from the tables above:
 
 ---
 
-**Document version**: v1.4 · **Last updated**: 2026-06-02
+**Document version**: v1.5 · **Last updated**: 2026-06-02
