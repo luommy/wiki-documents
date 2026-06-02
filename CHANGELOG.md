@@ -9,7 +9,7 @@ All notable changes to the CamThink Wiki documentation will be documented in thi
 ## [2026-06-02]
 
 ### Updated
-- **NE301 Verified Models**: Added YOLOv8n Pose int8 quantized model (`_ui`), 3 poses verified with 17 keypoints each (full bilingual support).
+- **NE301 Verified Models**: Added YOLOv8n Pose int8 quantized model (`_ui`) and YOLOv8n Seg instance segmentation model (`_ui`), new instance segmentation category with pixel-level mask output (full bilingual support).
 
 ## [2026-05-28]
 
