@@ -1,5 +1,5 @@
 ---
-description: Configure LLM backends in NeoMind: local Ollama (recommended qwen3.5:4b) and cloud models (OpenAI/Anthropic/Qwen/DeepSeek/GLM etc.) — setup steps, model selection, and multimodal capability.
+description: "Configure LLM backends in NeoMind: local Ollama (recommended qwen3.5:4b) and cloud models (OpenAI/Anthropic/Qwen/DeepSeek/GLM etc.) — setup steps, model selection, and multimodal capability."
 keywords: [NeoMind, LLM, Ollama, qwen3.5, model config, multimodal]
 tags: [NeoMind, User Guide]
 ---
