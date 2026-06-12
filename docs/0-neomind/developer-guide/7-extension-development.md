@@ -248,7 +248,7 @@ cd nmext && zip -r ../counter-1.0.0.nmext .
 ## 下一步
 
 - 把你的扩展提 PR 到 [NeoMind-Extensions](https://github.com/camthink-ai/NeoMind-Extensions)，让社区用上
-- 涉及 HTTP API 的扩展命令调用细节 → [REST API 参考](./4-rest-api.md#extensions-扩展)
+- 涉及 HTTP API 的扩展命令调用细节 → [REST API 参考](./4-rest-api.md)
 - Dashboard 组件开发（如果想让扩展带可视化）→ Phase 2 `8-dashboard-component-dev.md`
 
 ---

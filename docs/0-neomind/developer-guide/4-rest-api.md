@@ -159,7 +159,7 @@ HTTP 状态码遵循惯例：4xx 客户端错误、5xx 服务端错误。从 `er
 | GET | `/agents/:id` | Agent 详情 |
 | PUT | `/agents/:id` | 更新 Agent |
 | DELETE | `/agents/:id` | 删除 Agent |
-| POST | `/agents/:id/control` | 控制运行（`{"status": "start"|"stop"|"pause"}`） |
+| POST | `/agents/:id/control` | 控制运行（body `{"status": "start"}` / `"stop"` / `"pause"`） |
 | GET | `/agents/:id/executions` | 执行历史 |
 
 > **创建 Agent 必填字段**：`user_prompt`（必填）、`schedule: {"schedule_type": "..."}`（必填）。无资源绑定时需 `execution_mode: "free"`。
@@ -173,7 +173,7 @@ HTTP 状态码遵循惯例：4xx 客户端错误、5xx 服务端错误。从 `er
 | GET | `/llm-backends/:id` | 后端详情（含能力探测结果） |
 | PUT | `/llm-backends/:id` | 更新后端 |
 | DELETE | `/llm-backends/:id` | 删除后端 |
-| PATCH | `/llm-backends/:id/capabilities` | 手动覆盖能力（`{"multimodal": true|false|null}`，null 清除覆盖） |
+| PATCH | `/llm-backends/:id/capabilities` | 手动覆盖能力（body `{"multimodal": true}` / `false` / `null`，null 清除覆盖） |
 
 ### Messages（消息通知）
 

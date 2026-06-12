@@ -159,7 +159,7 @@ HTTP status codes follow convention: 4xx client errors, 5xx server errors. Pull 
 | GET | `/agents/:id` | Agent detail |
 | PUT | `/agents/:id` | Update agent |
 | DELETE | `/agents/:id` | Delete agent |
-| POST | `/agents/:id/control` | Control execution (`{"status": "start"|"stop"|"pause"}`) |
+| POST | `/agents/:id/control` | Control execution (body `{"status": "start"}` / `"stop"` / `"pause"`) |
 | GET | `/agents/:id/executions` | Execution history |
 
 > **Required fields for create**: `user_prompt` (required), `schedule: {"schedule_type": "..."}` (required). When no resources are bound, also set `execution_mode: "free"`.
@@ -173,7 +173,7 @@ HTTP status codes follow convention: 4xx client errors, 5xx server errors. Pull 
 | GET | `/llm-backends/:id` | Backend detail (includes probed capabilities) |
 | PUT | `/llm-backends/:id` | Update backend |
 | DELETE | `/llm-backends/:id` | Delete backend |
-| PATCH | `/llm-backends/:id/capabilities` | Manually override capability (`{"multimodal": true|false|null}`, null clears) |
+| PATCH | `/llm-backends/:id/capabilities` | Manually override capability (body `{"multimodal": true}` / `false` / `null`, null clears) |
 
 ### Messages
 
