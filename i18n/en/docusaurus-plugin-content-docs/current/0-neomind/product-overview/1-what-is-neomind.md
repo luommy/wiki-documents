@@ -34,51 +34,56 @@ NeoMind uses a **single-process, multi-layer** architecture — all core capabil
 flowchart TB
     subgraph UI["User Interface"]
         direction LR
-        WEB[Web]
-        DESKTOP[Desktop]
-        CLI[CLI]
+        WEB("Web")
+        DESKTOP("Desktop")
+        CLI("CLI")
     end
 
     subgraph AI["AI Intelligence"]
         direction LR
-        CHAT[Chat & Agents]
-        LLM[LLM Backends]
-        SKILLS[Memory & Skills]
+        CHAT["Chat & Agents"]
+        LLM["LLM Backends"]
+        SKILLS["Memory & Skills"]
     end
 
     subgraph AUTO["Automation"]
         direction LR
-        RULE[Rule Engine]
-        TRANSFORM[Transforms]
-        NOTIFY[Notifications]
+        RULE["Rule Engine"]
+        TRANSFORM["Transforms"]
+        NOTIFY["Notifications"]
     end
 
     subgraph CORE["Data Hub — Single Process"]
         direction LR
-        API[API :9375]
-        MQTT[MQTT :1883]
-        STORE[(Telemetry redb)]
+        API["API :9375"]
+        MQTT["MQTT :1883"]
+        STORE[("Telemetry<br/>redb")]
     end
 
     subgraph DEV["Device Ingress"]
         direction LR
-        MQDEV[MQTT]
-        BLEDEV[BLE]
-        HOOK[Webhook]
+        MQDEV("MQTT")
+        BLEDEV("BLE")
+        HOOK("Webhook")
     end
 
     subgraph EXT["Extensions — Process Isolated"]
         direction LR
-        VISION[Vision AI]
-        OCR[OCR]
-        CUSTOM[Custom]
+        VISION["Vision AI"]
+        OCR["OCR"]
+        CUSTOM["Custom"]
     end
 
-    UI --> AI
-    AI --> CORE
+    UI ==> AI
+    AI ==> CORE
     AUTO --> CORE
     DEV --> MQTT
     EXT -.FFI.-> API
+
+    classDef coreNode stroke-width:2.5px,font-weight:bold
+    classDef extNode stroke-dasharray:6 3
+    class API,MQTT,STORE coreNode
+    class VISION,OCR,CUSTOM extNode
 ```
 
 :::tip Three Design Philosophies
