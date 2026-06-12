@@ -106,12 +106,14 @@ flowchart LR
     D --> E[LLM Analysis]
     E --> F{Needs Tool Call?}
     F -- Yes --> G[Execute Tool]
-    G --> E
-    F -- No --> H[Output Analysis]
+    G --> H[Output Analysis]
+    F -- No --> H
     H --> I[Execute Decision Actions]
     I --> J[Write Journal]
     J --> K[Update Knowledge]
 ```
+
+> Tool calls can loop (G → E) until the LLM no longer needs tools or hits the 30-round limit.
 
 ## Status Management
 
