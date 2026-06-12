@@ -91,6 +91,9 @@ NeoMind is a modular ecosystem with specialized repositories for each concern:
 
 ## Next Steps
 
+- [5-Minute Quick Start](../quick-start/1-five-minute-guide.md) — Experience the core loop in record time
+- [Core Concepts](../concepts/2-core-concepts.md) — Understand the system overview and data flow
+- [Glossary](../concepts/1-glossary.md) — Central definitions for all core terminology
 - [Install & Setup](../user-guide/1-install-setup.md) — Get NeoMind running on desktop or server
 - [Configure LLM Backend](../user-guide/2-configure-llm.md) — Connect Ollama or cloud models
 - [Onboard a Device](../user-guide/3-onboard-device.md) — Use the onboarding wizard

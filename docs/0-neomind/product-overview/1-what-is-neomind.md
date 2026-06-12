@@ -91,6 +91,9 @@ NeoMind 是一个模块化生态系统，每个关注点由专门仓库承载：
 
 ## 下一步
 
+- [5 分钟快速上手](../quick-start/1-five-minute-guide.md) — 最短时间内体验核心闭环
+- [核心概念](../concepts/2-core-concepts.md) — 理解系统全貌与数据流
+- [术语表](../concepts/1-glossary.md) — 所有核心术语的集中定义
 - [安装与配置](../user-guide/1-install-setup.md) — 在桌面或服务器上跑起 NeoMind
 - [配置 LLM 后端](../user-guide/2-configure-llm.md) — 接入 Ollama 或云端模型
 - [接入设备](../user-guide/3-onboard-device.md) — 使用 onboarding 向导
