@@ -45,7 +45,7 @@ curl -fsSL https://raw.githubusercontent.com/camthink-ai/NeoMind/main/install.sh
 
 启动后浏览器访问 `http://localhost:9375`。
 
-<img src="https://resources.camthink.ai/wiki/img/ai-application/neomind/quick-start/step1-login.png" alt="NeoMind 登录页" style={{width: '100%'}} />
+<img src="/img/neomind/quick-start/step1-login.png" alt="NeoMind 登录页" style={{width: '100%'}} />
 
 > ✓ **检查点**：看到登录 / 注册页面 = 服务已运行。注册一个账号并登录。
 
@@ -84,7 +84,7 @@ ollama pull qwen3.5:4b
 2. 地址填 `http://localhost:11434`（默认）
 3. 模型选 `qwen3.5:4b`
 
-<img src="https://resources.camthink.ai/wiki/img/ai-application/neomind/quick-start/step2-llm-config.png" alt="LLM 配置向导" style={{width: '100%'}} />
+<img src="/img/neomind/quick-start/step2-llm-config.png" alt="LLM 配置向导" style={{width: '100%'}} />
 
 ### 方案 B：云端 API
 
@@ -116,8 +116,8 @@ ollama pull qwen3.5:4b
 创建后会得到一个专属的 Webhook URL（形如 `/api/devices/<DEVICE_ID>/webhook`）。
 
 <div style={{display: 'flex', gap: '8px'}}>
-  <img src="https://resources.camthink.ai/wiki/img/ai-application/neomind/quick-start/step3-add-device.png" alt="添加设备" style={{width: '50%'}} />
-  <img src="https://resources.camthink.ai/wiki/img/ai-application/neomind/quick-start/step3-webhook-url.png" alt="获取 Webhook URL" style={{width: '50%'}} />
+  <img src="/img/neomind/quick-start/step3-add-device.png" alt="添加设备" style={{width: '50%'}} />
+  <img src="/img/neomind/quick-start/step3-webhook-url.png" alt="获取 Webhook URL" style={{width: '50%'}} />
 </div>
 
 ### 3.2 推送数据
@@ -132,7 +132,7 @@ curl -X POST http://localhost:9375/api/devices/<DEVICE_ID>/webhook \
 
 返回 `{"success": true}` 即成功。打开设备详情页，可以看到最新遥测值。
 
-<img src="https://resources.camthink.ai/wiki/img/ai-application/neomind/quick-start/step3-device-detail.png" alt="设备详情页显示遥测数据" style={{width: '100%'}} />
+<img src="/img/neomind/quick-start/step3-device-detail.png" alt="设备详情页显示遥测数据" style={{width: '100%'}} />
 
 > ✓ **检查点**：设备详情页显示 `temperature: 25.6` 和 `humidity: 60` = 数据已入库。
 
@@ -159,7 +159,7 @@ NeoMind 内置 MQTT Broker（`localhost:1883`），支持 ESP32、树莓派、�
 2. 数据源填 `device:demo-sensor:temperature`
 3. 保存
 
-<img src="https://resources.camthink.ai/wiki/img/ai-application/neomind/quick-start/step4-dashboard.png" alt="仪表板数值卡" style={{width: '100%'}} />
+<img src="/img/neomind/quick-start/step4-dashboard.png" alt="仪表板数值卡" style={{width: '100%'}} />
 
 :::info DataSourceId 格式
 
@@ -196,7 +196,7 @@ curl -X POST http://localhost:9375/api/devices/<DEVICE_ID>/webhook \
 
 AI Agent 会自动查询设备列表和最新遥测值，用自然语言回答。
 
-<img src="https://resources.camthink.ai/wiki/img/ai-application/neomind/quick-start/step5-ai-chat.png" alt="AI Chat 对话" style={{width: '100%'}} />
+<img src="/img/neomind/quick-start/step5-ai-chat.png" alt="AI Chat 对话" style={{width: '100%'}} />
 
 再试一个更有挑战性的——让 AI 帮你创建自动化：
 
