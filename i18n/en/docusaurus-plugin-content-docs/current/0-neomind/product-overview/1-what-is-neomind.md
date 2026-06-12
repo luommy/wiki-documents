@@ -190,6 +190,9 @@ NeoMind is a modular ecosystem with specialized repositories for each concern:
 - [Install & Setup](../user-guide/1-install-setup.md) — Get NeoMind running on desktop or server
 - [Configure LLM Backend](../user-guide/2-configure-llm.md) — Connect Ollama or cloud models
 - [Onboard a Device](../user-guide/3-onboard-device.md) — Use the onboarding wizard
+- [AI Agent](../user-guide/6-ai-agent.md) — Create autonomous agents
+- [Automation Rules](../user-guide/7-automation-rules.md) — DSL rule engine
+- [Extensions](../user-guide/9-extensions.md) — Install vision AI / OCR extensions
 - [Developer Guide Overview](../developer-guide/1-overview.md) — Start from one of four dimensions: device types / extensions / dashboard components / main project
 - [Use Cases](../use-cases/1-object-detection.md) — End-to-end scenario examples
 

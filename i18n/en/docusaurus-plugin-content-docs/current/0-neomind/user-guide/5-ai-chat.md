@@ -79,7 +79,7 @@ Examples:
 - **Chat**: "What's the temperature of machine #3 right now?" ← one-shot query
 - **Agent**: Create an agent that checks machine #3 every hour and notifies you if it crosses a threshold ← long-running automation
 
-Advanced agent configuration is covered in [Automation Rules](./7-automation-rules.md) and the (Phase 2) manage-agents doc.
+For detailed agent configuration, see [AI Agent](./6-ai-agent.md). For automation rules, see [Rules](./7-automation-rules.md).
 
 ## Session Management
 

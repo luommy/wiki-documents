@@ -77,7 +77,7 @@ END
 
 ### 2. AI Agent Trigger
 
-Let an [agent](./5-ai-chat.md) decide whether to notify after analysis:
+Let an [AI Agent](./6-ai-agent.md) decide whether to notify after analysis:
 
 - Scheduled agents: write "Notify the ops team via Telegram when an anomaly is detected" in the prompt
 - Agent tool calls auto-route to the right channel

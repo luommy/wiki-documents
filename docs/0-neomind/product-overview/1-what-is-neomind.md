@@ -190,6 +190,9 @@ NeoMind 是一个模块化生态系统，每个关注点由专门仓库承载：
 - [安装与配置](../user-guide/1-install-setup.md) — 在桌面或服务器上跑起 NeoMind
 - [配置 LLM 后端](../user-guide/2-configure-llm.md) — 接入 Ollama 或云端模型
 - [接入设备](../user-guide/3-onboard-device.md) — 使用 onboarding 向导
+- [AI Agent](../user-guide/6-ai-agent.md) — 创建自主智能体
+- [自动化规则](../user-guide/7-automation-rules.md) — DSL 规则引擎
+- [扩展管理](../user-guide/9-extensions.md) — 安装视觉 AI / OCR 等扩展
 - [开发指南总览](../developer-guide/1-overview.md) — 按设备类型 / 扩展 / 仪表板组件 / 主项目四个维度切入
 - [应用案例](../use-cases/1-object-detection.md) — 端到端场景示例
 

@@ -79,7 +79,7 @@ NeoMind 的 AI 有两种运行形态，初学者容易混淆：
 - **Chat**：「现在 3 号机温度是多少？」← 一次性查询
 - **Agent**：创建一个 Agent，每小时检查 3 号机温度，超过阈值就发通知 ← 长期自动化
 
-Agent 的高级配置见 [自动化规则](./7-automation-rules.md) 与（Phase 2）管理智能体文档。
+Agent 的详细配置见 [AI Agent](./6-ai-agent.md)，自动化规则见 [规则引擎](./7-automation-rules.md)。
 
 ## 会话管理
 

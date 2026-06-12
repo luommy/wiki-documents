@@ -77,7 +77,7 @@ END
 
 ### 2. AI Agent 触发
 
-让 [Agent](./5-ai-chat.md) 在分析后决定是否发通知：
+让 [AI Agent](./6-ai-agent.md) 在分析后决定是否发通知：
 
 - 计划型 Agent 可在 prompt 里写「检测到异常时通过 Telegram 通知运维组」
 - Agent 工具调用会自动路由到对应渠道
