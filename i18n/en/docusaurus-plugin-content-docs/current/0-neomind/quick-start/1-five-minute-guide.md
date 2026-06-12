@@ -1,24 +1,43 @@
 ---
-description: "Get NeoMind running in 5 minutes: install → configure LLM → connect first device → see data on dashboard → ask AI Chat. Every step has a success checkpoint."
+description: "Get NeoMind running in 5 minutes: install → configure LLM → connect first device → see data on dashboard → ask AI Chat. Every step has a checkpoint, tips, and troubleshooting."
 keywords: [NeoMind, quick start, 5 minutes, getting started]
 tags: [NeoMind, Quick Start]
 ---
 
 # 5-Minute Quick Start
 
-The goal: experience NeoMind's core loop — **device ingress → data visualization → AI conversation** — as fast as possible. Each step has a ✓ checkpoint.
+Experience NeoMind's core loop — **device ingress → data visualization → AI conversation** — as fast as possible. Each step has a ✓ checkpoint and troubleshooting tips.
 
 > For full installation options and troubleshooting see [Install & Setup](../user-guide/1-install-setup.md).
 
 ---
 
+## What You'll Achieve
+
+By the end of this guide you will have:
+
+- ✅ A NeoMind service running locally
+- ✅ A large language model connected (local or cloud)
+- ✅ Your first device connected and pushing data via webhook
+- ✅ Live data visible on a dashboard
+- ✅ Asked the AI a question in natural language and gotten an answer
+
+:::tip Prerequisites
+
+- A **macOS / Windows / Linux** machine (4 GB+ RAM)
+- **No** need to pre-install databases, message brokers, or any other infrastructure — everything is built into NeoMind
+- For a local LLM (recommended): an extra 4–8 GB RAM; otherwise you can use a cloud API
+  :::
+
+---
+
 ## Step 1: Install (1 min)
 
-**Desktop app** (recommended for first use):
+### Option A: Desktop App (recommended)
 
 Download the installer for your platform from [GitHub Releases](https://github.com/camthink-ai/NeoMind/releases/latest), double-click to install, then launch.
 
-**Server deploy**:
+### Option B: Server Deploy
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/camthink-ai/NeoMind/main/install.sh | bash
@@ -26,43 +45,80 @@ curl -fsSL https://raw.githubusercontent.com/camthink-ai/NeoMind/main/install.sh
 
 After startup, open `http://localhost:9375` in your browser.
 
-> ✓ **Checkpoint**: you see the login / register page = the server is running.
+<img src="https://resources.camthink.ai/wiki/img/ai-application/neomind/quick-start/step1-login.png" alt="NeoMind login page" style={{width: '100%'}} />
 
-<!-- screenshot placeholder: login page -->
+> ✓ **Checkpoint**: you see the login / register page = the server is running. Register an account and log in.
+
+:::note Can't see the page?
+
+- **Port in use?** Default port is `9375`; you can change it in the config file
+- **macOS security block?** First launch shows "cannot verify developer" — go to `System Settings → Privacy & Security → Open Anyway`
+- **Server without a browser?** Use SSH port forwarding: `ssh -L 9375:localhost:9375 user@server`
+  :::
 
 ---
 
 ## Step 2: Configure LLM Backend (1 min)
 
-On first launch you'll enter the setup wizard. Choose **Ollama** (local, recommended):
+On first login you'll enter the setup wizard. NeoMind needs an LLM backend as its "brain" — pick one of three options:
+
+| Option | Best for | Latency | Privacy | Requires |
+|--------|----------|---------|---------|----------|
+| **Ollama (local)** | Recommended, offline use | Low | Never leaves LAN | 8 GB+ RAM |
+| **Cloud API** | Most powerful models | Medium | Data goes to cloud | API Key |
+| **Skip for now** | Just look around | — | — | — |
+
+### Option A: Ollama Local (recommended)
 
 ```bash
-# If you don't have Ollama yet: https://ollama.com
+# 1. Install Ollama (if you haven't): https://ollama.com
+# 2. Pull the model
 ollama pull qwen3.5:4b
 ```
 
 In the wizard:
+
 1. Backend type → **Ollama**
 2. URL → `http://localhost:11434` (default)
 3. Model → `qwen3.5:4b`
 
-You can also skip local deployment and pick a cloud backend (OpenAI / Anthropic / GLM).
+<img src="https://resources.camthink.ai/wiki/img/ai-application/neomind/quick-start/step2-llm-config.png" alt="LLM configuration wizard" style={{width: '100%'}} />
 
-> ✓ **Checkpoint**: wizard shows "LLM backend connected" = the brain is ready.
+### Option B: Cloud API
+
+Pick OpenAI / Anthropic / GLM etc., enter your API Key and model name (e.g. `gpt-4o`, `claude-sonnet-4-6`).
+
+> ✓ **Checkpoint**: the wizard shows **"LLM backend connected"** = the brain is ready.
+
+:::note Connection failed?
+
+- **Ollama not running?** Start it with `ollama serve` in a terminal
+- **Model not pulled?** Run `ollama list` to confirm `qwen3.5:4b` exists
+- **Cloud 401?** Check that your API Key is valid and has credit
+  :::
 
 > See [Configure LLM Backend](../user-guide/2-configure-llm.md).
-
-<!-- screenshot placeholder: LLM config success -->
 
 ---
 
 ## Step 3: Connect Your First Device (1 min)
 
-The fastest ingress method is **HTTP Webhook** (no MQTT client needed).
+The fastest ingress method is **HTTP Webhook** — no MQTT client needed, a single `curl` simulates a device.
 
-In the Web UI **Devices** page, click **Add Device**, select **Webhook**, name it `demo-sensor`. After creation you'll get a webhook URL.
+### 3.1 Create the device
 
-Simulate a device pushing a temperature reading with `curl`:
+In the Web UI **Devices** page → click **Add Device** → select **Webhook** → name it `demo-sensor`.
+
+After creation you'll get a dedicated Webhook URL (like `/api/devices/<DEVICE_ID>/webhook`).
+
+<div style={{display: 'flex', gap: '8px'}}>
+  <img src="https://resources.camthink.ai/wiki/img/ai-application/neomind/quick-start/step3-add-device.png" alt="Add device" style={{width: '50%'}} />
+  <img src="https://resources.camthink.ai/wiki/img/ai-application/neomind/quick-start/step3-webhook-url.png" alt="Get webhook URL" style={{width: '50%'}} />
+</div>
+
+### 3.2 Push data
+
+Copy the command below, replace `<DEVICE_ID>` with your device's ID, and run it:
 
 ```bash
 curl -X POST http://localhost:9375/api/devices/<DEVICE_ID>/webhook \
@@ -70,28 +126,57 @@ curl -X POST http://localhost:9375/api/devices/<DEVICE_ID>/webhook \
   -d '{"temperature": 25.6, "humidity": 60}'
 ```
 
-> ✓ **Checkpoint**: the device detail page shows the latest telemetry values = data is in the database.
+A `{"success": true}` response means it worked. Open the device detail page to see the latest telemetry values.
 
-> You can also connect real devices via MQTT (built-in broker at `localhost:1883`). See [Onboard Devices](../user-guide/3-onboard-device.md).
+<img src="https://resources.camthink.ai/wiki/img/ai-application/neomind/quick-start/step3-device-detail.png" alt="Device detail page showing telemetry" style={{width: '100%'}} />
 
-<!-- screenshot placeholder: device detail with telemetry -->
+> ✓ **Checkpoint**: the device detail page shows `temperature: 25.6` and `humidity: 60` = data is in the database.
+
+:::tip Connect real devices too
+
+NeoMind has a built-in MQTT broker (`localhost:1883`) that supports real devices like ESP32, Raspberry Pi, industrial sensors, and more. See [Onboard Devices](../user-guide/3-onboard-device.md).
+:::
+
+:::note webhook returned 404?
+
+- **Wrong device ID?** Click into the device in the device list — the ID is in the URL
+- **Forgot Content-Type?** You must include `-H 'Content-Type: application/json'`
+  :::
 
 ---
 
 ## Step 4: See Data on the Dashboard (30 sec)
 
-Go to the **Dashboard** page — a default dashboard is auto-created. Click **Edit**, add a **Value Card** widget:
+Go to the **Dashboard** page — a default dashboard is auto-created. Click **Edit**, then add a **Value Card** widget:
 
-1. Data source → `device:demo-sensor:temperature`
-2. Save
+1. Click **Add Widget** → choose **Value Card**
+2. Data source → `device:demo-sensor:temperature`
+3. Save
 
-The temperature value appears live on the card. Push another webhook payload and watch it update.
+<img src="https://resources.camthink.ai/wiki/img/ai-application/neomind/quick-start/step4-dashboard.png" alt="Dashboard value card" style={{width: '100%'}} />
+
+:::info DataSourceId Format
+
+The unified data source reference format is `{type}:{id}:{field}`:
+
+- `device:demo-sensor:temperature` — device telemetry
+- `extension:weather:temp` — extension metric
+- `agent:guard:status` — agent status
+
+Dashboards, rules, and data pushes all use this format. See the [Glossary](../concepts/1-glossary.md).
+:::
+
+The temperature value appears live on the card. Push another webhook payload and watch it update instantly:
+
+```bash
+curl -X POST http://localhost:9375/api/devices/<DEVICE_ID>/webhook \
+  -H 'Content-Type: application/json' \
+  -d '{"temperature": 28.3, "humidity": 55}'
+```
 
 > ✓ **Checkpoint**: you see a live temperature reading on the dashboard = visualization loop is working.
 
 > See [Use Dashboard](../user-guide/4-use-dashboard.md).
-
-<!-- screenshot placeholder: dashboard value card -->
 
 ---
 
@@ -101,28 +186,57 @@ Open **AI Chat** and type:
 
 > What devices do I have? What's the temperature of demo-sensor?
 
-The AI Agent will query the device list and latest telemetry, then answer in natural language. Try something more ambitious:
+The AI Agent will query the device list and latest telemetry, then answer in natural language.
+
+<img src="https://resources.camthink.ai/wiki/img/ai-application/neomind/quick-start/step5-ai-chat.png" alt="AI Chat conversation" style={{width: '100%'}} />
+
+Now try something more ambitious — let the AI create an automation for you:
 
 > Notify me when temperature exceeds 30
 
-The AI will help you create an automation rule.
+The AI will understand your intent, create a rule, and configure a notification channel.
 
 > ✓ **Checkpoint**: the AI answered your question = the intelligence loop is complete.
 
+:::note AI not responding?
+
+- **LLM backend not connected?** Go back to **Settings → LLM Config** and check status
+- **First reply is slow?** Local models need to warm up on first inference — 10–20 seconds is normal
+  :::
+
 > See [AI Chat](../user-guide/5-ai-chat.md).
 
-<!-- screenshot placeholder: AI Chat conversation -->
+---
+
+## 🎉 Core Loop Complete
+
+Here's the pipeline you just verified end-to-end:
+
+```mermaid
+flowchart LR
+    A[Device push] -->|Webhook/MQTT| B[NeoMind]
+    B --> C[Telemetry store]
+    C --> D[Dashboard real-time]
+    C --> E[Rule engine check]
+    B --> F[AI Agent query]
+    F --> G[Natural-language answer]
+```
+
+**Every link is verified**: data comes in, gets stored, is visualized, and can be queried.
 
 ---
 
 ## Next Steps
 
-Congratulations! You've completed the NeoMind core loop. From here you can:
+Congratulations! You've completed the NeoMind core loop. From here:
 
-- [Dive into core concepts](../concepts/1-glossary.md) — Device / Extension / Agent / Rule terminology explained
-- [Connect real devices](../user-guide/3-onboard-device.md) — MQTT / BLE / Webhook connection methods
-- [Install extensions](../developer-guide/1-overview.md) — Object detection, OCR, face recognition AI capabilities
-- [Browse use cases](../use-cases/1-object-detection.md) — Scenario-driven end-to-end tutorials
+| I want to... | Go to |
+|--------------|-------|
+| Understand the architecture | [Core Concepts](../concepts/2-core-concepts.md) — process model, data flow, extension mechanism |
+| Look up a term | [Glossary](../concepts/1-glossary.md) — Device / Extension / Agent / Rule |
+| Connect real devices | [Onboard Devices](../user-guide/3-onboard-device.md) — MQTT / BLE / Webhook |
+| Install extensions (YOLO/OCR) | [Developer Guide](../developer-guide/1-overview.md) — extension ecosystem |
+| See an end-to-end example | [Use Cases](../use-cases/1-object-detection.md) — full object detection solution |
 
 ---
 
