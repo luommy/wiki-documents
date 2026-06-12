@@ -41,7 +41,7 @@ NE101/NE301 图像采集 → NeoMind 平台 → OCR 插件识别 → 仪表板�
 | 物料 | 型号/规格 | 数量 | 用途 | 必需 |
 |------|----------|------|------|------|
 | **智能相机** | NE101 或 NE301 | 1+ | 图像采集 | ✅ |
-| **NeoMind 平台** | v0.6.8+ | 1 | 边缘 AI 管理 | [下载](https://github.com/camthink-ai/NeoMind/releases/latest) ✅ |
+| **NeoMind 平台** | v0.8.0+ | 1 | 边缘 AI 管理 | [下载](https://github.com/camthink-ai/NeoMind/releases/latest) ✅ |
 
 ---
 
@@ -49,7 +49,7 @@ NE101/NE301 图像采集 → NeoMind 平台 → OCR 插件识别 → 仪表板�
 
 ### 3.1 NeoMind 安装与配置
 
-请先完成 NeoMind 的安装、注册和基本配置，详细步骤请参考 [NeoMind 快速入门](./0-neomind-quick-start.md)。
+请先完成 NeoMind 的安装、注册和基本配置，详细步骤请参考 [NeoMind 快速入门](../user-guide/1-install-setup.md)。
 
 ### 3.2 设备接入
 
@@ -62,7 +62,7 @@ NE101/NE301 图像采集 → NeoMind 平台 → OCR 插件识别 → 仪表板�
 
 ![](https://resources.camthink.ai/wiki/img/ai-application/neomind/ocr-solution/device-0.png)
 
-> 详细的设备接入步骤请参考 [NeoMind 快速入门 - 设备管理](./0-neomind-quick-start.md#3-设备管理)。
+> 详细的设备接入步骤请参考 [NeoMind 快速入门 - 设备管理](../user-guide/3-onboard-device.md)。
 
 ---
 
@@ -135,8 +135,8 @@ Hello, what's the OCR result of my device ne301-new? Reply in English.
 
 ![](https://resources.camthink.ai/wiki/img/ai-application/neomind/ocr-solution/ai-chat-test.png)
 
-> **提示**：AI Chat 功能需要配置 LLM 后端（如 Ollama），配置方法请参考 [NeoMind 快速入门](./0-neomind-quick-start.md) 或 [AI Agent and Extensions Solutions](./1-ai-agent-and-extension-solutions.md#32-llm-后端配置方案-b-必需)。
+> **提示**：AI Chat 功能需要配置 LLM 后端（如 Ollama），配置方法请参考 [NeoMind 快速入门](../user-guide/1-install-setup.md) 或 [AI Agent and Extensions Solutions](../user-guide/2-configure-llm.md)。
 
 ---
 
-*最后更新: 2026-04-17*
+*最后更新: 2026-06-12 · NeoMind v0.8.11*

@@ -41,7 +41,7 @@ NE101/NE301 Image Capture → NeoMind Platform → OCR Plugin Recognition → Da
 | Item | Specification | Qty | Purpose | Required |
 |------|----------|------|------|------|
 | **Smart Camera** | NE101 or NE301 | 1+ | Image capture | ✅ |
-| **NeoMind Platform** | v0.6.8+ | 1 | Edge AI management | [Download](https://github.com/camthink-ai/NeoMind/releases/latest) ✅ |
+| **NeoMind Platform** | v0.8.0+ | 1 | Edge AI management | [Download](https://github.com/camthink-ai/NeoMind/releases/latest) ✅ |
 
 ---
 
@@ -49,7 +49,7 @@ NE101/NE301 Image Capture → NeoMind Platform → OCR Plugin Recognition → Da
 
 ### 3.1 NeoMind Installation and Configuration
 
-Complete the NeoMind installation, registration, and basic configuration first. For detailed steps, refer to [NeoMind Quick Start](./0-neomind-quick-start.md).
+Complete the NeoMind installation, registration, and basic configuration first. For detailed steps, refer to [NeoMind Quick Start](../user-guide/1-install-setup.md).
 
 ### 3.2 Device Onboarding
 
@@ -62,7 +62,7 @@ Register your NE101 or NE301 to the NeoMind platform:
 
 ![](https://resources.camthink.ai/wiki/img/ai-application/neomind/ocr-solution/device-0.png)
 
-> For detailed device onboarding steps, refer to [NeoMind Quick Start - Device Management](./0-neomind-quick-start.md#3-device-management).
+> For detailed device onboarding steps, refer to [NeoMind Quick Start - Device Management](../user-guide/3-onboard-device.md).
 
 ---
 
@@ -136,8 +136,8 @@ Hello, what's the OCR result of my device ne301-new? Reply in English.
 
 ![](https://resources.camthink.ai/wiki/img/ai-application/neomind/ocr-solution/ai-chat-test.png)
 
-> **Tip**: AI Chat requires an LLM backend (e.g., Ollama). For configuration, refer to [NeoMind Quick Start](./0-neomind-quick-start.md) or [AI Agent and Extensions Solutions](./1-ai-agent-and-extension-solutions.md#32-llm-backend-configuration-required-for-approach-b).
+> **Tip**: AI Chat requires an LLM backend (e.g., Ollama). For configuration, refer to [NeoMind Quick Start](../user-guide/1-install-setup.md) or [AI Agent and Extensions Solutions](../user-guide/2-configure-llm.md).
 
 ---
 
-*Last updated: 2026-04-17*
+*Last updated: 2026-06-12 · NeoMind v0.8.11*

@@ -34,7 +34,7 @@ NE101/NE301 图像采集 → NeoMind 平台 → Face Recognition 插件（检测
 | 物料 | 型号/规格 | 数量 | 用途 | 必需 |
 |------|----------|------|------|------|
 | **智能相机** | NE101 或 NE301 | 1+ | 图像采集 | ✅ |
-| **NeoMind 平台** | v0.6.10+ | 1 | 边缘 AI 管理 | [下载](https://github.com/camthink-ai/NeoMind/releases/latest) ✅ |
+| **NeoMind 平台** | v0.8.0+ | 1 | 边缘 AI 管理 | [下载](https://github.com/camthink-ai/NeoMind/releases/latest) ✅ |
 | **本地 LLM** | Ollama | 1 | AI Chat 后端 | 可选 |
 
 ---
@@ -43,11 +43,11 @@ NE101/NE301 图像采集 → NeoMind 平台 → Face Recognition 插件（检测
 
 ### 3.1 NeoMind 安装与配置
 
-请先完成 NeoMind 的安装、注册和基本配置，详细步骤请参考 [NeoMind 快速入门](./0-neomind-quick-start.md)。
+请先完成 NeoMind 的安装、注册和基本配置，详细步骤请参考 [NeoMind 快速入门](../user-guide/1-install-setup.md)。
 
 ### 3.2 设备接入
 
-将 NE101 或 NE301 注册到 NeoMind 平台，详细步骤请参考 [NeoMind 快速入门 - 设备管理](./0-neomind-quick-start.md#3-设备管理)。
+将 NE101 或 NE301 注册到 NeoMind 平台，详细步骤请参考 [NeoMind 快速入门 - 设备管理](../user-guide/3-onboard-device.md)。
 
 ---
 
@@ -133,11 +133,11 @@ hello, please analyse the history data and result of ‘face recognition’ , re
 
 ### 相关文档
 
-- [NeoMind 快速入门](./0-neomind-quick-start.md)
-- [AI Agent and Extensions Solutions](./1-ai-agent-and-extension-solutions.md)
-- [NE101 Quick Start](../2-neoeyes-ne101-series/1-quick-start.md)
-- [NE301 Quick Start](../5-neoeyes-ne301-series/1-quick-start.md)
+- [NeoMind 快速入门](../user-guide/1-install-setup.md)
+- [AI Agent and Extensions Solutions](./1-object-detection.md)
+- [NE101 Quick Start](../../2-neoeyes-ne101-series/1-quick-start.md)
+- [NE301 Quick Start](../../5-neoeyes-ne301-series/1-quick-start.md)
 
 ---
 
-*最后更新: 2026-04-23*
+*最后更新: 2026-06-12 · NeoMind v0.8.11*

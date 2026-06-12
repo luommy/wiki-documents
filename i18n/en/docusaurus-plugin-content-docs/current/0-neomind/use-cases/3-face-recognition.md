@@ -34,7 +34,7 @@ NE101/NE301 Image Capture → NeoMind Platform → Face Recognition Plugin (Dete
 | Item | Model/Spec | Qty | Purpose | Required |
 |------|-----------|-----|---------|----------|
 | **Smart Camera** | NE101 or NE301 | 1+ | Image capture | ✅ |
-| **NeoMind Platform** | v0.6.10+ | 1 | Edge AI management | [Download](https://github.com/camthink-ai/NeoMind/releases/latest) ✅ |
+| **NeoMind Platform** | v0.8.0+ | 1 | Edge AI management | [Download](https://github.com/camthink-ai/NeoMind/releases/latest) ✅ |
 | **Local LLM** | Ollama | 1 | AI Chat backend | Optional |
 
 ---
@@ -43,11 +43,11 @@ NE101/NE301 Image Capture → NeoMind Platform → Face Recognition Plugin (Dete
 
 ### 3.1 NeoMind Installation and Configuration
 
-Complete the NeoMind installation, registration, and basic configuration first. For detailed steps, refer to [NeoMind Quick Start](./0-neomind-quick-start.md).
+Complete the NeoMind installation, registration, and basic configuration first. For detailed steps, refer to [NeoMind Quick Start](../user-guide/1-install-setup.md).
 
 ### 3.2 Device Registration
 
-Register your NE101 or NE301 with the NeoMind platform. For detailed steps, refer to [NeoMind Quick Start - Device Management](./0-neomind-quick-start.md#3-device-management).
+Register your NE101 or NE301 with the NeoMind platform. For detailed steps, refer to [NeoMind Quick Start - Device Management](../user-guide/3-onboard-device.md).
 
 ---
 
@@ -129,11 +129,11 @@ hello, please analyse the history data and result of 'face recognition', reply i
 
 ### Related Documentation
 
-- [NeoMind Quick Start](./0-neomind-quick-start.md)
-- [AI Agent and Extensions Solutions](./1-ai-agent-and-extension-solutions.md)
-- [NE101 Quick Start](../2-neoeyes-ne101-series/1-quick-start.md)
-- [NE301 Quick Start](../5-neoeyes-ne301-series/1-quick-start.md)
+- [NeoMind Quick Start](../user-guide/1-install-setup.md)
+- [AI Agent and Extensions Solutions](./1-object-detection.md)
+- [NE101 Quick Start](../../2-neoeyes-ne101-series/1-quick-start.md)
+- [NE301 Quick Start](../../5-neoeyes-ne301-series/1-quick-start.md)
 
 ---
 
-*Last updated: 2026-04-23*
+*Last updated: 2026-06-12 · NeoMind v0.8.11*

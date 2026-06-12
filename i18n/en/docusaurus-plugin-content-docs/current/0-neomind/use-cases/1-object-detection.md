@@ -47,7 +47,7 @@ For detailed performance comparison and selection guidance, see [Section 8](#8-c
 | Item | Specification | Qty | Purpose | Required |
 |------|----------|------|------|------|
 | **Smart Camera** | NE101 or NE301 | 1+ | Image capture | ✅ |
-| **NeoMind Platform** | v0.6.8+ | 1 | Edge AI management | [Download](https://github.com/camthink-ai/NeoMind/releases/latest) ✅ |
+| **NeoMind Platform** | v0.8.0+ | 1 | Edge AI management | [Download](https://github.com/camthink-ai/NeoMind/releases/latest) ✅ |
 | **LLM Runtime** | Ollama / OpenAI / Anthropic etc. | 1 | AI Agent backend | Approach B |
 | **Solar Power Kit** | 10W panel + 7AH rechargeable battery | 1 | Outdoor long-term deployment | Optional |
 
@@ -59,7 +59,7 @@ For detailed performance comparison and selection guidance, see [Section 8](#8-c
 
 ### 3.1 NeoMind Installation and Configuration
 
-Complete the NeoMind installation, registration, and basic configuration first. For detailed steps, refer to [NeoMind Quick Start](./0-neomind-quick-start.md).
+Complete the NeoMind installation, registration, and basic configuration first. For detailed steps, refer to [NeoMind Quick Start](../user-guide/1-install-setup.md).
 
 ### 3.2 LLM Backend Configuration (Required for Approach B)
 
@@ -105,7 +105,7 @@ Register your NE101 or NE301 to the NeoMind platform:
 
 ![](https://resources.camthink.ai/wiki/img/ai-application/neomind/ai-agent-and-extension-solutions/device-1.png)
 
-> For detailed device onboarding steps, refer to [NeoMind Quick Start - Device Management](./0-neomind-quick-start.md#3-device-management).
+> For detailed device onboarding steps, refer to [NeoMind Quick Start - Device Management](../user-guide/3-onboard-device.md).
 
 ---
 
@@ -313,4 +313,4 @@ To receive notifications via email:
 
 ---
 
-*Last updated: 2026-04-16*
+*Last updated: 2026-06-12 · NeoMind v0.8.11*
