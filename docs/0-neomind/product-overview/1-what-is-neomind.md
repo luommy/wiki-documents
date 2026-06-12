@@ -10,10 +10,88 @@ NeoMind 是一款**边缘部署的 AI 平台**，为 IoT 带来智能。它在�
 
 **核心理念**：用自然语言和你的设备对话。AI 理解你的意图，查询设备状态，创建自动化规则，并自主执行动作。
 
-<!-- 截图占位符：仪表板 + AI Chat + 设备管理（来自 README docs/img/）
-     建议上传 resources.camthink.ai/wiki/img/ai-application/neomind/product-overview/
-     dashboard_light.png / chat.png / devices.png
--->
+## 产品一览
+
+NeoMind 三个核心界面——管理你的设备、可视化你的数据、用自然语言对话驱动一切。
+
+<div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
+
+<img src="/img/neomind/quick-start/step3-devices.png" alt="设备管理 — MQTT/BLE/Webhook 设备统一管理" style={{width: '100%', borderRadius: '8px', border: '1px solid var(--ifm-color-emphasis-200)'}} />
+
+<img src="/img/neomind/quick-start/step4-dashboard.png" alt="实时仪表板 — 拖拽构建、WebSocket 实时刷新" style={{width: '100%', borderRadius: '8px', border: '1px solid var(--ifm-color-emphasis-200)'}} />
+
+<img src="/img/neomind/quick-start/step5-ai-chat.png" alt="AI Chat — 自然语言查询设备、创建自动化" style={{width: '100%', borderRadius: '8px', border: '1px solid var(--ifm-color-emphasis-200)'}} />
+
+</div>
+
+---
+
+## 产品架构
+
+NeoMind 采用**单进程多层级**架构——所有核心能力打包在一个进程中，无需外部数据库或消息代理，开机即用。
+
+```mermaid
+flowchart TB
+    subgraph L1["User Interface"]
+        WEB[Web 应用<br/>响应式]
+        DESKTOP[桌面应用<br/>macOS · Windows · Linux]
+        CLI[CLI 工具]
+    end
+
+    subgraph L2["AI Intelligence"]
+        CHAT[AI Chat<br/>自然语言对话]
+        AGENT[自主 Agent<br/>定时 / 事件触发]
+        MEM[记忆 + 技能系统]
+        LLM["LLM 后端<br/>Ollama · OpenAI · Claude · GLM · 10+"]
+    end
+
+    subgraph L3["Automation"]
+        RULE[规则引擎<br/>DSL]
+        TRANSFORM[数据转换<br/>虚拟指标]
+        NOTIFY[通知推送<br/>7 渠道]
+    end
+
+    subgraph L4["Data Hub · Single Process"]
+        API[API 服务 :9375]
+        MQTT[MQTT Broker :1883]
+        STORE[(遥测存储 redb)]
+    end
+
+    subgraph L5["Device Ingress"]
+        MQDEV[MQTT 设备]
+        BLEDEV[BLE 蓝牙]
+        HOOKDEV[Webhook / HTTP]
+    end
+
+    subgraph L6["Extensions · Process Isolated"]
+        YOLO[YOLO 检测]
+        OCR[OCR 识别]
+        FACE[人脸识别]
+        CUSTOM[自定义扩展]
+    end
+
+    L1 --> L2
+    L2 --> L4
+    L3 --> L4
+    L5 --> MQTT
+    L6 -.FFI 隔离.-> API
+    MQTT --> STORE
+    API --> STORE
+    STORE -.实时推送.-> DASH[📊 仪表板]
+```
+
+:::tip 三大设计哲学
+
+1. **单进程自包含** — API、MQTT Broker、存储、规则引擎全在一个进程里。`cargo run` 一条命令，全部就绪。没有 Docker compose，没有外部依赖。
+
+2. **边缘优先，云端可选** — 默认用本地 LLM（Ollama）实现 100% 离线运行，数据不出局域网；需要更强能力时，一键切换云端模型（OpenAI / Claude / GLM）。
+
+3. **扩展崩溃隔离** — 扩展运行在独立进程中，通过 FFI 通信。一个 YOLO 扩展崩溃？主服务和其他扩展完全不受影响。
+   :::
+
+> 想深入了解每一层的设计原理？阅读 [核心概念](../concepts/2-core-concepts.md) — 数据生命周期、扩展模型、Agent 执行循环的完整剖析。
+
+---
 
 ## 为什么选择 NeoMind？
 

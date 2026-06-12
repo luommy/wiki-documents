@@ -10,10 +10,88 @@ NeoMind is an **edge-deployed AI platform** that brings intelligence to IoT. It 
 
 **Key idea**: Talk to your devices in natural language. The AI understands your intent, queries device states, creates automation rules, and takes action autonomously.
 
-<!-- Screenshot placeholder: dashboard + AI chat + device management (from README docs/img/)
-     Upload to resources.camthink.ai/wiki/img/ai-application/neomind/product-overview/
-     dashboard_light.png / chat.png / devices.png
--->
+## Product at a Glance
+
+Three core surfaces of NeoMind — manage your devices, visualize your data, and drive everything through natural language.
+
+<div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
+
+<img src="/img/neomind/quick-start/step3-devices.png" alt="Device management — unified MQTT/BLE/Webhook devices" style={{width: '100%', borderRadius: '8px', border: '1px solid var(--ifm-color-emphasis-200)'}} />
+
+<img src="/img/neomind/quick-start/step4-dashboard.png" alt="Real-time dashboard — drag-and-drop builder, WebSocket live updates" style={{width: '100%', borderRadius: '8px', border: '1px solid var(--ifm-color-emphasis-200)'}} />
+
+<img src="/img/neomind/quick-start/step5-ai-chat.png" alt="AI Chat — query devices and create automations in natural language" style={{width: '100%', borderRadius: '8px', border: '1px solid var(--ifm-color-emphasis-200)'}} />
+
+</div>
+
+---
+
+## Product Architecture
+
+NeoMind uses a **single-process, multi-layer** architecture — all core capabilities are packaged in one process, with no external database or message broker required. It's ready the moment you start.
+
+```mermaid
+flowchart TB
+    subgraph L1["User Interface"]
+        WEB[Web App<br/>Responsive]
+        DESKTOP[Desktop App<br/>macOS · Windows · Linux]
+        CLI[CLI Tool]
+    end
+
+    subgraph L2["AI Intelligence"]
+        CHAT[AI Chat<br/>Natural language]
+        AGENT[Autonomous Agent<br/>Scheduled / Event-driven]
+        MEM[Memory + Skill System]
+        LLM["LLM Backends<br/>Ollama · OpenAI · Claude · GLM · 10+"]
+    end
+
+    subgraph L3["Automation"]
+        RULE[Rule Engine<br/>DSL]
+        TRANSFORM[Data Transforms<br/>Virtual metrics]
+        NOTIFY[Notifications<br/>7 channels]
+    end
+
+    subgraph L4["Data Hub · Single Process"]
+        API[API Service :9375]
+        MQTT[MQTT Broker :1883]
+        STORE[(Telemetry Store redb)]
+    end
+
+    subgraph L5["Device Ingress"]
+        MQDEV[MQTT Devices]
+        BLEDEV[BLE Bluetooth]
+        HOOKDEV[Webhook / HTTP]
+    end
+
+    subgraph L6["Extensions · Process Isolated"]
+        YOLO[YOLO Detection]
+        OCR[OCR Recognition]
+        FACE[Face Recognition]
+        CUSTOM[Custom Extensions]
+    end
+
+    L1 --> L2
+    L2 --> L4
+    L3 --> L4
+    L5 --> MQTT
+    L6 -.FFI Isolated.-> API
+    MQTT --> STORE
+    API --> STORE
+    STORE -.Real-time push.-> DASH[📊 Dashboard]
+```
+
+:::tip Three Design Philosophies
+
+1. **Single-Process, Self-Contained** — API, MQTT broker, storage, and rule engine all live in one process. A single `cargo run` and everything is ready. No Docker compose, no external dependencies.
+
+2. **Edge-First, Cloud-Optional** — Defaults to local LLMs (Ollama) for 100% offline operation — data never leaves your LAN. When you need more power, switch to cloud models (OpenAI / Claude / GLM) with one click.
+
+3. **Crash-Isolated Extensions** — Extensions run in separate processes and communicate via FFI. A YOLO extension crashes? The main service and other extensions are completely unaffected.
+   :::
+
+> Want to go deeper into each layer's design? Read [Core Concepts](../concepts/2-core-concepts.md) — full breakdown of the data lifecycle, extension model, and agent execution loop.
+
+---
 
 ## Why NeoMind?
 
