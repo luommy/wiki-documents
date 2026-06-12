@@ -32,52 +32,53 @@ NeoMind 采用**单进程多层级**架构——所有核心能力打包在一�
 
 ```mermaid
 flowchart TB
-    subgraph L1["User Interface"]
-        WEB[Web 应用<br/>响应式]
-        DESKTOP[桌面应用<br/>macOS · Windows · Linux]
-        CLI[CLI 工具]
+    subgraph UI["User Interface"]
+        direction LR
+        WEB[Web]
+        DESKTOP[Desktop]
+        CLI[CLI]
     end
 
-    subgraph L2["AI Intelligence"]
-        CHAT[AI Chat<br/>自然语言对话]
-        AGENT[自主 Agent<br/>定时 / 事件触发]
-        MEM[记忆 + 技能系统]
-        LLM["LLM 后端<br/>Ollama · OpenAI · Claude · GLM · 10+"]
+    subgraph AI["AI Intelligence"]
+        direction LR
+        CHAT[Chat & Agents]
+        LLM[LLM Backends]
+        SKILLS[Memory & Skills]
     end
 
-    subgraph L3["Automation"]
-        RULE[规则引擎<br/>DSL]
-        TRANSFORM[数据转换<br/>虚拟指标]
-        NOTIFY[通知推送<br/>7 渠道]
+    subgraph AUTO["Automation"]
+        direction LR
+        RULE[Rule Engine]
+        TRANSFORM[Transforms]
+        NOTIFY[Notifications]
     end
 
-    subgraph L4["Data Hub · Single Process"]
-        API[API 服务 :9375]
-        MQTT[MQTT Broker :1883]
-        STORE[(遥测存储 redb)]
+    subgraph CORE["Data Hub — Single Process"]
+        direction LR
+        API[API :9375]
+        MQTT[MQTT :1883]
+        STORE[(Telemetry redb)]
     end
 
-    subgraph L5["Device Ingress"]
-        MQDEV[MQTT 设备]
-        BLEDEV[BLE 蓝牙]
-        HOOKDEV[Webhook / HTTP]
+    subgraph DEV["Device Ingress"]
+        direction LR
+        MQDEV[MQTT]
+        BLEDEV[BLE]
+        HOOK[Webhook]
     end
 
-    subgraph L6["Extensions · Process Isolated"]
-        YOLO[YOLO 检测]
-        OCR[OCR 识别]
-        FACE[人脸识别]
-        CUSTOM[自定义扩展]
+    subgraph EXT["Extensions — Process Isolated"]
+        direction LR
+        VISION[Vision AI]
+        OCR[OCR]
+        CUSTOM[Custom]
     end
 
-    L1 --> L2
-    L2 --> L4
-    L3 --> L4
-    L5 --> MQTT
-    L6 -.FFI 隔离.-> API
-    MQTT --> STORE
-    API --> STORE
-    STORE -.实时推送.-> DASH[📊 仪表板]
+    UI --> AI
+    AI --> CORE
+    AUTO --> CORE
+    DEV --> MQTT
+    EXT -.FFI.-> API
 ```
 
 :::tip 三大设计哲学

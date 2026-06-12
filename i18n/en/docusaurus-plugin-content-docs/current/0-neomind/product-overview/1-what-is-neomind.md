@@ -32,52 +32,53 @@ NeoMind uses a **single-process, multi-layer** architecture — all core capabil
 
 ```mermaid
 flowchart TB
-    subgraph L1["User Interface"]
-        WEB[Web App<br/>Responsive]
-        DESKTOP[Desktop App<br/>macOS · Windows · Linux]
-        CLI[CLI Tool]
+    subgraph UI["User Interface"]
+        direction LR
+        WEB[Web]
+        DESKTOP[Desktop]
+        CLI[CLI]
     end
 
-    subgraph L2["AI Intelligence"]
-        CHAT[AI Chat<br/>Natural language]
-        AGENT[Autonomous Agent<br/>Scheduled / Event-driven]
-        MEM[Memory + Skill System]
-        LLM["LLM Backends<br/>Ollama · OpenAI · Claude · GLM · 10+"]
+    subgraph AI["AI Intelligence"]
+        direction LR
+        CHAT[Chat & Agents]
+        LLM[LLM Backends]
+        SKILLS[Memory & Skills]
     end
 
-    subgraph L3["Automation"]
-        RULE[Rule Engine<br/>DSL]
-        TRANSFORM[Data Transforms<br/>Virtual metrics]
-        NOTIFY[Notifications<br/>7 channels]
+    subgraph AUTO["Automation"]
+        direction LR
+        RULE[Rule Engine]
+        TRANSFORM[Transforms]
+        NOTIFY[Notifications]
     end
 
-    subgraph L4["Data Hub · Single Process"]
-        API[API Service :9375]
-        MQTT[MQTT Broker :1883]
-        STORE[(Telemetry Store redb)]
+    subgraph CORE["Data Hub — Single Process"]
+        direction LR
+        API[API :9375]
+        MQTT[MQTT :1883]
+        STORE[(Telemetry redb)]
     end
 
-    subgraph L5["Device Ingress"]
-        MQDEV[MQTT Devices]
-        BLEDEV[BLE Bluetooth]
-        HOOKDEV[Webhook / HTTP]
+    subgraph DEV["Device Ingress"]
+        direction LR
+        MQDEV[MQTT]
+        BLEDEV[BLE]
+        HOOK[Webhook]
     end
 
-    subgraph L6["Extensions · Process Isolated"]
-        YOLO[YOLO Detection]
-        OCR[OCR Recognition]
-        FACE[Face Recognition]
-        CUSTOM[Custom Extensions]
+    subgraph EXT["Extensions — Process Isolated"]
+        direction LR
+        VISION[Vision AI]
+        OCR[OCR]
+        CUSTOM[Custom]
     end
 
-    L1 --> L2
-    L2 --> L4
-    L3 --> L4
-    L5 --> MQTT
-    L6 -.FFI Isolated.-> API
-    MQTT --> STORE
-    API --> STORE
-    STORE -.Real-time push.-> DASH[📊 Dashboard]
+    UI --> AI
+    AI --> CORE
+    AUTO --> CORE
+    DEV --> MQTT
+    EXT -.FFI.-> API
 ```
 
 :::tip Three Design Philosophies
