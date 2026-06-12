@@ -80,9 +80,18 @@ flowchart TB
     DEV --> MQTT
     EXT -.FFI.-> API
 
-    classDef coreNode stroke-width:2.5px,font-weight:bold
-    classDef extNode stroke-dasharray:6 3
+    classDef uiNode fill:#dae8fc,stroke:#6c8ebf,color:#1a3d6b
+    classDef aiNode fill:#e1d5e7,stroke:#9673a6,color:#3d1a4b
+    classDef autoNode fill:#ffe6cc,stroke:#d79b00,color:#6b3d00
+    classDef coreNode fill:#d5e8d4,stroke:#82b366,stroke-width:2.5px,font-weight:bold,color:#1f4d1f
+    classDef devNode fill:#f8cecc,stroke:#b85450,color:#6b1a1a
+    classDef extNode fill:#f5f5f5,stroke:#666,stroke-dasharray:6 3,color:#333
+
+    class WEB,DESKTOP,CLI uiNode
+    class CHAT,LLM,SKILLS aiNode
+    class RULE,TRANSFORM,NOTIFY autoNode
     class API,MQTT,STORE coreNode
+    class MQDEV,BLEDEV,HOOK devNode
     class VISION,OCR,CUSTOM extNode
 ```
 
