@@ -34,7 +34,7 @@ systemctl status neomind.service
 ```bash
 # 看谁占了 9375
 lsof -i :9375        # macOS / Linux
-netstat -ano | grep 9375   # Windows
+netstat -ano | findstr 9375   # Windows
 ```
 
 **修复**：

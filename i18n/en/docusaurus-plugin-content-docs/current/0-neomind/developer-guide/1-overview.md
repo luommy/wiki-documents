@@ -91,7 +91,7 @@ See the repo README for the full schema and submission conventions.
 **Flow summary** (details in [Extension Development](./7-extension-development.md)):
 
 1. Scaffold a crate from the SDK template
-2. Implement the `ExtensionHandler` trait and export with `neomind_export!`
+2. Implement the `Extension` trait and export with `neomind_export!`
 3. Declare capabilities (`network`, `filesystem`, `ml-model`, …)
 4. (Optional) bundle ML models with lazy-load lifecycle
 5. `cargo build --release` and pack into a `.nmext`

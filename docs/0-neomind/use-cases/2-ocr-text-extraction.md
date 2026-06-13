@@ -135,7 +135,7 @@ Hello, what's the OCR result of my device ne301-new? Reply in English.
 
 ![](https://resources.camthink.ai/wiki/img/ai-application/neomind/ocr-solution/ai-chat-test.png)
 
-> **提示**：AI Chat 功能需要配置 LLM 后端（如 Ollama），配置方法请参考 [NeoMind 快速入门](../user-guide/1-install-setup.md) 或 [AI Agent and Extensions Solutions](../user-guide/2-configure-llm.md)。
+> **提示**：AI Chat 功能需要配置 LLM 后端（如 Ollama），配置方法请参考 [NeoMind 快速入门](../user-guide/1-install-setup.md) 或 [配置 LLM 后端](../user-guide/2-configure-llm.md)。
 
 ---
 

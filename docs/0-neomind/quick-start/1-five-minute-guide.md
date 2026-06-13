@@ -40,7 +40,7 @@ tags: [NeoMind, 快速开始]
 ### 方式二：服务器部署
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/camthink-ai/NeoMind/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/camthink-ai/NeoMind/main/scripts/install.sh | sh
 ```
 
 启动后浏览器访问 `http://localhost:9375`。

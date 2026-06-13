@@ -91,7 +91,7 @@ NeoMind 是一个模块化生态，按**开发目标**分成四个独立仓库�
 **流程概览**（详见 [扩展开发实战](./7-extension-development.md)）：
 
 1. 用 SDK 模板创建 crate
-2. 实现 `ExtensionHandler` trait，用 `neomind_export!` 导出
+2. 实现 `Extension` trait，用 `neomind_export!` 导出
 3. 声明 capability（`network`、`filesystem`、`ml-model` 等）
 4. （可选）打包 ML 模型，使用 lazy-load 生命周期
 5. `cargo build --release` 后打包成 `.nmext`

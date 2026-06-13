@@ -130,7 +130,7 @@ hello, please analyse the history data and result of 'face recognition', reply i
 ### Related Documentation
 
 - [NeoMind Quick Start](../user-guide/1-install-setup.md)
-- [AI Agent and Extensions Solutions](./1-object-detection.md)
+- [Object Detection Use Case](./1-object-detection.md)
 - [NE101 Quick Start](../../2-neoeyes-ne101-series/1-quick-start.md)
 - [NE301 Quick Start](../../5-neoeyes-ne301-series/1-quick-start.md)
 

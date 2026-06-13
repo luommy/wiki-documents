@@ -210,7 +210,7 @@ DSL 人类可读——你一眼就能看出"什么时候触发、做什么"。�
 | `DO` | 执行动作 | `notify("email", "高温告警")` |
 | `END` | 结束 | `END` |
 
-> 详见规则引擎文档（即将上线）。
+> 详见 [自动化规则](../user-guide/7-automation-rules.md)。
 
 ### Message Channel（消息渠道）
 

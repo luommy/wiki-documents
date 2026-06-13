@@ -134,7 +134,7 @@ hello, please analyse the history data and result of ‘face recognition’ , re
 ### 相关文档
 
 - [NeoMind 快速入门](../user-guide/1-install-setup.md)
-- [AI Agent and Extensions Solutions](./1-object-detection.md)
+- [目标检测应用案例](./1-object-detection.md)
 - [NE101 Quick Start](../../2-neoeyes-ne101-series/1-quick-start.md)
 - [NE301 Quick Start](../../5-neoeyes-ne301-series/1-quick-start.md)
 

@@ -210,7 +210,7 @@ The text syntax used to define rules. It uses a four-segment structure of `RULE`
 | `DO` | Action | `notify("email", "High temperature alert")` |
 | `END` | Close | `END` |
 
-> See the rule engine doc (coming soon).
+> See [Automation Rules](../user-guide/7-automation-rules.md).
 
 ### Message Channel
 

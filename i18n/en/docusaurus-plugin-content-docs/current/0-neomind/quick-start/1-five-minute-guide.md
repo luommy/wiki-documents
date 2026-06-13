@@ -40,7 +40,7 @@ Download the installer for your platform from [GitHub Releases](https://github.c
 ### Option B: Server Deploy
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/camthink-ai/NeoMind/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/camthink-ai/NeoMind/main/scripts/install.sh | sh
 ```
 
 After startup, open `http://localhost:9375` in your browser.

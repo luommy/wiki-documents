@@ -136,7 +136,7 @@ Hello, what's the OCR result of my device ne301-new? Reply in English.
 
 ![](https://resources.camthink.ai/wiki/img/ai-application/neomind/ocr-solution/ai-chat-test.png)
 
-> **Tip**: AI Chat requires an LLM backend (e.g., Ollama). For configuration, refer to [NeoMind Quick Start](../user-guide/1-install-setup.md) or [AI Agent and Extensions Solutions](../user-guide/2-configure-llm.md).
+> **Tip**: AI Chat requires an LLM backend (e.g., Ollama). For configuration, refer to [NeoMind Quick Start](../user-guide/1-install-setup.md) or [Configure LLM Backend](../user-guide/2-configure-llm.md).
 
 ---
 
