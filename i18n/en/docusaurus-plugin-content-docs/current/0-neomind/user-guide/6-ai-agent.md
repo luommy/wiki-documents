@@ -193,6 +193,12 @@ If concurrency is full, the scheduler skips the current execution (retries on ne
 | [Devices](./3-onboard-device.md) | Focused mode binds device metrics |
 | [AI Chat](./5-ai-chat.md) | Two AI operation modes, complementary |
 
+## Next Steps
+
+- **[Automation Rules](./7-automation-rules.md)** — Use JSON rules for deterministic triggers and Agents for fuzzy judgment — they complement each other
+- **[Notifications](./8-notifications.md)** — Agent needs to notify ops after analysis? Configure notification channels first
+- **[Extensions](./9-extensions.md)** — Agents can call commands from installed extensions (YOLO detection, OCR, etc.)
+
 ---
 
 *Last updated: 2026-06-13 · NeoMind v0.8.11*

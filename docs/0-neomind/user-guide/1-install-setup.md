@@ -184,6 +184,15 @@ systemctl status neomind.service
 
 常见问题（端口占用、LLM 连接失败、MQTT 不通）见 [故障排查](./10-troubleshooting.md)。
 
+## 下一步
+
+NeoMind 已跑起来了？接下来按顺序：
+
+1. **[配置 LLM 后端](./2-configure-llm.md)** — 接入 Ollama 或云端模型，解锁 AI 能力
+2. **[接入设备](./3-onboard-device.md)** — 用 onboarding 向导把第一个设备连进来
+3. **[使用仪表板](./4-use-dashboard.md)** — 可视化遥测数据
+4. **[AI Chat](./5-ai-chat.md)** — 用自然语言操作系统
+
 ---
 
 *最后更新: 2026-06-12 · NeoMind v0.8.11*

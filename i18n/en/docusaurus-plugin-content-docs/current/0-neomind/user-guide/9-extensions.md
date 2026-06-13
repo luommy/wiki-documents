@@ -173,6 +173,12 @@ See [Troubleshooting](./10-troubleshooting.md) for more.
 
 Extension development is covered in the [Developer Guide](../developer-guide/7-extension-development.md), including a complete tutorial for creating extensions from scratch.
 
+## Next Steps
+
+- **[Use Cases](../use-cases/1-object-detection.md)** — See extensions in real-world scenarios (object detection / OCR / face recognition)
+- **[Dashboard](./4-use-dashboard.md)** — How to display extension-provided visual components on dashboards
+- **[AI Agent](./6-ai-agent.md)** — Let Agents call extension commands for automated inspection
+
 ---
 
 *Last updated: 2026-06-13 · NeoMind v0.8.11*

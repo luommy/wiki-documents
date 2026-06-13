@@ -173,6 +173,12 @@ weather-forecast.nep
 
 扩展开发见 [开发指南](../developer-guide/7-extension-development.md)，包含从零创建扩展的完整教程。
 
+## 下一步
+
+- **[应用案例](../use-cases/1-object-detection.md)** — 看扩展在实际场景中怎么用（目标检测 / OCR / 人脸识别）
+- **[仪表板](./4-use-dashboard.md)** — 扩展提供的可视化组件怎么在仪表板上展示
+- **[AI Agent](./6-ai-agent.md)** — 让 Agent 调用扩展命令，实现自动化巡检
+
 ---
 
 *最后更新: 2026-06-13 · NeoMind v0.8.11*

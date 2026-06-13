@@ -184,6 +184,15 @@ systemctl status neomind.service
 
 For common issues (port conflicts, LLM connection failures, MQTT unreachable), see [Troubleshooting](./10-troubleshooting.md).
 
+## Next Steps
+
+NeoMind is running? Here's the recommended order:
+
+1. **[Configure LLM Backend](./2-configure-llm.md)** — Connect Ollama or a cloud model to enable AI features
+2. **[Onboard a Device](./3-onboard-device.md)** — Use the onboarding wizard to connect your first device
+3. **[Use Dashboard](./4-use-dashboard.md)** — Visualize telemetry data
+4. **[AI Chat](./5-ai-chat.md)** — Control the system with natural language
+
 ---
 
 *Last updated: 2026-06-12 · NeoMind v0.8.11*

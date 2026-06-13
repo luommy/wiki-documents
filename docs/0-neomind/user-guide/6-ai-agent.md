@@ -193,6 +193,12 @@ neomind agent invoke <agent_id> "检查所有传感器最新读数"
 | [设备](./3-onboard-device.md) | Focused 模式绑定设备指标 |
 | [AI Chat](./5-ai-chat.md) | 两种 AI 运行形态，互为补充 |
 
+## 下一步
+
+- **[自动化规则](./7-automation-rules.md)** — 用 JSON 规则做确定性触发，Agent 做模糊判断，两者互补
+- **[通知](./8-notifications.md)** — Agent 分析后需要通知运维人员？先配置通知渠道
+- **[扩展](./9-extensions.md)** — Agent 可以调用已安装扩展的命令（YOLO 检测、OCR 等）
+
 ---
 
 *最后更新: 2026-06-13 · NeoMind v0.8.11*
