@@ -159,7 +159,7 @@ HTTP 状态码遵循惯例：4xx 客户端错误、5xx 服务端错误。从 `er
 | GET | `/agents/:id` | Agent 详情 |
 | PUT | `/agents/:id` | 更新 Agent |
 | DELETE | `/agents/:id` | 删除 Agent |
-| POST | `/agents/:id/control` | 控制运行（body `{"status": "start"}` / `"stop"` / `"pause"`） |
+| POST | `/agents/:id/status` | 控制运行（body `{"status": "active"}` / `"paused"`） |
 | GET | `/agents/:id/executions` | 执行历史 |
 
 > **创建 Agent 必填字段**：`user_prompt`（必填）、`schedule: {"schedule_type": "..."}`（必填）。无资源绑定时需 `execution_mode: "free"`。

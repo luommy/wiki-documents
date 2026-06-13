@@ -161,11 +161,11 @@ neomind agent list
 neomind agent get <agent_id>
 
 # Activate / pause
-neomind agent status <agent_id> --status active
-neomind agent status <agent_id> --status paused
+neomind agent control <agent_id> active
+neomind agent control <agent_id> paused
 
-# Manually trigger execution
-neomind agent run <agent_id>
+# Manually trigger execution (with input hint)
+neomind agent invoke <agent_id> "Check all sensor readings"
 ```
 
 ## Concurrency & Timeout

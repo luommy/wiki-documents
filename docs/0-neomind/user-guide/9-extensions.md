@@ -1,5 +1,5 @@
 ---
-description: "NeoMind 扩展管理指南：安装与卸载扩展（.nmext）、官方扩展市场、扩展能力（指标/命令/视觉）、进程隔离与崩溃保护、配置参数。"
+description: "NeoMind 扩展管理指南：安装与卸载扩展（.nep）、官方扩展市场、扩展能力（指标/命令/视觉）、进程隔离与崩溃保护、配置参数。"
 keywords: [NeoMind, 扩展, extension, 安装, 市场, 进程隔离]
 tags: [NeoMind, 用户指南]
 ---
@@ -39,7 +39,7 @@ tags: [NeoMind, 用户指南]
 
 1. 进入 **Extensions** 页签
 2. 点击 **Install Extension** 或 **Upload**
-3. 上传 `.nmext` 包（从 [NeoMind-Extensions](https://github.com/camthink-ai/NeoMind-Extensions/releases) 下载）
+3. 上传 `.nep` 包（从 [NeoMind-Extensions](https://github.com/camthink-ai/NeoMind-Extensions/releases) 下载）
 4. NeoMind 自动解包、验证 ABI 版本、加载
 
 安装后扩展自动启动。如果扩展声明了 `config_parameters`（如 API Key），需先配置参数才能正常运行。
@@ -48,16 +48,16 @@ tags: [NeoMind, 用户指南]
 
 ```bash
 # 安装扩展
-neomind extension install /path/to/weather-forecast.nmext
+neomind extension install /path/to/weather-forecast.nep
 
 # 从 URL 安装
-neomind extension install https://github.com/camthink-ai/NeoMind-Extensions/releases/download/v0.6.1/weather-forecast-v0.6.1.nmext
+neomind extension install https://github.com/camthink-ai/NeoMind-Extensions/releases/download/v0.6.1/weather-forecast-v0.6.1.nep
 
 # 列出已安装扩展
 neomind extension list
 
 # 查看扩展详情（指标、命令、配置参数）
-neomind extension get <extension_id>
+neomind extension info <extension_id>
 
 # 卸载
 neomind extension uninstall <extension_id>
@@ -69,7 +69,7 @@ neomind extension uninstall <extension_id>
 
 > 「帮我安装天气扩展」
 
-LLM 会引导你上传 `.nmext` 包或提供下载链接。
+LLM 会引导你上传 `.nep` 包或提供下载链接。
 
 ## 配置扩展
 
@@ -90,17 +90,14 @@ LLM 会引导你上传 `.nmext` 包或提供下载链接。
 | **Error** | 红色 | 扩展崩溃或加载失败 |
 | **Warning** | 黄色 | 扩展运行中但有异常（如 API 限流） |
 
-### 启停扩展
+### 重载扩展
 
 ```bash
-# 停止扩展
-neomind extension stop <extension_id>
+# 重载扩展（配置变更后重启进程）
+neomind extension reload <extension_id>
 
-# 启动扩展
-neomind extension start <extension_id>
-
-# 重启扩展
-neomind extension restart <extension_id>
+# 查看扩展状态
+neomind extension status <extension_id>
 ```
 
 ## 崩溃保护
@@ -145,12 +142,12 @@ DO
 END
 ```
 
-## 扩展包格式（.nmext）
+## 扩展包格式（.nep）
 
-`.nmext` 是 NeoMind 扩展的标准打包格式，本质是一个 ZIP 包：
+`.nep` 是 NeoMind 扩展的标准打包格式，本质是一个 ZIP 包：
 
 ```
-weather-forecast.nmext
+weather-forecast.nep
 ├── manifest.json      # 扩展元数据（ID、名称、版本、ABI 版本、能力声明）
 ├── extension.so       # 编译后的动态库（Linux）
 ├── extension.dylib    # macOS

@@ -214,7 +214,7 @@ Agent 的核心是一个 **Think-Act-Observe 循环**：
 
 **例子**：用户问"温度超过 30 度通知我"
 - Think: 需要先查当前温度 → Act: `neomind device get demo-sensor temperature` → Observe: 25.6°C
-- Think: 需要创建规则 → Act: `neomind rule create --dsl "RULE ... WHEN ... DO ..."` → Observe: 规则已创建
+- Think: 需要创建规则 → Act: `neomind rule create --json '{"name":"...","condition":{...},"actions":[...]}'` → Observe: 规则已创建
 - Think: 需要确认通知渠道 → Act: 检查现有渠道 → Observe: 有 email 渠道
 - Respond: "已创建规则：当 demo-sensor 温度超过 30°C 时通过 email 通知你"
 </details>

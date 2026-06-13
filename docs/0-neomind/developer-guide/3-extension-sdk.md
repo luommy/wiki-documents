@@ -200,7 +200,7 @@ async fn execute_command(&self, cmd: &str, args: &Value) -> Result<Value> {
 
 **交叉编译**建议用 `cross` 或 GitHub Actions 矩阵（NeoMind-Extensions 仓库的 CI 是参考样板）。
 
-**打包成 `.nmext`**：把多平台二进制 + metadata.json + （可选）模型文件打成单个 `.nmext` 归档，用户在 NeoMind Extensions 页一键安装，runner 会自动挑匹配当前平台的二进制。
+**打包成 `.nep`**：把多平台二进制 + metadata.json + （可选）模型文件打成单个 `.nep` 归档，用户在 NeoMind Extensions 页一键安装，runner 会自动挑匹配当前平台的二进制。
 
 ## 验证与调试
 

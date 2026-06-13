@@ -35,7 +35,7 @@ NeoMind 是一个模块化生态，按**开发目标**分成四个独立仓库�
 | 仓库 | 语言 | 用途 | 二进制 / 产物 |
 |------|------|------|--------------|
 | **[NeoMind](https://github.com/camthink-ai/NeoMind)** | Rust + TypeScript | 核心平台（后端 + 前端 + Tauri 桌面） | `neomind` 服务、`neomind-extension-runner`、Web 前端 |
-| **[NeoMind-Extensions](https://github.com/camthink-ai/NeoMind-Extensions)** | Rust | 官方扩展市场（天气 / YOLO / OCR / 人脸 / 流媒体 / 集成桥） | `.nmext` 扩展包 |
+| **[NeoMind-Extensions](https://github.com/camthink-ai/NeoMind-Extensions)** | Rust | 官方扩展市场（天气 / YOLO / OCR / 人脸 / 流媒体 / 集成桥） | `.nep` 扩展包 |
 | **[NeoMind-DeviceTypes](https://github.com/camthink-ai/NeoMind-DeviceTypes)** | JSON（+ 元数据） | 设备类型定义（指标 / 指令 / 默认配置） | JSON 类型文件 |
 | **[NeoMind-Dashboard-Components](https://github.com/camthink-ai/NeoMind-Dashboard-Components)** | TypeScript / React | Dashboard 组件市场 | JS 组件包 |
 
@@ -94,7 +94,7 @@ NeoMind 是一个模块化生态，按**开发目标**分成四个独立仓库�
 2. 实现 `Extension` trait，用 `neomind_export!` 导出
 3. 声明 capability（`network`、`filesystem`、`ml-model` 等）
 4. （可选）打包 ML 模型，使用 lazy-load 生命周期
-5. `cargo build --release` 后打包成 `.nmext`
+5. `cargo build --release` 后打包成 `.nep`
 6. 上传到 NeoMind 的 Extensions 页，或提交到 Extensions 仓库
 
 ## Dashboard 组件开发

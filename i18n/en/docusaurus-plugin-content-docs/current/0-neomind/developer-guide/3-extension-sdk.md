@@ -200,7 +200,7 @@ Extensions must support every NeoMind target platform — one binary per platfor
 
 **Cross-compile** with `cross` or a GitHub Actions matrix (the NeoMind-Extensions repo CI is the canonical template).
 
-**Packaging a `.nmext`**: bundle the multi-platform binaries + metadata.json + (optional) model files into a single `.nmext` archive. Users install it from the NeoMind Extensions page in one click; the runner picks the binary matching the current platform.
+**Packaging a `.nep`**: bundle the multi-platform binaries + metadata.json + (optional) model files into a single `.nep` archive. Users install it from the NeoMind Extensions page in one click; the runner picks the binary matching the current platform.
 
 ## Verify & Debug
 

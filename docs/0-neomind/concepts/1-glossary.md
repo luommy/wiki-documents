@@ -42,7 +42,7 @@ mindmap
     扩展
       Extension
       Capability
-      .nmext
+      .nep
       neomind_export!
     基础设施
       MQTT Broker
@@ -291,9 +291,9 @@ graph LR
 一个天气扩展只需要 `network` 能力。如果它试图读文件，NeoMind 会直接拒绝。这样即使扩展有 bug 被攻击，影响范围也被限制在声明的权限内。
 :::
 
-### .nmext
+### .nep
 
-NeoMind 扩展的分发包格式。一个 `.nmext` 文件是 zip 归档，包含多平台编译产物 + `metadata.json` + 可选模型文件。
+NeoMind 扩展的分发包格式。一个 `.nep` 文件是 zip 归档，包含多平台编译产物 + `metadata.json` + 可选模型文件。
 
 用户在 Web UI 一键安装时，runner 自动选择匹配当前平台的二进制——**不需要关心目标系统是 macOS 还是 Linux，是 ARM 还是 x86**。
 

@@ -1,5 +1,5 @@
 ---
-description: "用 neomind-extension-sdk 从零开发一个 NeoMind 扩展的实战指南：脚手架、Cargo.toml 配置、Extension trait 实现、neomind_export! 导出、跨平台编译、打包 .nmext、安装与调试。"
+description: "用 neomind-extension-sdk 从零开发一个 NeoMind 扩展的实战指南：脚手架、Cargo.toml 配置、Extension trait 实现、neomind_export! 导出、跨平台编译、打包 .nep、安装与调试。"
 keywords: [NeoMind, 扩展开发, extension, 实战, FFI, 打包]
 tags: [NeoMind, 开发指南]
 ---
@@ -192,7 +192,7 @@ curl -X POST http://localhost:9375/api/extensions/counter/commands/increment \
 
 在仪表板里加一个数值卡，数据源选 `extension:counter:counter`，即可看到实时数值。
 
-## Step 7：跨平台打包 `.nmext`
+## Step 7：跨平台打包 `.nep`
 
 单平台 `.dylib` 只能在 macOS 跑。要分发，需多平台编译并打包：
 
@@ -203,17 +203,17 @@ cross build --release --target aarch64-unknown-linux-gnu
 cross build --release --target x86_64-pc-windows-msvc
 # Apple Silicon / Intel macOS 各一份
 
-# 打包成 .nmext（一个 zip 归档）
-mkdir -p nmext/{linux-x64,linux-arm64,windows-x64,darwin-arm64,darwin-x64}
-cp target/x86_64-unknown-linux-gnu/release/libneomind_extension_counter.so nmext/linux-x64/
+# 打包成 .nep（一个 zip 归档）
+mkdir -p nep/{linux-x64,linux-arm64,windows-x64,darwin-arm64,darwin-x64}
+cp target/x86_64-unknown-linux-gnu/release/libneomind_extension_counter.so nep/linux-x64/
 # ... 其他平台
-cat > nmext/metadata.json <<EOF
+cat > nep/metadata.json <<EOF
 { "id": "counter", "version": "1.0.0", "platforms": { ... } }
 EOF
-cd nmext && zip -r ../counter-1.0.0.nmext .
+cd nep && zip -r ../counter-1.0.0.nep .
 ```
 
-`.nmext` 是约定俗成的归档格式（参考 NeoMind-Extensions 仓库的 CI 脚本）。用户在 Web UI 一键安装时，runner 会挑当前平台对应的二进制加载。
+`.nep` 是约定俗成的归档格式（参考 NeoMind-Extensions 仓库的 CI 脚本）。用户在 Web UI 一键安装时，runner 会挑当前平台对应的二进制加载。
 
 ## 进阶：加 ML 模型 / 网络 / 事件订阅
 
@@ -243,7 +243,7 @@ cd nmext && zip -r ../counter-1.0.0.nmext .
 | 命令调用报 "permission denied" | 缺少对应 capability 声明 |
 | Agent 看不到我的命令 | `commands()` 没实现，或 `llm_hints` 字段为空（影响 LLM 发现） |
 | 仪表板选不到我的 metric | `metrics()` 没实现，或 name 拼写与 DataSourceId 不一致 |
-| 跨平台分发报错 | 漏了某个目标平台的二进制；`.nmext` 里 metadata.json 的 platforms 字段不全 |
+| 跨平台分发报错 | 漏了某个目标平台的二进制；`.nep` 里 metadata.json 的 platforms 字段不全 |
 
 ## 下一步
 

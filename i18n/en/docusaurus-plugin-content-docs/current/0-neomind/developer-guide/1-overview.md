@@ -35,7 +35,7 @@ What do you want to do?
 | Repo | Language | Purpose | Artifact |
 |------|----------|---------|----------|
 | **[NeoMind](https://github.com/camthink-ai/NeoMind)** | Rust + TypeScript | Core platform (backend + frontend + Tauri desktop) | `neomind` server, `neomind-extension-runner`, web frontend |
-| **[NeoMind-Extensions](https://github.com/camthink-ai/NeoMind-Extensions)** | Rust | Official extension marketplace (weather / YOLO / OCR / face / streaming / bridges) | `.nmext` extension packages |
+| **[NeoMind-Extensions](https://github.com/camthink-ai/NeoMind-Extensions)** | Rust | Official extension marketplace (weather / YOLO / OCR / face / streaming / bridges) | `.nep` extension packages |
 | **[NeoMind-DeviceTypes](https://github.com/camthink-ai/NeoMind-DeviceTypes)** | JSON (+ metadata) | Device type definitions (metrics / commands / defaults) | JSON type files |
 | **[NeoMind-Dashboard-Components](https://github.com/camthink-ai/NeoMind-Dashboard-Components)** | TypeScript / React | Dashboard widget marketplace | JS component packages |
 
@@ -94,7 +94,7 @@ See the repo README for the full schema and submission conventions.
 2. Implement the `Extension` trait and export with `neomind_export!`
 3. Declare capabilities (`network`, `filesystem`, `ml-model`, …)
 4. (Optional) bundle ML models with lazy-load lifecycle
-5. `cargo build --release` and pack into a `.nmext`
+5. `cargo build --release` and pack into a `.nep`
 6. Upload via the Extensions page in NeoMind, or submit to the Extensions repo
 
 ## Dashboard Component Development

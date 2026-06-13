@@ -214,7 +214,7 @@ This loop runs at most 30 rounds (configurable) to prevent infinite loops. Each 
 
 **Example**: user asks "notify me when temperature exceeds 30"
 - Think: need to check current temperature → Act: `neomind device get demo-sensor temperature` → Observe: 25.6°C
-- Think: need to create a rule → Act: `neomind rule create --dsl "RULE ... WHEN ... DO ..."` → Observe: rule created
+- Think: need to create a rule → Act: `neomind rule create --json '{"name":"...","condition":{...},"actions":[...]}'` → Observe: rule created
 - Think: need to confirm notification channel → Act: check existing channels → Observe: email channel exists
 - Respond: "Created a rule: when demo-sensor temperature exceeds 30°C, you'll be notified via email"
 </details>

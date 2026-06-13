@@ -42,7 +42,7 @@ mindmap
     Extension
       Extension
       Capability
-      .nmext
+      .nep
       neomind_export!
     Infrastructure
       MQTT Broker
@@ -291,9 +291,9 @@ A permission an extension must declare at startup. Any capability not declared i
 A weather extension only needs the `network` capability. If it tries to read a file, NeoMind denies it outright. This way, even if an extension has a bug and gets exploited, the blast radius is limited to its declared permissions.
 :::
 
-### .nmext
+### .nep
 
-The distribution package format for NeoMind extensions. A `.nmext` file is a zip archive containing multi-platform binaries + `metadata.json` + optional model files.
+The distribution package format for NeoMind extensions. A `.nep` file is a zip archive containing multi-platform binaries + `metadata.json` + optional model files.
 
 When a user clicks install in the Web UI, the runner automatically selects the binary matching the current platform — **no need to worry about whether the target is macOS or Linux, ARM or x86**.
 

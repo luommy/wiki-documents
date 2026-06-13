@@ -1,5 +1,5 @@
 ---
-description: "NeoMind extension management guide: installing and uninstalling extensions (.nmext), official marketplace, extension capabilities (metrics/commands/components), process isolation and crash protection, configuration."
+description: "NeoMind extension management guide: installing and uninstalling extensions (.nep), official marketplace, extension capabilities (metrics/commands/components), process isolation and crash protection, configuration."
 keywords: [NeoMind, extension, install, marketplace, process isolation]
 tags: [NeoMind, User Guide]
 ---
@@ -39,7 +39,7 @@ See [Use Cases](../use-cases/1-object-detection.md) for end-to-end examples.
 
 1. Go to **Extensions** tab
 2. Click **Install Extension** or **Upload**
-3. Upload the `.nmext` package (downloaded from [NeoMind-Extensions](https://github.com/camthink-ai/NeoMind-Extensions/releases))
+3. Upload the `.nep` package (downloaded from [NeoMind-Extensions](https://github.com/camthink-ai/NeoMind-Extensions/releases))
 4. NeoMind auto-unpacks, verifies ABI version, and loads
 
 Extensions auto-start after installation. If the extension declares `config_parameters` (e.g., API Key), you must configure them before it can run properly.
@@ -48,16 +48,16 @@ Extensions auto-start after installation. If the extension declares `config_para
 
 ```bash
 # Install extension
-neomind extension install /path/to/weather-forecast.nmext
+neomind extension install /path/to/weather-forecast.nep
 
 # Install from URL
-neomind extension install https://github.com/camthink-ai/NeoMind-Extensions/releases/download/v0.6.1/weather-forecast-v0.6.1.nmext
+neomind extension install https://github.com/camthink-ai/NeoMind-Extensions/releases/download/v0.6.1/weather-forecast-v0.6.1.nep
 
 # List installed extensions
 neomind extension list
 
 # View extension details (metrics, commands, config params)
-neomind extension get <extension_id>
+neomind extension info <extension_id>
 
 # Uninstall
 neomind extension uninstall <extension_id>
@@ -69,7 +69,7 @@ Just tell [AI Chat](./5-ai-chat.md):
 
 > "Help me install the weather extension"
 
-The LLM guides you to upload the `.nmext` package or provide a download link.
+The LLM guides you to upload the `.nep` package or provide a download link.
 
 ## Configuring Extensions
 
@@ -90,17 +90,14 @@ Configuration parameters have type validation (string / integer / boolean / enum
 | **Error** | Red | Extension crashed or failed to load |
 | **Warning** | Yellow | Extension running with issues (e.g., API rate limited) |
 
-### Start/Stop Extensions
+### Reloading Extensions
 
 ```bash
-# Stop extension
-neomind extension stop <extension_id>
+# Reload extension (restarts process after config changes)
+neomind extension reload <extension_id>
 
-# Start extension
-neomind extension start <extension_id>
-
-# Restart extension
-neomind extension restart <extension_id>
+# Check extension status
+neomind extension status <extension_id>
 ```
 
 ## Crash Protection
@@ -145,12 +142,12 @@ DO
 END
 ```
 
-## Extension Package Format (.nmext)
+## Extension Package Format (.nep)
 
-`.nmext` is the standard NeoMind extension package format — essentially a ZIP archive:
+`.nep` is the standard NeoMind extension package format — essentially a ZIP archive:
 
 ```
-weather-forecast.nmext
+weather-forecast.nep
 ├── manifest.json      # Extension metadata (ID, name, version, ABI version, capabilities)
 ├── extension.so       # Compiled dynamic library (Linux)
 ├── extension.dylib    # macOS

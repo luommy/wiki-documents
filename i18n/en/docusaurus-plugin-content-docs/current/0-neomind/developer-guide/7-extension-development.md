@@ -1,5 +1,5 @@
 ---
-description: "End-to-end guide for building a NeoMind extension from scratch with neomind-extension-sdk: scaffolding, Cargo.toml, Extension trait implementation, neomind_export!, cross-platform compile, .nmext packaging, install & debug."
+description: "End-to-end guide for building a NeoMind extension from scratch with neomind-extension-sdk: scaffolding, Cargo.toml, Extension trait implementation, neomind_export!, cross-platform compile, .nep packaging, install & debug."
 keywords: [NeoMind, extension development, hands-on, FFI, packaging]
 tags: [NeoMind, Developer Guide]
 ---
@@ -192,7 +192,7 @@ Or in **AI Chat** say: "Call the counter extension's increment command, add 3" â
 
 On the dashboard, add a value card widget, pick data source `extension:counter:counter`, and the live value shows up.
 
-## Step 7: Cross-Platform `.nmext` Packaging
+## Step 7: Cross-Platform `.nep` Packaging
 
 A single-platform `.dylib` only runs on macOS. To distribute you must compile all targets and package:
 
@@ -203,17 +203,17 @@ cross build --release --target aarch64-unknown-linux-gnu
 cross build --release --target x86_64-pc-windows-msvc
 # Apple Silicon / Intel macOS each get their own copy
 
-# Package into .nmext (a zip archive)
-mkdir -p nmext/{linux-x64,linux-arm64,windows-x64,darwin-arm64,darwin-x64}
-cp target/x86_64-unknown-linux-gnu/release/libneomind_extension_counter.so nmext/linux-x64/
+# Package into .nep (a zip archive)
+mkdir -p nep/{linux-x64,linux-arm64,windows-x64,darwin-arm64,darwin-x64}
+cp target/x86_64-unknown-linux-gnu/release/libneomind_extension_counter.so nep/linux-x64/
 # ... other platforms
-cat > nmext/metadata.json <<EOF
+cat > nep/metadata.json <<EOF
 { "id": "counter", "version": "1.0.0", "platforms": { ... } }
 EOF
-cd nmext && zip -r ../counter-1.0.0.nmext .
+cd nep && zip -r ../counter-1.0.0.nep .
 ```
 
-`.nmext` is the conventional archive format (see the NeoMind-Extensions repo's CI scripts for the reference). When a user installs via the Web UI one-click flow, the runner picks the binary matching the current platform.
+`.nep` is the conventional archive format (see the NeoMind-Extensions repo's CI scripts for the reference). When a user installs via the Web UI one-click flow, the runner picks the binary matching the current platform.
 
 ## Advanced: ML Models / Network / Event Subscriptions
 

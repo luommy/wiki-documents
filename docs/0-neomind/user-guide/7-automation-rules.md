@@ -186,15 +186,15 @@ END
 ### 方式二：CLI
 
 ```bash
-# 创建规则（DSL 通过 --dsl 参数传入）
-neomind rule create --dsl 'RULE "高温告警" WHEN device("sensor-01").temperature > 30 DO NOTIFY "温度过高" END'
+# 创建规则（JSON 格式）
+neomind rule create --json '{"name":"高温告警","condition":{"condition_type":"comparison","source":"device:sensor-01:temperature","operator":"greater_than","threshold":30},"actions":[{"type":"notify","message":"温度过高"}]}'
 
 # 列出所有规则
 neomind rule list
 
-# 启用/暂停规则
-neomind rule status <rule_id> --status enabled
-neomind rule status <rule_id> --status disabled
+# 启用 / 禁用规则
+neomind rule enable <rule_id>
+neomind rule disable <rule_id>
 
 # 删除规则
 neomind rule delete <rule_id>

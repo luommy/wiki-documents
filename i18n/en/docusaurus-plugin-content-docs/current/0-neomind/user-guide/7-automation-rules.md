@@ -186,15 +186,15 @@ END
 ### Option 2: CLI
 
 ```bash
-# Create rule (DSL passed via --dsl flag)
-neomind rule create --dsl 'RULE "Temp Alert" WHEN device("sensor-01").temperature > 30 DO NOTIFY "Too hot" END'
+# Create rule (JSON format)
+neomind rule create --json '{"name":"Temp Alert","condition":{"condition_type":"comparison","source":"device:sensor-01:temperature","operator":"greater_than","threshold":30},"actions":[{"type":"notify","message":"Too hot"}]}'
 
 # List all rules
 neomind rule list
 
-# Enable/disable rule
-neomind rule status <rule_id> --status enabled
-neomind rule status <rule_id> --status disabled
+# Enable / disable rule
+neomind rule enable <rule_id>
+neomind rule disable <rule_id>
 
 # Delete rule
 neomind rule delete <rule_id>

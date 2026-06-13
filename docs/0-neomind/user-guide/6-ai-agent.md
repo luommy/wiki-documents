@@ -161,11 +161,11 @@ neomind agent list
 neomind agent get <agent_id>
 
 # 激活 / 暂停
-neomind agent status <agent_id> --status active
-neomind agent status <agent_id> --status paused
+neomind agent control <agent_id> active
+neomind agent control <agent_id> paused
 
-# 手动触发执行
-neomind agent run <agent_id>
+# 手动触发执行（附带输入提示）
+neomind agent invoke <agent_id> "检查所有传感器最新读数"
 ```
 
 ## 并发与超时
