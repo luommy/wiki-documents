@@ -175,7 +175,7 @@ neomind system info
 # 看扩展日志
 ls data/logs/                # 扩展日志在 这里
 neomind extension list       # 看扩展状态
-neomind extension get <ID>   # 看具体扩展的最近错误
+neomind extension info <ID>   # 看具体扩展的最近错误
 ```
 
 **修复**：

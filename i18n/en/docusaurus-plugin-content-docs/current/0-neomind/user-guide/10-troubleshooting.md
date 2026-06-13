@@ -175,7 +175,7 @@ Pass the credentials into device code: `client.connect(client_id, username, pass
 # Find extension logs
 ls data/logs/
 neomind extension list       # status overview
-neomind extension get <ID>   # recent error for a specific extension
+neomind extension info <ID>   # recent error for a specific extension
 ```
 
 **Fix**:

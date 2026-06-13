@@ -55,8 +55,10 @@ Conditions determine when a rule triggers. Three types are supported:
 | `not_equal` | Not equal |
 | `contains` | Contains (string) |
 | `starts_with` | Starts with (string) |
+| `ends_with` | Ends with (string) |
+| `regex` | Regex match (string) |
 
-`source` uses the DataSourceId format `{type}:{id}:{field}`, e.g. `device:sensor-01:temperature` or `extension:weather:temp`.
+`source` uses the DataSourceId format `{type}:{id}:{field}`, e.g. `device:sensor-01:temperature` or `extension:weather:temp`. String comparison operators (`contains`/`starts_with`/`ends_with`/`regex`) use the `threshold_value` field for the match text, not the numeric `threshold`.
 
 **Range** — triggers when value is within [min, max]:
 

@@ -55,8 +55,10 @@ tags: [NeoMind, 用户指南]
 | `not_equal` | 不等于 |
 | `contains` | 包含（字符串） |
 | `starts_with` | 前缀匹配（字符串） |
+| `ends_with` | 后缀匹配（字符串） |
+| `regex` | 正则匹配（字符串） |
 
-`source` 使用 DataSourceId 格式 `{type}:{id}:{field}`，如 `device:sensor-01:temperature` 或 `extension:weather:temp`。
+`source` 使用 DataSourceId 格式 `{type}:{id}:{field}`，如 `device:sensor-01:temperature` 或 `extension:weather:temp`。字符串比较运算符（`contains`/`starts_with`/`ends_with`/`regex`）使用 `threshold_value` 字段指定匹配文本，而非数字 `threshold`。
 
 **范围条件（range）**——值在某区间内时触发：
 
