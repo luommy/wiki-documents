@@ -138,17 +138,24 @@ HTTP 状态码遵循惯例：4xx 客户端错误、5xx 服务端错误。从 `er
 | 方法 | 路径 | 说明 |
 |------|------|------|
 | GET | `/rules` | 列出规则 |
-| POST | `/rules` | 创建规则 — **body 必须 `{"dsl": "RULE ... WHEN ... DO ... END"}`**，不是 trigger/actions JSON |
+| POST | `/rules` | 创建规则 — **JSON body**（name / trigger / condition / actions） |
 | GET | `/rules/:id` | 规则详情 |
 | PUT | `/rules/:id` | 更新规则 |
 | DELETE | `/rules/:id` | 删除规则 |
 | POST | `/rules/:id/test` | 试跑规则（不实际触发动作） |
 
-> **关键约定**：规则用 **DSL 字符串**而非结构化 JSON。POST body 形如：
+> **规则用 JSON 格式**（不是 DSL 字符串）。POST body 示例：
 
 ```json
-{ "dsl": "RULE HighTemp\nWHEN device(\"sensor-01\").temperature > 30\nDO notify(\"email\", \"高温\")\nEND" }
+{
+  "name": "高温告警",
+  "trigger": { "trigger_type": "data_change" },
+  "condition": { "condition_type": "comparison", "source": "device:sensor-01:temperature", "operator": "greater_than", "threshold": 30 },
+  "actions": [ { "type": "notify", "message": "温度过高" } ]
+}
 ```
+
+条件类型：`comparison` / `range` / `logical`。动作类型：`notify` / `execute` / `trigger_agent`。触发类型：`data_change` / `schedule` / `manual`。
 
 ### Agents（AI 智能体）
 

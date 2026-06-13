@@ -1,177 +1,214 @@
 ---
-description: "NeoMind automation rules guide: DSL syntax (RULE/WHEN/DO/END), conditions, actions, schedule triggers, Agent integration, with UI and CLI creation examples."
-keywords: [NeoMind, rules, automation, DSL, schedule, alert, trigger]
+description: "NeoMind automation rules guide: JSON rule structure, conditions (comparison/range/logical), actions (notify/execute/trigger_agent), triggers (data_change/schedule/manual), with UI, CLI, API creation examples."
+keywords: [NeoMind, rules engine, automation, JSON, condition, action, schedule, alert, integration]
 tags: [NeoMind, User Guide]
 ---
 
 # Automation Rules
 
-The rule engine lets NeoMind respond autonomously: device data crosses a threshold → automatically notify, send commands, or trigger an AI Agent. Rules are written in a human-readable DSL (Domain Specific Language).
+The rules engine lets NeoMind respond **unattended**: device data crosses a threshold → auto-notify, execute commands, trigger AI Agents. Rules are defined as JSON and created via Web UI, CLI, REST API, or AI Chat.
 
 ## Quick Overview
 
-A rule has three parts — **trigger condition**, **duration** (optional), and **actions**:
+A rule has four parts — **name**, **trigger**, **condition**, **actions** (plus optional duration and cooldown):
 
-```
-RULE "Rule Name"
-WHEN <condition>
-[FOR <duration>]
-DO
-  <action1>
-  <action2>
-END
-```
-
-Minimal example — notify when temperature exceeds 30°C:
-
-```
-RULE "Temperature Alert"
-WHEN device("sensor-01").temperature > 30
-DO
-  NOTIFY "sensor-01 temperature too high: {temperature}C"
-END
+```json
+{
+  "name": "High Temp Alert",
+  "trigger": { "trigger_type": "data_change" },
+  "condition": {
+    "condition_type": "comparison",
+    "source": "device:sensor-01:temperature",
+    "operator": "greater_than",
+    "threshold": 30
+  },
+  "actions": [
+    { "type": "notify", "message": "Too hot: {value}°C", "severity": "critical" }
+  ]
+}
 ```
 
-## DSL Syntax Reference
+## JSON Structure
 
-### Conditions (WHEN)
+### Condition
 
-Conditions determine when a rule triggers. Supports device metrics, extension metrics, logical combinations, and range matching.
+Conditions determine when a rule triggers. Three types are supported:
 
-**Device metric condition**:
+**Comparison**:
 
-```
-WHEN device("<device_id>").<metric> <operator> <value>
+```json
+{
+  "condition_type": "comparison",
+  "source": "device:sensor-01:temperature",
+  "operator": "greater_than",
+  "threshold": 30
+}
 ```
 
 | Operator | Meaning |
 |----------|---------|
-| `>` | Greater than |
-| `<` | Less than |
-| `>=` | Greater than or equal |
-| `<=` | Less than or equal |
-| `==` | Equal |
-| `!=` | Not equal |
+| `greater_than` | Greater than |
+| `less_than` | Less than |
+| `greater_equal` | Greater than or equal |
+| `less_equal` | Less than or equal |
+| `equal` | Equal |
+| `not_equal` | Not equal |
+| `contains` | Contains (string) |
+| `starts_with` | Starts with (string) |
 
-**Extension metric condition** (e.g., weather extension temperature):
+`source` uses the DataSourceId format `{type}:{id}:{field}`, e.g. `device:sensor-01:temperature` or `extension:weather:temp`.
 
-```
-WHEN extension("<extension_id>").<metric> > <value>
-```
+**Range** — triggers when value is within [min, max]:
 
-**Range condition** (triggers when value falls within a range):
-
-```
-WHEN device("sensor-01").temperature BETWEEN 20 AND 25
-```
-
-**Logical combination** (AND / OR / NOT):
-
-```
-WHEN (device("sensor-01").temperature > 30) AND (extension("weather").humidity < 20)
+```json
+{
+  "condition_type": "range",
+  "source": "device:sensor-01:temperature",
+  "min": 20,
+  "max": 25
+}
 ```
 
-### Duration (FOR)
+**Logical** — AND / OR / NOT:
 
-Add `FOR` to require the condition to **hold for a period** before triggering, filtering out sensor jitter:
-
-```
-RULE "Sustained High Temperature"
-WHEN device("sensor-01").temperature > 30
-FOR 5 minutes
-DO
-  NOTIFY "Temperature above 30C for 5 minutes"
-END
-```
-
-Supports `seconds`, `minutes`, `hours` time units.
-
-### Actions (DO)
-
-Actions execute when the condition is met. A rule can have multiple actions executed in order.
-
-| Action | Syntax | Description |
-|--------|--------|-------------|
-| **Send notification** | `NOTIFY "<message>"` | Sends via default channels; supports `{metric}` interpolation |
-| **Channel-specific notify** | `NOTIFY "<msg>" channels: ["email", "slack"]` | Sends to specified notification channels |
-| **Execute device command** | `EXECUTE device("<id>").<command>(param=value)` | Sends control command to device |
-| **Set device property** | `SET device("<id>").<property> = <value>` | Modifies device property |
-| **Create alert** | `CREATE_ALERT title: "<title>", message: "<msg>", severity: "critical"` | Generates system alert |
-| **Trigger AI Agent** | `TRIGGER_AGENT "<agent_id>" INPUT "<hint>"` | Calls AI Agent for deep analysis |
-| **HTTP request** | `HTTP_REQUEST POST "https://example.com/webhook"` | Calls external HTTP endpoint |
-| **Delay** | `DELAY 10 seconds` | Delays subsequent actions |
-| **Log** | `LOG level: "warn", message: "<msg>"` | Writes to runtime log |
-
-### Trigger Types
-
-Beyond default device-state triggers, rules can trigger **on a schedule**:
-
-**Scheduled trigger (Cron)** — check every 5 minutes:
-
-```
-RULE "Periodic Check"
-TRIGGER SCHEDULE "0 */5 * * * *"
-DO
-  EXECUTE device("sensor-01").read_sensors()
-END
+```json
+{
+  "condition_type": "logical",
+  "operator": "and",
+  "conditions": [
+    { "condition_type": "comparison", "source": "device:sensor-01:temperature", "operator": "greater_than", "threshold": 30 },
+    { "condition_type": "comparison", "source": "device:sensor-01:humidity", "operator": "less_than", "threshold": 20 }
+  ]
+}
 ```
 
-> Cron expression is 6-field: `second minute hour day month weekday`. `"0 */5 * * * *"` = every 5 minutes.
+### Trigger
 
-**Manual trigger** — executes only on API call, no automatic evaluation.
+| Trigger type | Description | JSON |
+|-------------|-------------|------|
+| **Data change** | Evaluates condition when referenced metrics receive new data | `{"trigger_type": "data_change"}` |
+| **Schedule** | Triggers on cron expression | `{"trigger_type": "schedule", "cron": "0 */5 * * * *"}` |
+| **Manual** | Only runs when invoked via API / CLI | `{"trigger_type": "manual"}` |
+
+> Cron expressions are 6-segment: `sec min hour day month weekday`. `"0 */5 * * * *"` = every 5 minutes.
+
+`data_change` triggers automatically extract data sources from the `condition` — no need to specify `sources` manually.
+
+### Actions
+
+Executed when the condition is met. A rule can have multiple actions, executed in order.
+
+| Action | type value | Description |
+|--------|------------|-------------|
+| **Send notification** | `notify` | Message template supports `{value}`, `{source_id}` placeholders |
+| **Execute command** | `execute` | Sends a control command to a device or extension |
+| **Trigger Agent** | `trigger_agent` | Calls an AI Agent for deeper analysis |
+
+**notify action**:
+
+```json
+{ "type": "notify", "message": "Too hot: {value}°C", "severity": "critical" }
+```
+
+severity values: `info`, `warning`, `critical`, `emergency`.
+
+**execute action**:
+
+```json
+{ "type": "execute", "target": "humidifier-01", "target_type": "device", "command": "power_on", "params": { "level": 3 } }
+```
+
+**trigger_agent action**:
+
+```json
+{ "type": "trigger_agent", "agent_id": "diagnostic", "input": "sensor-03 is offline, diagnose the cause" }
+```
+
+### Duration (for_duration) and Cooldown (cooldown)
+
+```json
+{
+  "name": "Sustained High Temp",
+  "trigger": { "trigger_type": "data_change" },
+  "condition": { "condition_type": "comparison", "source": "device:sensor-01:temperature", "operator": "greater_than", "threshold": 30 },
+  "actions": [{ "type": "notify", "message": "Temperature above 30°C for 5 minutes" }],
+  "for_duration": 300,
+  "cooldown": 60
+}
+```
+
+- **`for_duration`** (seconds): condition must hold **continuously** for this long before triggering — prevents sensor jitter false positives
+- **`cooldown`** (seconds): minimum interval between triggers, default 60 seconds
 
 ## Complete Examples
 
-### 1. Temperature & Humidity Alert
+### 1. Combined Temperature + Humidity Alert
 
-When temperature is high and humidity is low, notify via email and Slack, then turn on humidifier:
+High temp and low humidity → notify and turn on humidifier:
 
+```json
+{
+  "name": "Temp Humidity Linkage",
+  "trigger": { "trigger_type": "data_change" },
+  "condition": {
+    "condition_type": "logical",
+    "operator": "and",
+    "conditions": [
+      { "condition_type": "comparison", "source": "device:sensor-01:temperature", "operator": "greater_than", "threshold": 30 },
+      { "condition_type": "comparison", "source": "device:sensor-01:humidity", "operator": "less_than", "threshold": 20 }
+    ]
+  },
+  "actions": [
+    { "type": "notify", "message": "High temp low humidity: {value}°C", "severity": "critical" },
+    { "type": "execute", "target": "humidifier-01", "target_type": "device", "command": "power_on", "params": { "level": 3 } }
+  ]
+}
 ```
-RULE "Temp Humidity Alert"
-WHEN (device("sensor-01").temperature > 30) AND (device("sensor-01").humidity < 20)
-DO
-  NOTIFY "High temp low humidity: {temperature}C / {humidity}%" channels: ["email", "slack"]
-  EXECUTE device("humidifier-01").power_on(level=3)
-END
-```
 
-### 2. Daily Energy Report
+### 2. Scheduled Energy Report
 
-Summarize yesterday's energy consumption at 8 AM daily:
+Trigger an Agent daily at 8 AM to summarize energy:
 
-```
-RULE "Daily Energy Report"
-TRIGGER SCHEDULE "0 8 * * *"
-DO
-  TRIGGER_AGENT "energy-reporter" INPUT "Summarize yesterday's energy and send daily report"
-END
+```json
+{
+  "name": "Daily Energy Report",
+  "trigger": { "trigger_type": "schedule", "cron": "0 8 * * *" },
+  "actions": [
+    { "type": "trigger_agent", "agent_id": "energy-reporter", "input": "Summarize yesterday's energy and send the report" }
+  ]
+}
 ```
 
 ### 3. Extension Metric Alert
 
-Weather extension forecasts temperature above 35°C:
+Weather extension predicts temperature above 35°C:
 
-```
-RULE "Heat Wave Warning"
-WHEN extension("weather").tomorrow_temp > 35
-DO
-  NOTIFY "Heat wave tomorrow: expected {tomorrow_temp}C, recommend pre-cooling"
-  HTTP_REQUEST POST "https://api.example.com/pre-cool" body: '{"action":"pre_cool"}'
-END
+```json
+{
+  "name": "Heat Wave Warning",
+  "trigger": { "trigger_type": "data_change" },
+  "condition": { "condition_type": "comparison", "source": "extension:weather:tomorrow_temp", "operator": "greater_than", "threshold": 35 },
+  "actions": [
+    { "type": "notify", "message": "Heat wave tomorrow: {value}°C, consider pre-cooling", "severity": "warning" }
+  ]
+}
 ```
 
 ### 4. Sustained Anomaly Triggers Agent
 
-Device offline for over 10 minutes triggers diagnostic Agent:
+Device offline for over 10 minutes → trigger diagnostic Agent:
 
-```
-RULE "Device Offline Diagnosis"
-WHEN device("sensor-03").online == 0
-FOR 10 minutes
-DO
-  NOTIFY "sensor-03 offline for 10 minutes" channels: ["telegram"]
-  TRIGGER_AGENT "diagnostic" INPUT "sensor-03 offline, diagnose the cause"
-END
+```json
+{
+  "name": "Device Offline Diagnosis",
+  "trigger": { "trigger_type": "data_change" },
+  "condition": { "condition_type": "comparison", "source": "device:sensor-03:online", "operator": "equal", "threshold": 0 },
+  "for_duration": 600,
+  "actions": [
+    { "type": "notify", "message": "sensor-03 offline for 10 minutes", "severity": "critical" },
+    { "type": "trigger_agent", "agent_id": "diagnostic", "input": "sensor-03 is offline, diagnose the cause" }
+  ]
+}
 ```
 
 ## Creating Rules
@@ -179,15 +216,15 @@ END
 ### Option 1: Web UI
 
 1. Go to **Rules** tab, click **Add Rule**
-2. Write DSL in the editor (with syntax highlighting)
-3. Click **Validate** to check syntax and resource references
+2. Fill in the name, select trigger type, configure condition and actions
+3. Click **Validate** to verify resource references
 4. Save and enable
 
 ### Option 2: CLI
 
 ```bash
 # Create rule (JSON format)
-neomind rule create --json '{"name":"Temp Alert","condition":{"condition_type":"comparison","source":"device:sensor-01:temperature","operator":"greater_than","threshold":30},"actions":[{"type":"notify","message":"Too hot"}]}'
+neomind rule create --json '{"name":"High Temp Alert","trigger":{"trigger_type":"data_change"},"condition":{"condition_type":"comparison","source":"device:sensor-01:temperature","operator":"greater_than","threshold":30},"actions":[{"type":"notify","message":"Too hot"}]}'
 
 # List all rules
 neomind rule list
@@ -203,15 +240,15 @@ neomind rule delete <rule_id>
 ### Option 3: REST API
 
 ```bash
-# Create rule
+# Create rule (JSON body)
 curl -X POST http://localhost:9375/api/rules \
   -H "Content-Type: application/json" \
-  -d '{"dsl": "RULE \"Temp Alert\" WHEN device(\"sensor-01\").temperature > 30 DO NOTIFY \"Too hot\" END"}'
-
-# Validate DSL (without creating)
-curl -X POST http://localhost:9375/api/rules/validate \
-  -H "Content-Type: application/json" \
-  -d '{"dsl": "RULE \"Test\" WHEN device(\"sensor-01\").temperature > 30 DO NOTIFY \"High\" END"}'
+  -d '{
+    "name": "High Temp Alert",
+    "trigger": { "trigger_type": "data_change" },
+    "condition": { "condition_type": "comparison", "source": "device:sensor-01:temperature", "operator": "greater_than", "threshold": 30 },
+    "actions": [ { "type": "notify", "message": "Too hot" } ]
+  }'
 
 # View execution history
 curl http://localhost:9375/api/rules/<rule_id>/history
@@ -221,49 +258,49 @@ curl http://localhost:9375/api/rules/<rule_id>/history
 
 Just tell [AI Chat](./5-ai-chat.md):
 
-> "Send me an email when temperature exceeds 30 degrees"
+> "Notify me when temperature exceeds 30"
 
-The LLM auto-generates DSL and creates the rule.
+The LLM will generate and create the rule automatically.
 
 ## Rule Validation
 
 When creating a rule, NeoMind performs **context-aware validation**:
 
-- Device/extension existence
-- Metric name validity
-- Command parameter matching against device type definitions
-- Notification channel availability
+- Whether the device/extension exists
+- Whether the metric name is valid
+- Whether command parameters match the device type definition
+- Whether the Agent ID exists (for trigger_agent actions)
 
-Validation results have three levels: **Error** (cannot create), **Warning** (creatable but may have issues), **Info** (suggestions).
+Validation failures return detailed error messages listing the specific field with the issue.
 
 ## Execution History
 
 Each rule records execution results:
 
 - Trigger time
-- Whether condition was met
-- Number of actions executed
-- Each action's result (success/failure/reason)
+- Whether the condition was met
+- How many actions were executed
+- Result of each action (success / failure / reason)
 - Evaluation duration
 
-Click any rule in **Rules** tab to view history. Failed actions can be retried after investigating the cause.
+Click any rule in the **Rules** tab to view history. Failed actions can be investigated and retried.
 
 ## Integration with Other Modules
 
 | Module | Integration |
 |--------|-------------|
-| [Notifications](./8-notifications.md) | `NOTIFY` action routes to configured channels |
-| [AI Agent](./6-ai-agent.md) | `TRIGGER_AGENT` action calls autonomous agent for analysis |
-| [Devices](./3-onboard-device.md) | `EXECUTE` / `SET` actions send device commands |
-| [AI Chat](./5-ai-chat.md) | Natural language rule creation, LLM generates DSL |
+| [Notifications](./8-notifications.md) | `notify` action routes to configured notification channels |
+| [AI Agent](./6-ai-agent.md) | `trigger_agent` action calls autonomous agents for deep analysis |
+| [Devices](./3-onboard-device.md) | `execute` action sends device commands |
+| [AI Chat](./5-ai-chat.md) | Create rules in natural language, LLM generates JSON |
 
 ## Best Practices
 
-- **Add `FOR` to debounce**: Sensor data is noisy; use `FOR 2 minutes` to filter transient spikes
-- **Tiered notifications**: Routine alerts to in-app only, critical alerts to multiple channels (email + Slack + Telegram)
-- **Prefer rules over Agents**: Use DSL rules for deterministic logic (millisecond evaluation); use Agents only for fuzzy judgment (second-level LLM analysis)
-- **Idempotent actions**: Design device commands to be idempotent (e.g., `power_on()` safe to call multiple times), preventing side effects from rule retries
-- **Avoid loops**: Rule A changes device → Rule B reverts it. Use `FOR` or inter-action `DELAY` to break cycles
+- **Add `for_duration` for debounce**: sensor data is noisy, use `"for_duration": 120` to filter transient spikes
+- **Set `cooldown` to prevent flooding**: high-frequency data sources paired with cooldown prevent alert storms
+- **Tiered notifications**: normal alerts `severity: "info"`, critical alerts `severity: "critical"`
+- **Prefer rules over Agents**: deterministic logic belongs in rules (millisecond evaluation), fuzzy judgment in Agents (second-level LLM analysis)
+- **Idempotent actions**: design device commands to be idempotent (e.g. `power_on` called multiple times is safe), preventing side effects from rule retries
 
 ---
 

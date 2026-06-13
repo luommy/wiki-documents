@@ -136,7 +136,7 @@ flowchart TB
 - **Custom Device Types** — Define device metrics and commands via JSON type definitions
 
 ### Automation
-- **DSL Rule Engine** — Human-readable rule language: `WHEN device("sensor").temperature > 30 DO device("ac").power_on()`
+- **JSON Rule Engine** — Structured rule definitions: `{"condition": {"source": "device:sensor:temperature", "operator": "greater_than", "threshold": 30}}`
 - **Data Transforms** — JavaScript-based data transformation for creating virtual metrics
 - **Scheduled Agents** — Time-based or event-driven AI agent execution
 - **Event Bus** — Pub/sub architecture for decoupled component communication
@@ -191,7 +191,7 @@ NeoMind is a modular ecosystem with specialized repositories for each concern:
 - [Configure LLM Backend](../user-guide/2-configure-llm.md) — Connect Ollama or cloud models
 - [Onboard a Device](../user-guide/3-onboard-device.md) — Use the onboarding wizard
 - [AI Agent](../user-guide/6-ai-agent.md) — Create autonomous agents
-- [Automation Rules](../user-guide/7-automation-rules.md) — DSL rule engine
+- [Automation Rules](../user-guide/7-automation-rules.md) — JSON rule engine
 - [Extensions](../user-guide/9-extensions.md) — Install vision AI / OCR extensions
 - [Developer Guide Overview](../developer-guide/1-overview.md) — Start from one of four dimensions: device types / extensions / dashboard components / main project
 - [Use Cases](../use-cases/1-object-detection.md) — End-to-end scenario examples

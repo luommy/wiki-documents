@@ -33,7 +33,7 @@ This is the technical architecture reference for the NeoMind main project (`camt
           ▼              ▼              ▼                ▼
    ┌──────────┐   ┌──────────┐   ┌──────────┐    ┌────────────┐
    │  Agent   │   │ Devices  │   │  Rules   │    │ Extensions │
-   │ (LLM)   │   │  (MQTT)  │   │ (DSL)    │    │ (Process)  │
+   │ (LLM)   │   │  (MQTT)  │   │ (JSON)   │    │ (Process)  │
    └────┬─────┘   └────┬─────┘   └────┬─────┘    └─────┬──────┘
         │              │              │                │
         └──────────────┴──────┬───────┴────────────────┘
@@ -56,7 +56,7 @@ NeoMind is a Rust workspace. Each crate has a single, clear responsibility:
 | **neomind-devices** | Device management: MQTT / webhook adapters, registration, command queue, draft approval |
 | **neomind-storage** | redb embedded storage: schema and access layer for all `*.redb` tables |
 | **neomind-messages** | Message notification: 7 channels (webhook/email/telegram/wecom/dingtalk/slack/feishu) + in-app |
-| **neomind-rules** | DSL rule engine: parse, execute, event trigger |
+| **neomind-rules** | JSON rule engine: parse, execute, event trigger |
 | **neomind-extension-sdk** | Extension SDK: `neomind_export!` macro, capability, ML model lifecycle (public API surface) |
 | **neomind-extension-runner** | Extension process host: isolated sandbox, FFI bridge, crash-loop protection |
 | **neomind-data-push** | Data push: forward telemetry to external webhook / MQTT |
@@ -137,7 +137,7 @@ NeoMind uses **redb** (a pure-Rust embedded KV store, lmdb-like). All data lives
 | `telemetry.redb` | **Time-series telemetry** (every device's metric history). Largest table, indexed by (device_id, metric, timestamp) |
 | `devices.redb` | Device registry (id, name, type, adapter, config) |
 | `dashboards.redb` | Dashboard definitions (layout, widget config) |
-| `rules.redb` | Rule definitions (DSL source, enabled state) |
+| `rules.redb` | Rule definitions (JSON config, enabled state) |
 | `agents.redb` | Agent definitions (prompt, schedule, resources) |
 | `messages.redb` | Message delivery records |
 | `sessions.redb` | AI Chat session history |

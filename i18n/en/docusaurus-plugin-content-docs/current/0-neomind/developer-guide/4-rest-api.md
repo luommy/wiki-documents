@@ -138,17 +138,24 @@ HTTP status codes follow convention: 4xx client errors, 5xx server errors. Pull 
 | Method | Path | Description |
 |--------|------|-------------|
 | GET | `/rules` | List rules |
-| POST | `/rules` | Create rule — **body MUST be `{"dsl": "RULE ... WHEN ... DO ... END"}`**, not trigger/actions JSON |
+| POST | `/rules` | Create rule — **JSON body** (name / trigger / condition / actions) |
 | GET | `/rules/:id` | Rule detail |
 | PUT | `/rules/:id` | Update rule |
 | DELETE | `/rules/:id` | Delete rule |
 | POST | `/rules/:id/test` | Dry-run the rule (no real action) |
 
-> **Key convention**: rules use a **DSL string**, not structured JSON. The POST body looks like:
+> **Rules use JSON format** (not a DSL string). Example POST body:
 
 ```json
-{ "dsl": "RULE HighTemp\nWHEN device(\"sensor-01\").temperature > 30\nDO notify(\"email\", \"High temp\")\nEND" }
+{
+  "name": "High Temp Alert",
+  "trigger": { "trigger_type": "data_change" },
+  "condition": { "condition_type": "comparison", "source": "device:sensor-01:temperature", "operator": "greater_than", "threshold": 30 },
+  "actions": [ { "type": "notify", "message": "Too hot" } ]
+}
 ```
+
+Condition types: `comparison` / `range` / `logical`. Action types: `notify` / `execute` / `trigger_agent`. Trigger types: `data_change` / `schedule` / `manual`.
 
 ### Agents
 

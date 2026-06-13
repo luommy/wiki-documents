@@ -136,7 +136,7 @@ flowchart TB
 - **自定义设备类型** — 通过 JSON 类型定义声明设备指标与指令
 
 ### 自动化
-- **DSL 规则引擎** — 人类可读的规则语言：`WHEN device("sensor").temperature > 30 DO device("ac").power_on()`
+- **JSON 规则引擎** — 结构化的规则定义：`{"condition": {"source": "device:sensor:temperature", "operator": "greater_than", "threshold": 30}}`
 - **数据转换** — 基于 JavaScript 的数据变换，创建虚拟指标
 - **计划型 Agent** — 基于时间或事件触发的 AI Agent 执行
 - **事件总线** — 发布/订阅架构，组件间解耦通信
@@ -191,7 +191,7 @@ NeoMind 是一个模块化生态系统，每个关注点由专门仓库承载：
 - [配置 LLM 后端](../user-guide/2-configure-llm.md) — 接入 Ollama 或云端模型
 - [接入设备](../user-guide/3-onboard-device.md) — 使用 onboarding 向导
 - [AI Agent](../user-guide/6-ai-agent.md) — 创建自主智能体
-- [自动化规则](../user-guide/7-automation-rules.md) — DSL 规则引擎
+- [自动化规则](../user-guide/7-automation-rules.md) — JSON 规则引擎
 - [扩展管理](../user-guide/9-extensions.md) — 安装视觉 AI / OCR 等扩展
 - [开发指南总览](../developer-guide/1-overview.md) — 按设备类型 / 扩展 / 仪表板组件 / 主项目四个维度切入
 - [应用案例](../use-cases/1-object-detection.md) — 端到端场景示例

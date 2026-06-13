@@ -33,7 +33,7 @@ tags: [NeoMind, 开发指南]
           ▼              ▼              ▼                ▼
    ┌──────────┐   ┌──────────┐   ┌──────────┐    ┌────────────┐
    │  Agent   │   │ Devices  │   │  Rules   │    │ Extensions │
-   │ (LLM)   │   │  (MQTT)  │   │ (DSL)    │    │ (Process)  │
+   │ (LLM)   │   │  (MQTT)  │   │ (JSON)   │    │ (Process)  │
    └────┬─────┘   └────┬─────┘   └────┬─────┘    └─────┬──────┘
         │              │              │                │
         └──────────────┴──────┬───────┴────────────────┘
@@ -56,7 +56,7 @@ NeoMind 是一个 Rust workspace。每个 crate 有清晰单一的责任：
 | **neomind-devices** | 设备管理：MQTT / Webhook 适配器、设备注册、命令队列、草稿审批 |
 | **neomind-storage** | redb 嵌入式存储：所有 `*.redb` 表的 schema 与访问层 |
 | **neomind-messages** | 消息通知：7 个渠道（webhook/email/telegram/wecom/dingtalk/slack/feishu）+ 应用内 |
-| **neomind-rules** | DSL 规则引擎：解析、执行、事件触发 |
+| **neomind-rules** | JSON 规则引擎：解析、执行、事件触发 |
 | **neomind-extension-sdk** | 扩展 SDK：`neomind_export!` 宏、capability、ML 模型生命周期（公开 API） |
 | **neomind-extension-runner** | 扩展进程宿主：隔离沙箱、FFI 桥、崩溃循环保护 |
 | **neomind-data-push** | 数据推送：把遥测数据转发到外部 Webhook / MQTT |
@@ -137,7 +137,7 @@ NeoMind 用 **redb**（纯 Rust 嵌入式 KV 数据库，类似 lmdb）。所有
 | `telemetry.redb` | **时序遥测**（所有设备的指标历史）。这是最大的表，按 (device_id, metric, timestamp) 索引 |
 | `devices.redb` | 设备注册表（id、name、type、adapter、config） |
 | `dashboards.redb` | 仪表板定义（布局、组件配置） |
-| `rules.redb` | 规则定义（DSL 源码、启用状态） |
+| `rules.redb` | 规则定义（JSON 配置、启用状态） |
 | `agents.redb` | Agent 定义（prompt、schedule、resources） |
 | `messages.redb` | 消息投递记录 |
 | `sessions.redb` | AI Chat 会话历史 |

@@ -36,7 +36,7 @@ AI Chat has built-in tools covering nearly every NeoMind capability. Typical phr
 - "Change this chart's time range to 7 days"
 
 ### Automation Rules
-- "Email me when the temperature goes above 30°C" → create a [DSL rule](./7-automation-rules.md) and bind a notification channel
+- "Email me when the temperature goes above 30°C" → create an [automation rule](./7-automation-rules.md) and bind a notification channel
 - "Report yesterday's energy use every morning at 8 AM"
 
 ### Notifications

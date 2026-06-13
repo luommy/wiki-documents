@@ -36,7 +36,6 @@ mindmap
       Tool
     Automation
       Rule
-      Rule DSL
       Message Channel
       Data Push
     Extension
@@ -186,29 +185,18 @@ graph TD
 
 Event-driven automation logic. When a condition is met, the action executes automatically.
 
-NeoMind rules are defined with a **DSL (domain-specific language)** rather than structured JSON:
+NeoMind rules are defined in **JSON**:
 
+```json
+{
+  "name": "High Temp Alert",
+  "trigger": { "trigger_type": "data_change" },
+  "condition": { "condition_type": "comparison", "source": "device:sensor-01:temperature", "operator": "greater_than", "threshold": 30 },
+  "actions": [ { "type": "notify", "message": "Too hot" } ]
+}
 ```
-RULE HighTemp
-WHEN device("sensor-01").temperature > 30
-DO notify("email", "High temperature alert")
-END
-```
 
-:::info Why DSL instead of JSON?
-The DSL is human-readable — you can see "when it triggers, what it does" at a glance. Compared to an equivalent JSON rule definition, the DSL is shorter to write, faster to read, and simpler to edit.
-:::
-
-### Rule DSL
-
-The text syntax used to define rules. It uses a four-segment structure of `RULE` / `WHEN` / `DO` / `END`.
-
-| Segment | Purpose | Example |
-|---------|---------|---------|
-| `RULE` | Name | `RULE HighTemp` |
-| `WHEN` | Trigger condition | `device("sensor-01").temperature > 30` |
-| `DO` | Action | `notify("email", "High temperature alert")` |
-| `END` | Close | `END` |
+A rule has three parts: a **trigger** (when to evaluate), a **condition** (when it's met), and **actions** (what to do when met).
 
 > See [Automation Rules](../user-guide/7-automation-rules.md).
 

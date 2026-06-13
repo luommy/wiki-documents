@@ -36,7 +36,6 @@ mindmap
       Tool
     自动化
       Rule
-      Rule DSL
       Message Channel
       Data Push
     扩展
@@ -186,29 +185,18 @@ graph TD
 
 事件驱动的自动化逻辑。当条件满足时自动执行动作。
 
-NeoMind 规则用 **DSL（领域特定语言）** 而非结构化 JSON 定义：
+NeoMind 规则用 **JSON** 定义：
 
+```json
+{
+  "name": "高温告警",
+  "trigger": { "trigger_type": "data_change" },
+  "condition": { "condition_type": "comparison", "source": "device:sensor-01:temperature", "operator": "greater_than", "threshold": 30 },
+  "actions": [ { "type": "notify", "message": "温度过高" } ]
+}
 ```
-RULE HighTemp
-WHEN device("sensor-01").temperature > 30
-DO notify("email", "高温告警")
-END
-```
 
-:::info 为什么用 DSL 而不是 JSON？
-DSL 人类可读——你一眼就能看出"什么时候触发、做什么"。对比等价的 JSON 规则定义，DSL 写起来短、读起来快、改起来简单。
-:::
-
-### Rule DSL（规则领域语言）
-
-定义规则的文本语法。包含 `RULE` / `WHEN` / `DO` / `END` 四段式结构。
-
-| 段 | 作用 | 示例 |
-|----|------|------|
-| `RULE` | 命名 | `RULE HighTemp` |
-| `WHEN` | 触发条件 | `device("sensor-01").temperature > 30` |
-| `DO` | 执行动作 | `notify("email", "高温告警")` |
-| `END` | 结束 | `END` |
+规则由三部分组成：**触发器**（trigger，何时评估）、**条件**（condition，何时满足）、**动作**（actions，满足后做什么）。
 
 > 详见 [自动化规则](../user-guide/7-automation-rules.md)。
 

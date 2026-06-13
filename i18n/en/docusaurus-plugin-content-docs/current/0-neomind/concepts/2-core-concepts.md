@@ -56,7 +56,7 @@ flowchart TB
 |-----------|------|----------------|-----------------|
 | **API Service** | 9375 | Web UI and REST API entry point | All operations go through here |
 | **MQTT Broker** | 1883 | Device communication hub | Built-in, no extra install |
-| **Rule Engine** | — | Event-driven automation | DSL defines trigger conditions and actions |
+| **Rule Engine** | — | Event-driven automation | JSON defines trigger conditions and actions |
 | **Agent** | — | Natural language + tool calls | The system's "brain" |
 
 :::info Shared Storage
