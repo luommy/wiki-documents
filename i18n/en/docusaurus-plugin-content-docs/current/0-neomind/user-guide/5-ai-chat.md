@@ -94,6 +94,12 @@ For detailed agent configuration, see [AI Agent](./6-ai-agent.md). For automatio
 - **Correct mistakes**: if the LLM misreads your intent, just say "No, I meant machine #2" — no need to start a new session.
 - **Tool feedback**: when an LLM tool call fails, it returns an error with a suggestion — follow the hint.
 
+## Next Steps
+
+- [AI Agent](./6-ai-agent.md) — Upgrade from interactive chat to autonomous patrols
+- [Automation Rules](./7-automation-rules.md) — Create rules directly via Chat
+- [Extensions](./9-extensions.md) — Add vision / OCR capabilities to AI
+
 ---
 
 *Last updated: 2026-06-12 · NeoMind v0.8.11*

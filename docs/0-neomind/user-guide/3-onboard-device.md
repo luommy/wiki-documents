@@ -271,6 +271,12 @@ NeoMind 内置常见设备类型，覆盖 CamThink 硬件：
 
 更多见 [故障排查](./10-troubleshooting.md)。
 
+## 下一步
+
+- [使用仪表板](./4-use-dashboard.md) — 将设备数据可视化
+- [AI Chat](./5-ai-chat.md) — 用自然语言查询设备状态
+- [自动化规则](./7-automation-rules.md) — 设定阈值告警与联动控制
+
 ---
 
 *最后更新: 2026-06-12 · NeoMind v0.8.11*

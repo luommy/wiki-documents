@@ -234,9 +234,14 @@ Congratulations! You've completed the NeoMind core loop. From here:
 |--------------|-------|
 | Understand the architecture | [Core Concepts](../concepts/2-core-concepts.md) — process model, data flow, extension mechanism |
 | Look up a term | [Glossary](../concepts/1-glossary.md) — Device / Extension / Agent / Rule |
+| Configure more LLM backends | [Configure LLM Backend](../user-guide/2-configure-llm.md) — Ollama / cloud API |
 | Connect real devices | [Onboard Devices](../user-guide/3-onboard-device.md) — MQTT / BLE / Webhook |
-| Install extensions (YOLO/OCR) | [Developer Guide](../developer-guide/1-overview.md) — extension ecosystem |
+| Automate with AI Agents | [AI Agent](../user-guide/6-ai-agent.md) — scheduled / event-triggered autonomous agents |
+| Set up automation rules | [Automation Rules](../user-guide/7-automation-rules.md) — threshold alerts / linked control |
+| Configure notifications | [Notifications](../user-guide/8-notifications.md) — email / Slack / Telegram / Webhook |
+| Install extensions (YOLO/OCR) | [Extensions](../user-guide/9-extensions.md) — install and configure vision AI extensions |
 | See an end-to-end example | [Use Cases](../use-cases/1-object-detection.md) — full object detection solution |
+| Troubleshoot issues | [Troubleshooting](../user-guide/10-troubleshooting.md) — common problems and solutions |
 
 ---
 

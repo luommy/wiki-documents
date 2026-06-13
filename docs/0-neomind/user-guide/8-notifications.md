@@ -125,6 +125,12 @@ Web UI 右上角的 🔔 铃铛打开消息中心，显示：
 - **模板化**：用 Webhook 渠道对接统一告警平台（如 AlertManager、Home Assistant），由平台负责二次路由
 - **避免噪声**：合理设置去重窗口；规则里加 `THROTTLE` 或冷却时间，防止传感器抖动刷屏
 
+## 下一步
+
+- [自动化规则](./7-automation-rules.md) — 规则触发 `NOTIFY` 动作路由到通知渠道
+- [AI Agent](./6-ai-agent.md) — Agent 分析后决定是否发通知
+- [扩展管理](./9-extensions.md) — 用 Webhook 渠道对接外部系统
+
 ---
 
 *最后更新: 2026-06-12 · NeoMind v0.8.11*

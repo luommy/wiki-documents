@@ -103,6 +103,12 @@ NeoMind 通过 **WebSocket / SSE** 把设备数据推送到前端：
 
 详见 [开发指南 — Dashboard 组件开发](../developer-guide/1-overview.md)。
 
+## 下一步
+
+- [AI Chat](./5-ai-chat.md) — 用自然语言查询设备数据
+- [AI Agent](./6-ai-agent.md) — 定时/事件触发的自主巡检
+- [自动化规则](./7-automation-rules.md) — 数据越界自动告警
+
 ---
 
 *最后更新: 2026-06-12 · NeoMind v0.8.11*

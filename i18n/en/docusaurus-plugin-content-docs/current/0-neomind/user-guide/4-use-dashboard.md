@@ -103,6 +103,12 @@ Need something the built-in library doesn't cover?
 
 See [Developer Guide — Dashboard Component Development](../developer-guide/1-overview.md).
 
+## Next Steps
+
+- [AI Chat](./5-ai-chat.md) — Query device data in natural language
+- [AI Agent](./6-ai-agent.md) — Scheduled / event-triggered autonomous patrols
+- [Automation Rules](./7-automation-rules.md) — Auto-alert when data crosses thresholds
+
 ---
 
 *Last updated: 2026-06-12 · NeoMind v0.8.11*

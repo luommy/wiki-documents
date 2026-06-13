@@ -1,7 +1,7 @@
 ---
-description: A face recognition solution based on the NeoMind platform, using the Face Recognition plugin to detect faces and identify individuals, with real-time dashboard display, history review, and AI Chat natural language queries for NE101/NE301 smart cameras.
+description: A face recognition solution based on the NeoMind platform, using the Face Recognition extension to detect faces and identify individuals, with real-time dashboard display, history review, and AI Chat natural language queries for NE101/NE301 smart cameras.
 keywords: [NeoMind, face recognition, face detection, Face Recognition, NE101, NE301, identity recognition, dashboard, AI Chat]
-tags: [NeoMind, face recognition, plugin, identity recognition]
+tags: [NeoMind, face recognition, extension, identity recognition]
 ---
 
 # Face Recognition Solution
@@ -10,7 +10,7 @@ tags: [NeoMind, face recognition, plugin, identity recognition]
 
 ## 1. Overview
 
-The **Face Recognition plugin** for NeoMind detects faces and identifies individuals from images captured by connected devices. Results are displayed in real-time on the dashboard and can also be queried using **AI Chat** via natural language.
+The **Face Recognition extension** for NeoMind detects faces and identifies individuals from images captured by connected devices. Results are displayed in real-time on the dashboard and can also be queried using **AI Chat** via natural language.
 
 **Typical Application Scenarios**:
 
@@ -24,7 +24,7 @@ The **Face Recognition plugin** for NeoMind detects faces and identifies individ
 **Data Flow**:
 
 ```
-NE101/NE301 Image Capture → NeoMind Platform → Face Recognition Plugin (Detection + Identification) → Dashboard Display + AI Chat Query
+NE101/NE301 Image Capture → NeoMind Platform → Face Recognition Extension (Detection + Identification) → Dashboard Display + AI Chat Query
 ```
 
 ---
@@ -51,13 +51,13 @@ Register your NE101 or NE301 with the NeoMind platform. For detailed steps, refe
 
 ---
 
-## 4. Install the Face Recognition Plugin
+## 4. Install the Face Recognition Extension
 
-**Step 1**: Go to the **Extensions** management page and find the **Face Recognition** plugin
+**Step 1**: Go to the **Extensions** management page and find the **Face Recognition** extension
 
 ![](https://resources.camthink.ai/wiki/img/ai-application/neomind/face-recognition/extension-1.png)
 
-**Step 2**: Click to view the plugin details, review the description, then click Install. After installation, confirm the plugin status is Enabled
+**Step 2**: Click to view the extension details, review the description, then click Install. After installation, confirm the extension status is Enabled
 
 ![](https://resources.camthink.ai/wiki/img/ai-application/neomind/face-recognition/extension-2.png)
 
@@ -88,7 +88,7 @@ Before using the identification feature, you need to register faces to the face 
 
 ### 5.4 Test Recognition
 
-Once faces are registered, the plugin will automatically detect and identify faces when the device captures images. View real-time recognition results on the dashboard:
+Once faces are registered, the extension will automatically detect and identify faces when the device captures images. View real-time recognition results on the dashboard:
 
 ![](https://resources.camthink.ai/wiki/img/ai-application/neomind/face-recognition/dashboard-6.png)
 

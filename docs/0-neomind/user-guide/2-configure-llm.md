@@ -133,6 +133,10 @@ NeoMind 会自动探测模型的多模态能力（通过 LiteLLM 注册表 + `/a
 - 检查 API Key 是否有效
 - 更多见 [故障排查](./10-troubleshooting.md)
 
----
+## 下一步
+
+- [接入设备](./3-onboard-device.md) — 让 NeoMind 开始接收遥测数据
+- [使用仪表板](./4-use-dashboard.md) — 可视化你的设备数据
+- [AI Chat](./5-ai-chat.md) — 用自然语言查询设备状态
 
 *最后更新: 2026-06-12 · NeoMind v0.8.11*

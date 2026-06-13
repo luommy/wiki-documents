@@ -271,6 +271,12 @@ Full device type definitions (metrics, commands, default config) live in the [Ne
 
 More in [Troubleshooting](./10-troubleshooting.md).
 
+## Next Steps
+
+- [Use Dashboard](./4-use-dashboard.md) — Visualize device data
+- [AI Chat](./5-ai-chat.md) — Query device status in natural language
+- [Automation Rules](./7-automation-rules.md) — Set threshold alerts and linked control
+
 ---
 
 *Last updated: 2026-06-12 · NeoMind v0.8.11*

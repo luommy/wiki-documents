@@ -244,9 +244,14 @@ flowchart LR
 |---------|--------|
 | 深入理解系统架构 | [核心概念](../concepts/2-core-concepts.md) — 进程模型、数据流、扩展机制 |
 | 查术语含义 | [术语表](../concepts/1-glossary.md) — Device / Extension / Agent / Rule |
+| 配置更多 LLM 后端 | [配置 LLM 后端](../user-guide/2-configure-llm.md) — Ollama / 云端 API |
 | 接入真实设备 | [接入设备](../user-guide/3-onboard-device.md) — MQTT / BLE / Webhook |
-| 装扩展（YOLO/OCR） | [开发者指南](../developer-guide/1-overview.md) — 扩展生态与安装 |
+| 让 AI 自动巡检 | [AI Agent](../user-guide/6-ai-agent.md) — 定时/事件触发的自主智能体 |
+| 设自动化规则 | [自动化规则](../user-guide/7-automation-rules.md) — 阈值告警 / 联动控制 |
+| 配通知渠道 | [通知](../user-guide/8-notifications.md) — 邮件 / 飞书 / 钉钉 / Webhook |
+| 装扩展（YOLO/OCR） | [扩展管理](../user-guide/9-extensions.md) — 安装与配置视觉 AI 扩展 |
 | 看端到端实战 | [应用案例](../use-cases/1-object-detection.md) — 目标检测完整方案 |
+| 遇到问题 | [故障排查](../user-guide/10-troubleshooting.md) — 常见问题与解决方案 |
 
 ---
 

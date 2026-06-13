@@ -125,6 +125,12 @@ In-app messages require no configuration — they work out of the box.
 - **Template via Webhook**: point a Webhook channel at a unified alerting platform (AlertManager, Home Assistant) and let it handle secondary routing
 - **Avoid noise**: tune the dedup window; add `THROTTLE` or cooldown in rules to prevent sensor jitter from flooding channels
 
+## Next Steps
+
+- [Automation Rules](./7-automation-rules.md) — Rules trigger `NOTIFY` actions routed to notification channels
+- [AI Agent](./6-ai-agent.md) — Agents decide whether to send notifications after analysis
+- [Extensions](./9-extensions.md) — Use Webhook channels to integrate with external systems
+
 ---
 
 *Last updated: 2026-06-12 · NeoMind v0.8.11*

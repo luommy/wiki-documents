@@ -1,7 +1,7 @@
 ---
-description: 基于 NeoMind 平台的 OCR 通用文字识别方案，通过 OCR 插件实现图像文字提取，支持仪表板展示、历史记录查看和 AI Chat 自然语言查询，适用于 NE101/NE301 智能相机。
-keywords: [NeoMind, OCR, 文字识别, NE101, NE301, OCR 插件, 仪表板, AI Chat]
-tags: [NeoMind, OCR, 文字识别, 插件]
+description: 基于 NeoMind 平台的 OCR 通用文字识别方案，通过 OCR 扩展实现图像文字提取，支持仪表板展示、历史记录查看和 AI Chat 自然语言查询，适用于 NE101/NE301 智能相机。
+keywords: [NeoMind, OCR, 文字识别, NE101, NE301, OCR 扩展, 仪表板, AI Chat]
+tags: [NeoMind, OCR, 文字识别, 扩展]
 ---
 
 # OCR Solution
@@ -10,7 +10,7 @@ tags: [NeoMind, OCR, 文字识别, 插件]
 
 ## 1. 方案概述
 
-NeoMind 的 **OCR 插件** 可对设备采集的图像进行通用文字识别，提取图片中的文字内容并在仪表板中展示。识别结果还可通过 **AI Chat** 以自然语言方式查询。
+NeoMind 的 **OCR 扩展** 可对设备采集的图像进行通用文字识别，提取图片中的文字内容并在仪表板中展示。识别结果还可通过 **AI Chat** 以自然语言方式查询。
 
 **典型应用场景**：
 
@@ -24,13 +24,13 @@ NeoMind 的 **OCR 插件** 可对设备采集的图像进行通用文字识别�
 **数据流向**：
 
 ```
-NE101/NE301 图像采集 → NeoMind 平台 → OCR 插件识别 → 仪表板展示 + AI Chat 查询
+NE101/NE301 图像采集 → NeoMind 平台 → OCR 扩展识别 → 仪表板展示 + AI Chat 查询
 ```
 
 | 环节 | 说明 |
 |------|------|
 | 图像采集 | NE101/NE301 通过定时抓拍或事件触发获取图像 |
-| OCR 识别 | OCR 插件自动对图像进行文字提取 |
+| OCR 识别 | OCR 扩展自动对图像进行文字提取 |
 | 结果展示 | 仪表板实时展示识别结果，支持查看历史记录 |
 | AI Chat 查询 | 通过自然语言查询已识别的文字内容 |
 
@@ -66,15 +66,15 @@ NE101/NE301 图像采集 → NeoMind 平台 → OCR 插件识别 → 仪表板�
 
 ---
 
-## 4. 安装 OCR 插件
+## 4. 安装 OCR 扩展
 
-**步骤 1**：进入 **Extensions（插件）** 管理页面，找到 **OCR** 插件
+**步骤 1**：进入 **Extensions（扩展）** 管理页面，找到 **OCR** 扩展
 ![](https://resources.camthink.ai/wiki/img/ai-application/neomind/ocr-solution/extensions-2.png)
 
 **步骤 2**：点击安装
 ![](https://resources.camthink.ai/wiki/img/ai-application/neomind/ocr-solution/extensions-3.png)
 
-**步骤 3**：安装完成后，启用插件
+**步骤 3**：安装完成后，启用扩展
 ![](https://resources.camthink.ai/wiki/img/ai-application/neomind/ocr-solution/extensions-1.png)
 
 ---
@@ -87,7 +87,7 @@ NE101/NE301 图像采集 → NeoMind 平台 → OCR 插件识别 → 仪表板�
 
 ### 5.2 添加 OCR 面板并绑定设备
 
-在仪表板中点击 **添加面板**，选择 **OCR** 插件类型，并绑定目标设备：
+在仪表板中点击 **添加面板**，选择 **OCR** 扩展类型，并绑定目标设备：
 
 <div style={{display: 'flex', gap: '8px'}}>
   <img src="https://resources.camthink.ai/wiki/img/ai-application/neomind/ocr-solution/dashboard-1.png" style={{width: '50%'}} />
@@ -105,7 +105,7 @@ NE101/NE301 图像采集 → NeoMind 平台 → OCR 插件识别 → 仪表板�
 
 ### 6.1 触发抓拍测试
 
-设备绑定后，可通过手动触发抓拍来验证 OCR 识别效果。设备采集到图像后，OCR 插件会自动进行文字识别。
+设备绑定后，可通过手动触发抓拍来验证 OCR 识别效果。设备采集到图像后，OCR 扩展会自动进行文字识别。
 
 ### 6.2 查看识别结果
 

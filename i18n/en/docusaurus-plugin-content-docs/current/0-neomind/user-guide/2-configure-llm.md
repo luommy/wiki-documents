@@ -133,6 +133,12 @@ Once configured, open **AI Chat** and send a simple greeting ("Hello") to verify
 - Verify the API key is valid
 - See [Troubleshooting](./10-troubleshooting.md) for more
 
+## Next Steps
+
+- [Onboard Devices](./3-onboard-device.md) — Start receiving telemetry data
+- [Use Dashboard](./4-use-dashboard.md) — Visualize your device data
+- [AI Chat](./5-ai-chat.md) — Query device status in natural language
+
 ---
 
 *Last updated: 2026-06-12 · NeoMind v0.8.11*

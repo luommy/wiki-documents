@@ -1,7 +1,7 @@
 ---
-description: A NeoMind-based OCR solution for general text recognition, using the OCR plugin to extract text from images with dashboard display, history viewing, and AI Chat natural language queries, supporting NE101/NE301 smart cameras.
-keywords: [NeoMind, OCR, text recognition, NE101, NE301, OCR plugin, dashboard, AI Chat]
-tags: [NeoMind, OCR, text recognition, plugin]
+description: A NeoMind-based OCR solution for general text recognition, using the OCR extension to extract text from images with dashboard display, history viewing, and AI Chat natural language queries, supporting NE101/NE301 smart cameras.
+keywords: [NeoMind, OCR, text recognition, NE101, NE301, OCR extension, dashboard, AI Chat]
+tags: [NeoMind, OCR, text recognition, extension]
 ---
 
 # OCR Solution
@@ -10,7 +10,7 @@ tags: [NeoMind, OCR, text recognition, plugin]
 
 ## 1. Solution Overview
 
-The NeoMind **OCR plugin** performs general text recognition on images captured by devices, extracting text content and displaying it on the dashboard. Recognition results can also be queried via **AI Chat** using natural language.
+The NeoMind **OCR extension** performs general text recognition on images captured by devices, extracting text content and displaying it on the dashboard. Recognition results can also be queried via **AI Chat** using natural language.
 
 **Typical Use Cases**:
 
@@ -24,13 +24,13 @@ The NeoMind **OCR plugin** performs general text recognition on images captured 
 **Data Flow**:
 
 ```
-NE101/NE301 Image Capture → NeoMind Platform → OCR Plugin Recognition → Dashboard Display + AI Chat Query
+NE101/NE301 Image Capture → NeoMind Platform → OCR Extension Recognition → Dashboard Display + AI Chat Query
 ```
 
 | Stage | Description |
 |------|------|
 | Image Capture | NE101/NE301 captures images via timed snapshots or event triggers |
-| OCR Recognition | OCR plugin automatically extracts text from images |
+| OCR Recognition | OCR extension automatically extracts text from images |
 | Result Display | Dashboard displays recognition results in real time, with history support |
 | AI Chat Query | Query recognized text content using natural language |
 
@@ -66,15 +66,15 @@ Register your NE101 or NE301 to the NeoMind platform:
 
 ---
 
-## 4. Install the OCR Plugin
+## 4. Install the OCR Extension
 
-**Step 1**: Navigate to the **Extensions** management page and find the **OCR** plugin
+**Step 1**: Navigate to the **Extensions** management page and find the **OCR** extension
 ![](https://resources.camthink.ai/wiki/img/ai-application/neomind/ocr-solution/extensions-2.png)
 
 **Step 2**: Click Install
 ![](https://resources.camthink.ai/wiki/img/ai-application/neomind/ocr-solution/extensions-3.png)
 
-**Step 3**: After installation, enable the plugin
+**Step 3**: After installation, enable the extension
 ![](https://resources.camthink.ai/wiki/img/ai-application/neomind/ocr-solution/extensions-1.png)
 
 ---
@@ -87,7 +87,7 @@ Navigate to the **Dashboard** management page and click **Create Dashboard**.
 
 ### 5.2 Add OCR Panel and Bind Device
 
-In the dashboard, click **Add Panel**, select the **OCR** plugin type, and bind the target device:
+In the dashboard, click **Add Panel**, select the **OCR** extension type, and bind the target device:
 
 <div style={{display: 'flex', gap: '8px'}}>
   <img src="https://resources.camthink.ai/wiki/img/ai-application/neomind/ocr-solution/dashboard-1.png" style={{width: '50%'}} />
@@ -106,7 +106,7 @@ You can add other widgets to the Dashboard page for additional data and content 
 
 ### 6.1 Trigger Capture Test
 
-After binding the device, you can manually trigger a capture to verify OCR recognition. Once the device captures an image, the OCR plugin will automatically perform text recognition.
+After binding the device, you can manually trigger a capture to verify OCR recognition. Once the device captures an image, the OCR extension will automatically perform text recognition.
 
 ### 6.2 View Recognition Results
 

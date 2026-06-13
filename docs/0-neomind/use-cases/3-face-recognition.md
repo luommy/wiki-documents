@@ -1,7 +1,7 @@
 ---
-description: 基于 NeoMind 平台的人脸识别方案，通过 Face Recognition 插件实现人脸检测与身份识别，支持仪表板实时展示、历史记录查看和 AI Chat 自然语言查询，适用于 NE101/NE301 智能相机。
+description: 基于 NeoMind 平台的人脸识别方案，通过 Face Recognition 扩展实现人脸检测与身份识别，支持仪表板实时展示、历史记录查看和 AI Chat 自然语言查询，适用于 NE101/NE301 智能相机。
 keywords: [NeoMind, 人脸识别, 人脸检测, Face Recognition, NE101, NE301, 身份识别, 仪表板, AI Chat]
-tags: [NeoMind, 人脸识别, 插件, 身份识别]
+tags: [NeoMind, 人脸识别, 扩展, 身份识别]
 ---
 
 # Face Recognition Solution
@@ -10,7 +10,7 @@ tags: [NeoMind, 人脸识别, 插件, 身份识别]
 
 ## 1. 方案概述
 
-NeoMind 的 **Face Recognition 插件** 可对设备采集的图像进行人脸检测与身份识别，并在仪表板中实时展示识别结果，也可通过 **AI Chat** 以自然语言方式查询。
+NeoMind 的 **Face Recognition 扩展** 可对设备采集的图像进行人脸检测与身份识别，并在仪表板中实时展示识别结果，也可通过 **AI Chat** 以自然语言方式查询。
 
 **典型应用场景**：
 
@@ -24,7 +24,7 @@ NeoMind 的 **Face Recognition 插件** 可对设备采集的图像进行人脸�
 **数据流向**：
 
 ```
-NE101/NE301 图像采集 → NeoMind 平台 → Face Recognition 插件（检测 + 识别）→ 仪表板展示 + AI Chat 查询
+NE101/NE301 图像采集 → NeoMind 平台 → Face Recognition 扩展（检测 + 识别）→ 仪表板展示 + AI Chat 查询
 ```
 
 ---
@@ -51,13 +51,13 @@ NE101/NE301 图像采集 → NeoMind 平台 → Face Recognition 插件（检测
 
 ---
 
-## 4. 安装 Face Recognition 插件
+## 4. 安装 Face Recognition 扩展
 
-**步骤 1**：进入 **Extensions（插件）** 管理页面，找到 **Face Recognition** 插件
+**步骤 1**：进入 **Extensions（扩展）** 管理页面，找到 **Face Recognition** 扩展
 
 ![](https://resources.camthink.ai/wiki/img/ai-application/neomind/face-recognition/extension-1.png)
 
-**步骤 2**：点击进入插件详情页，查看插件说明后点击安装。安装完成后，确认插件状态为已启用
+**步骤 2**：点击进入扩展详情页，查看扩展说明后点击安装。安装完成后，确认扩展状态为已启用
 
 ![](https://resources.camthink.ai/wiki/img/ai-application/neomind/face-recognition/extension-2.png)
 
@@ -91,7 +91,7 @@ NE101/NE301 图像采集 → NeoMind 平台 → Face Recognition 插件（检测
 
 ### 5.4 测试识别效果
 
-人脸注册完成后，设备采集到图像时，插件会自动进行人脸检测和身份识别。在仪表板中可以查看实时识别结果：
+人脸注册完成后，设备采集到图像时，扩展会自动进行人脸检测和身份识别。在仪表板中可以查看实时识别结果：
 
 ![](https://resources.camthink.ai/wiki/img/ai-application/neomind/face-recognition/dashboard-6.png)
 
