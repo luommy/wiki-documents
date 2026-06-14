@@ -170,12 +170,11 @@ flowchart TB
     INPUT[用户输入<br/>温度超过 30 度时通知我]
     INPUT --> LLM[LLM 理解意图]
 
-    subgraph Loop["Agent 执行循环"]
+    subgraph Loop["Agent 执行循环（未完成时重复 选择→执行→观察）"]
         LLM --> CHOOSE[选择工具]
         CHOOSE --> EXEC[执行工具<br/>CLI / 设备 / 扩展]
         EXEC --> OBSERVE[观察结果]
         OBSERVE --> DECIDE{完成?}
-        DECIDE -->|否| CHOOSE
         DECIDE -->|是| RESPOND[回复用户]
     end
 

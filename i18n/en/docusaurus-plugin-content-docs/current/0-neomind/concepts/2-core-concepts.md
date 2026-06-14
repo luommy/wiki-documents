@@ -170,12 +170,11 @@ flowchart TB
     INPUT[User input<br/>Notify me when temp exceeds 30]
     INPUT --> LLM[LLM understands intent]
 
-    subgraph Loop["Agent Execution Loop"]
+    subgraph Loop["Agent Execution Loop (repeats pick → execute → observe until done)"]
         LLM --> CHOOSE[Pick tool]
         CHOOSE --> EXEC[Execute tool<br/>CLI / device / extension]
         EXEC --> OBSERVE[Observe result]
         OBSERVE --> DECIDE{Done?}
-        DECIDE -->|no| CHOOSE
         DECIDE -->|yes| RESPOND[Respond to user]
     end
 
