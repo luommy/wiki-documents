@@ -2,6 +2,7 @@
 description: NeoMind 桌面端与服务端部署的硬件、操作系统、网络端口与运行时依赖要求，含本地 LLM（Ollama）推荐配置。
 keywords: [NeoMind, 系统要求, 部署, 硬件需求, Ollama]
 tags: [NeoMind, 产品介绍]
+sidebar_label: "System Requirements"
 ---
 
 # 系统要求

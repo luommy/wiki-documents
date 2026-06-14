@@ -2,6 +2,7 @@
 description: "NeoMind 扩展管理指南：安装与卸载扩展（.nep）、官方扩展市场、扩展能力（指标/命令/视觉）、进程隔离与崩溃保护、配置参数。"
 keywords: [NeoMind, 扩展, extension, 安装, 市场, 进程隔离]
 tags: [NeoMind, 用户指南]
+sidebar_label: "Extension Management"
 ---
 
 # 扩展管理

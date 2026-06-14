@@ -2,6 +2,7 @@
 description: 在桌面（macOS/Windows/Linux）或服务器上安装 NeoMind 的完整流程，含一键脚本、Docker、手动安装、nginx 反向代理与开发环境配置。
 keywords: [NeoMind, 安装, 部署, Docker, 一键脚本, 首次配置]
 tags: [NeoMind, 用户指南]
+sidebar_label: "Install & Setup"
 ---
 
 # 安装与配置

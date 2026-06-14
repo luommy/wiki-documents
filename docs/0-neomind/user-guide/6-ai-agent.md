@@ -2,6 +2,7 @@
 description: "NeoMind AI Agent 使用指南：自主智能体的概念、执行模式（Focused/Free）、调度方式（定时/事件/间隔）、资源绑定、记忆系统与状态管理。"
 keywords: [NeoMind, AI Agent, 自主智能体, 定时执行, 事件触发, 记忆系统]
 tags: [NeoMind, 用户指南]
+sidebar_label: "AI Agent"
 ---
 
 # AI Agent 自主智能体

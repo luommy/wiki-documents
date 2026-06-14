@@ -2,6 +2,7 @@
 description: 在 NeoMind 中配置 LLM 后端：本地 Ollama（推荐 qwen3.5:4b）与云端模型（OpenAI/Anthropic/Qwen/DeepSeek/GLM 等）的接入步骤、模型选择与多模态能力说明。
 keywords: [NeoMind, LLM, Ollama, qwen3.5, 模型配置, 多模态]
 tags: [NeoMind, 用户指南]
+sidebar_label: "Configure LLM Backend"
 ---
 
 # 配置 LLM 后端

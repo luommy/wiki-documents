@@ -2,6 +2,7 @@
 description: 将设备接入 NeoMind 的完整指南：通过 MQTT（内置 Broker，自动发现）、HTTP Webhook、手动注册或外部 Broker 四种方式接入，含 ESP32/Python 示例与草稿审批流程。
 keywords: [NeoMind, 设备接入, onboarding, MQTT, Webhook, 自动发现, ESP32]
 tags: [NeoMind, 用户指南]
+sidebar_label: "Onboard a Device"
 ---
 
 # 接入设备

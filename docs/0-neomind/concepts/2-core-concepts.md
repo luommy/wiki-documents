@@ -2,6 +2,7 @@
 description: "NeoMind 系统架构概览：进程模型（主进程 + 扩展进程）、数据生命周期（设备 → MQTT → 遥测存储 → 仪表板/AI）、扩展模型、Agent 模型。面向用户理解，非开发者深度文档。"
 keywords: [NeoMind, 核心概念, 架构概览, 数据流, 进程模型]
 tags: [NeoMind, 概念]
+sidebar_label: "Core Concepts"
 ---
 
 # 核心概念

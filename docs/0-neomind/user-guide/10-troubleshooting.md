@@ -2,6 +2,7 @@
 description: "NeoMind 常见问题排查：服务启动失败、端口占用、Ollama 连接、MQTT 不通、多模态 400 错误、扩展崩溃、数据目录权限、日志位置等。"
 keywords: [NeoMind, 故障排查, FAQ, Ollama, MQTT, 端口, 日志]
 tags: [NeoMind, 用户指南]
+sidebar_label: "Troubleshooting"
 ---
 
 # 故障排查

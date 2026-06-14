@@ -2,6 +2,7 @@
 description: "NeoMind REST API 参考：base URL、认证（JWT + API Key）、统一响应格式、主要端点分组（设备 / 仪表板 / 规则 / Agent / 消息 / 扩展 / 数据推送 / LLM 后端），含 Swagger 入口与错误格式。"
 keywords: [NeoMind, REST API, HTTP, Swagger, JWT, API Key, 端点]
 tags: [NeoMind, 开发指南]
+sidebar_label: "REST API Reference"
 ---
 
 # REST API 参考

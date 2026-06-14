@@ -2,6 +2,7 @@
 description: "NeoMind 核心术语表：Device、Device Type、Extension、Capability、Metric、DataSourceId、Agent、Rule、Dashboard、Widget、LLM Backend、MQTT Broker、Telemetry 等概念的定义、关系与示例。"
 keywords: [NeoMind, 术语表, 概念, glossary, Device, Extension, Agent, Rule]
 tags: [NeoMind, 概念]
+sidebar_label: "Glossary"
 ---
 
 # 术语表

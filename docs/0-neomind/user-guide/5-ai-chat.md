@@ -2,6 +2,7 @@
 description: "NeoMind AI Chat 使用指南：用自然语言查询与控制设备、创建仪表板与规则、上传图像做视觉分析，以及 Chat（交互对话）与 Agent（自主执行）的区别。"
 keywords: [NeoMind, AI Chat, 自然语言, 多模态, AI Agent]
 tags: [NeoMind, 用户指南]
+sidebar_label: "AI Chat"
 ---
 
 # AI Chat 对话

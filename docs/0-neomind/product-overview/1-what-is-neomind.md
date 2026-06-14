@@ -2,6 +2,7 @@
 description: NeoMind 是面向 IoT 的边缘 AI 平台，在本地硬件上运行 LLM 驱动的智能体，通过 MQTT/BLE/Webhook 连接设备，用规则引擎实现自动化，并在实时仪表板上可视化一切。
 keywords: [NeoMind, 边缘 AI, IoT 平台, AI Agent, 设备管理, 自动化]
 tags: [NeoMind, 产品介绍]
+sidebar_label: "What is NeoMind?"
 ---
 
 # 什么是 NeoMind？

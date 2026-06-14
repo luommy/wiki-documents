@@ -2,6 +2,7 @@
 description: "NeoMind 自动化规则引擎使用指南：JSON 规则结构、条件（comparison/range/logical）、动作（notify/execute/trigger_agent）、触发方式（data_change/schedule/manual），含 UI、CLI、API 创建示例。"
 keywords: [NeoMind, 规则引擎, 自动化, JSON, 条件, 动作, 定时, 告警, 联动]
 tags: [NeoMind, 用户指南]
+sidebar_label: "Automation Rules"
 ---
 
 # 自动化规则

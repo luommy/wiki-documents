@@ -2,6 +2,7 @@
 description: "NeoMind 通知系统使用指南：配置 7 个外部通知渠道（Webhook、邮件、Telegram、企业微信、钉钉、Slack、飞书）与应用内消息，含投递跟踪、重试与去重。"
 keywords: [NeoMind, 通知, webhook, 邮件, telegram, 钉钉, 飞书, 企业微信, slack]
 tags: [NeoMind, 用户指南]
+sidebar_label: "Notifications & Messages"
 ---
 
 # 通知与消息

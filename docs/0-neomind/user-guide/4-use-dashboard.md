@@ -2,6 +2,7 @@
 description: "NeoMind 仪表板使用指南：创建与编辑仪表板、添加组件（数值卡/图表/仪表盘/表格/视觉）、实时数据、数据源格式、分享公开链接与移动端适配。"
 keywords: [NeoMind, 仪表板, dashboard, 组件, widget, 实时数据, 分享]
 tags: [NeoMind, 用户指南]
+sidebar_label: "Use Dashboards"
 ---
 
 # 使用仪表板

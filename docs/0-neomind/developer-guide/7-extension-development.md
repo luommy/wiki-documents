@@ -2,6 +2,7 @@
 description: "用 neomind-extension-sdk 从零开发一个 NeoMind 扩展的实战指南：脚手架、Cargo.toml 配置、Extension trait 实现、neomind_export! 导出、跨平台编译、打包 .nep、安装与调试。"
 keywords: [NeoMind, 扩展开发, extension, 实战, FFI, 打包]
 tags: [NeoMind, 开发指南]
+sidebar_label: "Extension Development"
 ---
 
 # 扩展开发实战

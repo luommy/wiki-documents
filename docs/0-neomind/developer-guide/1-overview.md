@@ -2,6 +2,7 @@
 description: "NeoMind 开发指南总览：按设备类型、扩展、Dashboard 组件、主项目四个仓库维度切入，含技术栈、crate 布局与各文档入口。"
 keywords: [NeoMind, 开发指南, 架构, crate, 仓库, SDK]
 tags: [NeoMind, 开发指南]
+sidebar_label: "Developer Guide Overview"
 ---
 
 # 开发指南总览

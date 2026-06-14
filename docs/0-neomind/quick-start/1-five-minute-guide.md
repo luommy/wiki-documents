@@ -2,6 +2,7 @@
 description: "5 分钟快速上手 NeoMind：安装 → 配置 LLM → 连接第一个设备 → 在仪表板看数据 → 用 AI Chat 提问。每步都有成功检查点、提示与排障。"
 keywords: [NeoMind, 快速开始, 5 分钟, 快速上手, 初体验]
 tags: [NeoMind, 快速开始]
+sidebar_label: "5-Minute Quick Start"
 ---
 
 # 5 分钟快速上手

@@ -2,6 +2,7 @@
 description: "NeoMind 产品技术架构：crate 布局与依赖、主进程 + 扩展进程隔离模型、事件总线、扩展 FFI ABI、redb 存储层、Tokio 并发与信号量。"
 keywords: [NeoMind, 架构, crate, 进程隔离, 事件总线, 存储, Tokio]
 tags: [NeoMind, 开发指南]
+sidebar_label: "Product Architecture"
 ---
 
 # 产品架构
