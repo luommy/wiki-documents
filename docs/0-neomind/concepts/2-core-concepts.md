@@ -42,12 +42,12 @@ flowchart TB
         EX3[OCR 识别]
     end
 
-    DEV[IoT 设备<br/>相机/传感器] <-.Webhook/MQTT.-> MQTT
-    ML[ML 模型<br/>ONNX/PyTorch] <-.FFI.-> EX1
+    DEV[IoT 设备<br/>相机/传感器] -.Webhook/MQTT.-> MQTT
+    ML[ML 模型<br/>ONNX/PyTorch] -.FFI.-> EX1
 
-    API <.->|FFI| EX1
-    API <.->|FFI| EX2
-    API <.->|FFI| EX3
+    API -.->|FFI| EX1
+    API -.->|FFI| EX2
+    API -.->|FFI| EX3
 ```
 
 ### 四个核心子系统
@@ -126,8 +126,8 @@ flowchart LR
         IMPL --- MODEL
     end
 
-    ER <-.spawn 进程.-> IMPL
-    IMPL <-.FFI / serde JSON.-> ROUTER
+    ER -.spawn 进程.-> IMPL
+    IMPL -.FFI / serde JSON.-> ROUTER
 ```
 
 ### 四个设计原则

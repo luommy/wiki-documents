@@ -42,12 +42,12 @@ flowchart TB
         EX3[OCR Recognition]
     end
 
-    DEV[IoT Device<br/>Camera/Sensor] <-.Webhook/MQTT.-> MQTT
-    ML[ML Model<br/>ONNX/PyTorch] <-.FFI.-> EX1
+    DEV[IoT Device<br/>Camera/Sensor] -.Webhook/MQTT.-> MQTT
+    ML[ML Model<br/>ONNX/PyTorch] -.FFI.-> EX1
 
-    API <.->|FFI| EX1
-    API <.->|FFI| EX2
-    API <.->|FFI| EX3
+    API -.->|FFI| EX1
+    API -.->|FFI| EX2
+    API -.->|FFI| EX3
 ```
 
 ### Four Core Subsystems
@@ -126,8 +126,8 @@ flowchart LR
         IMPL --- MODEL
     end
 
-    ER <-.spawn process.-> IMPL
-    IMPL <-.FFI / serde JSON.-> ROUTER
+    ER -.spawn process.-> IMPL
+    IMPL -.FFI / serde JSON.-> ROUTER
 ```
 
 ### Four Design Principles
