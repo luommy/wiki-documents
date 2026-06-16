@@ -8,6 +8,10 @@ tags: [NeoMind, Developer Guide]
 
 NeoMind is a modular ecosystem split into four independent repositories organized by **development goal**. This page helps you pick the right repo to start from and points to the deeper doc for each path.
 
+:::tip Recommended: AI-Assisted Development
+The NeoMind codebase is purpose-built for AI coding tools like **Claude Code** — the project ships with a `CLAUDE.md` context file, a 33-section frontend design spec, and 16 reference extension implementations. **Whether you're building extensions, components, or contributing to the main project, we recommend starting with AI-assisted development.** See the [AI-Assisted Development Guide](./5-ai-assisted-development.md).
+:::
+
 ## First Question: What Are You Building?
 
 ```
@@ -48,7 +52,7 @@ What do you want to do?
 - Desktop: Tauri 2.x
 - Protocols: REST + WebSocket + SSE + MQTT 3.1.1
 
-**Extensions**: Rust, depend on the `neomind-extension-sdk` crate (latest v0.6.1), export via the `neomind_export!` FFI macro, run in an isolated process provided by `neomind-extension-runner`.
+**Extensions**: Rust, depend on the `neomind-extension-sdk` crate (latest v0.6.3), export via the `neomind_export!` FFI macro, run in an isolated process provided by `neomind-extension-runner`.
 
 **Device types**: declarative JSON, no runtime code — just describes the metrics, commands, and defaults. Loaded by NeoMind on the fly.
 
@@ -137,27 +141,6 @@ cd web && npm install && npm run dev
 cd web && npm run tauri:dev
 ```
 
-## Doc Navigation
-
-Live / planned docs in this guide:
-
-| Doc | Content | Status |
-|-----|---------|--------|
-| **1-overview (this page)** | Decision tree, repo navigation, tech stack | ✅ |
-| [2-architecture](./2-architecture.md) | Crate layout, process model, event bus, extension ABI, storage, threading | ✅ |
-| [3-extension-sdk](./3-extension-sdk.md) | `neomind_export!` macro, capabilities, ML model lifecycle, cross-platform packaging | ✅ |
-| [4-rest-api](./4-rest-api.md) | HTTP API reference (devices / dashboards / rules / agents / messages / extensions / data-push / LLM) | ✅ |
-| [7-extension-development](./7-extension-development.md) | Hands-on guide to building an extension on the SDK | ✅ |
-| 5-websocket-realtime | Realtime API (WebSocket / SSE) | Phase 2 |
-| 6-device-type-development | Detailed device type spec | Phase 2 |
-| 8-dashboard-component-dev | Detailed dashboard component spec | Phase 2 |
-| 9-contribute-to-main | Main project contribution guide (CI, PR flow) | Phase 2 |
-| 10-llm-backend-integration | LLM backend integration guide | Phase 2 |
-
-## Need Deeper Reference?
-
-Code-level detail currently lives under the product repo's `docs/guides/` (organized by module, ~19 docs). These are a **migration source** — this guide will progressively absorb the externally valuable content into the relevant sections; once migrated, the source file is removed from the product repo, leaving the wiki as the single source of truth. During the transition, the deepest code references can still be found in the product repo's `docs/guides/`.
-
 ---
 
-*Last updated: 2026-06-12 · NeoMind v0.8.11*
+*Last updated: 2026-06-16*

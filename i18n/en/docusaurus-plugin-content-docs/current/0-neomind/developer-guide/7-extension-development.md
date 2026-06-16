@@ -34,7 +34,7 @@ name = "neomind_extension_counter"        # prefix MUST be neomind_extension_
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-neomind-extension-sdk = "0.6.1"
+neomind-extension-sdk = "0.6.3"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 async-trait = "0.1"
@@ -201,10 +201,11 @@ A single-platform `.dylib` only runs on macOS. To distribute you must compile al
 cross build --release --target x86_64-unknown-linux-gnu
 cross build --release --target aarch64-unknown-linux-gnu
 cross build --release --target x86_64-pc-windows-msvc
-# Apple Silicon / Intel macOS each get their own copy
+# Apple Silicon macOS (arm64)
+cross build --release --target aarch64-apple-darwin
 
 # Package into .nep (a zip archive)
-mkdir -p nep/{linux-x64,linux-arm64,windows-x64,darwin-arm64,darwin-x64}
+mkdir -p nep/{linux-x64,linux-arm64,windows-x64,darwin-arm64}
 cp target/x86_64-unknown-linux-gnu/release/libneomind_extension_counter.so nep/linux-x64/
 # ... other platforms
 cat > nep/metadata.json <<EOF
@@ -215,12 +216,252 @@ cd nep && zip -r ../counter-1.0.0.nep .
 
 `.nep` is the conventional archive format (see the NeoMind-Extensions repo's CI scripts for the reference). When a user installs via the Web UI one-click flow, the runner picks the binary matching the current platform.
 
-## Advanced: ML Models / Network / Event Subscriptions
+## Advanced Patterns
 
-- **ML models**: use `OnceLock<Model>` to lazy-load (load on first command, keep resident afterwards) — see [SDK — ML Model Lifecycle](./3-extension-sdk.md#ml-model-lifecycle)
-- **Network access**: declare `capabilities: ["network"]` in metadata, otherwise outbound requests are rejected
-- **Event subscriptions**: implement `event_subscriptions()` returning the event types you care about, and `handle_event()` to react
-- **Streaming output** (video / push): implement `stream_capability()` + `process_chunk()` or push-mode methods (see the full SDK trait signature)
+The following cover the most common patterns in real-world extension development.
+
+### Pattern 1: Network Extension (Weather API)
+
+A weather extension is the canonical network extension — fetches an external API and produces metrics.
+
+```rust
+use neomind_extension_sdk::prelude::*;
+use neomind_extension_sdk::capability::CapabilityContext;
+
+pub struct WeatherExtension {
+    config: std::sync::Mutex<WeatherConfig>,
+}
+
+struct WeatherConfig {
+    api_key: String,
+    city: String,
+}
+
+#[async_trait]
+impl Extension for WeatherExtension {
+    fn metadata(&self) -> &ExtensionMetadata {
+        static META: OnceLock<ExtensionMetadata> = OnceLock::new();
+        META.get_or_init(|| ExtensionMetadata {
+            id: "weather".into(),
+            name: "Weather".into(),
+            version: Version::parse("1.0.0").unwrap(),
+            config_parameters: Some(vec![
+                ParameterDefinition {
+                    name: "api_key".into(),
+                    display_name: "API Key".into(),
+                    description: "OpenWeatherMap API key".into(),
+                    param_type: MetricDataType::String,
+                    required: true,
+                    ..Default::default()
+                },
+            ]),
+            ..Default::default()
+        })
+    }
+
+    fn metrics(&self) -> &[MetricDescriptor] {
+        // temperature, humidity, pressure
+        // DataSourceId: extension:weather:temperature etc.
+    }
+
+    async fn configure(&mut self, config: &Value) -> Result<()> {
+        let cfg = self.config.lock().unwrap();
+        // update api_key / city from config JSON
+    }
+
+    async fn execute_command(&self, cmd: &str, args: &Value) -> Result<Value> {
+        match cmd {
+            "fetch" => {
+                let ctx = CapabilityContext::default();
+                // HTTP request via network capability
+                let resp = ctx.invoke_capability("network", &json!({
+                    "method": "GET",
+                    "url": format!("https://api.openweathermap.org/data/2.5/weather?q={}&appid={}",
+                        cfg.city, cfg.api_key)
+                }));
+                // Parse response, write virtual device metrics
+                ctx.invoke_capability("device_metrics_write", &json!({
+                    "device_id": "virtual-weather",
+                    "metric": "temperature",
+                    "value": resp["main"]["temp"]
+                }));
+                Ok(json!({"status": "ok"}))
+            }
+            _ => Err(ExtensionError::CommandNotFound(cmd.into())),
+        }
+    }
+
+    fn as_any(&self) -> &dyn std::any::Any { self }
+}
+
+neomind_export!(WeatherExtension);
+```
+
+### Pattern 2: Streaming (Video Frames)
+
+A video analysis extension uses the streaming API — each frame enters `process_chunk()` and returns detections.
+
+```rust
+pub struct YoloVideoExtension {
+    model: OnceLock<YoloModel>,
+}
+
+#[async_trait]
+impl Extension for YoloVideoExtension {
+    fn stream_capability(&self) -> Option<StreamCapability> {
+        Some(StreamCapability {
+            mode: StreamMode::Stateless, // stateless: each frame independent
+            input_format: "image/jpeg".into(),
+            output_format: "application/json".into(),
+        })
+    }
+
+    async fn process_chunk(&self, chunk: DataChunk) -> Result<StreamResult> {
+        let model = self.model.get_or_try_init(|| YoloModel::load("yolov8n.onnx"))?;
+        let detections = model.infer(&chunk.data)?;
+
+        Ok(StreamResult {
+            output: serde_json::to_value(&detections)?,
+            metadata: Some(json!({"frame_id": chunk.sequence})),
+        })
+    }
+
+    // ... other methods
+}
+```
+
+### Pattern 3: Push Mode (Sensors)
+
+Push mode is for extensions that proactively produce data (e.g. serial sensors). The extension pushes via `output_sender`.
+
+```rust
+use tokio::sync::mpsc;
+use std::sync::Arc;
+
+pub struct SensorPushExtension {
+    sender: std::sync::Mutex<Option<Arc<mpsc::Sender<PushOutputMessage>>>>,
+}
+
+#[async_trait]
+impl Extension for SensorPushExtension {
+    fn set_output_sender(&self, sender: Arc<mpsc::Sender<PushOutputMessage>>) {
+        *self.sender.lock().unwrap() = Some(sender);
+    }
+
+    async fn start_push(&self, _session_id: &str) -> Result<()> {
+        let sender = self.sender.lock().unwrap().clone()
+            .ok_or(ExtensionError::ExecutionFailed("no sender".into()))?;
+
+        // Start background collection task
+        tokio::spawn(async move {
+            loop {
+                let value = read_sensor(); // your collection logic
+                let msg = PushOutputMessage {
+                    metric: "temperature".into(),
+                    value: json!(value),
+                    timestamp: chrono::Utc::now().timestamp(),
+                };
+                if sender.send(msg).await.is_err() { break; }
+                tokio::time::sleep(Duration::from_secs(5)).await;
+            }
+        });
+
+        Ok(())
+    }
+
+    async fn stop_push(&self, _session_id: &str) -> Result<()> {
+        // Stop the background task (via channel close or cancel token)
+        Ok(())
+    }
+}
+```
+
+### Pattern 4: Event Subscriptions
+
+Extensions can subscribe to platform events (e.g. device online, rule triggered) and respond in `handle_event()`.
+
+```rust
+fn event_subscriptions(&self) -> &[&str] {
+    &["device.online", "rule.triggered"]
+}
+
+fn handle_event(&self, event_type: &str, payload: &Value) -> Result<()> {
+    match event_type {
+        "device.online" => {
+            let device_id = payload["device_id"].as_str().unwrap();
+            // Initialize when a device comes online...
+        }
+        "rule.triggered" => {
+            // Rule-triggered联动 logic...
+        }
+        _ => {}
+    }
+    Ok(())
+}
+```
+
+### Pattern 5: Configuration Hot-Reload
+
+When a user changes config in the Web UI, `configure()` is called. Use a `Mutex` to guard config state:
+
+```rust
+pub struct MyExtension {
+    config: std::sync::Mutex<MyConfig>,
+}
+
+async fn configure(&mut self, config: &Value) -> Result<()> {
+    let new_cfg = MyConfig {
+        api_key: config["api_key"].as_str().unwrap_or("").to_string(),
+        interval: config["interval"].as_u64().unwrap_or(60),
+    };
+    // Validate
+    if new_cfg.api_key.is_empty() {
+        return Err(ExtensionError::InvalidArguments("api_key required".into()));
+    }
+    *self.config.lock().unwrap() = new_cfg;
+    Ok(())
+}
+```
+
+### .nep Package Structure
+
+A complete `.nep` package is a ZIP archive containing multi-platform binaries + metadata:
+
+```
+my-extension-1.0.0.nep (ZIP)
+├── metadata.json               ← extension metadata + platform mapping
+├── darwin-arm64/
+│   └── libneomind_extension_my_extension.dylib
+├── darwin-x86_64/
+│   └── libneomind_extension_my_extension.dylib
+├── linux-x86_64/
+│   └── libneomind_extension_my_extension.so
+├── linux-arm64/
+│   └── libneomind_extension_my_extension.so
+├── windows-x86_64/
+│   └── neomind_extension_my_extension.dll
+└── models/                     ← (optional) ML model files
+    └── yolov8n.onnx
+```
+
+**metadata.json** example:
+
+```json
+{
+  "id": "my-extension",
+  "name": "My Extension",
+  "version": "1.0.0",
+  "sdk_version": "0.6.3",
+  "abi_version": 3,
+  "platforms": {
+    "darwin-arm64": "darwin-arm64/libneomind_extension_my_extension.dylib",
+    "linux-x86_64": "linux-x86_64/libneomind_extension_my_extension.so",
+    "windows-x86_64": "windows-x86_64/neomind_extension_my_extension.dll"
+  }
+}
+```
+
+The runner automatically selects the binary matching the current platform on load.
 
 ## Reference Implementations
 
@@ -249,8 +490,9 @@ Reading one of these is more illuminating than any doc.
 
 - Open a PR to [NeoMind-Extensions](https://github.com/camthink-ai/NeoMind-Extensions) so the community can use your extension
 - Extension command HTTP invocation details → [REST API Reference](./4-rest-api.md#extensions)
-- Dashboard component development (if your extension ships visualizations) → Phase 2 `8-dashboard-component-dev.md`
+- Dashboard component development (if your extension ships visualizations) → [Dashboard Component Dev](./8-dashboard-component-dev.md)
+- Device metrics as extension data sources → [Device Type Development](./6-device-type-development.md)
 
 ---
 
-*Last updated: 2026-06-12 · NeoMind v0.8.11 · SDK v0.6.1*
+*Last updated: 2026-06-15*

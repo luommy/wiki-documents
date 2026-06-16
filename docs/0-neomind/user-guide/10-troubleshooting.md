@@ -24,6 +24,38 @@ curl http://localhost:9375/api/health
 systemctl status neomind.service
 ```
 
+## CLI / API Key
+
+### CLI 命令报 `401 Unauthorized`
+
+**原因**：CLI 无法向 Server 提供有效的 API Key。
+
+**排查**：
+
+```bash
+# 1. 是否设了环境变量？（设了错误值也会导致 401——auto-auth 被完全跳过）
+echo $NEOMIND_API_KEY
+
+# 2. 当前目录是否在项目根？（auto-auth 需要相对路径 data/api_keys.redb）
+ls data/api_keys.redb
+```
+
+**按场景修复**：
+
+| 场景 | 修复 |
+|------|------|
+| 设了错误的 `NEOMIND_API_KEY`（如文档占位符） | `unset NEOMIND_API_KEY`，然后在项目根目录运行 |
+| 不在项目根目录 | `cd /path/to/neomind && neomind device list` |
+| 需要跨目录使用 | 从 Server 启动输出获取真实 Key，`export NEOMIND_API_KEY=nmk_真实Key` |
+| 远程连接另一台 Server | 从那台 Server 的启动输出取 Key |
+| auto-auth 之前能用，突然 401 | **重启 Server**：CLI 直接操作 `api_keys.redb` 可能导致 redb 锁冲突 |
+
+> ⚠ **关键**：
+> - `NEOMIND_API_KEY` 一旦设置（即使是占位符），auto-auth 就被完全跳过。先 `unset` 再试。
+> - 不要在 Server 运行时执行 `neomind api-key create`——会与 Server 的 redb 锁冲突。如需重建 Key，先停 Server，再创建，再启动。
+
+> 完整 API Key 配置流程见 [安装与配置 → CLI API Key 配置](./1-install-setup.md#cli-api-key-配置)。
+
 ## 服务启动
 
 ### `neomind serve` 启动报 "address already in use"
@@ -260,4 +292,4 @@ journalctl -u neomind.service | grep -i "vision\|multimodal\|image"
 
 ---
 
-*最后更新: 2026-06-12 · NeoMind v0.8.11*
+*最后更新: 2026-06-15*

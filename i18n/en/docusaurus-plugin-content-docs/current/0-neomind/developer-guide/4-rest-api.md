@@ -237,7 +237,7 @@ In addition to REST, NeoMind exposes:
 - **SSE**: `GET /api/events` (Server-Sent Events) — same event stream over plain HTTP
 - **MQTT**: connect directly to `mqtt://<host>:1883` and subscribe to device topics
 
-Full realtime protocol details are in (Phase 2) `5-websocket-realtime.md`. For now, the canonical reference is the frontend implementation: `web/src/lib/events.ts` and `web/src/lib/websocket.ts`.
+The canonical reference for the realtime protocol (WebSocket / SSE) is the frontend implementation: `web/src/lib/events.ts` and `web/src/lib/websocket.ts`.
 
 ## Error Handling Example
 
@@ -261,8 +261,8 @@ else:
 
 - **Full interactive docs**: `/api/docs` (Swagger) — every endpoint + parameter schema + live try-it
 - Adding a new endpoint → add a handler under `crates/neomind-api/src/`, follow the existing per-module pattern
-- Realtime push → WebSocket / SSE (Phase 2 doc)
+- Realtime push → WebSocket / SSE (see `web/src/lib/websocket.ts`)
 
 ---
 
-*Last updated: 2026-06-12 · NeoMind v0.8.11*
+*Last updated: 2026-06-15*

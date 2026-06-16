@@ -1,5 +1,5 @@
 ---
-description: "NeoMind core glossary: definitions, relationships, and examples for Device, Device Type, Extension, Capability, Metric, DataSourceId, Agent, Rule, Dashboard, Widget, LLM Backend, MQTT Broker, Telemetry, and more."
+description: "NeoMind core glossary: definitions, relationships, and examples for Device, Device Type, Extension, Capability, Metric, DataSourceId, Agent, AI Chat, Memory, Transform, Rule, Cooldown, Dashboard, Widget, LLM Backend, MQTT Broker, Telemetry, SSE, and more."
 keywords: [NeoMind, glossary, concepts, terminology, Device, Extension, Agent, Rule]
 tags: [NeoMind, Concepts]
 ---
@@ -32,15 +32,24 @@ mindmap
       Command
     AI
       LLM Backend
+      AI Chat
       Agent
       Tool
+      Memory
+      Skill
+      Multimodal
+    Data Pipeline
+      Transform
+      DataSourceId
     Automation
       Rule
+      Cooldown
       Message Channel
       Data Push
     Extension
       Extension
       Capability
+      FFI
       .nep
       neomind_export!
     Infrastructure
@@ -48,6 +57,7 @@ mindmap
       Telemetry
       redb
       Webhook
+      SSE
     Dashboard
       Dashboard
       Widget
@@ -71,11 +81,35 @@ A physical or virtual device that has been connected to NeoMind. Each device has
 
 ### Device Type
 
-The "template" for a device, defining which metrics, commands, and connection parameters that kind of device exposes. Device types are defined in JSON and stored in the [NeoMind-DeviceTypes](https://github.com/camthink-ai/NeoMind-DeviceTypes) repository.
+The "template" for a class of devices, defining which metrics, commands, and connection parameters that kind of device exposes. Device types are defined in JSON and stored in the [NeoMind-DeviceTypes](https://github.com/camthink-ai/NeoMind-DeviceTypes) repository.
 
 When you create a device you pick a type and NeoMind generates the default metric / command schema from it.
 
-**Example**: `NE101` is a device type that defines an `image_data` (video frame) metric and a `capture` command.
+**Example** — a temperature & humidity sensor type:
+
+```json
+{
+  "device_type": "dht22_sensor",
+  "name": "Temperature & Humidity Sensor",
+  "description": "DHT22-based ambient environment sensor",
+  "categories": ["sensor", "environment"],
+  "metrics": [
+    { "name": "temperature", "display_name": "Temperature", "data_type": "float", "unit": "°C", "min": -40, "max": 80 },
+    { "name": "humidity", "display_name": "Humidity", "data_type": "float", "unit": "%", "min": 0, "max": 100 }
+  ],
+  "commands": [
+    { "name": "reboot", "display_name": "Reboot", "description": "Restart the sensor" }
+  ]
+}
+```
+
+:::info Why Device Types matter
+Device Type is the **contract** between hardware and the platform. It serves three roles:
+
+1. **Standardizes a device class** — all DHT22 sensors share one type definition, regardless of manufacturer. 100 sensors of the same type all conform to the same metric / command schema.
+2. **Gives the AI Agent a device standard** — the Agent reads the metric definitions to understand what data a device produces and what operations it supports. When you ask "what's the temperature?", the Agent knows exactly which metric to query — no need to inspect raw payloads.
+3. **Drives downstream configuration** — dashboard widgets, automation rules, and data push configs all reference metrics by name. Those names originate from the Device Type definition.
+   :::
 
 ### Draft
 
@@ -126,15 +160,15 @@ Dashboard widget data sources, rule trigger conditions, data push targets — al
 
 The large language model instance NeoMind connects to. Multiple backends are supported: **Ollama** (local), **OpenAI**, **Anthropic**, **GLM**, **llama.cpp**, etc. You can configure several backends and switch between them per scenario.
 
-```mermaid
-graph LR
-    A[Agent] --> B{Pick backend}
-    B --> C[Ollama local]
-    B --> D[OpenAI cloud]
-    B --> E[Anthropic cloud]
-    B --> F[GLM cloud]
-    B --> G[llama.cpp local]
-```
+<div style={{display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center', margin: '16px 0'}}>
+  <span style={{background: '#e1d5e7', border: '1px solid #9673a6', borderRadius: '20px', padding: '6px 16px', fontSize: '0.9em', fontWeight: 600}}>Agent</span>
+  <span style={{fontSize: '1.2em', color: '#999'}}>→</span>
+  <span style={{background: '#d5e8d4', border: '1px solid #82b366', borderRadius: '20px', padding: '6px 16px', fontSize: '0.9em'}}>Ollama <em>(local)</em></span>
+  <span style={{background: '#d5e8d4', border: '1px solid #82b366', borderRadius: '20px', padding: '6px 16px', fontSize: '0.9em'}}>llama.cpp <em>(local)</em></span>
+  <span style={{background: '#dae8fc', border: '1px solid #6c8ebf', borderRadius: '20px', padding: '6px 16px', fontSize: '0.9em'}}>OpenAI</span>
+  <span style={{background: '#dae8fc', border: '1px solid #6c8ebf', borderRadius: '20px', padding: '6px 16px', fontSize: '0.9em'}}>Anthropic</span>
+  <span style={{background: '#dae8fc', border: '1px solid #6c8ebf', borderRadius: '20px', padding: '6px 16px', fontSize: '0.9em'}}>GLM</span>
+</div>
 
 :::info Local vs Cloud
 - **Local (Ollama / llama.cpp)**: zero latency, data never leaves the LAN, works offline — but limited by hardware
@@ -146,36 +180,70 @@ graph LR
 
 ### Agent
 
-NeoMind's core intelligent unit. An agent receives natural-language input from a user (or runs on a schedule), uses an LLM to understand intent, invokes tools (CLI commands, device controls, extension commands) to take action, and learns from the results.
-
-**Two execution modes**:
-
-| Mode | Trigger | Bound resources | Typical use case |
-|------|---------|-----------------|------------------|
-| **Free mode** | User conversation | None | Free-form Q&A, ad-hoc queries |
-| **Focused mode** | Schedule / event | Bound devices + data sources | Periodic inspection, anomaly monitoring |
+NeoMind's core intelligent unit. An agent receives natural-language input (or runs on a schedule), uses an LLM to understand intent, invokes tools (CLI commands, device controls, extension commands) to take action, and learns from the results.
 
 :::tip Agent ≠ ChatGPT
 An agent does more than chat — it **takes action**. When you ask "notify me when temperature exceeds 30", it actually creates a rule, configures a notification channel, and starts monitoring. This is powered by Tool Use.
 :::
 
-> See [AI Chat](../user-guide/5-ai-chat.md).
+> See [AI Chat](../user-guide/5-ai-chat.md) and [AI Agent](../user-guide/6-ai-agent.md).
+
+### AI Chat
+
+The **interactive mode** of the agent — the user types a message in the chat, and the AI calls tools in real time and streams the response. Supports image uploads for multimodal analysis. Uses conversation history + MemorySnapshot for context.
+
+### Memory
+
+Experience accumulated across executions/sessions, split into two systems by mode:
+
+| Mode | Memory Structure | Storage | Purpose |
+|------|-----------------|---------|---------|
+| **AI Chat** | Conversation history + MemorySnapshot | `user.md` + `knowledge.md` | Remembers user preferences and key facts across sessions |
+| **AI Agent** | Journal + Knowledge Files | redb + Markdown files | Accumulates experience across executions: success/failure, learned patterns, device identity, mission |
+
+**Journal** is a summary of each agent execution (what was done, success/failure, lessons learned). **Knowledge Files** are long-term knowledge (device identity, mission, resources, patrol patterns).
+
+### Think-Act-Observe
+
+The agent's core execution pattern: the LLM analyzes the current state (**Think**) → calls a tool (**Act**) → reads the result (**Observe**) → loops until the task is done or the round limit is reached (default 30 rounds, global timeout 5 minutes).
+
+### Skill
+
+A Markdown file (stored in `data/skills/`) that provides scenario-specific guidance to agents. A Skill defines operational steps, common errors, and best practices for a specific scenario. The LLM automatically references relevant Skills during execution.
+
+### Multimodal
+
+An LLM's ability to process image input. Depends on the model — after pulling a vision model (e.g. `qwen3.5:4b-vl` / `llava`) in Ollama or using a cloud vision model (`gpt-4o` / `claude-3-5-sonnet` / `gemini-1.5-flash`), AI Chat supports image uploads for visual analysis.
 
 ### Tool
 
 An action an agent can call. NeoMind's agent operates primarily through `neomind` CLI commands to manage devices, rules, dashboards, and so on. The tool system automatically exposes commands from installed extensions to the LLM as well.
 
-```mermaid
-graph TD
-    Agent --> CLI[neomind CLI]
-    CLI --> D[device management]
-    CLI --> R[rule management]
-    CLI --> DA[dashboard management]
-    CLI --> E[extension calls]
-    E --> EX1[YOLO detection]
-    E --> EX2[OCR recognition]
-    E --> EX3[weather forecast]
 ```
+Agent
+  └── neomind CLI
+        ├── device management
+        ├── rule management
+        ├── dashboard management
+        └── extension calls
+              ├── YOLO detection
+              ├── OCR recognition
+              └── weather forecast
+```
+
+---
+
+## Data Processing Related
+
+### Transform
+
+A JavaScript pipeline that automatically executes after data is written to Telemetry, converting raw metrics into more meaningful derived metrics. Supports three scope levels: **Global** (all devices), **Device Type** (a class of devices), **Device** (a single device).
+
+**Example**: Raw data `{temperature: 25.6, humidity: 60}` → Transform calculates `dew_point: 16.7°C` (dew point) and `comfort: "humid"` (comfort level).
+
+Derived metrics are written to Telemetry in `transform:{output_prefix}:{field}` format, consumed by dashboards, rules, and agents just like raw data.
+
+> See [Core Concepts — Transform](./2-core-concepts.md#transform) and [Automation Rules](../user-guide/7-automation-rules.md).
 
 ---
 
@@ -192,7 +260,8 @@ NeoMind rules are defined in **JSON**:
   "name": "High Temp Alert",
   "trigger": { "trigger_type": "data_change" },
   "condition": { "condition_type": "comparison", "source": "device:sensor-01:temperature", "operator": "greater_than", "threshold": 30 },
-  "actions": [ { "type": "notify", "message": "Too hot" } ]
+  "actions": [ { "type": "notify", "message": "Too hot" } ],
+  "cooldown": 60
 }
 ```
 
@@ -200,22 +269,30 @@ A rule has three parts: a **trigger** (when to evaluate), a **condition** (when 
 
 > See [Automation Rules](../user-guide/7-automation-rules.md).
 
+### Cooldown
+
+A suppression window (in seconds) after a rule triggers. During cooldown, the rule will not fire again even if the condition is still met — preventing alert storms. For example, `cooldown: 60` means no repeat trigger for 60 seconds after firing.
+
+### Rule Engine
+
+NeoMind's built-in automation evaluation engine. Evaluates bound rule conditions **immediately** when data is written to Telemetry (zero latency, no polling). On match, it executes actions (notify, execute command, trigger agent).
+
 ### Message Channel
 
 The delivery channel used when a rule triggers a notification. Supports 7 external channels plus in-app messages:
 
-```mermaid
-graph LR
-    R[Rule triggers] --> Ch{Pick channel}
-    Ch --> W[Webhook]
-    Ch --> E[Email]
-    Ch --> T[Telegram]
-    Ch --> WC[WeCom]
-    Ch --> DT[DingTalk]
-    Ch --> S[Slack]
-    Ch --> F[Feishu]
-    Ch --> In[In-app message]
-```
+<div style={{display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center', margin: '16px 0'}}>
+  <span style={{background: '#ffe6cc', border: '1px solid #d79b00', borderRadius: '20px', padding: '6px 16px', fontSize: '0.9em', fontWeight: 600}}>Rule triggers</span>
+  <span style={{fontSize: '1.2em', color: '#999'}}>→</span>
+  <span style={{background: '#dae8fc', border: '1px solid #6c8ebf', borderRadius: '20px', padding: '6px 16px', fontSize: '0.9em'}}>Webhook</span>
+  <span style={{background: '#dae8fc', border: '1px solid #6c8ebf', borderRadius: '20px', padding: '6px 16px', fontSize: '0.9em'}}>Email</span>
+  <span style={{background: '#dae8fc', border: '1px solid #6c8ebf', borderRadius: '20px', padding: '6px 16px', fontSize: '0.9em'}}>Telegram</span>
+  <span style={{background: '#dae8fc', border: '1px solid #6c8ebf', borderRadius: '20px', padding: '6px 16px', fontSize: '0.9em'}}>WeCom</span>
+  <span style={{background: '#dae8fc', border: '1px solid #6c8ebf', borderRadius: '20px', padding: '6px 16px', fontSize: '0.9em'}}>DingTalk</span>
+  <span style={{background: '#dae8fc', border: '1px solid #6c8ebf', borderRadius: '20px', padding: '6px 16px', fontSize: '0.9em'}}>Slack</span>
+  <span style={{background: '#dae8fc', border: '1px solid #6c8ebf', borderRadius: '20px', padding: '6px 16px', fontSize: '0.9em'}}>Feishu</span>
+  <span style={{background: '#e1d5e7', border: '1px solid #9673a6', borderRadius: '20px', padding: '6px 16px', fontSize: '0.9em'}}>In-app</span>
+</div>
 
 > See [Notifications](../user-guide/8-notifications.md).
 
@@ -242,20 +319,19 @@ Extensions can:
 - Load ML models (e.g. YOLO object detection)
 - Process streaming data (e.g. video frames)
 
-```mermaid
-graph LR
-    subgraph Main[Main process]
-        ER[ExtensionRunner]
-    end
-    subgraph Ext1[Extension process 1]
-        Y[YOLO detection]
-    end
-    subgraph Ext2[Extension process 2]
-        O[OCR recognition]
-    end
-    ER <-.FFI.- Y
-    ER <-.FFI.- O
-```
+<div style={{display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap', margin: '16px 0'}}>
+  <div style={{background: '#d5e8d4', border: '2px solid #82b366', borderRadius: '8px', padding: '12px 20px', fontWeight: 'bold', color: '#1f4d1f'}}>
+    ExtensionRunner<br/><span style={{fontSize: '0.8em', fontWeight: 'normal'}}>(main process)</span>
+  </div>
+  <div style={{display: 'flex', flexDirection: 'column', gap: '8px'}}>
+    <div style={{background: '#f5f5f5', border: '1px dashed #666', borderRadius: '6px', padding: '8px 16px', fontSize: '0.9em'}}>
+      YOLO detection <span style={{fontSize: '0.8em', color: '#888'}}>(isolated process · FFI)</span>
+    </div>
+    <div style={{background: '#f5f5f5', border: '1px dashed #666', borderRadius: '6px', padding: '8px 16px', fontSize: '0.9em'}}>
+      OCR recognition <span style={{fontSize: '0.8em', color: '#888'}}>(isolated process · FFI)</span>
+    </div>
+  </div>
+</div>
 
 :::warning Why process isolation matters
 Extensions run in separate processes — if the YOLO extension crashes because a model fails to load, **the main service is completely unaffected**. Other extensions are not impacted either. This is a key design for NeoMind's stability.
@@ -265,19 +341,26 @@ Extensions run in separate processes — if the YOLO extension crashes because a
 
 ### Capability
 
-A permission an extension must declare at startup. Any capability not declared is denied. This enforces the **principle of least privilege**.
+A permission an extension must declare at startup. Any capability not declared is denied. This enforces the **principle of least privilege**. 14 built-in capabilities cover device read/write, device control, storage queries, event pub/sub, and triggers:
 
-| Capability | Meaning |
-|------------|---------|
-| `network` | Outbound network access |
-| `filesystem:read` / `filesystem:write` | File read / write |
-| `ml-model` | Load / run ML models |
-| `camera` | Access cameras |
-| `serial` | Serial port access |
+| Category | Capability | Description |
+|----------|-----------|-------------|
+| Device Data | `device_metrics_read` / `device_metrics_write` | Read/write device metrics (incl. virtual) |
+| Device Control | `device_control` | Send commands to devices |
+| Storage | `storage_query` / `telemetry_history` / `metrics_aggregate` | Query telemetry history and aggregation |
+| Events | `event_publish` / `event_subscribe` | Publish/subscribe system events |
+| Triggers | `extension_call` / `agent_trigger` / `rule_trigger` | Call extensions, trigger agents/rules |
+| Device Mgmt | `device_register` / `device_unregister` / `device_template_register` | Dynamic device registration |
+
+Also supports `Custom(String)` for custom capabilities.
 
 :::info Security model
-A weather extension only needs the `network` capability. If it tries to read a file, NeoMind denies it outright. This way, even if an extension has a bug and gets exploited, the blast radius is limited to its declared permissions.
+A weather extension only needs the `device_metrics_write` capability. If it tries to control a device, NeoMind denies it outright. This way, even if an extension has a bug and gets exploited, the blast radius is limited to its declared permissions.
 :::
+
+### FFI (Foreign Function Interface)
+
+The cross-process communication mechanism between extension processes and the main process. All requests and responses use serde JSON serialization — no custom binary protocol, logs are readable, debugging is straightforward. This is the key reason NeoMind chose **process isolation over WASM**: FFI can directly call GPU/ML frameworks, while WASM cannot.
 
 ### .nep
 
@@ -343,6 +426,10 @@ sequenceDiagram
     Note over N: Trigger dashboard update + rule check
 ```
 
+### SSE (Server-Sent Events)
+
+An HTTP long-connection unidirectional push protocol. NeoMind uses SSE to push real-time device data updates to the Web UI — data is pushed to open dashboards immediately after being written to Telemetry, without frontend polling. AI Chat streaming responses also use SSE.
+
 ---
 
 ## Dashboard Related
@@ -374,45 +461,44 @@ Custom widgets provided by extensions are also supported.
 
 How do these concepts work together? The diagram below shows the full data flow from device to visualization:
 
-```mermaid
-flowchart TB
-    subgraph Device Layer
-        DEV[Device]
-        DT[Device Type]
-        DEV -.typed by.-> DT
-    end
+<div style={{overflowX: 'auto', margin: '16px 0'}}>
+  <table style={{borderCollapse: 'separate', borderSpacing: '4px', width: '100%', fontSize: '0.9em'}}>
+    <thead>
+      <tr>
+        <th style={{background: '#f8cecc', color: '#6b1a1a', padding: '10px 12px', textAlign: 'center', borderRadius: '8px', border: '1px solid #b85450'}}>Data Sources</th>
+        <th style={{background: '#ffe6cc', color: '#6b3d00', padding: '10px 12px', textAlign: 'center', borderRadius: '8px', border: '1px solid #d79b00'}}>Ingestion</th>
+        <th style={{background: '#d5e8d4', color: '#1f4d1f', padding: '10px 12px', textAlign: 'center', borderRadius: '8px', border: '2.5px solid #82b366', fontSize: '1.05em'}}>Telemetry Store</th>
+        <th style={{background: '#dae8fc', color: '#1a3d6b', padding: '10px 12px', textAlign: 'center', borderRadius: '8px', border: '1px solid #6c8ebf'}}>Consumers</th>
+        <th style={{background: '#dae8fc', color: '#1a3d6b', padding: '10px 12px', textAlign: 'center', borderRadius: '8px', border: '1px solid #6c8ebf'}}>Outputs</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style={{textAlign: 'center', padding: '10px 8px'}}>
+          <strong>Device</strong><br/><span style={{fontSize: '0.85em', color: '#666'}}>Camera · Sensor · Controller</span><br/><hr style={{border: 'none', borderTop: '1px solid #ddd', margin: '8px 0'}}/>
+          <strong>Extension</strong><br/><span style={{fontSize: '0.85em', color: '#666'}}>YOLO · OCR · Bridge</span>
+        </td>
+        <td style={{textAlign: 'center', padding: '10px 8px'}}>
+          MQTT <code>:1883</code><br/><br/>Webhook<br/><br/>BLE
+        </td>
+        <td style={{textAlign: 'center', padding: '10px 8px', fontWeight: 'bold'}}>
+          <strong>redb</strong><br/><code style={{fontSize: '0.85em'}}>data/telemetry.redb</code><br/><br/><span style={{fontSize: '0.8em', fontWeight: 'normal', color: '#666'}}>Written once<br/>consumed by many</span>
+        </td>
+        <td style={{textAlign: 'center', padding: '10px 8px'}}>
+          <strong>Dashboard</strong> / Widget<br/><br/>Rule Engine<br/><br/>Agent (LLM)
+        </td>
+        <td style={{textAlign: 'center', padding: '10px 8px'}}>
+          Real-time UI<br/><span style={{fontSize: '0.85em', color: '#666'}}>(WebSocket push)</span><br/><br/>Notifications<br/><span style={{fontSize: '0.85em', color: '#666'}}>(7 channels)</span><br/><br/>AI Responses<br/><span style={{fontSize: '0.85em', color: '#666'}}>(natural language)</span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
-    subgraph Ingest Layer
-        MQTT[MQTT Broker]
-        WH[Webhook]
-        DEV -->|MQTT| MQTT
-        DEV -->|HTTP| WH
-    end
-
-    subgraph Storage Layer
-        T[Telemetry / redb]
-        MQTT --> T
-        WH --> T
-    end
-
-    subgraph Consumer Layer
-        DA[Dashboard / Widget]
-        R[Rule]
-        AG[Agent]
-        T --> DA
-        T --> R
-        T --> AG
-    end
-
-    subgraph Extension Layer
-        EX[Extension]
-        EX -->|metrics| T
-        AG -->|commands| EX
-    end
-
-    R -->|triggers| CH[Message Channel]
-```
+<div style={{display: 'flex', justifyContent: 'center', gap: '4px', alignItems: 'center', fontSize: '1.5em', color: '#999', margin: '4px 0 16px'}}>
+  <span>→</span><span>→</span><span>→</span><span>→</span><span>→</span>
+</div>
 
 ---
 
-*Last updated: 2026-06-12 · NeoMind v0.8.11*
+*Last updated: 2026-06-15*

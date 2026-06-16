@@ -16,11 +16,11 @@ Three core surfaces of NeoMind — manage your devices, visualize your data, and
 
 <div style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
 
-<img src="/img/neomind/quick-start/step3-devices.png" alt="Device management — unified MQTT/BLE/Webhook devices" style={{width: '100%', borderRadius: '8px', border: '1px solid var(--ifm-color-emphasis-200)'}} />
+<img src="https://resources.camthink.ai/NeoMind/devices-overview.png" alt="Device management — unified MQTT/BLE/Webhook devices" style={{width: '100%', borderRadius: '8px', border: '1px solid var(--ifm-color-emphasis-200)'}} />
 
-<img src="/img/neomind/quick-start/step4-dashboard.png" alt="Real-time dashboard — drag-and-drop builder, WebSocket live updates" style={{width: '100%', borderRadius: '8px', border: '1px solid var(--ifm-color-emphasis-200)'}} />
+<img src="https://resources.camthink.ai/NeoMind/dashboard-overview.png" alt="Real-time dashboard — drag-and-drop builder, WebSocket live updates" style={{width: '100%', borderRadius: '8px', border: '1px solid var(--ifm-color-emphasis-200)'}} />
 
-<img src="/img/neomind/quick-start/step5-ai-chat.png" alt="AI Chat — query devices and create automations in natural language" style={{width: '100%', borderRadius: '8px', border: '1px solid var(--ifm-color-emphasis-200)'}} />
+<img src="https://resources.camthink.ai/NeoMind/chat-overview.png" alt="AI Chat — query devices and create automations in natural language" style={{width: '100%', borderRadius: '8px', border: '1px solid var(--ifm-color-emphasis-200)'}} />
 
 </div>
 
@@ -32,67 +32,46 @@ NeoMind uses a **single-process, multi-layer** architecture — all core capabil
 
 ```mermaid
 flowchart TB
-    subgraph UI["User Interface"]
-        direction LR
-        WEB("Web")
-        DESKTOP("Desktop")
-        CLI("CLI")
-    end
+    CLIENT["Web · Desktop · CLI"]
+    CHAT["Chat & Agents"]
+    LLM["LLM Backends<br/>Ollama · OpenAI · Claude · GLM"]
+    MEM["Memory & Skills"]
 
-    subgraph AI["AI Intelligence"]
-        direction LR
-        CHAT["Chat & Agents"]
-        LLM["LLM Backends"]
-        SKILLS["Memory & Skills"]
-    end
+    API["REST API :9375"]
+    MQTT["MQTT Broker :1883"]
+    STORE[("Telemetry<br/>redb")]
+    AUTO["Rule Engine · Transforms · Notifications"]
 
-    subgraph AUTO["Automation"]
-        direction LR
-        RULE["Rule Engine"]
-        TRANSFORM["Transforms"]
-        NOTIFY["Notifications"]
-    end
+    EXT["Extensions — Process Isolated<br/>Vision AI · OCR · Custom"]
+    DEV["IoT Devices<br/>Cameras · Sensors · Controllers"]
 
-    subgraph CORE["Data Hub — Single Process"]
-        direction LR
-        API["API :9375"]
-        MQTT["MQTT :1883"]
-        STORE[("Telemetry<br/>redb")]
-    end
+    CLIENT --> CHAT
+    CHAT --> LLM
+    CHAT --> MEM
+    CHAT -->|tool calls| API
 
-    subgraph DEV["Device Ingress"]
-        direction LR
-        MQDEV("MQTT")
-        BLEDEV("BLE")
-        HOOK("Webhook")
-    end
+    DEV -->|MQTT| MQTT
+    DEV -.->|Webhook / BLE| API
 
-    subgraph EXT["Extensions — Process Isolated"]
-        direction LR
-        VISION["Vision AI"]
-        OCR["OCR"]
-        CUSTOM["Custom"]
-    end
+    MQTT --> STORE
+    API --> STORE
+    API --> AUTO
 
-    UI ==> AI
-    AI ==> CORE
-    AUTO --> CORE
-    DEV --> MQTT
-    EXT -.FFI.-> API
+    API -.->|FFI| EXT
 
-    classDef uiNode fill:#dae8fc,stroke:#6c8ebf,color:#1a3d6b
+    classDef clientNode fill:#dae8fc,stroke:#6c8ebf,color:#1a3d6b
     classDef aiNode fill:#e1d5e7,stroke:#9673a6,color:#3d1a4b
-    classDef autoNode fill:#ffe6cc,stroke:#d79b00,color:#6b3d00
-    classDef coreNode fill:#d5e8d4,stroke:#82b366,stroke-width:2.5px,font-weight:bold,color:#1f4d1f
-    classDef devNode fill:#f8cecc,stroke:#b85450,color:#6b1a1a
+    classDef coreNode fill:#d5e8d4,stroke:#82b366,stroke-width:2.5px,color:#1f4d1f
+    classDef autoNode fill:#fff2cc,stroke:#d6b656,color:#7d6400
     classDef extNode fill:#f5f5f5,stroke:#666,stroke-dasharray:6 3,color:#333
+    classDef devNode fill:#f8cecc,stroke:#b85450,color:#6b1a1a
 
-    class WEB,DESKTOP,CLI uiNode
-    class CHAT,LLM,SKILLS aiNode
-    class RULE,TRANSFORM,NOTIFY autoNode
+    class CLIENT clientNode
+    class CHAT,LLM,MEM aiNode
     class API,MQTT,STORE coreNode
-    class MQDEV,BLEDEV,HOOK devNode
-    class VISION,OCR,CUSTOM extNode
+    class AUTO autoNode
+    class EXT extNode
+    class DEV devNode
 ```
 
 :::tip Three Design Philosophies
@@ -198,4 +177,4 @@ NeoMind is a modular ecosystem with specialized repositories for each concern:
 
 ---
 
-*Last updated: 2026-06-12 · NeoMind v0.8.11*
+*Last updated: 2026-06-15*

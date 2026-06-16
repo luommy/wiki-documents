@@ -313,4 +313,4 @@ To receive notifications via email:
 
 ---
 
-*Last updated: 2026-06-12 · NeoMind v0.8.11*
+*Last updated: 2026-06-15*

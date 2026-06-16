@@ -187,4 +187,4 @@ All storage access goes through `neomind-storage`'s repository pattern — no ot
 
 ---
 
-*Last updated: 2026-06-12 · NeoMind v0.8.11*
+*Last updated: 2026-06-15*

@@ -9,15 +9,46 @@ sidebar_label: "System Requirements"
 
 NeoMind 可在桌面（macOS / Windows / Linux）或服务器上运行。以下是各部署方式的具体要求。
 
+## 包大小与资源占用
+
+### 下载体积（GitHub Releases）
+
+| 产物 | 大小 | 说明 |
+|------|------|------|
+| **服务器二进制** (tar.gz) | ~23–26 MB | `neomind` + `neomind-extension-runner` 打包；按平台分发 |
+| **Web 前端** (tar.gz) | ~5.4 MB | 静态资源（HTML/JS/CSS），由后端直接服务 |
+| **macOS 桌面** (.dmg) | ~39 MB | Tauri 应用 — 内含后端 + 前端 + 系统 WebView |
+| **Windows 桌面** (.msi) | ~39 MB | |
+| **Linux 桌面** (.deb) | ~43 MB | |
+| **Linux AppImage** | ~112 MB | 完全自包含 — 包含所有系统库 |
+
+> **服务器总磁盘占用**：~30 MB（二进制 + Web 资源）。没有 Docker 镜像层，没有 pip/npm 运行时——一个静态编译二进制 + 一组静态文件。
+
+### 运行时资源占用
+
+主进程在单个二进制中内嵌 API 服务器、MQTT Broker、redb 存储和规则引擎。扩展运行在独立进程中。
+
+| 组件 | 内存（典型） | 说明 |
+|------|-------------|------|
+| **主进程** | 50–150 MB | Axum + MQTT Broker + redb。随设备数量和遥测量增长。 |
+| **扩展进程** | 每个扩展 10–50 MB | ML 模型延迟加载（首次命令 → 加载 → 常驻）。YOLOv8n 模型激活时增加 ~50 MB。 |
+| **遥测存储** | 随数据量增长 | redb 文件位于 `data/telemetry.redb`。每个数据点 ~1 KB。保留时间可配置。 |
+
+:::tip 无外部依赖
+NeoMind **不需要** PostgreSQL、Mosquitto、Redis 或任何其他外部服务。唯一可选的外部依赖是 LLM——可以是本地运行的 [Ollama](https://ollama.ai)，也可以是云端 API Key。
+:::
+
 ## 桌面应用（推荐入门）
 
 通过 [GitHub Releases](https://github.com/camthink-ai/NeoMind/releases/latest) 下载安装包。
 
 | 操作系统 | 架构 | 安装包格式 |
 |----------|------|-----------|
-| macOS（Apple Silicon + Intel） | arm64 / x86_64 | `.dmg` |
+| macOS | Apple Silicon（arm64） | `.dmg` |
 | Windows | x86_64 | `.msi` / `.exe` |
-| Linux | x86_64 | `.AppImage` / `.deb` |
+| Linux | x86_64 / arm64 | `.AppImage` / `.deb` |
+
+> 官方仅提供上述架构的预编译包。如需其他平台（如 macOS Intel / Windows ARM），可[从源码构建](../user-guide/1-install-setup.md#从源码构建开发)。
 
 **最低硬件**：
 
@@ -109,4 +140,4 @@ NeoMind 支持多种 LLM 后端，按部署形态分两类：
 
 ---
 
-*最后更新: 2026-06-12 · NeoMind v0.8.11*
+*最后更新: 2026-06-15*

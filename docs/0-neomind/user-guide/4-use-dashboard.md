@@ -1,5 +1,5 @@
 ---
-description: "NeoMind 仪表板使用指南：创建与编辑仪表板、添加组件（数值卡/图表/仪表盘/表格/视觉）、实时数据、数据源格式、分享公开链接与移动端适配。"
+description: "NeoMind 仪表板使用指南：创建与编辑仪表板、组件库（数值卡/图表/开关/图像/视频/地图等）、实时数据、数据源绑定、分享公开链接与移动端适配。"
 keywords: [NeoMind, 仪表板, dashboard, 组件, widget, 实时数据, 分享]
 tags: [NeoMind, 用户指南]
 sidebar_label: "Use Dashboards"
@@ -20,35 +20,99 @@ sidebar_label: "Use Dashboards"
 
 ## 创建仪表板
 
-1. 进入 **Dashboards（仪表板）** 页签
-2. 点击 **New Dashboard（新建仪表板）**
-3. 输入名称（必填）与描述（可选）
-4. 保存后进入编辑模式
+1. 点击左侧导航栏的 **Dashboards（仪表板）** 图标进入仪表板列表
+2. 点击列表中的 **+（New Dashboard）** 按钮
 
-<!-- 截图占位符：仪表板网格编辑器 + 组件选择面板
-     建议上传 resources.camthink.ai/wiki/img/ai-application/neomind/user-guide/
-     dashboard-editor.png / widget-picker.png
--->
+<img src="https://resources.camthink.ai/NeoMind/dashboard-create-dialog.png" alt="创建仪表板对话框 — 输入名称与描述" style={{width: '100%', borderRadius: '8px', border: '1px solid var(--ifm-color-emphasis-200)'}} />
 
-## 添加与配置组件
+3. 输入**名称**（必填）与**描述**（可选），点击创建
+4. 新仪表板自动进入编辑模式，此时画布为空
 
-在编辑模式下点击 **Add Widget（添加组件）**，从组件库选择类型：
+> 仪表板列表页会展示所有已创建的仪表板，点击名称即可进入查看：
 
-| 组件类型 | 用途 | 典型数据 |
-|---------|------|---------|
-| **Value Card（数值卡）** | 单个数值大字号展示 | 温度、湿度、计数 |
-| **Chart（图表）** | 时序折线 / 柱状 / 面积图 | 历史遥测趋势 |
-| **Gauge（仪表盘）** | 圆形 / 线性量表，带阈值色带 | CPU 占用、水位 |
-| **Table（表格）** | 多行多列结构化数据 | 设备列表、识别记录 | |
-| **VLM Vision（视觉组件）** | 渲染图像 / 视频 + AI 标注框 | YOLO/OCR/人脸识别结果 |
-| **Stream Player（流播放）** | RTSP / RTMP / HLS 视频流 | NE301/NE101 实时画面 |
-| **Custom（自定义）** | 社区或自研组件 | 任意 |
+<img src="https://resources.camthink.ai/NeoMind/dashboard-list.png" alt="仪表板列表 — 所有已创建的仪表板" style={{width: '100%', borderRadius: '8px', border: '1px solid var(--ifm-color-emphasis-200)'}} />
 
-每个组件的核心配置是**数据源（Data Source）**。
+## 查看模式 vs 编辑模式
 
-### 数据源格式（DataSourceId）
+仪表板有两种模式，通过工具栏左侧的 **齿轮/✓ 图标** 切换：
 
-NeoMind 用统一格式 `"{type}:{id}:{field}"` 标识一个数据点：
+| 模式 | 说明 | 图标 |
+|------|------|------|
+| **查看模式**（默认） | 锁定布局，仅展示实时数据。普通用户和分享链接访客看到的就是这个模式 | 齿轮图标（Settings2） |
+| **编辑模式** | 可拖拽组件位置与大小、添加/删除组件、修改配置。网格支持磁吸对齐 | ✓ 图标（Check） |
+
+<img src="https://resources.camthink.ai/NeoMind/dashboard-view-empty.png" alt="仪表板查看模式 — 空状态提示进入编辑" style={{width: '100%', borderRadius: '8px', border: '1px solid var(--ifm-color-emphasis-200)'}} />
+
+> 空仪表板在查看模式下会提示「Click Edit Layout to add components」。点击齿轮图标进入编辑模式后，会出现 **Add Component** 按钮。
+
+<img src="https://resources.camthink.ai/NeoMind/dashboard-edit-mode.png" alt="仪表板编辑模式 — 空状态与 Add Component 按钮" style={{width: '100%', borderRadius: '8px', border: '1px solid var(--ifm-color-emphasis-200)'}} />
+
+## 添加组件
+
+### 组件库
+
+在编辑模式下点击 **Add Component**，打开组件库面板。组件按类别分组：
+
+<img src="https://resources.camthink.ai/NeoMind/dashboard-widget-library.png" alt="组件库 — 按类别分组的内置组件" style={{width: '100%', borderRadius: '8px', border: '1px solid var(--ifm-color-emphasis-200)'}} />
+
+#### 指标与指示器（Indicators & Metrics）
+
+| 组件 | 用途 | 典型场景 |
+|------|------|---------|
+| **Value Card**（数值卡） | 大字号展示单个数值，支持单位、阈值变色 | 温度、湿度、计数器 |
+| **LED Indicator**（LED 指示灯） | 开/关状态指示灯 | 设备在线状态、阀门开关 |
+| **Sparkline**（迷你折线图） | 小型趋势线，嵌入紧凑布局 | 实时趋势预览 |
+| **Progress Bar**（进度条） | 水平/垂直进度条 | CPU 占用、存储使用率 |
+
+#### 图表（Charts）
+
+| 组件 | 用途 | 典型场景 |
+|------|------|---------|
+| **Line Chart**（折线图） | 时序数据折线趋势 | 温度历史曲线、流量趋势 |
+| **Area Chart**（面积图） | 带填充的时序图 | 累积量、库存水位 |
+| **Bar Chart**（柱状图） | 离散数据对比 | 各产线产量、周统计 |
+| **Pie Chart**（饼图） | 占比分布 | 设备类型分布、告警分类 |
+
+#### 控件（Controls）
+
+| 组件 | 用途 | 典型场景 |
+|------|------|---------|
+| **Toggle Switch**（开关） | 发送开/关指令到设备 | 远程控制灯光、水泵 |
+
+#### 展示与内容（Display & Content）
+
+| 组件 | 用途 | 典型场景 |
+|------|------|---------|
+| **Image Display**（图像展示） | 显示最新一帧图像 + AI 标注框 | YOLO 检测结果、抓拍画面 |
+| **Image History**（图像历史） | 按时间浏览历史图像 | 安防回放、事件追溯 |
+| **Web Display**（网页嵌入） | iframe 嵌入外部网页 | 第三方监控面板、文档 |
+| **Markdown Display**（Markdown 文本） | 富文本说明 | 仪表板标题说明、操作指南 |
+
+#### 空间与媒体（Spatial & Media）
+
+| 组件 | 用途 | 典型场景 |
+|------|------|---------|
+| **Map Display**（地图） | GPS 坐标标注 + 轨迹 | 车辆定位、资产分布 |
+| **Video Display**（视频流） | RTSP / RTMP / HLS 实时视频流 | NE301/NE101 实时画面 |
+| **Custom Layer**（自定义图层） | 社区或自研组件 | 任意扩展 |
+
+> 除了内置组件，还可以通过 **Marketplace** 标签页从[社区市场](https://github.com/camthink-ai/NeoMind-Dashboard-Components)安装更多组件。
+
+### 配置组件
+
+从组件库点击一个组件类型后，它会添加到画布上，同时弹出配置面板。核心配置项：
+
+**① 数据源绑定（Data Source）**
+
+每个组件需要绑定一个数据源才能显示数据。在配置面板中选择：
+
+| 选择项 | 说明 |
+|--------|------|
+| **Instance**（实例） | 选择 NeoMind 后端实例（本地或远程） |
+| **Device**（设备） | 选择要展示哪个设备的数据 |
+| **Metric**（指标） | 选择具体指标（如 `temperature`、`humidity`） |
+
+选择后系统自动生成 **DataSourceId**，格式为 `{type}:{id}:{field}`：
 
 | 类型 | 示例 | 含义 |
 |------|------|------|
@@ -56,12 +120,21 @@ NeoMind 用统一格式 `"{type}:{id}:{field}"` 标识一个数据点：
 | `extension` | `extension:weather:temp` | 扩展提供的指标 |
 | `agent` | `agent:guard-01:last_result` | Agent 执行结果 |
 
-在组件配置面板选择设备 / 指标后，DataSourceId 会自动生成，无需手写。
+> DataSourceId 自动生成，无需手写。
 
-### 编辑模式 vs 预览模式
+**② 显示选项**
 
-- **编辑模式**：可拖拽改变组件位置与大小，修改配置。网格支持磁吸。
-- **预览模式**：锁定布局，仅展示实时数据。普通用户访问分享链接时进入此模式。
+根据组件类型不同，可配置：
+- **标题/单位**：组件上方显示的名称和数据单位
+- **颜色/阈值**：数值超过阈值时变色（如温度 > 30°C 变红）
+- **时间范围**：图表类组件可选最近 1h / 24h / 7d / 自定义
+- **刷新间隔**：数据拉取频率（实时推送不受此限制）
+
+**③ 布局调整**
+
+- **拖拽**：按住组件拖动到目标位置，网格自动对齐
+- **缩放**：拖拽组件右下角调整大小
+- **删除**：选中组件后按删除键或点配置面板中的删除按钮
 
 ## 实时数据流
 
@@ -77,14 +150,20 @@ NeoMind 通过 **WebSocket / SSE** 把设备数据推送到前端：
 
 可将仪表板生成**公开链接**分享给未登录用户：
 
-1. 在仪表板详情页点击 **Share（分享）**
-2. 设置过期时间（1 小时 / 1 天 / 7 天 / 永久）
-3. 复制生成的链接（形如 `https://your-host/share/<token>`）
-4. 访问者无需账号即可查看（只读）
+1. 在仪表板工具栏点击 **Share（分享）** 图标
+
+<img src="https://resources.camthink.ai/NeoMind/dashboard-share-dialog.png" alt="分享对话框 — 生成公开链接" style={{width: '100%', borderRadius: '8px', border: '1px solid var(--ifm-color-emphasis-200)'}} />
+
+2. 点击 **New Link** 生成新链接
+3. 设置过期时间（1 小时 / 1 天 / 7 天 / 永久）
+4. 复制生成的链接（形如 `https://your-host/share/<token>`）
+5. 访问者无需账号即可查看（只读）
 
 > **注意**：分享链接只暴露该仪表板的只读视图，不暴露 API Key、设备控制权或其他仪表板。过期后链接自动失效。
 
 ## 移动端适配
+
+<img src="https://resources.camthink.ai/NeoMind/dashboard-mobile.png" alt="仪表板移动端 — 单列堆叠布局" style={{width: '50%', borderRadius: '8px', border: '1px solid var(--ifm-color-emphasis-200)'}} />
 
 - **响应式断点**：< 768px 自动切单列堆叠布局
 - **编辑模式**：移动端默认禁用拖拽编辑（屏幕过小），建议在桌面端编辑
@@ -95,14 +174,62 @@ NeoMind 通过 **WebSocket / SSE** 把设备数据推送到前端：
 
 如果你管理多个 NeoMind 后端（如厂房的多台边缘服务器），可在 **Settings → Instances（实例）** 注册它们。注册后，在仪表板编辑组件时可以**跨实例**选择数据源——一个仪表板同时展示多个后端的设备数据。
 
-## 自定义组件
+## 社区组件与自定义组件
 
-内置组件不够用？你可以：
+内置组件覆盖了常见的物联网可视化需求。如果需要更多组件，NeoMind 提供两种扩展方式：
 
-- 从 [NeoMind-Dashboard-Components](https://github.com/camthink-ai/NeoMind-Dashboard-Components) 社区市场安装现成组件
-- 用 React 自研组件并发布到市场
+### 方式一：从社区市场安装（Marketplace）
 
-详见 [开发指南 — Dashboard 组件开发](../developer-guide/1-overview.md)。
+在组件库面板切换到 **Marketplace** 标签页，可以浏览社区组件市场：
+
+<img src="https://resources.camthink.ai/NeoMind/dashboard-marketplace.png" alt="社区组件市场 — 浏览并一键安装社区组件" style={{width: '100%', borderRadius: '8px', border: '1px solid var(--ifm-color-emphasis-200)'}} />
+
+每个组件卡片显示：
+
+| 信息 | 说明 |
+|------|------|
+| **组件名称 + 图标** | 组件的标识 |
+| **版本号** | 如 `v1.1.0` |
+| **作者** | 如 `NeoMind Team`、`CamThink Team` |
+| **描述** | 组件功能简介 |
+| **Install / Uninstall** | 一键安装或卸载 |
+
+点击 **Install** 即可安装，安装后组件出现在 **Components** 标签页中，可以像内置组件一样使用。已安装的组件显示 **Uninstall** 按钮，随时可移除。
+
+> 市场组件来源于 [NeoMind-Dashboard-Components](https://github.com/camthink-ai/NeoMind-Dashboard-Components) 社区仓库，持续更新中。
+
+### 方式二：上传 ZIP 包导入
+
+如果你自己开发了组件，或从其他渠道获得了组件包，可以通过 **Import Component** 功能上传：
+
+1. 在 Marketplace 标签页点击右上角的 **Import Component** 按钮
+
+<img src="https://resources.camthink.ai/NeoMind/dashboard-widget-import.png" alt="导入组件对话框 — 上传 ZIP 组件包" style={{width: '100%', borderRadius: '8px', border: '1px solid var(--ifm-color-emphasis-200)'}} />
+
+2. 点击上传区域选择 `.zip` 文件（或拖拽文件到上传区）
+3. ZIP 包内必须包含 `manifest.json`（组件元数据）和 `bundle.js`（组件代码）
+4. 点击 **Install Confirm** 完成安装
+
+> ZIP 包结构详见 [开发指南 — Dashboard 组件开发](../developer-guide/8-dashboard-component-dev.md)。
+
+也可以用 CLI 安装：
+
+```bash
+# 列出市场可用组件
+neomind widget list
+
+# 安装市场组件
+neomind widget install <组件名>
+
+# 从本地 ZIP 安装
+neomind widget install /path/to/widget.zip
+```
+
+### 自研组件
+
+想开发自己的组件？NeoMind 组件本质是一个 ZIP 包（`manifest.json` + `bundle.js`），用 React 编写，打包为 IIFE 格式。开发完成后通过 Import Component 上传即可使用。
+
+完整开发流程见 [开发指南 — Dashboard 组件开发](../developer-guide/8-dashboard-component-dev.md)。
 
 ## 下一步
 
@@ -112,4 +239,4 @@ NeoMind 通过 **WebSocket / SSE** 把设备数据推送到前端：
 
 ---
 
-*最后更新: 2026-06-12 · NeoMind v0.8.11*
+*最后更新: 2026-06-16*

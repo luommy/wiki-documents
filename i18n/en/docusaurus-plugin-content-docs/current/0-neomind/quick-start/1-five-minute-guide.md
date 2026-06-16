@@ -45,7 +45,7 @@ curl -fsSL https://raw.githubusercontent.com/camthink-ai/NeoMind/main/scripts/in
 
 After startup, open `http://localhost:9375` in your browser.
 
-<img src="/img/neomind/quick-start/step1-login.png" alt="NeoMind login page" style={{width: '100%'}} />
+<img src="https://resources.camthink.ai/NeoMind/step1-login-v2.png" alt="NeoMind login page" style={{width: '100%'}} />
 
 > ✓ **Checkpoint**: you see the login / register page = the server is running. Register an account and log in.
 
@@ -82,7 +82,7 @@ In the wizard:
 2. URL → `http://localhost:11434` (default)
 3. Model → `qwen3.5:4b`
 
-<img src="/img/neomind/quick-start/step2-llm-config.png" alt="LLM configuration wizard" style={{width: '100%'}} />
+<img src="https://resources.camthink.ai/NeoMind/step2-llm-config.png" alt="LLM configuration wizard" style={{width: '100%'}} />
 
 ### Option B: Cloud API
 
@@ -99,6 +99,25 @@ Pick OpenAI / Anthropic / GLM etc., enter your API Key and model name (e.g. `gpt
 
 > See [Configure LLM Backend](../user-guide/2-configure-llm.md).
 
+:::tip Prefer the CLI?
+Skip the UI — one command does it:
+
+```bash
+# Ollama local
+neomind llm create --name local --type ollama --endpoint http://localhost:11434 --model qwen3.5:4b
+
+# Cloud API (GLM example)
+neomind llm create --name glm --type openai \
+  --endpoint https://open.bigmodel.cn/api/paas/v4 \
+  --model glm-4-flash --api-key YOUR_API_KEY
+
+# Test connection → set as default
+neomind llm test local && neomind llm activate local
+```
+
+Full command reference: `neomind llm --help`
+:::
+
 ---
 
 ## Step 3: Connect Your First Device (1 min)
@@ -112,8 +131,8 @@ In the Web UI **Devices** page → click **Add Device** → select **Webhook** �
 After creation you'll get a dedicated Webhook URL (like `/api/devices/<DEVICE_ID>/webhook`).
 
 <div style={{display: 'flex', gap: '8px'}}>
-  <img src="/img/neomind/quick-start/step3-add-device.png" alt="Add device" style={{width: '50%'}} />
-  <img src="/img/neomind/quick-start/step3-webhook-url.png" alt="Get webhook URL" style={{width: '50%'}} />
+  <img src="https://resources.camthink.ai/NeoMind/step3-add-device.png" alt="Add device" style={{width: '50%'}} />
+  <img src="https://resources.camthink.ai/NeoMind/step3-webhook-url.png" alt="Get webhook URL" style={{width: '50%'}} />
 </div>
 
 ### 3.2 Push data
@@ -128,7 +147,7 @@ curl -X POST http://localhost:9375/api/devices/<DEVICE_ID>/webhook \
 
 A `{"success": true}` response means it worked. Open the device detail page to see the latest telemetry values.
 
-<img src="/img/neomind/quick-start/step3-device-detail.png" alt="Device detail page showing telemetry" style={{width: '100%'}} />
+<img src="https://resources.camthink.ai/NeoMind/step3-device-detail.png" alt="Device detail page showing telemetry" style={{width: '100%'}} />
 
 > ✓ **Checkpoint**: the device detail page shows `temperature: 25.6` and `humidity: 60` = data is in the database.
 
@@ -153,7 +172,7 @@ Go to the **Dashboard** page — a default dashboard is auto-created. Click **Ed
 2. Data source → `device:demo-sensor:temperature`
 3. Save
 
-<img src="/img/neomind/quick-start/step4-dashboard.png" alt="Dashboard value card" style={{width: '100%'}} />
+<img src="https://resources.camthink.ai/NeoMind/step4-dashboard.png" alt="Dashboard value card" style={{width: '100%'}} />
 
 :::info DataSourceId Format
 
@@ -188,7 +207,7 @@ Open **AI Chat** and type:
 
 The AI Agent will query the device list and latest telemetry, then answer in natural language.
 
-<img src="/img/neomind/quick-start/step5-ai-chat.png" alt="AI Chat conversation" style={{width: '100%'}} />
+<img src="https://resources.camthink.ai/NeoMind/step5-ai-chat.png" alt="AI Chat conversation" style={{width: '100%'}} />
 
 Now try something more ambitious — let the AI create an automation for you:
 
@@ -245,4 +264,4 @@ Congratulations! You've completed the NeoMind core loop. From here:
 
 ---
 
-*Last updated: 2026-06-12 · NeoMind v0.8.11*
+*Last updated: 2026-06-15*

@@ -1,7 +1,8 @@
 ---
-description: "NeoMind AI Agent guide: autonomous agent concepts, execution modes (Focused/Free), scheduling (cron/event/interval), resource binding, memory system, and status management."
+description: "NeoMind AI Agent guide: autonomous agent concepts, execution modes (Focused/Free), scheduling (cron/event/interval), resource binding, memory system, execution history, and status management."
 keywords: [NeoMind, AI Agent, autonomous, scheduling, event trigger, memory]
 tags: [NeoMind, User Guide]
+sidebar_label: "AI Agent"
 ---
 
 # AI Agent
@@ -20,20 +21,42 @@ AI Agent is NeoMind's **autonomous execution mode** — you set goals and trigge
 - An [LLM backend](./2-configure-llm.md) configured (Agents call LLM)
 - [Devices](./3-onboard-device.md) onboarded (Agents need data sources)
 
+## Interface Overview
+
+Click **Agents** (bot icon) in the left nav to open the Agent management page:
+
+<img src="https://resources.camthink.ai/NeoMind/agents-list.png" alt="AI Agent list — card grid showing all agents with status, schedule type, last execution time" style={{width: '100%', borderRadius: '8px', border: '1px solid var(--ifm-color-emphasis-200)'}} />
+
+The page displays all agents in a **card grid**, each card showing:
+
+| Info | Description |
+|------|-------------|
+| **Agent Name** | The name you set (e.g. "Temperature Patrol", "Energy Report") |
+| **Status Badge** | Active / Paused / Executing / Error |
+| **Schedule** | Cron expression / Interval / Event |
+| **Last Run** | Time and result of the most recent execution |
+
+The page has three tabs at the top: **Agents** (agent list), **Memory** (system memory), **Skills** (skill management).
+
 ## Creating an Agent
 
-Go to **Agents** tab, click **Create Agent**, and fill in these core fields:
+Click the **Create AI Agent** button in the top right to open the full-screen editor:
 
-### 1. Name & Prompt
+<img src="https://resources.camthink.ai/NeoMind/agent-editor.png" alt="AI Agent editor — left side has basic info and prompt, right side has execution mode and schedule config" style={{width: '100%', borderRadius: '8px', border: '1px solid var(--ifm-color-emphasis-200)'}} />
 
-- **Name**: 1–100 characters, easy to identify (e.g., "Energy Patrol", "Device Health Monitor")
+The editor is split into left and right columns. Here's what each field means:
+
+### 1. Name & Prompt (Left)
+
+- **Name**: 1–100 characters, easy to identify (e.g. "Energy Patrol", "Device Health Monitor")
+- **Description**: Optional, brief summary of the agent's purpose
 - **User Prompt**: Tell the Agent what to do. 1–10000 characters.
 
 Example prompt:
 
 > Check the latest readings from all temperature and humidity sensors. If any sensor reports temperature above 35C, notify the ops team via Slack and log an alert on the dashboard. If all devices are normal, give a brief summary.
 
-### 2. Execution Mode
+### 2. Execution Mode (Right)
 
 | Mode | Description | Best For |
 |------|-------------|----------|
@@ -44,28 +67,47 @@ Example prompt:
 
 **Free mode** needs no resource binding. The LLM has access to all tools (device / rule / message / extension / shell, etc.) and can do multi-round tool calls (default max 30 rounds, 5-minute timeout).
 
-### 3. Schedule Type
+### 3. Schedule Type (Right)
+
+<img src="https://resources.camthink.ai/NeoMind/agent-editor-schedule.png" alt="Agent editor — schedule configuration area with cron, interval, event options" style={{width: '100%', borderRadius: '8px', border: '1px solid var(--ifm-color-emphasis-200)'}} />
 
 Agents trigger automatically based on their schedule:
 
 | Schedule | Description | Config |
 |----------|-------------|--------|
-| **Cron** | Triggers on cron expression | `schedule_type: "cron"`, `cron_expression: "0 */5 * * * *"` |
+| **Cron** | Triggers on cron expression | `schedule_type: "cron"`, `cron_expression: "0 0 * * * *"` |
 | **Interval** | Executes every N seconds | `schedule_type: "interval"`, `interval_seconds: 300` |
 | **Event** | Triggers on device data change / alert | `schedule_type: "event"` |
 
-**Cron examples**:
-- Every hour: `0 0 * * * *`
-- Daily at 8 AM: `0 8 * * *`
-- Every 5 minutes: `0 */5 * * * *`
+> **Cron uses 6-field format** (with seconds): `sec min hour day month weekday`. For example, `0 0 * * * *` = every hour on the hour, `0 0 8 * * *` = daily at 8 AM.
 
-**Event trigger**: Executes automatically when devices push new data or the system generates alerts. Ideal for real-time response scenarios (e.g., immediate analysis after anomaly detection). Event triggers have a 60-second dedup window to prevent event storms.
+**Event trigger**: Executes automatically when devices push new data or the system generates alerts. Ideal for real-time response scenarios (e.g. immediate analysis after anomaly detection). Event triggers have a 60-second dedup window to prevent event storms.
 
 ### 4. LLM Backend
 
 Each Agent can bind an independent LLM backend. Decoupled from the Chat model — switching Chat models doesn't affect Agent configuration. Recommendations:
 - **Simple monitoring**: Local small model (`qwen3.5:4b`), lower latency and cost
 - **Complex analysis**: Large model (`qwen3.5:32b` / cloud model), better reasoning quality
+
+Click **Save** at the bottom to save the Agent.
+
+## Agent Detail
+
+Click any Agent card to open the detail panel:
+
+<img src="https://resources.camthink.ai/NeoMind/agent-detail.png" alt="Agent detail panel — overview, execution history, memory system, user messages" style={{width: '100%', borderRadius: '8px', border: '1px solid var(--ifm-color-emphasis-200)'}} />
+
+The detail panel contains multiple sections:
+
+| Section | Description |
+|---------|-------------|
+| **Top Action Bar** | Edit and Run Now buttons |
+| **Overview** | Agent basic info, bound resources, schedule config, LLM backend |
+| **Execution History** | Chronological execution records with success/failure status and duration |
+| **Memory** | Journal logs and Knowledge files |
+| **User Messages** | Feedback messages left for the Agent |
+
+The **Run Now** button in the top right triggers an immediate execution without waiting for the schedule.
 
 ## Agent Memory System
 
@@ -90,7 +132,7 @@ Agent's persistent knowledge in Markdown format:
 - **resources.md** — Bound resource descriptions
 - **schedule.md** — Execution plan
 
-Auto-initialized on first execution. You can manually edit these files to fine-tune Agent behavior (Agent settings → Knowledge panel).
+Auto-initialized on first execution. You can manually edit these files to fine-tune Agent behavior (Agent detail → Memory panel).
 
 ### User Messages (Feedback)
 
@@ -117,16 +159,24 @@ flowchart LR
 
 ## Status Management
 
-| Status | Description |
-|--------|-------------|
-| **Active** | Agent is active, auto-executes on schedule |
-| **Paused** | Agent is paused, won't auto-trigger (can be run manually) |
+The status badge on each Agent card reflects the current state in real time:
 
-Pause/activate syncs with the scheduler — pausing unschedules, activating reschedules.
+| Status | Description | Color |
+|--------|-------------|-------|
+| **Active** | Agent is active, auto-executes on schedule | Green |
+| **Executing** | Agent is currently running (real-time WebSocket push) | Blue / animated |
+| **Paused** | Agent is paused, won't auto-trigger (can be run manually) | Gray |
+| **Error** | Last execution failed, check logs to troubleshoot | Red |
+
+Pause/activate is toggled via the switch button on the card, which syncs with the scheduler — pausing unschedules, activating reschedules.
+
+### Real-time Execution Status
+
+When an Agent is executing, the card shows a live "Thinking..." indicator (pushed via WebSocket), letting you see what the LLM is currently doing (e.g. "Querying device data", "Analyzing temperature trends").
 
 ### Manual Execution
 
-Don't want to wait for the schedule? Click **Run Now** on the Agent detail page to execute immediately.
+Don't want to wait for the schedule? Click **Run Now** on the Agent card or detail page to execute immediately.
 
 ## Typical Scenarios
 
@@ -148,7 +198,7 @@ Don't want to wait for the schedule? Click **Run Now** on the Agent detail page 
 
 - **Mode**: Focused
 - **Resources**: Bind energy consumption metrics
-- **Schedule**: Cron `0 8 * * *` (daily 8 AM)
+- **Schedule**: Cron `0 0 8 * * *` (daily 8 AM)
 - **Prompt**: Summarize yesterday's 24-hour energy data, calculate peak and average, compare with the same period last week, generate a daily report, and send it to the ops email.
 
 ## CLI Management
@@ -193,6 +243,12 @@ If concurrency is full, the scheduler skips the current execution (retries on ne
 | [Devices](./3-onboard-device.md) | Focused mode binds device metrics |
 | [AI Chat](./5-ai-chat.md) | Two AI operation modes, complementary |
 
+## Mobile
+
+<img src="https://resources.camthink.ai/NeoMind/agents-mobile.png" alt="Agent management on mobile — card list adapts to single column" style={{width: '50%', borderRadius: '8px', border: '1px solid var(--ifm-color-emphasis-200)'}} />
+
+On mobile, the interface switches to a single-column card list, supporting status viewing, manual execution, and pause/activate toggling.
+
 ## Next Steps
 
 - **[Automation Rules](./7-automation-rules.md)** — Use JSON rules for deterministic triggers and Agents for fuzzy judgment — they complement each other
@@ -201,4 +257,4 @@ If concurrency is full, the scheduler skips the current execution (retries on ne
 
 ---
 
-*Last updated: 2026-06-13 · NeoMind v0.8.11*
+*Last updated: 2026-06-16*

@@ -238,7 +238,7 @@ HTTP 状态码遵循惯例：4xx 客户端错误、5xx 服务端错误。从 `er
 - **SSE**：`GET /api/events`（Server-Sent Events）— 同样的事件流，HTTP 单向
 - **MQTT**：直连 `mqtt://<host>:1883` 订阅设备原始 topic
 
-详细实时协议见（Phase 2）`5-websocket-realtime.md`。当前可参考 Web 前端 `web/src/lib/events.ts` 与 `web/src/lib/websocket.ts` 的实现。
+实时协议（WebSocket / SSE）的权威实现参考 Web 前端 `web/src/lib/events.ts` 与 `web/src/lib/websocket.ts`。
 
 ## 错误处理建议
 
@@ -262,8 +262,8 @@ else:
 
 - **完整交互式文档**：`/api/docs`（Swagger）——所有端点 + 参数 schema + 在线试调用
 - 加新端点 → 在 `crates/neomind-api/src/` 加 handler，遵循现有分模块模式
-- 实时推送 → WebSocket / SSE（Phase 2 文档）
+- 实时推送 → WebSocket / SSE（参考 `web/src/lib/websocket.ts`）
 
 ---
 
-*最后更新: 2026-06-12 · NeoMind v0.8.11*
+*最后更新: 2026-06-15*

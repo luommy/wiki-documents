@@ -35,7 +35,7 @@ name = "neomind_extension_counter"        # 前缀必须是 neomind_extension_
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-neomind-extension-sdk = "0.6.1"
+neomind-extension-sdk = "0.6.3"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 async-trait = "0.1"
@@ -202,10 +202,11 @@ curl -X POST http://localhost:9375/api/extensions/counter/commands/increment \
 cross build --release --target x86_64-unknown-linux-gnu
 cross build --release --target aarch64-unknown-linux-gnu
 cross build --release --target x86_64-pc-windows-msvc
-# Apple Silicon / Intel macOS 各一份
+# Apple Silicon macOS（arm64）
+cross build --release --target aarch64-apple-darwin
 
 # 打包成 .nep（一个 zip 归档）
-mkdir -p nep/{linux-x64,linux-arm64,windows-x64,darwin-arm64,darwin-x64}
+mkdir -p nep/{linux-x64,linux-arm64,windows-x64,darwin-arm64}
 cp target/x86_64-unknown-linux-gnu/release/libneomind_extension_counter.so nep/linux-x64/
 # ... 其他平台
 cat > nep/metadata.json <<EOF
@@ -216,12 +217,252 @@ cd nep && zip -r ../counter-1.0.0.nep .
 
 `.nep` 是约定俗成的归档格式（参考 NeoMind-Extensions 仓库的 CI 脚本）。用户在 Web UI 一键安装时，runner 会挑当前平台对应的二进制加载。
 
-## 进阶：加 ML 模型 / 网络 / 事件订阅
+## 进阶模式
 
-- **ML 模型**：用 `OnceLock<Model>` 实现 lazy-load（首次命令时加载，之后常驻）—— 见 [SDK — ML 模型生命周期](./3-extension-sdk.md#ml-模型生命周期)
-- **网络访问**：在 metadata 声明 `capabilities: ["network"]`，runner 才允许出站请求
-- **事件订阅**：实现 `event_subscriptions()` 返回关心的事件类型列表，`handle_event()` 处理事件
-- **流式输出**（视频 / 推送）：实现 `stream_capability()` + `process_chunk()` 或 push 模式方法（见 SDK trait 完整签名）
+以下覆盖真实扩展开发中最常见的几种模式。
+
+### 模式 1：网络扩展（天气 API）
+
+天气扩展是最典型的网络扩展——拉取外部 API 数据，产出指标。
+
+```rust
+use neomind_extension_sdk::prelude::*;
+use neomind_extension_sdk::capability::CapabilityContext;
+
+pub struct WeatherExtension {
+    config: std::sync::Mutex<WeatherConfig>,
+}
+
+struct WeatherConfig {
+    api_key: String,
+    city: String,
+}
+
+#[async_trait]
+impl Extension for WeatherExtension {
+    fn metadata(&self) -> &ExtensionMetadata {
+        static META: OnceLock<ExtensionMetadata> = OnceLock::new();
+        META.get_or_init(|| ExtensionMetadata {
+            id: "weather".into(),
+            name: "Weather".into(),
+            version: Version::parse("1.0.0").unwrap(),
+            config_parameters: Some(vec![
+                ParameterDefinition {
+                    name: "api_key".into(),
+                    display_name: "API Key".into(),
+                    description: "OpenWeatherMap API key".into(),
+                    param_type: MetricDataType::String,
+                    required: true,
+                    ..Default::default()
+                },
+            ]),
+            ..Default::default()
+        })
+    }
+
+    fn metrics(&self) -> &[MetricDescriptor] {
+        // 温度、湿度、气压
+        // DataSourceId: extension:weather:temperature 等
+    }
+
+    async fn configure(&mut self, config: &Value) -> Result<()> {
+        let cfg = self.config.lock().unwrap();
+        // 从 config JSON 更新 api_key / city
+    }
+
+    async fn execute_command(&self, cmd: &str, args: &Value) -> Result<Value> {
+        match cmd {
+            "fetch" => {
+                let ctx = CapabilityContext::default();
+                // 通过 network capability 发起 HTTP 请求
+                let resp = ctx.invoke_capability("network", &json!({
+                    "method": "GET",
+                    "url": format!("https://api.openweathermap.org/data/2.5/weather?q={}&appid={}",
+                        cfg.city, cfg.api_key)
+                }));
+                // 解析响应，写入虚拟设备指标
+                ctx.invoke_capability("device_metrics_write", &json!({
+                    "device_id": "virtual-weather",
+                    "metric": "temperature",
+                    "value": resp["main"]["temp"]
+                }));
+                Ok(json!({"status": "ok"}))
+            }
+            _ => Err(ExtensionError::CommandNotFound(cmd.into())),
+        }
+    }
+
+    fn as_any(&self) -> &dyn std::any::Any { self }
+}
+
+neomind_export!(WeatherExtension);
+```
+
+### 模式 2：流式处理（视频帧）
+
+视频分析扩展使用流式 API——每帧进入 `process_chunk()`，返回检测结果。
+
+```rust
+pub struct YoloVideoExtension {
+    model: OnceLock<YoloModel>,
+}
+
+#[async_trait]
+impl Extension for YoloVideoExtension {
+    fn stream_capability(&self) -> Option<StreamCapability> {
+        Some(StreamCapability {
+            mode: StreamMode::Stateless, // 无状态：每帧独立处理
+            input_format: "image/jpeg".into(),
+            output_format: "application/json".into(),
+        })
+    }
+
+    async fn process_chunk(&self, chunk: DataChunk) -> Result<StreamResult> {
+        let model = self.model.get_or_try_init(|| YoloModel::load("yolov8n.onnx"))?;
+        let detections = model.infer(&chunk.data)?;
+
+        Ok(StreamResult {
+            output: serde_json::to_value(&detections)?,
+            metadata: Some(json!({"frame_id": chunk.sequence})),
+        })
+    }
+
+    // ... 其他方法
+}
+```
+
+### 模式 3：推送模式（传感器）
+
+推送模式适用于扩展主动产出数据的场景（如串口传感器）。扩展通过 `output_sender` 主动推送。
+
+```rust
+use tokio::sync::mpsc;
+use std::sync::Arc;
+
+pub struct SensorPushExtension {
+    sender: std::sync::Mutex<Option<Arc<mpsc::Sender<PushOutputMessage>>>>,
+}
+
+#[async_trait]
+impl Extension for SensorPushExtension {
+    fn set_output_sender(&self, sender: Arc<mpsc::Sender<PushOutputMessage>>) {
+        *self.sender.lock().unwrap() = Some(sender);
+    }
+
+    async fn start_push(&self, _session_id: &str) -> Result<()> {
+        let sender = self.sender.lock().unwrap().clone()
+            .ok_or(ExtensionError::ExecutionFailed("no sender".into()))?;
+
+        // 启动后台采集任务
+        tokio::spawn(async move {
+            loop {
+                let value = read_sensor(); // 你的采集逻辑
+                let msg = PushOutputMessage {
+                    metric: "temperature".into(),
+                    value: json!(value),
+                    timestamp: chrono::Utc::now().timestamp(),
+                };
+                if sender.send(msg).await.is_err() { break; }
+                tokio::time::sleep(Duration::from_secs(5)).await;
+            }
+        });
+
+        Ok(())
+    }
+
+    async fn stop_push(&self, _session_id: &str) -> Result<()> {
+        // 停止后台任务（通过 channel 关闭或 cancel token）
+        Ok(())
+    }
+}
+```
+
+### 模式 4：事件订阅
+
+扩展可以订阅平台事件（如设备上线、规则触发），在 `handle_event()` 中响应。
+
+```rust
+fn event_subscriptions(&self) -> &[&str] {
+    &["device.online", "rule.triggered"]
+}
+
+fn handle_event(&self, event_type: &str, payload: &Value) -> Result<()> {
+    match event_type {
+        "device.online" => {
+            let device_id = payload["device_id"].as_str().unwrap();
+            // 设备上线时做初始化...
+        }
+        "rule.triggered" => {
+            // 规则触发时的联动逻辑...
+        }
+        _ => {}
+    }
+    Ok(())
+}
+```
+
+### 模式 5：配置参数热更新
+
+用户在 Web UI 修改配置后，`configure()` 被调用。建议用 `Mutex` 保护配置状态：
+
+```rust
+pub struct MyExtension {
+    config: std::sync::Mutex<MyConfig>,
+}
+
+async fn configure(&mut self, config: &Value) -> Result<()> {
+    let new_cfg = MyConfig {
+        api_key: config["api_key"].as_str().unwrap_or("").to_string(),
+        interval: config["interval"].as_u64().unwrap_or(60),
+    };
+    // 校验
+    if new_cfg.api_key.is_empty() {
+        return Err(ExtensionError::InvalidArguments("api_key required".into()));
+    }
+    *self.config.lock().unwrap() = new_cfg;
+    Ok(())
+}
+```
+
+### .nep 包结构
+
+完整的 `.nep` 包是一个 ZIP 归档，包含多平台二进制 + metadata：
+
+```
+my-extension-1.0.0.nep (ZIP)
+├── metadata.json               ← 扩展元数据 + 平台映射
+├── darwin-arm64/
+│   └── libneomind_extension_my_extension.dylib
+├── darwin-x86_64/
+│   └── libneomind_extension_my_extension.dylib
+├── linux-x86_64/
+│   └── libneomind_extension_my_extension.so
+├── linux-arm64/
+│   └── libneomind_extension_my_extension.so
+├── windows-x86_64/
+│   └── neomind_extension_my_extension.dll
+└── models/                     ← （可选）ML 模型文件
+    └── yolov8n.onnx
+```
+
+**metadata.json** 示例：
+
+```json
+{
+  "id": "my-extension",
+  "name": "My Extension",
+  "version": "1.0.0",
+  "sdk_version": "0.6.3",
+  "abi_version": 3,
+  "platforms": {
+    "darwin-arm64": "darwin-arm64/libneomind_extension_my_extension.dylib",
+    "linux-x86_64": "linux-x86_64/libneomind_extension_my_extension.so",
+    "windows-x86_64": "windows-x86_64/neomind_extension_my_extension.dll"
+  }
+}
+```
+
+runner 加载时会根据当前平台自动选择对应的二进制路径。
 
 ## 参考实现
 
@@ -250,8 +491,9 @@ cd nep && zip -r ../counter-1.0.0.nep .
 
 - 把你的扩展提 PR 到 [NeoMind-Extensions](https://github.com/camthink-ai/NeoMind-Extensions)，让社区用上
 - 涉及 HTTP API 的扩展命令调用细节 → [REST API 参考](./4-rest-api.md)
-- Dashboard 组件开发（如果想让扩展带可视化）→ Phase 2 `8-dashboard-component-dev.md`
+- Dashboard 组件开发（如果想让扩展带可视化）→ [Dashboard 组件开发](./8-dashboard-component-dev.md)
+- 设备指标作为扩展数据源 → [设备类型开发](./6-device-type-development.md)
 
 ---
 
-*最后更新: 2026-06-12 · NeoMind v0.8.11 · SDK v0.6.1*
+*最后更新: 2026-06-15*

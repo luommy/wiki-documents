@@ -1,5 +1,5 @@
 ---
-description: "NeoMind AI Agent 使用指南：自主智能体的概念、执行模式（Focused/Free）、调度方式（定时/事件/间隔）、资源绑定、记忆系统与状态管理。"
+description: "NeoMind AI Agent 使用指南：自主智能体的概念、执行模式（Focused/Free）、调度方式（定时/事件/间隔）、资源绑定、记忆系统、执行历史与状态管理。"
 keywords: [NeoMind, AI Agent, 自主智能体, 定时执行, 事件触发, 记忆系统]
 tags: [NeoMind, 用户指南]
 sidebar_label: "AI Agent"
@@ -21,20 +21,42 @@ AI Agent 是 NeoMind 的**自主执行模式**——你设定目标和触发条�
 - 已配置 [LLM 后端](./2-configure-llm.md)（Agent 需要调用 LLM）
 - 已接入[设备](./3-onboard-device.md)（Agent 需要数据源）
 
+## 界面概览
+
+点击左侧导航的 **Agents**（机器人图标）进入 Agent 管理页面：
+
+<img src="https://resources.camthink.ai/NeoMind/agents-list.png" alt="AI Agent 列表 — 卡片式展示所有 Agent，含状态、调度方式、上次执行时间" style={{width: '100%', borderRadius: '8px', border: '1px solid var(--ifm-color-emphasis-200)'}} />
+
+页面以**卡片网格**展示所有 Agent，每张卡片显示：
+
+| 信息 | 说明 |
+|------|------|
+| **Agent 名称** | 你设置的名称（如「温度巡检」「能耗日报」） |
+| **状态徽章** | Active（激活）/ Paused（暂停）/ Executing（执行中）/ Error（错误） |
+| **调度方式** | Cron 表达式 / Interval / Event |
+| **上次执行** | 最近一次执行的时间与结果 |
+
+页面顶部有三个页签：**Agents**（智能体列表）、**Memory**（系统记忆）、**Skills**（技能管理）。
+
 ## 创建 Agent
 
-进入 **Agents** 页签，点击 **Create Agent**，填写以下核心字段：
+点击右上角的 **Create AI Agent** 按钮，打开全屏编辑器：
 
-### 1. 名称与 Prompt
+<img src="https://resources.camthink.ai/NeoMind/agent-editor.png" alt="AI Agent 编辑器 — 左侧基本信息与提示词，右侧执行模式与调度配置" style={{width: '100%', borderRadius: '8px', border: '1px solid var(--ifm-color-emphasis-200)'}} />
 
-- **名称**：1–100 字符，便于识别（如「能耗巡检」「设备健康监测」）
+编辑器分为左右两栏，以下是各配置项说明：
+
+### 1. 名称与 Prompt（左侧）
+
+- **Name（名称）**：1–100 字符，便于识别（如「能耗巡检」「设备健康监测」）
+- **Description（描述）**：可选，简短说明 Agent 用途
 - **User Prompt（用户提示词）**：告诉 Agent 要做什么。1–10000 字符。
 
 示例 prompt：
 
 > 检查所有温湿度传感器的最新数据。如果任何传感器温度超过 35°C，通过飞书通知运维组，并在仪表板上记录告警。如果所有设备正常，简短汇报即可。
 
-### 2. 执行模式
+### 2. 执行模式（右侧）
 
 | 模式 | 说明 | 适用场景 |
 |------|------|---------|
@@ -45,20 +67,19 @@ AI Agent 是 NeoMind 的**自主执行模式**——你设定目标和触发条�
 
 **Free 模式**无需绑定资源，LLM 拥有全部工具（device / rule / message / extension / shell 等），可做多轮工具调用（默认上限 30 轮，5 分钟超时）。
 
-### 3. 调度方式
+### 3. 调度方式（右侧）
+
+<img src="https://resources.camthink.ai/NeoMind/agent-editor-schedule.png" alt="Agent 编辑器 — 调度配置区域，含 cron、interval、event 选项" style={{width: '100%', borderRadius: '8px', border: '1px solid var(--ifm-color-emphasis-200)'}} />
 
 Agent 按调度方式自动触发执行：
 
 | 调度类型 | 说明 | 配置 |
 |---------|------|------|
-| **Cron（定时表达式）** | 按 cron 表达式触发 | `schedule_type: "cron"`, `cron_expression: "0 */5 * * * *"` |
+| **Cron（定时表达式）** | 按 cron 表达式触发 | `schedule_type: "cron"`, `cron_expression: "0 0 * * * *"` |
 | **Interval（固定间隔）** | 每隔 N 秒执行 | `schedule_type: "interval"`, `interval_seconds: 300` |
 | **Event（事件触发）** | 设备数据变化 / 告警时触发 | `schedule_type: "event"` |
 
-**Cron 示例**：
-- 每小时：`0 0 * * * *`
-- 每天早上 8 点：`0 8 * * *`
-- 每 5 分钟：`0 */5 * * * *`
+> **Cron 使用 6 字段格式**（含秒）：`秒 分 时 日 月 周`。例如 `0 0 * * * *` = 每小时整点，`0 0 8 * * *` = 每天早 8 点。
 
 **事件触发**：当设备推送新数据或系统产生告警时自动执行。适合实时响应场景（如异常检测后立即分析）。事件触发有 60 秒去重窗口，防止事件风暴。
 
@@ -67,6 +88,26 @@ Agent 按调度方式自动触发执行：
 每个 Agent 可绑定独立的 LLM 后端。与 Chat 模型解耦——切换 Chat 模型不会影响 Agent 配置。建议：
 - **简单监控**：本地小模型（`qwen3.5:4b`），降低延迟和成本
 - **复杂分析**：大模型（`qwen3.5:32b` / 云端模型），提高推理质量
+
+填写完成后点击底部的 **Save** 保存 Agent。
+
+## Agent 详情
+
+点击任意 Agent 卡片，打开详情面板：
+
+<img src="https://resources.camthink.ai/NeoMind/agent-detail.png" alt="Agent 详情面板 — 概览、执行历史、记忆系统、用户消息" style={{width: '100%', borderRadius: '8px', border: '1px solid var(--ifm-color-emphasis-200)'}} />
+
+详情面板包含多个区域：
+
+| 区域 | 说明 |
+|------|------|
+| **顶部操作栏** | Edit（编辑）、Run Now（立即执行）按钮 |
+| **概览** | Agent 基本信息、绑定资源、调度配置、LLM 后端 |
+| **执行历史** | 按时间排列的执行记录列表，含成功/失败状态、执行时长 |
+| **记忆系统** | Journal 日志和 Knowledge 知识文件 |
+| **用户消息** | 给 Agent 的留言反馈 |
+
+详情页右上角的 **Run Now** 可以立即触发一次执行，无需等待定时调度。
 
 ## Agent 记忆系统
 
@@ -91,7 +132,7 @@ Agent 的持久知识，Markdown 格式：
 - **resources.md** — 绑定资源说明
 - **schedule.md** — 执行计划
 
-首次执行时自动初始化。你可以手动编辑这些文件来微调 Agent 行为（在 Agent 设置 → Knowledge 面板）。
+首次执行时自动初始化。你可以手动编辑这些文件来微调 Agent 行为（在 Agent 详情 → Memory 面板）。
 
 ### User Messages（用户反馈）
 
@@ -118,16 +159,24 @@ flowchart LR
 
 ## 状态管理
 
-| 状态 | 说明 |
-|------|------|
-| **Active** | Agent 激活中，按计划自动执行 |
-| **Paused** | Agent 已暂停，不会自动触发（可手动执行） |
+Agent 卡片上的状态徽章实时反映当前状态：
 
-暂停 / 激活会同步到调度器——暂停即取消调度，激活即恢复调度。
+| 状态 | 说明 | 颜色 |
+|------|------|------|
+| **Active** | Agent 激活中，按计划自动执行 | 绿色 |
+| **Executing** | Agent 正在执行（实时 WebSocket 推送） | 蓝色 / 动画 |
+| **Paused** | Agent 已暂停，不会自动触发（可手动执行） | 灰色 |
+| **Error** | 上次执行失败，检查日志排查原因 | 红色 |
+
+暂停 / 激活通过卡片上的开关按钮切换，会同步到调度器——暂停即取消调度，激活即恢复调度。
+
+### 实时执行状态
+
+Agent 执行时，卡片会实时显示「正在思考...」的内容（通过 WebSocket 推送），让你了解 LLM 当前正在做什么（如「正在查询设备数据」「正在分析温度趋势」）。
 
 ### 手动执行
 
-不想等定时触发？点击 Agent 详情页的 **Run Now** 立即执行一次。
+不想等定时触发？点击 Agent 卡片或详情页的 **Run Now** 立即执行一次。
 
 ## 典型场景
 
@@ -149,7 +198,7 @@ flowchart LR
 
 - **模式**：Focused
 - **资源**：绑定能耗指标
-- **调度**：Cron `0 8 * * *`（每天 8 点）
+- **调度**：Cron `0 0 8 * * *`（每天 8 点）
 - **Prompt**：汇总昨日 24 小时的能耗数据，计算峰值和平均值，与上周同期对比，生成日报并发送到运维邮箱。
 
 ## CLI 管理
@@ -194,6 +243,12 @@ neomind agent invoke <agent_id> "检查所有传感器最新读数"
 | [设备](./3-onboard-device.md) | Focused 模式绑定设备指标 |
 | [AI Chat](./5-ai-chat.md) | 两种 AI 运行形态，互为补充 |
 
+## 移动端
+
+<img src="https://resources.camthink.ai/NeoMind/agents-mobile.png" alt="Agent 管理移动端 — 卡片列表自适应单列" style={{width: '50%', borderRadius: '8px', border: '1px solid var(--ifm-color-emphasis-200)'}} />
+
+移动端自动切换为单列卡片列表，支持查看状态、手动执行、切换暂停/激活。
+
 ## 下一步
 
 - **[自动化规则](./7-automation-rules.md)** — 用 JSON 规则做确定性触发，Agent 做模糊判断，两者互补
@@ -202,4 +257,4 @@ neomind agent invoke <agent_id> "检查所有传感器最新读数"
 
 ---
 
-*最后更新: 2026-06-13 · NeoMind v0.8.11*
+*最后更新: 2026-06-16*

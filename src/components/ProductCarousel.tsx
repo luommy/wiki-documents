@@ -50,6 +50,20 @@ const ProductCarousel = () => {
                 { label: <Translate id="carousel.link.hwguide">硬件指南</Translate>, url: 'docs/neoedge-ng4500-series/ng4500-cb01-development-board/dev-guide', icon: '⚙️' },
                 { label: <Translate id="carousel.link.usecases">应用案例</Translate>, url: 'docs/neoedge-ng4500-series/application-guide/deepseek-r1', icon: '💡' },
             ]
+        },
+        {
+            id: 'neomind',
+            badge: 'NEW',
+            title: <Translate id="carousel.neomind.title">NeoMind (Edge AI Platform)</Translate>,
+            tagline: <Translate id="carousel.neomind.tagline">Rust + React 构建的边缘 AI 平台 · 开箱即用的 IoT + AI 一体化方案</Translate>,
+            description: <Translate id="carousel.neomind.desc">设备管理、实时仪表板、规则引擎、AI Agent、扩展生态、消息通知一应俱全。支持 MQTT/Webhook/BLE 多协议接入，可独立部署也可作为 CamThink 硬件的上位机软件。</Translate>,
+            image: 'https://resources.camthink.ai/NeoMind/dashboard-overview.png',
+            links: [
+                { label: <Translate id="carousel.link.overview">产品概述</Translate>, url: 'docs/neomind/product-overview/what-is-neomind', icon: '📘' },
+                { label: <Translate id="carousel.link.quickstart">快速入门</Translate>, url: 'docs/neomind/quick-start/five-minute-guide', icon: '🚀' },
+                { label: <Translate id="carousel.link.userguide">用户指南</Translate>, url: 'docs/neomind/user-guide/install-setup', icon: '📖' },
+                { label: <Translate id="carousel.link.devguide">开发指南</Translate>, url: 'docs/neomind/developer-guide/overview', icon: '🛠️' },
+            ]
         }
     ];
 

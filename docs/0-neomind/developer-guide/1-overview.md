@@ -9,6 +9,10 @@ sidebar_label: "Developer Guide Overview"
 
 NeoMind 是一个模块化生态，按**开发目标**分成四个独立仓库。本文帮你判断该从哪个仓库切入，并给出每个维度的深入入口。
 
+:::tip 推荐用 AI 辅助开发
+NeoMind 的代码库为 AI 编程工具（如 **Claude Code**）做了专门优化——项目自带 `CLAUDE.md` 上下文、33 节前端设计规范、16 个参考扩展实现。**无论你要写扩展、做组件还是贡献主项目，都建议先用 AI 辅助开发。** 详见 [AI 辅助开发指南](./5-ai-assisted-development.md)。
+:::
+
 ## 先问自己：你要做什么？
 
 ```
@@ -49,7 +53,7 @@ NeoMind 是一个模块化生态，按**开发目标**分成四个独立仓库�
 - 桌面：Tauri 2.x
 - 协议：REST + WebSocket + SSE + MQTT 3.1.1
 
-**扩展**：Rust，依赖 `neomind-extension-sdk` crate（最新 v0.6.1），通过 FFI 宏 `neomind_export!` 导出，运行在 `neomind-extension-runner` 提供的隔离进程中。
+**扩展**：Rust，依赖 `neomind-extension-sdk` crate（最新 v0.6.3），通过 FFI 宏 `neomind_export!` 导出，运行在 `neomind-extension-runner` 提供的隔离进程中。
 
 **设备类型**：声明式 JSON，无运行时代码——只描述有哪些指标（metric）、指令（command）、默认配置。NeoMind 加载后即生效。
 
@@ -138,27 +142,6 @@ cd web && npm install && npm run dev
 cd web && npm run tauri:dev
 ```
 
-## 文档导航
-
-本指南已上线 / 计划上线的文档：
-
-| 文档 | 内容 | 状态 |
-|------|------|------|
-| **1-overview（本文）** | 决策树、仓库导航、技术栈 | ✅ |
-| [2-architecture](./2-architecture.md) | crate 布局、进程模型、事件总线、扩展 ABI、存储、线程 | ✅ |
-| [3-extension-sdk](./3-extension-sdk.md) | `neomind_export!` 宏、capability、ML 模型生命周期、跨平台打包 | ✅ |
-| [4-rest-api](./4-rest-api.md) | HTTP API 参考（设备 / 仪表板 / 规则 / Agent / 消息 / 扩展 / 数据推送 / LLM） | ✅ |
-| [7-extension-development](./7-extension-development.md) | 用 SDK 写扩展的实战指南 | ✅ |
-| 5-websocket-realtime | 实时 API（WebSocket / SSE） | Phase 2 |
-| 6-device-type-development | 设备类型开发详细规范 | Phase 2 |
-| 8-dashboard-component-dev | Dashboard 组件开发详细规范 | Phase 2 |
-| 9-contribute-to-main | 主项目贡献指南（CI、提 PR 流程） | Phase 2 |
-| 10-llm-backend-integration | LLM 后端接入指南 | Phase 2 |
-
-## 还需要更深的参考？
-
-代码级细节散落在产品仓库的 `docs/guides/` 下（按模块组织，约 19 篇）。这些是**迁移型源**——本指南会逐步把对外有价值的内容迁入对应章节，迁完后从产品仓库删除，最终 wiki 为唯一真相源。在过渡期内，需要最深的代码参考仍可查阅产品仓库 `docs/guides/`。
-
 ---
 
-*最后更新: 2026-06-12 · NeoMind v0.8.11*
+*最后更新: 2026-06-16*

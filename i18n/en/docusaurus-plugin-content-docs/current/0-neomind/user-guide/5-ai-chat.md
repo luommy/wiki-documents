@@ -1,7 +1,8 @@
 ---
-description: "NeoMind AI Chat guide: query and control devices in natural language, create dashboards and rules, upload images for visual analysis, and understand the difference between Chat (interactive) and Agent (autonomous)."
-keywords: [NeoMind, AI Chat, natural language, multimodal, AI Agent]
+description: "NeoMind AI Chat guide: query and control devices in natural language, create dashboards and rules, upload images for visual analysis, tool call mechanism, Chat vs Agent, and multi-session management."
+keywords: [NeoMind, AI Chat, natural language, multimodal, AI Agent, tool calls]
 tags: [NeoMind, User Guide]
+sidebar_label: "AI Chat"
 ---
 
 # AI Chat
@@ -13,23 +14,45 @@ AI Chat is NeoMind's conversational interface — tell it what you want in natur
 - At least one [LLM backend](./2-configure-llm.md) configured (Ollama or cloud)
 - At least one [device](./3-onboard-device.md) onboarded (otherwise Chat is just small talk)
 
-## Entry Point
+## Interface Overview
 
-Click **AI Chat** in the left nav to open the conversation view. You can pick which LLM backend to talk to from the dropdown at the top.
+Click **AI Chat** (chat icon) in the left nav to open the conversation view:
 
-<!-- Screenshot placeholder: AI Chat main view + multimodal upload
-     Upload to resources.camthink.ai/wiki/img/ai-application/neomind/user-guide/
-     ai-chat-main.png / ai-chat-vision.png
--->
+<img src="https://resources.camthink.ai/NeoMind/ai-chat-empty.png" alt="AI Chat main interface — session list, welcome page, suggested questions, input box" style={{width: '100%', borderRadius: '8px', border: '1px solid var(--ifm-color-emphasis-200)'}} />
+
+The interface has three areas:
+
+| Area | Description |
+|------|-------------|
+| **Left · Session List** | Manage multiple sessions (create / switch / search / delete). Each session has independent context |
+| **Center · Conversation** | Displays messages, tool call process, AI replies |
+| **Bottom · Input Area** | LLM model selector, image upload button, text input, send button |
+
+A new session initially shows **suggested questions** (e.g. "Check current online device status") — click to quickly start a conversation without typing.
+
+## Tool Call Mechanism
+
+When you send a message, the AI doesn't answer directly — it **understands intent → selects tools → executes → synthesizes results**. The whole process is visible in the conversation:
+
+<img src="https://resources.camthink.ai/NeoMind/ai-chat-conversation.png" alt="AI Chat conversation — tool call process visible" style={{width: '100%', borderRadius: '8px', border: '1px solid var(--ifm-color-emphasis-200)'}} />
+
+In the screenshot above, the user asked "How many devices are online right now?" and the AI's process was:
+
+1. **Understand intent**: Identify that device status needs to be queried
+2. **Call tool**: Execute the `device list` command (green ✓ means success)
+3. **Synthesize answer**: Generate a natural language reply based on the data returned by the tool
+
+> **Thinking process display**: Above the AI's reply, a "Thinking process" summary appears (rounds, character count) so you can see how many steps the AI reasoned through. Complex requests may chain multiple tool call rounds (NeoMind caps at 30 rounds per turn with a 5-minute timeout).
 
 ## What You Can Ask
 
-AI Chat has built-in tools covering nearly every NeoMind capability. Typical phrasings (Chinese or English both work):
+AI Chat has built-in tools covering nearly every NeoMind capability. Here are typical phrasings (Chinese or English both work):
 
 ### Query & Control Devices
 - "What's the temperature in the living room?" → latest telemetry
 - "Set the AC to 26 degrees, cooling mode" → send a device command
 - "Show me the humidity curve over the last 24 hours" → pull history, render a chart
+- "How many devices are online right now?" → query device status
 
 ### Dashboards & Visualization
 - "Build me a dashboard showing real-time values from all temp/humidity sensors" → create dashboard + auto-add widgets
@@ -50,19 +73,34 @@ AI Chat has built-in tools covering nearly every NeoMind capability. Typical phr
 - "How many devices are online right now?"
 - "Why isn't this device reporting data?" → triggers a diagnostic flow
 
-The LLM decides which tools to call and in what order. Complex requests may chain multiple tool calls (NeoMind caps at 30 rounds per turn with a 5-minute timeout).
+> The LLM decides which tools to call and in what order. If the AI only ran query operations but didn't complete your actual request (e.g. you asked it to create a rule but it only checked), just follow up with "Please create it".
+
+## Switching LLM Backend
+
+Use the dropdown on the left side of the input box to switch the LLM backend for the current session:
+
+- **Ollama local models**: e.g. `qwen3.5:4b` (default), `granite4.1:3b`, etc.
+- **Cloud models**: e.g. DeepSeek, Qwen Cloud, GPT-4o, etc. (must be added in [LLM backend configuration](./2-configure-llm.md))
+
+Different backends have different capabilities (reasoning quality, speed, multimodal support). Choose based on the task:
+- Simple queries → lightweight model (fast)
+- Complex analysis / rule creation → stronger model (accurate)
 
 ## Multimodal (Images)
 
 If your LLM backend supports vision (see [Configure an LLM Backend — Multimodal](./2-configure-llm.md#multimodal-vision-capability)), you can **upload images** in Chat:
 
-- Upload a photo: "What objects are in this image?" → vision model or YOLO extension
-- Upload a camera snapshot: "Read the digits on this meter" → OCR extension
-- Upload a surveillance frame: "Identify the faces in this frame" → face recognition extension
+Click the **image upload** button on the right side of the input box. PNG / JPG / JPEG / WebP supported.
 
-Click the **📎 (attachment)** button next to the input box. PNG / JPG / JPEG / WebP supported.
+Typical use cases:
 
-> **Ollama users**: You must pull a vision model (`qwen3.5:4b-vl` / `llava`) first — otherwise uploaded images are silently dropped. NeoMind auto-detects backend capability and warns you.
+| Upload Content | How to Ask | Backend Call |
+|----------------|------------|--------------|
+| Field photo | "What objects are in this image?" | Vision model or YOLO extension |
+| Camera snapshot | "Read the digits on this meter" | OCR extension |
+| Surveillance frame | "Identify the faces in this frame" | Face recognition extension |
+
+> **Ollama users**: You must pull a vision model (e.g. `qwen3.5:4b-vl` / `llava`) first — otherwise uploaded images are silently dropped. NeoMind auto-detects backend capability. Text-only models (e.g. `qwen3.5:4b`, DeepSeek-V3) cannot process images.
 
 ## Chat vs Agent: Two Modes
 
@@ -85,7 +123,14 @@ For detailed agent configuration, see [AI Agent](./6-ai-agent.md). For automatio
 
 - **Multiple sessions**: each has independent context. Switch / rename / delete from the left sidebar.
 - **Cross-session memory**: NeoMind extracts key facts from conversations (your preferences, device aliases) into user memory, applied across sessions.
-- **History**: sessions persist in `sessions.redb`; restarting the server won't lose them.
+- **History persistence**: sessions are stored in `sessions.redb`; restarting the server won't lose them.
+- **Auto title**: the first message of a new session automatically becomes the session title for easy identification in the list.
+
+## Mobile
+
+<img src="https://resources.camthink.ai/NeoMind/ai-chat-mobile.png" alt="AI Chat on mobile — full-screen conversation" style={{width: '50%', borderRadius: '8px', border: '1px solid var(--ifm-color-emphasis-200)'}} />
+
+On mobile, the interface switches to a full-screen conversation mode. The session list is accessed via the menu in the top-left corner.
 
 ## Tips
 
@@ -93,6 +138,7 @@ For detailed agent configuration, see [AI Agent](./6-ai-agent.md). For automatio
 - **Break complex tasks into steps**: "First check the humidity; if it's below 40%, turn on the humidifier" is more reliable than one giant instruction.
 - **Correct mistakes**: if the LLM misreads your intent, just say "No, I meant machine #2" — no need to start a new session.
 - **Tool feedback**: when an LLM tool call fails, it returns an error with a suggestion — follow the hint.
+- **Suggested questions**: the questions shown on the new session page are clickable and a great way to explore AI capabilities.
 
 ## Next Steps
 
@@ -102,4 +148,4 @@ For detailed agent configuration, see [AI Agent](./6-ai-agent.md). For automatio
 
 ---
 
-*Last updated: 2026-06-12 · NeoMind v0.8.11*
+*Last updated: 2026-06-16*

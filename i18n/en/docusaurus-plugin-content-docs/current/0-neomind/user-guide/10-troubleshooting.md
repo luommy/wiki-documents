@@ -23,6 +23,38 @@ curl http://localhost:9375/api/health
 systemctl status neomind.service
 ```
 
+## CLI / API Key
+
+### CLI commands return `401 Unauthorized`
+
+**Cause**: The CLI can't provide a valid API key to the server.
+
+**Diagnose**:
+
+```bash
+# 1. Is the env var set? (a WRONG value also causes 401 — auto-auth is completely skipped)
+echo $NEOMIND_API_KEY
+
+# 2. Are you in the project root? (auto-auth needs relative path data/api_keys.redb)
+ls data/api_keys.redb
+```
+
+**Fix by scenario**:
+
+| Scenario | Fix |
+|----------|-----|
+| Set a wrong `NEOMIND_API_KEY` (e.g. doc placeholder) | `unset NEOMIND_API_KEY`, then run from project root |
+| Not in project root | `cd /path/to/neomind && neomind device list` |
+| Need cross-directory access | Get real key from server startup output, `export NEOMIND_API_KEY=nmk_REAL_KEY` |
+| Connecting to remote server | Get the key from that server's startup output |
+| Auto-auth worked before, suddenly 401 | **Restart the server**: CLI operations on `api_keys.redb` can cause redb lock conflicts |
+
+> ⚠ **Key points**:
+> - Once `NEOMIND_API_KEY` is set (even to a placeholder), auto-auth is completely skipped. Always `unset` first.
+> - Do NOT run `neomind api-key create` while the server is running — it conflicts with the server's redb lock. To regenerate a key: stop the server, create the key, then restart.
+
+> Full API key setup walkthrough: [Install & Setup → CLI API Key Setup](./1-install-setup.md#cli-api-key-setup).
+
 ## Service Startup
 
 ### `neomind serve` fails with "address already in use"
@@ -259,4 +291,4 @@ journalctl -u neomind.service | grep -i "vision\|multimodal\|image"
 
 ---
 
-*Last updated: 2026-06-12 · NeoMind v0.8.11*
+*Last updated: 2026-06-15*

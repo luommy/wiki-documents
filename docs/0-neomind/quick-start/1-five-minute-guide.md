@@ -46,7 +46,7 @@ curl -fsSL https://raw.githubusercontent.com/camthink-ai/NeoMind/main/scripts/in
 
 启动后浏览器访问 `http://localhost:9375`。
 
-<img src="/img/neomind/quick-start/step1-login.png" alt="NeoMind 登录页" style={{width: '100%'}} />
+<img src="https://resources.camthink.ai/NeoMind/step1-login-v2.png" alt="NeoMind 登录页" style={{width: '100%'}} />
 
 > ✓ **检查点**：看到登录 / 注册页面 = 服务已运行。注册一个账号并登录。
 
@@ -85,7 +85,7 @@ ollama pull qwen3.5:4b
 2. 地址填 `http://localhost:11434`（默认）
 3. 模型选 `qwen3.5:4b`
 
-<img src="/img/neomind/quick-start/step2-llm-config.png" alt="LLM 配置向导" style={{width: '100%'}} />
+<img src="https://resources.camthink.ai/NeoMind/step2-llm-config.png" alt="LLM 配置向导" style={{width: '100%'}} />
 
 ### 方案 B：云端 API
 
@@ -102,6 +102,25 @@ ollama pull qwen3.5:4b
 
 > 详见 [配置 LLM 后端](../user-guide/2-configure-llm.md)。
 
+:::tip 也可以用 CLI 配置
+不想点界面？一行命令即可：
+
+```bash
+# Ollama 本地
+neomind llm create --name local --type ollama --endpoint http://localhost:11434 --model qwen3.5:4b
+
+# 云端 API（以 GLM 为例）
+neomind llm create --name glm --type openai \
+  --endpoint https://open.bigmodel.cn/api/paas/v4 \
+  --model glm-4-flash --api-key YOUR_API_KEY
+
+# 测试连接 → 设为默认
+neomind llm test local && neomind llm activate local
+```
+
+完整命令参考：`neomind llm --help`
+:::
+
 <!-- 截图说明：LLM 配置成功的界面 -->
 
 ---
@@ -117,8 +136,8 @@ ollama pull qwen3.5:4b
 创建后会得到一个专属的 Webhook URL（形如 `/api/devices/<DEVICE_ID>/webhook`）。
 
 <div style={{display: 'flex', gap: '8px'}}>
-  <img src="/img/neomind/quick-start/step3-add-device.png" alt="添加设备" style={{width: '50%'}} />
-  <img src="/img/neomind/quick-start/step3-webhook-url.png" alt="获取 Webhook URL" style={{width: '50%'}} />
+  <img src="https://resources.camthink.ai/NeoMind/step3-add-device.png" alt="添加设备" style={{width: '50%'}} />
+  <img src="https://resources.camthink.ai/NeoMind/step3-webhook-url.png" alt="获取 Webhook URL" style={{width: '50%'}} />
 </div>
 
 ### 3.2 推送数据
@@ -133,7 +152,7 @@ curl -X POST http://localhost:9375/api/devices/<DEVICE_ID>/webhook \
 
 返回 `{"success": true}` 即成功。打开设备详情页，可以看到最新遥测值。
 
-<img src="/img/neomind/quick-start/step3-device-detail.png" alt="设备详情页显示遥测数据" style={{width: '100%'}} />
+<img src="https://resources.camthink.ai/NeoMind/step3-device-detail.png" alt="设备详情页显示遥测数据" style={{width: '100%'}} />
 
 > ✓ **检查点**：设备详情页显示 `temperature: 25.6` 和 `humidity: 60` = 数据已入库。
 
@@ -160,7 +179,7 @@ NeoMind 内置 MQTT Broker（`localhost:1883`），支持 ESP32、树莓派、�
 2. 数据源填 `device:demo-sensor:temperature`
 3. 保存
 
-<img src="/img/neomind/quick-start/step4-dashboard.png" alt="仪表板数值卡" style={{width: '100%'}} />
+<img src="https://resources.camthink.ai/NeoMind/step4-dashboard.png" alt="仪表板数值卡" style={{width: '100%'}} />
 
 :::info DataSourceId 格式
 
@@ -197,7 +216,7 @@ curl -X POST http://localhost:9375/api/devices/<DEVICE_ID>/webhook \
 
 AI Agent 会自动查询设备列表和最新遥测值，用自然语言回答。
 
-<img src="/img/neomind/quick-start/step5-ai-chat.png" alt="AI Chat 对话" style={{width: '100%'}} />
+<img src="https://resources.camthink.ai/NeoMind/step5-ai-chat.png" alt="AI Chat 对话" style={{width: '100%'}} />
 
 再试一个更有挑战性的——让 AI 帮你创建自动化：
 
@@ -256,4 +275,4 @@ flowchart LR
 
 ---
 
-*最后更新: 2026-06-12 · NeoMind v0.8.11*
+*最后更新: 2026-06-15*

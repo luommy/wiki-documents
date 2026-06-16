@@ -8,15 +8,46 @@ tags: [NeoMind, Product Overview]
 
 NeoMind runs on desktop (macOS / Windows / Linux) or servers. Below are the requirements for each deployment mode.
 
+## Package Sizes & Resource Footprint
+
+### Download Sizes (GitHub Releases)
+
+| Artifact | Size | Notes |
+|----------|------|-------|
+| **Server binary** (tar.gz) | ~23–26 MB | `neomind` + `neomind-extension-runner` bundled; per-platform |
+| **Web frontend** (tar.gz) | ~5.4 MB | Static assets (HTML/JS/CSS), served by the backend |
+| **macOS Desktop** (.dmg) | ~39 MB | Tauri app — bundles backend + frontend + system WebView |
+| **Windows Desktop** (.msi) | ~39 MB | |
+| **Linux Desktop** (.deb) | ~43 MB | |
+| **Linux AppImage** | ~112 MB | Fully self-contained — includes all system libraries |
+
+> **Total server footprint**: ~30 MB on disk (binary + web assets). No Docker layers, no pip/npm runtime — a single statically compiled binary plus static files.
+
+### Runtime Resource Usage
+
+The main process embeds the API server, MQTT broker, redb storage, and rule engine in one binary. Extensions run in separate processes.
+
+| Component | RAM (typical) | Notes |
+|-----------|---------------|-------|
+| **Main process** | 50–150 MB | Axum + MQTT broker + redb. Scales with device count and telemetry volume. |
+| **Extension runner** | 10–50 MB per extension | ML models are lazy-loaded (first command → load → stay resident). A YOLOv8n model adds ~50 MB when active. |
+| **Telemetry storage** | grows with data | redb file at `data/telemetry.redb`. ~1 KB per data point. Retention is configurable. |
+
+:::tip No external dependencies
+NeoMind does **not** require PostgreSQL, Mosquitto, Redis, or any other external service. The only optional external dependency is an LLM — either [Ollama](https://ollama.ai) running locally, or a cloud API key.
+:::
+
 ## Desktop App (Recommended for Getting Started)
 
 Download the installer from [GitHub Releases](https://github.com/camthink-ai/NeoMind/releases/latest).
 
 | OS | Architecture | Format |
 |----|--------------|--------|
-| macOS (Apple Silicon + Intel) | arm64 / x86_64 | `.dmg` |
+| macOS | Apple Silicon (arm64) | `.dmg` |
 | Windows | x86_64 | `.msi` / `.exe` |
-| Linux | x86_64 | `.AppImage` / `.deb` |
+| Linux | x86_64 / arm64 | `.AppImage` / `.deb` |
+
+> Official pre-built packages cover only the architectures above. For other platforms (e.g. macOS Intel / Windows ARM), [build from source](../user-guide/1-install-setup.md#build-from-source-development).
 
 **Minimum hardware**:
 
@@ -108,4 +139,4 @@ See [Configure LLM Backend](../user-guide/2-configure-llm.md) for setup.
 
 ---
 
-*Last updated: 2026-06-12 · NeoMind v0.8.11*
+*Last updated: 2026-06-15*

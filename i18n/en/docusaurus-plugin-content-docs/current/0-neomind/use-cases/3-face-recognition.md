@@ -136,4 +136,4 @@ hello, please analyse the history data and result of 'face recognition', reply i
 
 ---
 
-*Last updated: 2026-06-12 · NeoMind v0.8.11*
+*Last updated: 2026-06-15*

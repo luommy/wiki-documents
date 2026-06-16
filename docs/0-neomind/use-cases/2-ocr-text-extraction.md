@@ -139,4 +139,4 @@ Hello, what's the OCR result of my device ne301-new? Reply in English.
 
 ---
 
-*最后更新: 2026-06-12 · NeoMind v0.8.11*
+*最后更新: 2026-06-15*

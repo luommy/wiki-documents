@@ -140,4 +140,4 @@ hello, please analyse the history data and result of ‘face recognition’ , re
 
 ---
 
-*最后更新: 2026-06-12 · NeoMind v0.8.11*
+*最后更新: 2026-06-15*
