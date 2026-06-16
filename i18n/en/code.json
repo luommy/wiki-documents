@@ -493,5 +493,20 @@
   },
   "carousel.link.usecases": {
     "message": "Use Cases"
+  },
+  "carousel.neomind.title": {
+    "message": "NeoMind (Edge AI Platform)"
+  },
+  "carousel.neomind.tagline": {
+    "message": "Rust + React edge AI platform · Out-of-the-box IoT + AI integration"
+  },
+  "carousel.neomind.desc": {
+    "message": "Device management, real-time dashboards, rule engine, AI Agent, extension ecosystem, and message notifications — all built in. Supports MQTT/Webhook/BLE protocols. Can be deployed standalone or as the companion software for CamThink hardware."
+  },
+  "carousel.link.userguide": {
+    "message": "User Guide"
+  },
+  "carousel.link.devguide": {
+    "message": "Developer Guide"
   }
 }
