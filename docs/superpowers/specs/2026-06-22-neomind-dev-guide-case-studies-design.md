@@ -47,7 +47,7 @@ docs/0-neomind/developer-guide/
     appendix-standards.md                 # 共享附录：工程标准一览
     1-weather-forecast.md                 # 入门 · 数据型扩展
     2-yolo-device-inference.md            # 进阶 · AI 推理扩展
-    3-yolo-video-stream.md                # 进阶 · 流式扩展
+    3-yolo-video-v2.md                    # 进阶 · 流式扩展
     4-onvif-bridge.md                     # 进阶 · 标准协议桥接
     5-uink-rms-bridge.md                  # 进阶 · 生产验证桥接
     6-metric-card-component.md            # 入门 · 仪表板组件
@@ -227,7 +227,7 @@ NeoMind Dashboard Components 采用**手写 IIFE JavaScript**作为分发格式�
 
 部分源仓库存在历史遗留的卫生问题，案例写作时遵守以下约束：
 
-- **yolo-device-inference**：`src/` 下存在 19 个 `lib.rs.bak/final/backup` 备份文件。**所有深链接只指向 `lib.rs` 主文件**，备份文件一律不引用。
+- **yolo-device-inference**：`src/` 下存在 18 个 `lib.rs.bak/final/backup` 备份文件（`lib.rs*` 共 19 个，减去 1 个真实 `lib.rs`）。**所有深链接只指向 `lib.rs` 主文件**，备份文件一律不引用。
 - **反例化处理**：在案例 #2 的"常见坑与最佳实践"段，把"备份文件堆积"作为**反面教材**写出来，提醒社区贡献者维护源仓库卫生。
 - **git log 解读**：解读 yolo-device-inference 演进时，过滤掉仅修改备份文件的噪声提交，只解读有实质工程意义的 commit。
 
@@ -265,8 +265,10 @@ NeoMind Dashboard Components 采用**手写 IIFE JavaScript**作为分发格式�
 所有"关键代码走读"统一采用深链接格式：
 
 ```markdown
-查看完整实现：[`src/metrics.rs`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/weather-forecast-v2/src/metrics.rs#L42-L87) L42-87
+查看完整实现：[`src/metrics.rs`](https://github.com/<org>/NeoMind-Extensions/blob/main/extensions/weather-forecast-v2/src/metrics.rs#L42-L87) L42-87
 ```
+
+> **注**：示例 URL 中的 `<org>` 在写作时替换为实际 GitHub 组织/用户（Extensions 仓库与 Dashboard-Components 仓库可能分属不同 org，落盘前需核实 canonical org）。
 
 - 链接到 GitHub 源仓库的具体行号
 - 行号区间便于读者快速跳转
@@ -322,7 +324,7 @@ i18n/en/docusaurus-plugin-content-docs/current/0-neomind/developer-guide/case-st
 ### Phase 3 — 4 个进阶案例（批量产出）
 
 - #2 yolo-device-inference
-- #3 yolo-video-stream
+- #3 yolo-video-v2
 - #4 onvif-bridge
 - #5 uink-rms-bridge
 
@@ -360,7 +362,7 @@ i18n/en/docusaurus-plugin-content-docs/current/0-neomind/developer-guide/case-st
 - [ ] `0-overview.md` 包含 4 条阅读路径
 - [ ] `appendix-standards.md` 覆盖所有共享标准
 - [ ] 每篇案例通过 4.3 节验收清单
-- [ ] 旗舰案例满足 4.4 节额外门槛
+- [ ] 旗舰案例满足 4.5 节额外门槛
 - [ ] 版本对齐表填写完整
 - [ ] 现有 `7-extension-development.md` / `8-dashboard-component-dev.md` 添加了交叉链接
 - [ ] `7-release-notes/` 新增发布说明
