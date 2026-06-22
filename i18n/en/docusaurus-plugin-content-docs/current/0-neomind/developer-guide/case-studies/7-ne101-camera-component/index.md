@@ -35,8 +35,8 @@ If you are short on time and only want to understand "how this component works",
 | 4 | 4-data-contract.md ★ | MQTT topics, WebSocket deltas, the `detections` field schema | MVP |
 | 5 | 5-frontend-consume.md ★ | How the component fetches detections, parses JSON strings, colors per class | MVP |
 | 6 | 6-component-build.md ★ | The `NE101CameraPanel` named export, IIFE injection, React-hooks-in-IIFE pitfalls | MVP |
-| 7 | 7-roi-overlay.md (v1.1) | Single-rectangle ROI vs multi-ROI array, normalized coords, `processingRoiOverlap` threshold | v1.1 |
-| 8 | 8-operations.md (v1.1) | Version evolution (25+ commits), debug traces, performance tuning | v1.1 |
+| 7 | 7-integration-test.md (v1.1) | End-to-end integration tests, ROI overlay verification, multi-extension switching matrix | v1.1 |
+| 8 | 8-deep-dive.md (v1.1) | Version evolution (25+ commits), debug traces, performance tuning, source hygiene recap | v1.1 |
 
 ---
 
@@ -133,3 +133,7 @@ graph LR
 - Want to jump straight to code structure → §2 Architecture (v1.1)
 - Want to understand the AI processing contract → §3 Extension Side (v1.1) + §4 Data Contract (MVP)
 - Want React implementation details → §5 Frontend Consume (MVP) + §6 Component Build (MVP)
+
+---
+
+*Last updated: 2026-06-23*

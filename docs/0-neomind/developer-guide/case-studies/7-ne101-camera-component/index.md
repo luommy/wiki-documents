@@ -35,8 +35,8 @@ sidebar_label: "ne101_camera 旗舰"
 | 4 | 4-data-contract.md ★ | MQTT 主题、WebSocket 增量、`detections` 字段格式 | MVP |
 | 5 | 5-frontend-consume.md ★ | 组件如何拉取 detections、解析 JSON string、按类别上色 | MVP |
 | 6 | 6-component-build.md ★ | `NE101CameraPanel` 命名导出、IIFE 注入、React hooks 在 IIFE 中的注意事项 | MVP |
-| 7 | 7-roi-overlay.md（v1.1） | 单 ROI 矩形 + 多 ROI 数组、归一化坐标、`processingRoiOverlap` 阈值 | v1.1 |
-| 8 | 8-operations.md（v1.1） | 版本演进（25 commits）、调试 Trace、性能优化 | v1.1 |
+| 7 | 7-integration-test.md（v1.1） | 端到端集成测试、ROI 叠加验证、多扩展切换测试矩阵 | v1.1 |
+| 8 | 8-deep-dive.md（v1.1） | 版本演进（25 commits）、调试 Trace、性能优化、源码卫生复盘 | v1.1 |
 
 ---
 
@@ -133,3 +133,7 @@ graph LR
 - 想直接看代码结构 → 跳到 §2 架构总览（v1.1 发布）
 - 想理解 AI 处理契约 → 跳到 §3 扩展侧（v1.1 发布）+ §4 数据契约（MVP）
 - 想看 React 实现细节 → 跳到 §5 前端消费（MVP）+ §6 组件构建（MVP）
+
+---
+
+*最后更新: 2026-06-23*

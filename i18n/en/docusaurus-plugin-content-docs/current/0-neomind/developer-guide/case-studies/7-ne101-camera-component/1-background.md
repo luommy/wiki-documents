@@ -254,3 +254,7 @@ Later sections reference the commits below; they are listed here for convenience
 | `0601cd4` | fix | move conditional useState hook to fix React error #310 (hook-order pitfall) | §6 Component Build |
 | `e3a70be` | fix | parse JSON string detections from backend virtual metrics (JSON string parsing) | §4 Data Contract |
 | `c4fe7bf` | fix | guard rawImageSrc against non-string metric values (type guard) | §5 Frontend Consume |
+
+---
+
+*Last updated: 2026-06-23*

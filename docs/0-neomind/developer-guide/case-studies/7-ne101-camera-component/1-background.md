@@ -254,3 +254,7 @@ sequenceDiagram
 | `0601cd4` | fix | move conditional useState hook to fix React error #310（hooks 顺序陷阱） | §6 组件构建 |
 | `e3a70be` | fix | parse JSON string detections from backend virtual metrics（JSON string 解析） | §4 数据契约 |
 | `c4fe7bf` | fix | guard rawImageSrc against non-string metric values（类型守卫） | §5 前端消费 |
+
+---
+
+*最后更新: 2026-06-23*
