@@ -5,7 +5,7 @@
 - **日期**：2026-06-22
 - **目标读者**：二次开发者（ NeoMind-Extensions / NeoMind-Dashboard-Components 的贡献者和使用者）
 - **关联仓库**：
-  - `CamThink Project/NeoMind-Extensions`（18 个扩展）
+  - `CamThink Project/NeoMind-Extensions`（17 个扩展）
   - `CamThink Project/NeoMind-Dashboard-Components`（6 个组件）
   - `Marketing/wiki-documents`（本文档所在地）
 
@@ -23,12 +23,12 @@
 
 ### 1.2 目标
 
-新增**工程实践案例集**子目录，从两个源仓库的 18 个扩展 + 6 个组件中**精选 7 个代表性案例**，做完整工程剖析。重点不在"API 是什么"（已有通用参考），而在**"真实代码里为什么这样设计、踩过哪些坑、标准如何落地"**。
+新增**工程实践案例集**子目录，从两个源仓库的 17 个扩展 + 6 个组件中**精选 7 个代表性案例**，做完整工程剖析。重点不在"API 是什么"（已有通用参考），而在**"真实代码里为什么这样设计、踩过哪些坑、标准如何落地"**。
 
 ### 1.3 非目标
 
 - 不重写已有的通用 API 参考（`7-extension-development.md`、`8-dashboard-component-dev.md` 等）
-- 不覆盖全量 18+6 = 24 个扩展/组件（只选 7 个）
+- 不覆盖全量 17+6 = 23 个扩展/组件（只选 7 个）
 - 不做自动化 CI 校验链接有效性（人工 audit 即可）
 
 ---
@@ -89,7 +89,18 @@ i18n/en/docusaurus-plugin-content-docs/current/0-neomind/developer-guide/case-st
 - **路径 3（工业集成商）**：#4 → #5 → #7
 - **路径 4（组件开发者）**：#6 → #7 → 任意扩展案例
 
-### 2.4 与现有文档的关系
+### 2.4 组件源码格式说明（重要）
+
+NeoMind Dashboard Components 采用**手写 IIFE JavaScript**作为分发格式（文件名 `bundle.js` 但**不是编译产物**）：
+
+- 使用 `var React = window.React` + `var jsx = window.jsxRuntime.jsx` 注入运行时依赖
+- 完整注释、合理分行、可读性接近源码
+- 无需打包工具链即可分发（Docusaurus 直接挂载）
+- 352 行（metric_card）/ 1972 行（ne101_camera）
+
+**因此案例集 #6 / #7 的"关键代码走读"和"深链接"直接指向 `bundle.js` 的具体行号**，与扩展案例指向 `src/*.rs` 的处理方式一致。所有质量门槛（代码片段 < 30 行、git log 工程演进、标注式注释）均适用。
+
+### 2.5 与现有文档的关系
 
 - 现有 `7-extension-development.md` / `8-dashboard-component-dev.md` 保留为**API 通用参考**
 - 案例集在合适处**交叉引用**通用参考（避免重复）
@@ -151,7 +162,7 @@ i18n/en/docusaurus-plugin-content-docs/current/0-neomind/developer-guide/case-st
 | `index.md` | 案例总览 + 学习路径 | ~150 行 |
 | `1-background.md` | NE101 设备能力 + 用户痛点 + 在生态中的定位 | ~300 行 |
 | `2-architecture.md` | 端到端架构图（扩展 ↔ 数据契约 ↔ 前端组件） | ~400 行 |
-| `3-extension-side.md` | 扩展如何产出结构化数据（metrics/commands/stream） | ~400 行 |
+| `3-extension-side.md` | 通用契约机制（`processingExtensionId`）+ yolo-device-inference 具体演示（交叉引用 #2） | ~400 行 |
 | `4-data-contract.md` ★ | 扩展 `metadata.json` ↔ 前端 TS 类型 ↔ 运行时数据流的对应关系 + 契约版本演进 | ~500 行 |
 | `5-frontend-consume.md` ★ | React 组件订阅扩展数据 / 生命周期 / 错误边界 / 断连重连 | ~500 行 |
 | `6-component-build.md` ★ | 原始数据 → 可复用组件：props / manifest schema / 默认值 / 主题适配 | ~500 行 |
@@ -159,6 +170,8 @@ i18n/en/docusaurus-plugin-content-docs/current/0-neomind/developer-guide/case-st
 | `8-deep-dive.md` | 高级话题：性能 / 错误处理 / 可扩展性边界 | ~400 行 |
 
 **3 个带 ★ 的子页面是核心**，直接回答用户提出的"前端如何用数据整合扩展，开发可复用高级组件"。
+
+> **关于 `3-extension-side.md`**：ne101_camera 的 `manifest.json` 通过 `processingExtensionId`（可配置）消费**任意** AI 处理扩展的输出（如 `yolo-device-inference` / `ocr-device-inference` 等），不是和单一扩展绑定。因此该子页面采用**通用契约 + 具体演示**结构：先讲清"任何处理扩展如何接入 ne101_camera"的契约，再用 yolo-device-inference 做端到端实例。
 
 ---
 
@@ -210,7 +223,15 @@ i18n/en/docusaurus-plugin-content-docs/current/0-neomind/developer-guide/case-st
 [ ] 源码链接全部指向 main 分支具体行号
 ```
 
-### 4.4 旗舰案例 ne101-camera 的额外门槛
+### 4.4 源仓库卫生约束
+
+部分源仓库存在历史遗留的卫生问题，案例写作时遵守以下约束：
+
+- **yolo-device-inference**：`src/` 下存在 19 个 `lib.rs.bak/final/backup` 备份文件。**所有深链接只指向 `lib.rs` 主文件**，备份文件一律不引用。
+- **反例化处理**：在案例 #2 的"常见坑与最佳实践"段，把"备份文件堆积"作为**反面教材**写出来，提醒社区贡献者维护源仓库卫生。
+- **git log 解读**：解读 yolo-device-inference 演进时，过滤掉仅修改备份文件的噪声提交，只解读有实质工程意义的 commit。
+
+### 4.5 旗舰案例 ne101-camera 的额外门槛
 
 | 门槛 | 数据来源 |
 |------|----------|
@@ -277,8 +298,8 @@ i18n/en/docusaurus-plugin-content-docs/current/0-neomind/developer-guide/case-st
 
 | 案例 | 源仓库版本 | SDK 版本 | 最后 audit 日期 |
 |------|-----------|----------|-----------------|
-| #1 weather-forecast | v2.7.0 | SDK 0.6 | 2026-06-22 |
-| #7 ne101-camera | v2.7.0 | SDK 0.6 | 2026-06-22 |
+| #1 weather-forecast | v2.7.6 | SDK 0.6 | 2026-06-22 |
+| #7 ne101-camera | v2.14.9 | SDK 0.6 | 2026-06-22 |
 
 源仓库 release 时触发案例 audit（人工，非自动化）。
 
