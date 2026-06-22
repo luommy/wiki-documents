@@ -100,7 +100,7 @@ graph TB
 | 集成路径 | 局域网 UDP/HTTP 直连设备 | **公网 HTTPS 经厂商云中转** |
 | 鉴权 | WS-Security UsernameToken（设备级） | **JWT login + refresh token（账号级）** |
 | 厂商依赖 | 无（任何 ONVIF Profile S 设备） | **强依赖 Uink-RMS 云可用性** |
-| 演进风险 | 低（标准稳定） | **高（API v1.0.1，厂商可改） |
+| 演进风险 | 低（标准稳定） | **高（API v1.0.1，厂商可改）** |
 | 文件组织 | 5 文件（lib/discovery/soap_client/ptz/types） | **1 文件 lib.rs（2250 行）** |
 | 前端组件 | 无（纯后端） | **有 DisplayEditorCard** |
 | 渲染职责 | 无（只返回 RTSP URL） | **Markdown → JPEG 全管线** |
@@ -123,7 +123,7 @@ Uink-RMS 采用账号级 JWT 鉴权（区别于 onvif-bridge 的设备级 WS-Sec
 
 ### §3.4 图像推送（push_image_to_device）
 
-渲染完的 PNG/JPEG 字节通过 [`push_image_to_device`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs) 以 `multipart/form-data` POST 到 `POST /api/v1/devices/{id}/image`。若用户传了 `dither_algorithm` / `resize_mode` / `padding_color` 参数，走处理端点；否则走 raw 端点直接推原图。支持的抖动算法有 8 种（ordered / floyd-steinberg / atkinson / burkes / sierra / stucki / jarvis-judice-ninke / threshold），resize 模式有 fit / cover / fill 三种。图像大小限制 10MB。
+渲染完的 PNG/JPEG 字节通过 [`push_image_to_device`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L1445-L1523) 以 `multipart/form-data` POST 到 `POST /api/v1/devices/{id}/image`。若用户传了 `dither_algorithm` / `resize_mode` / `padding_color` 参数，走处理端点；否则走 raw 端点直接推原图。支持的抖动算法有 8 种（ordered / floyd-steinberg / atkinson / burkes / sierra / stucki / jarvis-judice-ninke / threshold），resize 模式有 fit / cover / fill 三种。图像大小限制 10MB。
 
 ### §3.5 设备注册与 ID 映射（uink_epaper device template）
 

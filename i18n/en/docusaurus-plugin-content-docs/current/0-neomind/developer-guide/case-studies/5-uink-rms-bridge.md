@@ -123,7 +123,7 @@ This is the most complex part of the extension, about 400 lines of code (L230-L6
 
 ### §3.4 Image Push (push_image_to_device)
 
-The rendered PNG/JPEG bytes are POSTed via [`push_image_to_device`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs) as `multipart/form-data` to `POST /api/v1/devices/{id}/image`. If the user passes `dither_algorithm` / `resize_mode` / `padding_color` parameters, it goes through the processing endpoint; otherwise it uses the raw endpoint to push the original image directly. Supported dithering algorithms include 8 options (ordered / floyd-steinberg / atkinson / burkes / sierra / stucki / jarvis-judice-ninke / threshold), and resize modes include fit / cover / fill. The image size limit is 10MB.
+The rendered PNG/JPEG bytes are POSTed via [`push_image_to_device`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L1445-L1523) as `multipart/form-data` to `POST /api/v1/devices/{id}/image`. If the user passes `dither_algorithm` / `resize_mode` / `padding_color` parameters, it goes through the processing endpoint; otherwise it uses the raw endpoint to push the original image directly. Supported dithering algorithms include 8 options (ordered / floyd-steinberg / atkinson / burkes / sierra / stucki / jarvis-judice-ninke / threshold), and resize modes include fit / cover / fill. The image size limit is 10MB.
 
 ### §3.5 Device Registration and ID Mapping (uink_epaper device template)
 
