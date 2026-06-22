@@ -496,3 +496,14 @@ Reading one of these is more illuminating than any doc.
 ---
 
 *Last updated: 2026-06-15*
+
+## Practical Case Studies
+
+This page is the API reference. To see **how these APIs are used in real engineering, and why designs were chosen**, read:
+
+- [Case Studies Overview](./case-studies/0-overview.md)
+- [#1 weather-forecast-v2](./case-studies/1-weather-forecast.md) — Starter data extension
+- [#2 yolo-device-inference](./case-studies/2-yolo-device-inference.md) — AI inference extension
+- [#3 yolo-video-v2](./case-studies/3-yolo-video-v2.md) — Streaming extension
+- [#4 onvif-bridge](./case-studies/4-onvif-bridge.md) — Standard protocol bridge
+- [#5 uink-rms-bridge](./case-studies/5-uink-rms-bridge.md) — Production-verified bridge

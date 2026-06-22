@@ -438,3 +438,11 @@ Corresponding manifest.json:
 ---
 
 *Last updated: 2026-06-15*
+
+## Practical Case Studies
+
+This page is the component API reference. Real-world engineering examples:
+
+- [Case Studies Overview](./case-studies/0-overview.md)
+- [#6 metric_card](./case-studies/6-metric-card-component.md) — Starter component
+- [#7 ne101_camera](./case-studies/7-ne101-camera-component/index.md) — Extension-linked embedded component (flagship)

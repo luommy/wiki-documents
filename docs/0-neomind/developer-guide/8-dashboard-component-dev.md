@@ -438,3 +438,11 @@ neomind dashboard update <DASHBOARD_ID> --components '[{
 ---
 
 *最后更新: 2026-06-15*
+
+## 实战参考
+
+本篇是组件 API 通用参考。真实工程案例：
+
+- [工程实践案例集 · 总览](./case-studies/0-overview.md)
+- [#6 metric_card](./case-studies/6-metric-card-component.md) — 入门组件
+- [#7 ne101_camera](./case-studies/7-ne101-camera-component/index.md) — 扩展联动嵌入式组件（旗舰案例）
