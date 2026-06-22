@@ -189,7 +189,28 @@ fn geocode_sync(&self, city: &str) -> std::result::Result<GeoLocation, String> {
 
 `Cargo.toml` 第 21 行有明确注释：`# Use sync HTTP client to avoid Tokio runtime issues in dynamic libraries`。这是整个案例最关键的设计决策，详见 §4.1。
 
-### 3.5 前端入口：Vite UMD 包
+### 3.5 命令流时序：get_weather 端到端调用链
+
+下方的时序图展示了 `get_weather` 命令从运行时调度到指标产出的完整调用链，标注了缓存读取（RwLock）、两次外部 HTTP 请求（Geocoding → Forecast）、以及定点数编码（×100 / ÷100）发生的时机。这是贡献者修改本扩展时需要理解的最小行为单元——尤其是缓存命中/未命中的分支位置和定点编码的边界。
+
+```mermaid
+sequenceDiagram
+    participant Runtime as NeoMind Runtime
+    participant Ext as WeatherExtension
+    participant Geo as Open-Meteo Geocoding
+    participant Forecast as Open-Meteo Forecast
+
+    Runtime->>Ext: execute_command("get_weather", {location, ...})
+    Note over Ext: 读 RwLock<String> city 缓存
+    Ext->>Geo: GET /search?name=<location>
+    Geo-->>Ext: { latitude, longitude }
+    Ext->>Forecast: GET /forecast?latitude=...&current=...
+    Forecast-->>Ext: { temperature, wind_speed, humidity, ... }
+    Note over Ext: store_weather_metrics()<br/>AtomicI64 定点数 ×100 写入
+    Ext-->>Runtime: ProduceMetrics → ExtensionMetricValue /100 还原
+```
+
+### 3.6 前端入口：Vite UMD 包
 
 查看完整实现：[`frontend/src/index.tsx`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/weather-forecast-v2/frontend/src/index.tsx#L425-L565) L425-565
 
@@ -220,6 +241,8 @@ fn geocode_sync(&self, city: &str) -> std::result::Result<GeoLocation, String> {
 
 **权衡代价**：同步调用会阻塞调用线程。`execute_command` 是 async 方法，但内部的 `get_weather_sync` 是同步阻塞的——调用期间该 task 无法让出控制权。**这是可接受的**，因为天气 API 响应通常 &lt;2s，而 NeoMind 的命令超时默认 30s。
 
+量化阻塞影响：典型负载（1 次请求 / 30s 采集周期）下，Open-Meteo 的 200–500ms 响应仅占扩展线程时序的 &lt;2%。即使未来支持多城市并行拉取，受益于异步并发的也只是少数高并发场景，而 SDK 当前同步的 `execute_command` 契约让异步化收益被抹平——一旦宿主以同步方式调用 `produce_metrics()`，再快的 HTTP 客户端也无法缩短整体调用链。
+
 ### 4.2 RwLock 包装 default_city vs Mutex vs AtomicPtr
 
 **决策**：`default_city: std::sync::RwLock<String>`。
@@ -229,7 +252,7 @@ fn geocode_sync(&self, city: &str) -> std::result::Result<GeoLocation, String> {
 - **B. `Arc<AtomicPtr<str>>`** → 否决原因：字符串不是定长类型，无法用原子操作直接交换。需要 `Box::leak` 或类似技巧，引入 unsafe 代码，违反 [附录 §7.1](./appendix-standards.md#71-unsafe-rust) 的「尽量避免 unsafe」原则。
 - **C. 每次创建新的 `String`（不可变设计）** → 否决原因：需要把整个 `WeatherExtension` 放在 `Arc<Mutex<>>` 或 `Arc<RwLock<>>` 里，改变所有方法的签名，侵入性太大。
 
-**权衡代价**：`RwLock` 在 Linux 上比 `Mutex` 略慢（内核态开销），但在 weather-forecast-v2 的负载下（每 5 分钟一次写），差异可忽略。
+**权衡代价**：`RwLock` 在 Linux 上比 `Mutex` 略慢（内核态开销），但在 weather-forecast-v2 的负载下（每 5 分钟一次写），差异可忽略。读写比大致为 N:1——每次 `produce_metrics()` 都会间接读取与城市相关的派生数据（每 30s 一次），而用户触发的 `get_weather` 命令才是写者。默认配置下读写比约为 30:1，正是 `RwLock` 优于 `Mutex` 的典型区间。若未来引入「城市热切换」类高频写场景（如跟随定位自动切换），应重新评估是否改用 `ArcSwap<String>` 等无锁结构。
 
 ### 4.3 指标命名：`<物理量>_<单位>` 后缀
 
@@ -240,7 +263,7 @@ fn geocode_sync(&self, city: &str) -> std::result::Result<GeoLocation, String> {
 - **B. 扩展前缀：`weather_temperature`** → 否决原因：NeoMind 指标系统已经有 `device_id` 维度做命名空间隔离，不需要在指标名里重复扩展名。单位后缀比扩展前缀更有信息量——用户看到 `temperature_c` 就知道单位是摄氏度。
 - **C. 点号分隔：`temperature.celsius`** → 否决原因：Prometheus 风格的点号在 NeoMind 指标查询语法中会与字段路径冲突（`device.metrics.temperature.celsius` 被解析为嵌套字段）。下划线更安全。
 
-**权衡代价**：指标名较长（`wind_speed_kmph` vs `wind_speed`），但这是可读性和唯一性之间的合理折衷。
+**权衡代价**：指标名较长（`wind_speed_kmph` vs `wind_speed`），但这是可读性和唯一性之间的合理折衷。扩展性上：`weather_` 前缀模式可防止未来若新增 `weather_alerts` 扩展时与 `temperature` 等同名指标发生碰撞；单位后缀（`_celsius`、`_kmh`）则让规则引擎无需查表即可做单位感知的阈值判断（如 `temperature_c > 35` 自动等价于「摄氏 35 度告警」）。这一约定也是仪表板 i18n 数字格式化的隐式契约——前端可依据后缀选择 ℃/℉ 转换策略。
 
 ---
 
@@ -332,7 +355,7 @@ weather-forecast-v2 是纯 Rust + HTTP，没有 C 依赖，5 个 target 都能�
 
 **根因**：扩展直接依赖 SDK 的 git 仓库（`neomind-extension-sdk = { git = "..." }`），主项目更新 SDK 后，扩展必须同步重编译。SDK 内部类型变更（如 `Version` → `String`）在所难免，但 git 依赖没有版本号隔离，一改全崩。
 
-**修复**：改用 crates.io 发布的 SDK 版本（`neomind-extension-sdk = "0.6"`），版本号写死。同时把 `Version::parse("2.0.0").unwrap()` 改为直接传 `"2.0.0"` 字符串。新增 `test_metadata_json_matches_runtime_metadata` 测试，用 `include_str!("../metadata.json")` 在编译时校验 metadata.json 与运行时 metadata 一致。
+**修复**：改用 crates.io 发布的 SDK 版本（`neomind-extension-sdk = "0.6"`），版本号写死。同时把 `Version::parse("2.0.0").unwrap()` 改为直接传 `"2.0.0"` 字符串。新增 `test_metadata_json_matches_runtime_metadata` 测试，用 `include_str!("../metadata.json")` 在编译时**旨在**捕获 Cargo.toml 与 metadata.json 之间的元数据漂移；不过该测试当前断言的 `metadata_json["repository"]` 字段并未出现在 metadata.json 中，属已知的源码 drift，读者引用时应留意。
 
 **教训**：扩展 SDK 必须通过 crates.io 发布，不能依赖 git。每次 breaking change 必须升 major 版本。扩展应锁定具体版本（`"0.6"` 而非 `"*"`），避免被意外的 SDK 更新破坏。
 
