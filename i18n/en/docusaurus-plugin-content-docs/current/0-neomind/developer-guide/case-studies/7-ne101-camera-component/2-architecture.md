@@ -155,7 +155,7 @@ The core hooks of `NE101CameraPanel` (located at [`bundle.js` L484-L513](https:/
 | `lastDetsRef = React.useRef([])` | [L512](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L512) | Caches the previous frame's detections to avoid image/detection misalignment |
 | `lastDetsTsRef = React.useRef(null)` | [L513](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L513) | The source_ts that the previous frame's detections correspond to |
 
-This group of hooks reveals the three axes of ne101_camera's state machine: **the command axis** (short-term state for user-initiated actions), **the extension axis** (medium-term state for AI scheduling), and **the detection cache axis** (long-term refs for cross-frame alignment). metric_card has only one axis (the loading/data/error of data fetching) — this is the most直观 illustration of the complexity gap between the two.
+This group of hooks reveals the three axes of ne101_camera's state machine: **the command axis** (short-term state for user-initiated actions), **the extension axis** (medium-term state for AI scheduling), and **the detection cache axis** (long-term refs for cross-frame alignment). metric_card has only one axis (the loading/data/error of data fetching) — this is the clearest illustration of the complexity gap between the two.
 
 > **Hook-order pitfall**: commit [`0601cd4`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/0601cd4) (`fix(ne101_camera): move conditional useState hook to fix React error #310`) specifically fixes a bug where a conditional `useState` caused inconsistent hook ordering. When writing hooks inside an IIFE, the absence of ESLint's `rules-of-hooks` makes this class of bug easy to miss — a hidden cost of the hand-written IIFE philosophy.
 
@@ -212,7 +212,7 @@ The core contract of this data flow is written in the comment at [`bundle.js` L1
 Two commits mark the introduction of this dual-channel strategy:
 
 - commit [`b0be12b`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/b0be12b) (`fix(ne101): initial fetch on mount for image + virtual metrics`) — fixes "if WebSocket has not pushed the first message by the time the component mounts, the screen is blank", by triggering an active REST fetch in the mount effect.
-- commit [`0eedd27`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/0eedd27) (`fix(ne101): update virtual data on WS-triggered REST fetch`) — fixes "WS push only carries small metrics (battery/ts), large images need REST to补充", by making the WS-triggered REST fetch also refresh virtual metrics.
+- commit [`0eedd27`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/0eedd27) (`fix(ne101): update virtual data on WS-triggered REST fetch`) — fixes "WS push only carries small metrics (battery/ts), large images need REST to backfill", by making the WS-triggered REST fetch also refresh virtual metrics.
 
 Detection parsing has one easy-to-miss pitfall: the backend stores the `detections` virtual metric as a **JSON string** rather than an array. [`bundle.js` L857](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L853-L867) does a defensive parse with try/catch:
 
