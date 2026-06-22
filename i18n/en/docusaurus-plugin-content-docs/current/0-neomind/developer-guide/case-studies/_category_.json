@@ -1,0 +1,8 @@
+{
+  "label": "Engineering Case Studies",
+  "position": 10,
+  "link": {
+    "type": "generated-index",
+    "slug": "/case-studies"
+  }
+}
