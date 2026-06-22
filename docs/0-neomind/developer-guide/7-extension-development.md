@@ -494,10 +494,6 @@ runner 加载时会根据当前平台自动选择对应的二进制路径。
 - Dashboard 组件开发（如果想让扩展带可视化）→ [Dashboard 组件开发](./8-dashboard-component-dev.md)
 - 设备指标作为扩展数据源 → [设备类型开发](./6-device-type-development.md)
 
----
-
-*最后更新: 2026-06-15*
-
 ## 实战参考
 
 本篇是 API 通用参考。如果你想看**真实工程里怎么用、为什么这么设计**，阅读：
@@ -508,3 +504,7 @@ runner 加载时会根据当前平台自动选择对应的二进制路径。
 - [#3 yolo-video-v2](./case-studies/3-yolo-video-v2.md) — 流式扩展
 - [#4 onvif-bridge](./case-studies/4-onvif-bridge.md) — 标准协议桥接
 - [#5 uink-rms-bridge](./case-studies/5-uink-rms-bridge.md) — 生产验证桥接
+
+---
+
+*最后更新: 2026-06-15*

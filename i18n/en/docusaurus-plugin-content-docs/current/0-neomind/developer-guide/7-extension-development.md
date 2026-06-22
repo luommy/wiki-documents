@@ -493,10 +493,6 @@ Reading one of these is more illuminating than any doc.
 - Dashboard component development (if your extension ships visualizations) → [Dashboard Component Dev](./8-dashboard-component-dev.md)
 - Device metrics as extension data sources → [Device Type Development](./6-device-type-development.md)
 
----
-
-*Last updated: 2026-06-15*
-
 ## Practical Case Studies
 
 This page is the API reference. To see **how these APIs are used in real engineering, and why designs were chosen**, read:
@@ -507,3 +503,7 @@ This page is the API reference. To see **how these APIs are used in real enginee
 - [#3 yolo-video-v2](./case-studies/3-yolo-video-v2.md) — Streaming extension
 - [#4 onvif-bridge](./case-studies/4-onvif-bridge.md) — Standard protocol bridge
 - [#5 uink-rms-bridge](./case-studies/5-uink-rms-bridge.md) — Production-verified bridge
+
+---
+
+*Last updated: 2026-06-15*
