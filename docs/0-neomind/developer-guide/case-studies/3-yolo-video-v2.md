@@ -255,7 +255,7 @@ sequenceDiagram
 
 ### 命令系统
 
-`start_stream` / `stop_stream` 作为标准 `ExtensionCommand` 暴露给 Agent 和前端（[`src/lib.rs` L1101-L1111`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/yolo-video-v2/src/lib.rs#L1101-L1111) 的 `commands()` 方法）。前端通过 WebSocket 发送 `{command: "start_stream", args: {source_url, rois, ...}}`，runtime 调用 `execute_command` 调度。Agent 也可以通过同一接口触发流式分析（例如 "监控门口 10 分钟并报告所有进入的人"）。
+`start_stream` / `stop_stream` 作为标准 `ExtensionCommand` 暴露给 Agent 和前端，声明在 [src/lib.rs 的 commands() 方法（约 L1101-L1111）](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/yolo-video-v2/src/lib.rs#L1101-L1111)。前端通过 WebSocket 发送一个 JSON 对象作为指令，runtime 调用 `execute_command` 调度。Agent 也可以通过同一接口触发流式分析（例如 "监控门口 10 分钟并报告所有进入的人"）。
 
 ### StreamCapability + send_push_output
 
@@ -364,11 +364,11 @@ commit `60e4e5b` 把 ffmpeg-next 从 v7 升级到 v8（注意：当前 `Cargo.to
 
 ### 推荐阅读顺序
 
-如果你是第一次接触 NeoMind 流式扩展，建议按以下顺序阅读：(1) 先读 [总览](./0-overview.md) 理解扩展模型；(2) 读 [案例 #1](./1-weather-forecast-v2.md) 掌握基础同步扩展；(3) 读 [案例 #2](./2-yolo-device-inference.md) 理解 AI 推理 + 同步能力桥；(4) 最后读本案例 #3，对比 Push 与 Pull 的差异。如果你只关心 SDK 的 StreamCapability 接口设计，可以直接从 §3.1 开始读。
+如果你是第一次接触 NeoMind 流式扩展，建议按以下顺序阅读：(1) 先读 [总览](./0-overview.md) 理解扩展模型；(2) 读 [案例 #1](./1-weather-forecast.md) 掌握基础同步扩展；(3) 读 [案例 #2](./2-yolo-device-inference.md) 理解 AI 推理 + 同步能力桥；(4) 最后读本案例 #3，对比 Push 与 Pull 的差异。如果你只关心 SDK 的 StreamCapability 接口设计，可以直接从 §3.1 开始读。
 
 ### 延伸到 ne101_camera
 
-[案例 #7 ne101_camera](./ne101-camera/0-overview.md)（旗舰案例）会展示一个真实的摄像头产品如何同时使用 #2（设备绑定推理）和 #3（RTSP 流式分析）——ne101 设备的图像指标走 #2 的 event-driven 路径，而 ne101 的 RTSP 直播流走 #3 的 Push 路径。理解本案例的 `init_session` → `start_push` → 帧循环 → `send_push_output` 链路是阅读 #7 的前置条件。
+案例 #7 ne101_camera（旗舰案例，即将发布）会展示一个真实的摄像头产品如何同时使用 #2（设备绑定推理）和 #3（RTSP 流式分析）——ne101 设备的图像指标走 #2 的 event-driven 路径，而 ne101 的 RTSP 直播流走 #3 的 Push 路径。理解本案例的 `init_session` → `start_push` → 帧循环 → `send_push_output` 链路是阅读 #7 的前置条件。
 
 ### 小结
 

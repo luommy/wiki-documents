@@ -191,7 +191,7 @@ sequenceDiagram
 
 **We chose to hardcode two regions + Custom fallback** (see [L713-L720](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L713-L720)); the alternative was to provide only a `custom_server_url` field for users to fill in completely. Rationale: (1) Uink-RMS currently has only cn / eu regions, and a dropdown is more user-friendly than manually typing a URL, reducing configuration cognitive load; (2) hardcoded endpoints prevent users from mistyping URLs (missing a `/`, adding `/api/v1`, etc.); (3) the `Custom` option and `custom_server_url` field are retained as extension points — if Uink opens new regions or customers self-host RMS instances, users can still fill in a full URL. The tradeoff is that adding a new Uink region requires a code change and new release (but this is rare).
 
-### Decision 5: RwLock<HashMap> instead of DashMap / SQLite
+### Decision 5: `RwLock<HashMap>` instead of DashMap / SQLite
 
 **We chose `RwLock<HashMap<String, String>>`** ([L730](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L730)); alternative A was DashMap (lock-free concurrent HashMap); alternative B was persisted SQLite. Rationale: (1) a single customer's e-paper device count is typically tens to hundreds, HashMap reads/writes are O(1), performance is not a bottleneck; (2) DashMap adds an extra dependency and API complexity with no benefit at this scale; (3) SQLite persistence brings IO overhead and file locking issues, while device mappings can be rebuilt from RMS after each sync, no persistence needed. parking_lot::RwLock performs better than std::sync::RwLock and doesn't poison, making it the unified choice for NeoMind extensions.
 

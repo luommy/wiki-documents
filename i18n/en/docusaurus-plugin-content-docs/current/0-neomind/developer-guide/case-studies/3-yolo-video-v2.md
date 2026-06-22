@@ -255,7 +255,7 @@ This section lists five key decisions, each with the chosen approach, the altern
 
 ### Command system
 
-`start_stream` / `stop_stream` are exposed as standard `ExtensionCommand`s to both Agent and front end (see the `commands()` method around [`src/lib.rs` L1101-L1111](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/yolo-video-v2/src/lib.rs#L1101-L1111)). The front end sends `{command: "start_stream", args: {source_url, rois, ...}}` over WebSocket and the runtime dispatches via `execute_command`. An Agent can also trigger streaming analysis via the same interface (for example, "monitor the front door for 10 minutes and report everyone who enters").
+`start_stream` / `stop_stream` are exposed as standard `ExtensionCommand`s to both Agent and front end, declared in the [commands() method around L1101-L1111 of src/lib.rs](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/yolo-video-v2/src/lib.rs#L1101-L1111). The front end sends a JSON object as the command over WebSocket and the runtime dispatches via `execute_command`. An Agent can also trigger streaming analysis via the same interface (for example, "monitor the front door for 10 minutes and report everyone who enters").
 
 ### StreamCapability + send_push_output
 
@@ -364,11 +364,11 @@ Commit `60e4e5b` upgraded ffmpeg-next from v7 to v8 (note: the current `Cargo.to
 
 ### Recommended reading order
 
-If this is your first encounter with NeoMind streaming extensions, read in this order: (1) start with the [Overview](./0-overview.md) to grasp the extension model; (2) read [Case #1](./1-weather-forecast-v2.md) to learn the basics of synchronous extensions; (3) read [Case #2](./2-yolo-device-inference.md) to understand AI inference + the synchronous capability bridge; (4) finish with this case (#3) to contrast Push versus Pull. If you only care about the SDK's StreamCapability interface design, jump straight to §3.1.
+If this is your first encounter with NeoMind streaming extensions, read in this order: (1) start with the [Overview](./0-overview.md) to grasp the extension model; (2) read [Case #1](./1-weather-forecast.md) to learn the basics of synchronous extensions; (3) read [Case #2](./2-yolo-device-inference.md) to understand AI inference + the synchronous capability bridge; (4) finish with this case (#3) to contrast Push versus Pull. If you only care about the SDK's StreamCapability interface design, jump straight to §3.1.
 
 ### Bridge to ne101_camera
 
-[Case #7 ne101_camera](./ne101-camera/0-overview.md) (the flagship case) shows how a real camera product simultaneously uses #2 (device-bound inference) and #3 (RTSP streaming analysis) — the ne101 device's image metrics flow through #2's event-driven path, while its RTSP live stream flows through #3's Push path. Understanding this case's `init_session` → `start_push` → frame loop → `send_push_output` chain is a prerequisite for reading #7.
+Case #7 ne101_camera (the flagship case, coming soon) shows how a real camera product simultaneously uses #2 (device-bound inference) and #3 (RTSP streaming analysis) — the ne101 device's image metrics flow through #2's event-driven path, while its RTSP live stream flows through #3's Push path. Understanding this case's `init_session` → `start_push` → frame loop → `send_push_output` chain is a prerequisite for reading #7.
 
 ### Summary
 

@@ -191,7 +191,7 @@ sequenceDiagram
 
 **我们选硬编码两个区域 + Custom 兜底**（见 [L713-L720](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L713-L720)）；替代方案是只提供 `custom_server_url` 一个字段让用户完全自填。理由：(1) Uink-RMS 目前只有 cn / eu 两个区域，下拉框选比手填 URL 更友好，降低用户配置心智负担；(2) 硬编码端点可以避免用户填错 URL（少个 `/`、多了 `/api/v1` 等）；(3) 保留 `Custom` 选项和 `custom_server_url` 字段作为扩展点——如果 Uink 未来开新区域或客户自建 RMS 实例，用户仍可填完整 URL。代价是 Uink 新增区域时需要改代码发新版（但这种情况罕见）。
 
-### 决策 5：RwLock<HashMap> 而非 DashMap / SQLite
+### 决策 5：`RwLock<HashMap>` 而非 DashMap / SQLite
 
 **我们选 `RwLock<HashMap<String, String>>`**（[L730](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L730)）；替代方案 A 是 DashMap（无锁并发 HashMap）；替代方案 B 是落盘 SQLite 持久化。理由：(1) 单个客户的 e-paper 设备量通常几十到几百台，HashMap 读写都是 O(1)，性能不是瓶颈；(2) DashMap 引入额外依赖且 API 复杂度上升，对这个规模无收益；(3) SQLite 落盘带来 IO 开销和文件锁问题，而设备映射在每次 sync 后从 RMS 重建即可，无需持久化。parking_lot::RwLock 比 std::sync::RwLock 性能更好且不中毒（poisoning），是 NeoMind 扩展的统一选择。
 
