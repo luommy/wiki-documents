@@ -83,6 +83,36 @@ i18n/en/docusaurus-plugin-content-docs/current/0-neomind/developer-guide/case-st
 
 - **每个 Phase 收尾**：本地 `npm run start` 验证 Docusaurus 构建 + 侧边栏正确显示 + 中英切换正常
 
+### GitHub 源仓库 canonical org（已确认）
+
+两个源仓库的正式公开 URL 均在 `camthink-ai` org 下（本地 fork 指向 mingmingshen，但**公开链接一律用 camthink-ai**）：
+
+| 仓库 | URL 前缀 |
+|------|----------|
+| NeoMind-Extensions | `https://github.com/camthink-ai/NeoMind-Extensions/blob/main/` |
+| NeoMind-Dashboard-Components | `https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/` |
+
+### Mermaid 约束
+
+- Mermaid 图必须是**顶层 fenced block**（` ```mermaid `），**不可放在 admonition（`:::note` / `:::tip` 等）内部**——会渲染失败
+- 每个 mermaid 提交前在 `npm run start` 下肉眼检查
+
+### i18n `_category_.json` 镜像约束
+
+每个 `_category_.json` 必须在中英两处都存在，且 `position` / `link` 结构**完全一致**；只有 `label` 字段翻译。`slug` 不翻译（保证 URL 一致）。
+
+### 跨链接扩展名约定
+
+写作前先 `grep -r '\]\(\./' docs/0-neomind/developer-guide/*.md | head -5`，匹配现有仓库风格（`.md` 后缀留或不留）。全文统一。
+
+### 图片 CDN（spec §5.3）执行策略
+
+本计划**默认不使用位图截图**，所有图示用 mermaid 表达。若某案例确需位图（如 UI 截图），上传到 `https://resources.camthink.ai/NeoMind/case-studies/<case-id>-<seq>-<desc>.png`，文件命名规范见 spec §5.3。绝大多数情况下 mermaid 已够用。
+
+### Spec 修订策略
+
+执行过程中如发现 spec 设计有问题，**不中途修订 spec**（会污染审计链）。改为：把问题记录到 `docs/superpowers/specs/2026-06-22-neomind-dev-guide-case-studies-design.md` 末尾的"Follow-up 问题"段，全部案例完成后统一处理。
+
 ---
 
 ## Phase 1：基础设施（先搭骨架）
@@ -121,17 +151,14 @@ i18n/en/docusaurus-plugin-content-docs/current/0-neomind/developer-guide/case-st
 }
 ```
 
-- [ ] **Step 3: 验证 Docusaurus 构建**
-
-Run: `cd /Users/shenmingming/Marketing/wiki-documents && npm run build 2>&1 | tail -20`
-Expected: BUILD SUCCESS（空目录可能告警，只要不阻断）
-
-- [ ] **Step 4: Commit**
+- [ ] **Step 3: Commit**
 
 ```bash
 git add docs/0-neomind/developer-guide/case-studies/_category_.json i18n/en/docusaurus-plugin-content-docs/current/0-neomind/developer-guide/case-studies/_category_.json
 git commit -m "feat(neomind/case-studies): 创建案例集目录骨架（中英）"
 ```
+
+> **注**：构建验证延后到 Task 1.2 完成（空 `_category_.json` 目录的 build 输出有噪音警告，在 `0-overview.md` 落盘后一起验证更清晰）。
 
 ---
 
@@ -151,15 +178,15 @@ git commit -m "feat(neomind/case-studies): 创建案例集目录骨架（中英�
 5. **组件源码格式说明**（spec §2.4）：引用一段
 6. **延伸阅读**：链接到 `7-extension-development.md` / `8-dashboard-component-dev.md`
 
-版本对齐表初始值（核实后填入）：
+版本对齐表初始值（用以下命令核实后填入）：
 | 案例 | 源仓库版本 | SDK 版本 | 最后 audit |
 |------|-----------|----------|------------|
 | #1 weather-forecast | v2.7.6 | SDK 0.6 | 2026-06-22 |
-| #2 yolo-device-inference | （读 Cargo.toml） | SDK 0.6 | 2026-06-22 |
-| #3 yolo-video-v2 | （读 Cargo.toml） | SDK 0.6 | 2026-06-22 |
-| #4 onvif-bridge | （读 Cargo.toml） | SDK 0.6 | 2026-06-22 |
-| #5 uink-rms-bridge | （读 Cargo.toml） | SDK 0.6 | 2026-06-22 |
-| #6 metric_card | v2.14.x（读 manifest） | — | 2026-06-22 |
+| #2 yolo-device-inference | `grep '^version' "/Users/shenmingming/CamThink Project/NeoMind-Extensions/extensions/yolo-device-inference/Cargo.toml"` | SDK 0.6 | 2026-06-22 |
+| #3 yolo-video-v2 | `grep '^version' "/Users/shenmingming/CamThink Project/NeoMind-Extensions/extensions/yolo-video-v2/Cargo.toml"` | SDK 0.6 | 2026-06-22 |
+| #4 onvif-bridge | `grep '^version' "/Users/shenmingming/CamThink Project/NeoMind-Extensions/extensions/onvif-bridge/Cargo.toml"` | SDK 0.6 | 2026-06-22 |
+| #5 uink-rms-bridge | `grep '^version' "/Users/shenmingming/CamThink Project/NeoMind-Extensions/extensions/uink-rms-bridge/Cargo.toml"` | SDK 0.6 | 2026-06-22 |
+| #6 metric_card | `grep '"version"' "/Users/shenmingming/CamThink Project/NeoMind-Dashboard-Components/components/metric_card/manifest.json"` | — | 2026-06-22 |
 | #7 ne101_camera | v2.14.9 | — | 2026-06-22 |
 
 - [ ] **Step 2: 同步英文版**
@@ -384,14 +411,26 @@ git commit -m "docs(neomind/case-studies): #6 metric_card 入门组件案例（�
 2. 5 条硬标准是否可执行？哪条过严/过松？
 3. 验收清单是否漏项？
 
-- [ ] **Step 2: 必要时修订 spec §3.1 / §4.2 / §4.3，并写 commit**
+- [ ] **Step 2: 把发现的问题归档到 spec 的"Follow-up 问题"段**
+
+不改 spec 原文（避免污染审计链）。在 `docs/superpowers/specs/2026-06-22-neomind-dev-guide-case-studies-design.md` 末尾追加：
+
+```markdown
+---
+
+## Follow-up 问题（执行过程中发现，待 v1.1 处理）
+
+- [YYYY-MM-DD] Phase 2 校准发现：<具体问题与建议>
+```
+
+然后写 commit：
 
 ```bash
 git add docs/superpowers/specs/2026-06-22-neomind-dev-guide-case-studies-design.md
-git commit -m "docs(neomind/case-studies): Phase 2 模板校准后修订 spec"
+git commit -m "docs(neomind/case-studies): Phase 2 模板校准问题归档（不改 spec 原文）"
 ```
 
-- [ ] **Step 3: 同步更新已写完的 #1 / #6（如模板有变）**
+- [ ] **Step 3: 继续按原模板执行 Phase 3**（spec 修订延后到全部案例完成后）
 
 ---
 
@@ -422,8 +461,21 @@ git commit -m "docs(neomind/case-studies): Phase 2 模板校准后修订 spec"
 - 跨 session 模型复用机制
 - 设备相机集成方式（与 `device_type_filter` 的关系）
 
-- [ ] Step 1-7：同 Task 2.1 流程
-- [ ] Step 8: Commit message: `docs(neomind/case-studies): #2 yolo-device-inference AI 推理案例（中英）`
+**Step 2 拆分（按模板 8 段，每段独立产出）：**
+
+- [ ] **Step 1: 读源码 + git log，做工程解读笔记**（提取 ≥3 决策、≥1 演进、≥1 反例）
+- [ ] **Step 2a: 写 §1 案例背景**（~50 行）
+- [ ] **Step 2b: 写 §2 架构总览**（~80 行，含 2 张 mermaid）
+- [ ] **Step 2c: 写 §3 实现剖析**（~250 行，含 ≥3 处深链接到 `lib.rs`）
+- [ ] **Step 2d: 写 §4 设计权衡**（~100 行，≥3 决策 × 2+ 替代方案）
+- [ ] **Step 2e: 写 §5 技术栈拆解**（~50 行）
+- [ ] **Step 2f: 写 §6 标准落地**（~80 行，含 1 个反例）
+- [ ] **Step 2g: 写 §7 常见坑（含备份文件反例）+ §8 延伸阅读**（~90 行）
+- [ ] **Step 3: 7 项验收清单自查**
+- [ ] **Step 4: 同步英文版**
+- [ ] **Step 5: 更新 `0-overview.md` 版本对齐表 #2 行**
+- [ ] **Step 6: 本地预览 + 深链接验证**
+- [ ] **Step 7: Commit**：`docs(neomind/case-studies): #2 yolo-device-inference AI 推理案例（中英）`
 
 ---
 
@@ -443,7 +495,7 @@ git commit -m "docs(neomind/case-studies): Phase 2 模板校准后修订 spec"
 - 视频帧批量处理的吞吐设计
 - 与 VLM 仪表板组件的联动
 
-- [ ] Step 1-7：同 Task 2.1 流程
+- [ ] Step 1-7：同 Task 3.1 流程（8 子步拆分）
 - [ ] Step 8: Commit message: `docs(neomind/case-studies): #3 yolo-video-v2 流式扩展案例（中英）`
 
 ---
@@ -463,7 +515,7 @@ git commit -m "docs(neomind/case-studies): Phase 2 模板校准后修订 spec"
 - 设备发现 → 类型映射 → 指令下发的完整链路
 - 与 NeoEyes 摄像头产品线的关系（交叉引用）
 
-- [ ] Step 1-7：同 Task 2.1 流程
+- [ ] Step 1-7：同 Task 3.1 流程（8 子步拆分）
 - [ ] Step 8: Commit message: `docs(neomind/case-studies): #4 onvif-bridge 标准协议桥接案例（中英）`
 
 ---
@@ -483,7 +535,7 @@ git commit -m "docs(neomind/case-studies): Phase 2 模板校准后修订 spec"
 - 与 onvif-bridge 对比：通用协议 vs 厂商专有协议的取舍
 - 生产部署的特殊考虑（重连/鉴权/错误恢复）
 
-- [ ] Step 1-7：同 Task 2.1 流程
+- [ ] Step 1-7：同 Task 3.1 流程（8 子步拆分）
 - [ ] Step 8: Commit message: `docs(neomind/case-studies): #5 uink-rms-bridge 生产验证桥接案例（中英）`
 
 ---
@@ -507,15 +559,28 @@ Expected: HTTP/2 200
 ## Phase 4：旗舰案例 ne101_camera（8 子页面）
 
 > 最复杂，最后做。所有 8 个子页面在一个子目录 `7-ne101-camera-component/` 下，独立 `_category_.json`。
+>
+> **MVP 顺序**：先完成 `index` + 3 个 ★（4 数据契约 / 5 前端消费 / 6 组件封装）+ `2-architecture`，作为 v1.0 可发布的最小集合；`3-extension-side` 与 `7-integration-test` / `8-deep-dive` 标记为 **deferrable to v1.1**（如时间紧张可延后）。
 
-### Task 4.1：创建子目录与 `_category_.json`
+### Task 4.1：创建子目录 + `_category_.json` + `index.md` + `1-background.md`（中英）
+
+> **合并原因**：单独提交 `_category_.json`（`link.type: "doc"` 指向 `index`）会让 Docusaurus 在 `index.md` 不存在时构建报错。一起提交避免此问题。
 
 **Files:**
 - Create: `docs/0-neomind/developer-guide/case-studies/7-ne101-camera-component/_category_.json`
-- Create: `i18n/en/.../case-studies/7-ne101-camera-component/_category_.json`
+- Create: `docs/0-neomind/developer-guide/case-studies/7-ne101-camera-component/index.md`
+- Create: `docs/0-neomind/developer-guide/case-studies/7-ne101-camera-component/1-background.md`
+- Create: `i18n/en/.../7-ne101-camera-component/{_category_.json,index.md,1-background.md}`
 
-- [ ] **Step 1: 中文 `_category_.json`**
+**Files:**
+- Create: `docs/.../7-ne101-camera-component/index.md`
+- Create: `docs/.../7-ne101-camera-component/1-background.md`
+- Create: `i18n/en/.../7-ne101-camera-component/index.md`
+- Create: `i18n/en/.../7-ne101-camera-component/1-background.md`
 
+- [ ] **Step 1: 创建 `_category_.json`（中文 + 英文）**
+
+中文：
 ```json
 {
   "label": "ne101_camera 旗舰案例",
@@ -527,26 +592,11 @@ Expected: HTTP/2 200
 }
 ```
 
-- [ ] **Step 2: 英文 `_category_.json`**
+英文：相同结构，`label` 译为 "ne101_camera Flagship Case"。
 
-- [ ] **Step 3: Commit**
+> **注**：`position: 7` 是在 `case-studies/` 目录内的位置（与 `7-` 前缀对齐）；父级 `case-studies/_category_.json` 的 `position: 10` 是在 `developer-guide/` 内的位置。两者作用域独立，无冲突。
 
-```bash
-git add docs/0-neomind/developer-guide/case-studies/7-ne101-camera-component/_category_.json i18n/en/docusaurus-plugin-content-docs/current/0-neomind/developer-guide/case-studies/7-ne101-camera-component/_category_.json
-git commit -m "feat(neomind/case-studies): 创建 ne101-camera 旗舰案例子目录"
-```
-
----
-
-### Task 4.2：`index.md` + `1-background.md`（中英）
-
-**Files:**
-- Create: `docs/.../7-ne101-camera-component/index.md`
-- Create: `docs/.../7-ne101-camera-component/1-background.md`
-- Create: `i18n/en/.../7-ne101-camera-component/index.md`
-- Create: `i18n/en/.../7-ne101-camera-component/1-background.md`
-
-- [ ] **Step 1: `index.md`（~150 行）**
+- [ ] **Step 2: 写 `index.md`（~150 行）**
 
 内容：
 - 案例一句话定位
@@ -554,7 +604,7 @@ git commit -m "feat(neomind/case-studies): 创建 ne101-camera 旗舰案例子�
 - 8 个子页面索引表
 - 与 #6 metric_card 的关系（从入门到旗舰的递进）
 
-- [ ] **Step 2: `1-background.md`（~300 行）**
+- [ ] **Step 3: 写 `1-background.md`（~300 行）**
 
 内容：
 - NE101 设备能力（参考 NeoMind 主仓库 `crates/neomind-storage/src/builtin_types/ne101_camera.json`）
@@ -562,18 +612,23 @@ git commit -m "feat(neomind/case-studies): 创建 ne101-camera 旗舰案例子�
 - 在 NeoMind 生态中的定位
 - mermaid：NE101 设备 → 平台 → ne101_camera 组件的端到端流程图
 
-- [ ] **Step 3: 同步英文**
+- [ ] **Step 4: 同步英文**
 
-- [ ] **Step 4: Commit**
+- [ ] **Step 5: 本地构建验证（必做）**
+
+Run: `npm run build`
+Expected: BUILD SUCCESS（此时 `_category_.json` 的 `link.id` 指向的 `index.md` 已存在，不会报错）
+
+- [ ] **Step 6: Commit**
 
 ```bash
-git add docs/0-neomind/developer-guide/case-studies/7-ne101-camera-component/index.md docs/0-neomind/developer-guide/case-studies/7-ne101-camera-component/1-background.md i18n/en/docusaurus-plugin-content-docs/current/0-neomind/developer-guide/case-studies/7-ne101-camera-component/index.md i18n/en/docusaurus-plugin-content-docs/current/0-neomind/developer-guide/case-studies/7-ne101-camera-component/1-background.md
-git commit -m "docs(neomind/case-studies): ne101-camera index + 业务背景（中英）"
+git add docs/0-neomind/developer-guide/case-studies/7-ne101-camera-component/ i18n/en/docusaurus-plugin-content-docs/current/0-neomind/developer-guide/case-studies/7-ne101-camera-component/
+git commit -m "docs(neomind/case-studies): ne101-camera 子目录 + index + 业务背景（中英）"
 ```
 
 ---
 
-### Task 4.3：`2-architecture.md`（中英）
+### Task 4.2：`2-architecture.md`（中英）
 
 **Files:**
 - Create: `docs/.../7-ne101-camera-component/2-architecture.md`
@@ -597,7 +652,7 @@ git commit -m "docs(neomind/case-studies): ne101-camera 端到端架构剖析（
 
 ---
 
-### Task 4.4：`3-extension-side.md`（中英）
+### Task 4.3：`3-extension-side.md`（中英） — **deferrable to v1.1**
 
 **Files:**
 - Create: `docs/.../7-ne101-camera-component/3-extension-side.md`
@@ -625,7 +680,7 @@ git commit -m "docs(neomind/case-studies): ne101-camera 扩展侧（通用契约
 
 ---
 
-### Task 4.5：`4-data-contract.md` ★（中英）
+### Task 4.4：`4-data-contract.md` ★（中英） — MVP 核心
 
 **Files:**
 - Create: `docs/.../7-ne101-camera-component/4-data-contract.md`
@@ -656,7 +711,7 @@ git commit -m "docs(neomind/case-studies): ne101-camera 数据契约剖析（中
 
 ---
 
-### Task 4.6：`5-frontend-consume.md` ★（中英）
+### Task 4.5：`5-frontend-consume.md` ★（中英） — MVP 核心
 
 **Files:**
 - Create: `docs/.../7-ne101-camera-component/5-frontend-consume.md`
@@ -685,7 +740,7 @@ git commit -m "docs(neomind/case-studies): ne101-camera 前端数据消费（中
 
 ---
 
-### Task 4.7：`6-component-build.md` ★（中英）
+### Task 4.6：`6-component-build.md` ★（中英） — MVP 核心
 
 **Files:**
 - Create: `docs/.../7-ne101-camera-component/6-component-build.md`
@@ -715,7 +770,7 @@ git commit -m "docs(neomind/case-studies): ne101-camera 组件封装与可复用
 
 ---
 
-### Task 4.8：`7-integration-test.md` + `8-deep-dive.md`（中英）
+### Task 4.7：`7-integration-test.md` + `8-deep-dive.md`（中英） — **deferrable to v1.1**
 
 **Files:**
 - Create: `docs/.../7-ne101-camera-component/{7-integration-test.md,8-deep-dive.md}`
@@ -746,7 +801,7 @@ git commit -m "docs(neomind/case-studies): ne101-camera 集成测试与深度话
 
 ---
 
-### Task 4.9：Phase 4 收尾 + 发布说明
+### Task 4.8：Phase 4 收尾 + 发布说明
 
 **Files:**
 - Modify: `docs/0-neomind/developer-guide/case-studies/0-overview.md`（更新版本表 #7）
@@ -768,14 +823,25 @@ Expected: BUILD SUCCESS，侧边栏"工程实践案例集"下显示 9 篇 + 旗�
 Run: 批量 curl GitHub URL
 Expected: 全部 200
 
-- [ ] **Step 4: 写发布说明**
+- [ ] **Step 4: 旗舰案例 §4.5 额外门槛自查（必做）**
+
+```
+[ ] ≥1 端到端时序图（推导自源码，分布在 4.2 架构 / 4.4 契约 / 4.5 前端消费 中至少一处）
+[ ] ≥1 工程演进解读（git log 提取，例如 commit 403c0f1 / d7836b8 / c276c23）
+[ ] 错误处理链（扩展侧 Result/?/unwrap + 前端侧 try/catch 路径提取，分布在 4.5 / 4.7 中）
+[ ] 可复用性边界（硬编码常量 + TODO/FIXME 提取，集中在 4.6）
+```
+
+如有缺项，回填到对应子页面再继续。
+
+- [ ] **Step 5: 写发布说明**
 
 中文 + 英文，简述：
 - 案例集发布（7 案例 + 旗舰 8 子页）
 - 主要价值（5 条硬标准 + 工程演进解读）
 - 阅读路径推荐
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 6: Commit**
 
 ```bash
 git add docs/0-neomind/developer-guide/case-studies/0-overview.md i18n/en/docusaurus-plugin-content-docs/current/0-neomind/developer-guide/case-studies/0-overview.md docs/7-release-notes/2026-06-22-neomind-case-studies.md i18n/en/docusaurus-plugin-content-docs/current/7-release-notes/2026-06-22-neomind-case-studies.md
@@ -821,13 +887,15 @@ Phase 1（基础设施，5 个 task）
    ↓
 Phase 2（2 入门案例 + 模板校准，3 个 task）
    ↓
-[模板校准复盘点] — 必要时修订 spec
+[模板校准复盘点] — 问题归档到 spec follow-up，不改原文
    ↓
 Phase 3（4 进阶案例，5 个 task）
    ↓
-Phase 4（旗舰案例 8 子页 + 发布说明，9 个 task）
+Phase 4（旗舰案例 8 子页 + 发布说明，8 个 task）
+  ├─ MVP 路径（v1.0）：4.1 → 4.2 → 4.4★ → 4.5★ → 4.6★
+  └─ 完整路径（v1.1）：+ 4.3 + 4.7 + 4.8（发布说明）
    ↓
 全局验收
 ```
 
-总计 **22 个 task**，每 task 独立 commit，每 Phase 收尾做构建验证。
+总计 **21 个 task**，每 task 独立 commit，每 Phase 收尾做构建验证。
