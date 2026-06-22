@@ -328,8 +328,8 @@ The common theme across these 7 decisions: **choosing the simplest approach that
 
 - Back to [§2 Architecture](./2-architecture.md) — the five-layer module structure of this section complements §2.2's five-layer architecture overview: §2 focuses on "what," §6 focuses on "how to build." §2.5 decision #1 (IIFE + window.React) has a deeper build-perspective analysis in §6.1.
 - Back to [§5 Frontend Consumption](./5-frontend-consume.md) — §5's callback ref pattern (commit `d7836b8`) and §6.4's hooks order fix (commit `0601cd4`) are two sides of the same coin: both are pitfalls of writing React in an IIFE.
-- [§7 Debugging & Troubleshooting](./7-debugging.md) (v1.1) — the hooks pitfalls, frozen input, and shadcn class desync issues mentioned here will have a systematic debugging methodology in §7.
-- [§8 Performance Optimization](./8-performance.md) (v1.1) — the performance characteristics of the 1972-line IIFE (full re-render, no tree-shaking) will be quantitatively analyzed in §8.
+- [§7 Integration Test](./7-integration-test.md) — the hooks pitfalls, frozen input, and shadcn class desync issues mentioned here have corresponding verification cases in §7's test matrix.
+- [§8 Deep Dive](./8-deep-dive.md) — the version evolution (133 commits), debug trace saga, and `_configHash` performance optimization of the 1972-line IIFE are fully recapped in §8.
 
 ---
 

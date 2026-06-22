@@ -68,7 +68,7 @@ sidebar_label: "ne101_camera 旗舰"
 
 3. **`processingExtensionId` 通用 AI 处理契约**——这是本案例最核心的设计创新：组件不自己跑 AI，而是通过 `processingExtensionId: ""` 字段把图像「外包」给用户选择的扩展（object_detection / ocr / describe / 任意 `locate-anything-v2` 兼容扩展）。这种「组件 + 可插拔扩展」的契约是 NeoMind 生态复用 AI 能力的范本。详见 [§3 扩展侧](./3-extension-side.md)（v1.1）。
 
-4. **ROI 叠加渲染的工程细节**——从单矩形 ROI（`processingRoiX/Y/W/H`，归一化 0-1）到多 ROI 数组（`processingRois: []`），从中心点判定（已被废弃）到 `processingRoiOverlap: 0.6` 的 IoU 阈值判定。这块涉及 Canvas 坐标映射、`objectFit: contain` 的非线性缩放、ResizeObserver 异步建立等坑点。详见 [§7 ROI 叠加](./7-roi-overlay.md)（v1.1）。
+4. **ROI 叠加渲染的工程细节**——从单矩形 ROI（`processingRoiX/Y/W/H`，归一化 0-1）到多 ROI 数组（`processingRois: []`），从中心点判定（已被废弃）到 `processingRoiOverlap: 0.6` 的 IoU 阈值判定。这块涉及 Canvas 坐标映射、`objectFit: contain` 的非线性缩放、ResizeObserver 异步建立等坑点。详见 [§5 前端消费](./5-frontend-consume.md) + [§7 集成测试](./7-integration-test.md)。
 
 5. **React-in-IIFE 的工程范式与陷阱**——在 1972 行的 IIFE 里写 React hooks 会有意外陷阱：例如 `b060a25` 修复了 React error #310（useEffect 里用了 hooks 依赖了未初始化的 state）、`0601cd4` 把条件 useState 移到顶层避免 hooks 顺序问题。这些坑在打包 React 项目里不会遇到，但在 IIFE 范式下必须显式处理。详见 [§6 组件构建](./6-component-build.md)（v1.1）。
 

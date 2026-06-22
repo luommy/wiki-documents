@@ -328,8 +328,8 @@ var DESC_CLS = 'text-sm text-muted-foreground';
 
 - 回到 [§2 架构总览](./2-architecture.md) —— 本节的五层模块结构与 §2.2 的五层架构概述互补：§2 聚焦「是什么」，§6 聚焦「怎么构建」。§2.5 的决策 #1（IIFE + window.React）在 §6.1 有更深入的构建视角分析。
 - 回到 [§5 前端消费](./5-frontend-consume.md) —— §5 的 callback ref 模式（commit `d7836b8`）和 §6.4 的 hooks 顺序修复（commit `0601cd4`）是同一主题的两面：都是在 IIFE 里写 React 时容易踩的坑。
-- [§7 调试与故障排查](./7-debugging.md)（v1.1）—— 本节提到的 hooks 陷阱、frozen input、shadcn 类不同步等问题，在 §7 会有系统化的调试方法论。
-- [§8 性能优化](./8-performance.md)（v1.1）—— 1972 行 IIFE 的性能特征（全量重渲染、无 tree-shaking）在 §8 会有量化分析。
+- [§7 集成测试](./7-integration-test.md)—— 本节提到的 hooks 陷阱、frozen input、shadcn 类不同步等问题，在 §7 的测试矩阵里有对应的验证用例。
+- [§8 深度复盘](./8-deep-dive.md)—— 1972 行 IIFE 的版本演进（133 commits）、调试 trace 兴衰、`_configHash` 性能优化在 §8 有完整复盘。
 
 ---
 
