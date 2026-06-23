@@ -7,7 +7,7 @@ sidebar_label: "4. Data Contract"
 
 # 4 Data Contract: Full-pipeline schema from MQTT telemetry to virtual metrics
 
-> This section is the **contract reference page** for the ne101_camera case study MVP phase. After reading you should be able to: (1) draw the boundaries of the three-layer contract — device telemetry, extension response, virtual metrics; (2) recite how the four `responseType` values (`boxes_x1y1x2y2` / `objects_bbox` / `detections_bbox` / `ocr_text_blocks`) normalize to the unified internal `{bbox, label, confidence}` shape; (3) explain the `virtual.<ext_id_normalized>.detections` output prefix assembly rule and the `source_ts` alignment mechanism; (4) describe the pitfall of backend-serialized JSON-string detections and the component's defensive `JSON.parse` strategy; (5) describe the Sutherland-Hodgman polygon-clipping-based ROI overlap detection algorithm and the tradeoffs of its 0.6 threshold. All line-number anchors point to the `main` branch of the source repo's [`bundle.js`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js) and [`manifest.json`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json).
+> This section is the **contract reference page** for the ne101_camera case study MVP phase, covering the three-layer contract (device telemetry, extension response, virtual metrics), four responseType normalizations, JSON string parsing pitfalls, and the ROI overlap detection algorithm.
 
 ---
 
@@ -119,84 +119,18 @@ if (!rawImageSrc) {
 
 The AI extension's response format is decided by the extension author; ne101_camera cannot control it. To handle this uniformly inside the component, `generateTransformJsCode` normalizes all four `responseType` values into the same internal shape: `{bbox: [x1, y1, x2, y2], label, confidence}` (coordinates normalized to 0-1). The dispatch logic for these four responseTypes is at [`bundle.js` L288-L329](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L288-L329):
 
-```js
-// bundle.js L288-L329
-if (mode.responseType === 'boxes_x1y1x2y2') {
-  L.push('var rawBoxes = r.boxes || [];');
-  L.push('var refTags = (r.answer || \'\').match(/<ref>(.*?)<\\/ref>/g) || [];');
-  L.push('var dets = rawBoxes.map(function(b, i) {');
-  L.push('  return { bbox: [b.x1 / W, b.y1 / H, b.x2 / W, b.y2 / H],');
-  L.push('    label: (refTags[i] || \'\').replace(/<\\/?ref>/g, \'\'), confidence: b.score || b.confidence || null };');
-  L.push('});');
-} else if (mode.responseType === 'objects_bbox') {
-  L.push('var dets = (r.objects || []).map(function(o) {');
-  L.push('  var b = o.bbox || {};');
-  L.push('  return { bbox: [(b.x||0)/W, (b.y||0)/H, ((b.x||0)+(b.width||0))/W, ((b.y||0)+(b.height||0))/H],');
-  L.push('    label: o.label || \'\', confidence: o.confidence || null };');
-  L.push('});');
-} else if (mode.responseType === 'detections_bbox') {
-  L.push('var dets = (r.detections || []).map(function(d) {');
-  L.push('  var b = d.bbox || {};');
-  L.push('  return { bbox: [(b.x||0)/W, (b.y||0)/H, ((b.x||0)+(b.width||0))/W, ((b.y||0)+(b.height||0))/H],');
-  L.push('    label: d.label || \'\', confidence: d.confidence || null };');
-  L.push('});');
-} else if (mode.responseType === 'ocr_text_blocks') {
-  // ... (omitted for brevity — see L316-L328 below)
-}
-```
-[Source: bundle.js L288-L329](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L288-L329)
+| responseType | Data path | Field format |
+|---|---|---|
+| `boxes_x1y1x2y2` | `r.boxes` | `{x1,y1,x2,y2}` normalized coords |
+| `objects_bbox` | `r.objects[].bbox` | `{x,y,w,h}` pixel coords |
+| `detections_bbox` | `r.detections[].bbox` | `{x,y,w,h}` pixel coords |
+| `ocr_text_blocks` | `r.text_blocks` | See code block below (has polygon) |
 
-**`boxes_x1y1x2y2`** (locate-anything-v2 family)** — see [`bundle.js` L288-L297](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L288-L297). The response structure is `r.boxes[]`, where each box has `x1, y1, x2, y2` (pixel coordinates) + `score`/`confidence`. Labels are not in the boxes — they are in the `r.answer` string as `<ref>label</ref>` tags in order. The code uses regex `match(/<ref>(.*?)<\/ref>/g)` to extract the label array, then pairs them by index `refTags[i]`. During normalization, coordinates are divided by image dimensions `W/H` to get 0-1 range. Commit `8656148` (`feat(ne101): pass NMS IoU threshold 0.5 to locate-anything-v2`) passes an additional `nms_iou_threshold: 0.5` parameter to this extension at L282, controlling the non-maximum suppression threshold:
+**`boxes_x1y1x2y2`** (locate-anything-v2 family)** — see [`bundle.js` L288-L297](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L288-L297). The response structure is `r.boxes[]`, where each box has `x1, y1, x2, y2` (pixel coordinates) + `score`/`confidence`. Labels are not in the boxes — they are in the `r.answer` string as `<ref>label</ref>` tags in order. The code uses regex `match(/<ref>(.*?)<\/ref>/g)` to extract the label array, then pairs them by index `refTags[i]`. During normalization, coordinates are divided by image dimensions `W/H` to get 0-1 range. Commit `8656148` (`feat(ne101): pass NMS IoU threshold 0.5 to locate-anything-v2`) passes an additional `nms_iou_threshold: 0.5` parameter to this extension at L282, controlling the non-maximum suppression threshold.
 
-```js
-// bundle.js L288-L297
-if (mode.responseType === 'boxes_x1y1x2y2') {
-  L.push('var rawBoxes = r.boxes || [];');
-  L.push('var refTags = (r.answer || \'\').match(/<ref>(.*?)<\\/ref>/g) || [];');
-  L.push('var dets = rawBoxes.map(function(b, i) {');
-  L.push('  return {');
-  L.push('    bbox: [b.x1 / W, b.y1 / H, b.x2 / W, b.y2 / H],');
-  L.push('    label: (refTags[i] || \'\').replace(/<\\/?ref>/g, \'\'),');
-  L.push('    confidence: b.score || b.confidence || null');
-  L.push('  };');
-  L.push('});');
-}
-```
-[Source: bundle.js L288-L297](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L288-L297)
+**`objects_bbox`** (image-analyzer-v2)** — see [`bundle.js` L298-L306](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L298-L306). The response structure is `r.objects[]`, where each object has `label`, `confidence`, and `bbox: {x, y, width, height}` (pixel coordinates). Normalization converts `{x, y, width, height}` to `[x1, y1, x2, y2]`: `x2 = x + width`, `y2 = y + height`, then divides by `W/H`.
 
-**`objects_bbox`** (image-analyzer-v2)** — see [`bundle.js` L298-L306](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L298-L306). The response structure is `r.objects[]`, where each object has `label`, `confidence`, and `bbox: {x, y, width, height}` (pixel coordinates). Normalization converts `{x, y, width, height}` to `[x1, y1, x2, y2]`: `x2 = x + width`, `y2 = y + height`, then divides by `W/H`:
-
-```js
-// bundle.js L298-L306
-} else if (mode.responseType === 'objects_bbox') {
-  L.push('var dets = (r.objects || []).map(function(o) {');
-  L.push('  var b = o.bbox || {};');
-  L.push('  return {');
-  L.push('    bbox: [(b.x||0)/W, (b.y||0)/H, ((b.x||0)+(b.width||0))/W, ((b.y||0)+(b.height||0))/H],');
-  L.push('    label: o.label || \'\',');
-  L.push('    confidence: o.confidence || null');
-  L.push('  };');
-  L.push('});');
-}
-```
-[Source: bundle.js L298-L306](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L298-L306)
-
-**`detections_bbox`** (yolo-device-inference)** — see [`bundle.js` L307-L315](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L307-L315). The response structure is `r.detections[]`, with nearly identical field structure to `objects_bbox` (`label`, `confidence`, `bbox: {x, y, width, height}`), only the top-level key changes from `objects` to `detections`. The reason for listing it as a separate responseType instead of reusing `objects_bbox` is that these two extensions have different invocation commands (`analyze_image` vs `detect`), and yolo-device-inference may add device-specific fields in the future (e.g., inference time, model version):
-
-```js
-// bundle.js L307-L315
-} else if (mode.responseType === 'detections_bbox') {
-  L.push('var dets = (r.detections || []).map(function(d) {');
-  L.push('  var b = d.bbox || {};');
-  L.push('  return {');
-  L.push('    bbox: [(b.x||0)/W, (b.y||0)/H, ((b.x||0)+(b.width||0))/W, ((b.y||0)+(b.height||0))/H],');
-  L.push('    label: d.label || \'\',');
-  L.push('    confidence: d.confidence || null');
-  L.push('  };');
-  L.push('});');
-}
-```
-[Source: bundle.js L307-L315](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L307-L315)
+**`detections_bbox`** (yolo-device-inference)** — see [`bundle.js` L307-L315](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L307-L315). The response structure is `r.detections[]`, with nearly identical field structure to `objects_bbox` (`label`, `confidence`, `bbox: {x, y, width, height}`), only the top-level key changes from `objects` to `detections`. The reason for listing it as a separate responseType instead of reusing `objects_bbox` is that these two extensions have different invocation commands (`analyze_image` vs `detect`), and yolo-device-inference may add device-specific fields in the future (e.g., inference time, model version).
 
 **`ocr_text_blocks`** (ocr-device-inference)** — see [`bundle.js` L316-L328](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L316-L328). The response structure is `r.data.text_blocks[]`, where each block has `text`, `confidence`, `bbox: {x, y, width, height}` and an optional `polygon` (array of polygon vertices). Normalization **preserves the `polygon` field** (`polygon: b.polygon || null`), because OCR text boxes are typically not axis-aligned rectangles (tilted text), and a polygon fits better than a bbox. Coordinates are already normalized to 0-1 and are not divided by `W/H`. Commit `403c0f1` (`fix(ne101): handle {x,y} object format for OCR polygon detection boxes`) fixed a compatibility issue where polygon vertices could arrive in either `{x, y}` object format or `[x, y]` array format:
 

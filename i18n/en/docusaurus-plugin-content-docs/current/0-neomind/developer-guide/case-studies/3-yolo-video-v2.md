@@ -9,9 +9,13 @@ sidebar_label: "3. yolo-video-v2"
 
 ## 1 Case Background
 
-**yolo-video-v2** is the **most complex streaming extension** in the NeoMind ecosystem. It mounts an Ultralytics YOLOv11 object-detection model onto a live video stream and supports three input sources (RTSP/RTMP/HLS network streams, local cameras, and front-end base64 frame pushes). In Push mode it continuously pushes JPEG frames with detection overlays plus structured detection JSON back to the front end, and ships business features such as ROI region counting, line-crossing counting, and smart-capture rules (threshold/presence/absence triggers). The current version is 2.7.6; the core code is about 2829 lines of Rust (`src/lib.rs`) plus 721 lines (`src/detector.rs`) and 387 lines (`src/video_source.rs`). It is the single largest crate in this series and the only extension that exercises the full SDK chain of `StreamCapability` + `StreamMode::Push` + the `send_push_output` FFI.
+**yolo-video-v2** is the **most complex streaming extension** in the NeoMind ecosystem. It mounts an Ultralytics YOLOv11 object-detection model onto a live video stream and supports three input sources (RTSP/RTMP/HLS network streams, local cameras, and front-end base64 frame pushes). In Push mode it continuously pushes JPEG frames with detection overlays plus structured detection JSON back to the front end.
 
-**What problem does it solve?** NeoMind's synchronous capability bridge (see [Case #2](./2-yolo-device-inference.md)) is designed for "event-driven + single-frame inference" — you run YOLO once when a device's image metric updates. But video analytics is a "continuous frame stream": an RTSP camera produces 25-30 frames per second, and every frame needs inference, statistics, and visualization. If you polled via the synchronous bridge, you would issue 30 cross-process calls per second, which is unacceptable in both latency and overhead. yolo-video-v2 solves this with Push mode: the extension spawns a dedicated OS thread to run the frame loop in `init_session`, and each frame is pushed directly into the SDK's output channel via the `send_push_output` FFI. The `UnifiedExtensionService` then relays it to the front-end WebSocket, never blocking the runtime's main thread.
+It also ships business features such as ROI region counting, line-crossing counting, and smart-capture rules (threshold/presence/absence triggers). The current version is 2.7.6; the core code is about 2829 lines of Rust (`src/lib.rs`) plus 721 lines (`src/detector.rs`) and 387 lines (`src/video_source.rs`). It is the single largest crate in this series and the only extension that exercises the full SDK chain of `StreamCapability` + `StreamMode::Push` + the `send_push_output` FFI.
+
+**What problem does it solve?** NeoMind's synchronous capability bridge (see [Case #2](./2-yolo-device-inference.md)) is designed for "event-driven + single-frame inference" — you run YOLO once when a device's image metric updates. But video analytics is a "continuous frame stream": an RTSP camera produces 25-30 frames per second, and every frame needs inference, statistics, and visualization. If you polled via the synchronous bridge, you would issue 30 cross-process calls per second, which is unacceptable in both latency and overhead.
+
+yolo-video-v2 solves this with Push mode: the extension spawns a dedicated OS thread to run the frame loop in `init_session`, and each frame is pushed directly into the SDK's output channel via the `send_push_output` FFI. The `UnifiedExtensionService` then relays it to the front-end WebSocket, never blocking the runtime's main thread.
 
 **Key differences from yolo-device-inference** (this is the most important comparison for understanding this case):
 
@@ -25,7 +29,13 @@ sidebar_label: "3. yolo-video-v2"
 
 **Target audience**: (1) Vision engineers who want to run real-time video analytics on NeoMind — you will see the complete RTSP ingestion + YOLO inference + JPEG encoding + Push delivery chain. (2) SDK developers who want to understand Push streaming mode — this case is the only "production-grade" reference implementation of the SDK's `StreamCapability` interface.
 
-**What you will learn**: (1) The semantics of Push mode — why video streams must use Push instead of Pull, and what `StreamMode::Push` actually does at the SDK layer. (2) Session lifecycle management — the complete `init_session` → `start_push` → frame loop → `stop_stream` state machine and cleanup logic. (3) Multi-backend video source abstraction — why RTSP uses ffmpeg-next while local cameras use nokhwa, and which path base64 pushing takes. (4) Cross-platform ONNX Runtime dynamic-library governance — from versioned `libonnxruntime.so.N` symlinks on Linux, to Windows DLL paths, to macOS `DYLD_LIBRARY_PATH`. (5) A source-hygiene anti-pattern — why files like `detector.rs.backup` should never be committed.
+**What you will learn**:
+
+1. The semantics of Push mode — why video streams must use Push instead of Pull, and what `StreamMode::Push` actually does at the SDK layer
+2. Session lifecycle management — the complete `init_session` → `start_push` → frame loop → `stop_stream` state machine and cleanup logic
+3. Multi-backend video source abstraction — why RTSP uses ffmpeg-next while local cameras use nokhwa, and which path base64 pushing takes
+4. Cross-platform ONNX Runtime dynamic-library governance — from versioned `libonnxruntime.so.N` symlinks on Linux, to Windows DLL paths, to macOS `DYLD_LIBRARY_PATH`
+5. A source-hygiene anti-pattern — why files like `detector.rs.backup` should never be committed
 
 ---
 
@@ -174,7 +184,15 @@ async fn init_session(&self, session: &StreamSession) -> Result<()> {
 ```
 [Source: lib.rs L1290-L1360](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/yolo-video-v2/src/lib.rs#L1290-L1360)
 
-Key logic: (1) Deserialize `StreamConfig` from `session.config` (which contains `source_url`, `confidence_threshold`, `max_objects`, `target_fps`, `rois`, `lines`, `capture_rules`). (2) Decide `is_network_stream` from the `source_url` prefix (RTSP/RTMP/HLS/HTTP/File go to ffmpeg; the rest go to local camera or base64). (3) Construct the `ActiveStream` struct (`running: true`, empty `tracker` / `line_counts` / `capture_rule_states`). (4) Check if a session with the same id already exists; if so, stop the old session first (set `running = false` and drop the old `push_task`). (5) Insert into the registry. Note that `init_session` itself **does not start the frame loop** — the loop starts in `start_push`, so the SDK has a chance to bind the output sender before frames begin flowing.
+Key logic:
+
+1. Deserialize `StreamConfig` from `session.config` (which contains `source_url`, `confidence_threshold`, `max_objects`, `target_fps`, `rois`, `lines`, `capture_rules`)
+2. Decide `is_network_stream` from the `source_url` prefix (RTSP/RTMP/HLS/HTTP/File go to ffmpeg; the rest go to local camera or base64)
+3. Construct the `ActiveStream` struct (`running: true`, empty `tracker` / `line_counts` / `capture_rule_states`)
+4. Check if a session with the same id already exists; if so, stop the old session first (set `running = false` and drop the old `push_task`)
+5. Insert into the registry
+
+Note that `init_session` itself **does not start the frame loop** — the loop starts in `start_push`, so the SDK has a chance to bind the output sender before frames begin flowing.
 
 ### 3.3 execute_command: start_stream / stop_stream dispatch
 

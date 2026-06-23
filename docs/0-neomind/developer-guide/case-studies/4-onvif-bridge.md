@@ -9,7 +9,9 @@ sidebar_label: "4. onvif-bridge"
 
 ## 1 案例背景
 
-**onvif-bridge** 是 NeoMind 生态中的**标准协议桥接**案例。ONVIF（Open Network Video Interface Forum）是网络视频设备的开放标准，定义了设备发现（WS-Discovery）、媒体流协商（RTSP URL 获取）、PTZ 控制、事件订阅等接口规范。覆盖 Profile S（流媒体）、Profile T（高级流媒体）、Profile G（视频存储）等多个 profile。任何符合 ONVIF Profile S 的 IP 摄像头——海康、大华、安讯威、Tiandy——都可以通过 onvif-bridge 接入 NeoMind，无需厂商私有 SDK，无需适配层。当前版本 2.7.6，核心代码分布在 5 个 Rust 源文件中约 2700 行：`lib.rs`（1646 行，Extension trait + 命令分发）、`soap_client.rs`（516 行，SOAP envelope + WS-Security）、`discovery.rs`（211 行，WS-Discovery UDP 多播）、`ptz.rs`（214 行，PTZ 命令）、`types.rs`（78 行，数据结构）。
+**onvif-bridge** 是 NeoMind 生态中的**标准协议桥接**案例。ONVIF（Open Network Video Interface Forum）是网络视频设备的开放标准，定义了设备发现（WS-Discovery）、媒体流协商（RTSP URL 获取）、PTZ 控制、事件订阅等接口规范。覆盖 Profile S（流媒体）、Profile T（高级流媒体）、Profile G（视频存储）等多个 profile。任何符合 ONVIF Profile S 的 IP 摄像头——海康、大华、安讯威、Tiandy——都可以通过 onvif-bridge 接入 NeoMind，无需厂商私有 SDK，无需适配层。
+
+当前版本 2.7.6，核心代码分布在 5 个 Rust 源文件中约 2700 行：`lib.rs`（1646 行，Extension trait + 命令分发）、`soap_client.rs`（516 行，SOAP envelope + WS-Security）、`discovery.rs`（211 行，WS-Discovery UDP 多播）、`ptz.rs`（214 行，PTZ 命令）、`types.rs`（78 行，数据结构）。
 
 **它解决了什么问题？** NeoMind 的前端需要统一管理异构 IP 摄像头。如果每个厂商都用自己的 SDK（海康 SDK、大华 SDK、Tiandy SDK），代码量爆炸、维护成本高、新厂商接入周期长。onvif-bridge 把 ONVIF 标准协议封装为 NeoMind 的命令和指标，前端只需调用 `discover` / `get_stream_uri` / `ptz_move` 等统一命令，就能操作任何 ONVIF 兼容摄像头。这是**开放标准驱动的集成策略**——不是适配厂商，而是适配协议。
 
@@ -17,11 +19,19 @@ sidebar_label: "4. onvif-bridge"
 
 **与 NeoEyes 摄像头产品线的关系**：NeoEyes NE101 / NE301 等硬件设备部分支持 ONVIF 协议栈，onvif-bridge 也可以作为这些自研设备的通用接入路径。当客户混部 NeoEyes 摄像头和第三方 ONVIF 摄像头时，onvif-bridge 提供统一的管理面板。
 
-**两大痛点驱动了手写而非依赖现成 crate**：(1) ONVIF 协议栈复杂——SOAP 1.2 envelope + WS-Security UsernameToken Profile + WS-Discovery UDP 多播，现成的 Rust crate（如 `onvif-rs`）维护滞后且不覆盖 PTZ/事件订阅，缺失的功能只能自己补；(2) 厂商实现差异大——某些设备 Probe 响应的 XML 命名空间前缀不规范（`SOAP-ENV:` vs `s:` vs `soap:`），某些设备 SOAP Fault 格式不标准，解析逻辑必须容忍这些差异。
+**两大痛点驱动了手写而非依赖现成 crate**：
+
+1. ONVIF 协议栈复杂——SOAP 1.2 envelope + WS-Security UsernameToken Profile + WS-Discovery UDP 多播，现成的 Rust crate（如 `onvif-rs`）维护滞后且不覆盖 PTZ/事件订阅，缺失的功能只能自己补
+2. 厂商实现差异大——某些设备 Probe 响应的 XML 命名空间前缀不规范（`SOAP-ENV:` vs `s:` vs `soap:`），某些设备 SOAP Fault 格式不标准，解析逻辑必须容忍这些差异
 
 **目标读者**：(1) 要接入第三方 IP 摄像头的集成商——你会看到从设备发现到 PTZ 控制的完整命令链路；(2) 想理解 SOAP / WS-Discovery / WS-Security 在 Rust 中如何手写的协议开发者——本案例没有依赖任何 ONVIF/SOAP crate，全部手写，是纯协议工程的极佳参考。
 
-**你将学到**：(1) WS-Discovery 多播发现的工程实现——UDP 多播 socket 绑定、TTL 控制、Probe/ProbeMatch 消息格式、macOS 多播陷阱；(2) SOAP 1.2 + WS-Security UsernameToken Profile 的 PasswordDigest 算法——SHA1(nonce+created+password) 的 Rust 实现和为什么选择 PasswordDigest 而非 PasswordText；(3) ONVIF 设备能力协商链路——GetDeviceInformation → GetProfiles → GetStreamUri → 可选 PTZ；(4) 纯后端桥接扩展的架构模式——无 frontend 组件、无 ONNX 模型、同步 HTTP、如何通过命令系统和虚拟指标与 NeoMind 主体集成。
+**你将学到**：
+
+1. WS-Discovery 多播发现的工程实现——UDP 多播 socket 绑定、TTL 控制、Probe/ProbeMatch 消息格式、macOS 多播陷阱
+2. SOAP 1.2 + WS-Security UsernameToken Profile 的 PasswordDigest 算法——SHA1(nonce+created+password) 的 Rust 实现和为什么选择 PasswordDigest 而非 PasswordText
+3. ONVIF 设备能力协商链路——GetDeviceInformation → GetProfiles → GetStreamUri → 可选 PTZ
+4. 纯后端桥接扩展的架构模式——无 frontend 组件、无 ONNX 模型、同步 HTTP、如何通过命令系统和虚拟指标与 NeoMind 主体集成
 
 ---
 
@@ -458,7 +468,13 @@ sequenceDiagram
 
 **替代方案**：使用社区 crate `onvif-rs`（Rust 生态中最知名的 ONVIF 客户端库）。
 
-**理由**：(1) `onvif-rs` 维护滞后——最后一次实质性更新距离我们调研已超过一年，且不覆盖 PTZ ContinuousMove / GotoPreset / GetPresets 等关键操作；(2) `onvif-rs` 依赖 `hyper` + `tokio` 异步栈，而 onvif-bridge 作为 `.dylib`/`.so` 动态库加载到 NeoMind 主进程时，嵌套 tokio runtime 会引发 panic，手写客户端用同步 `ureq` 彻底规避了这个问题；(3) 手写的约 500 行代码完全可控——遇到厂商非标准实现可以立即修改解析逻辑，而修改第三方 crate 需要发 PR 等待合并。权衡的代价是失去了 `onvif-rs` 提供的类型安全 WSDL 绑定，但通过严格的单元测试（参见 6）弥补。
+**理由**：
+
+1. `onvif-rs` 维护滞后——最后一次实质性更新距离我们调研已超过一年，且不覆盖 PTZ ContinuousMove / GotoPreset / GetPresets 等关键操作
+2. `onvif-rs` 依赖 `hyper` + `tokio` 异步栈，而 onvif-bridge 作为 `.dylib`/`.so` 动态库加载到 NeoMind 主进程时，嵌套 tokio runtime 会引发 panic，手写客户端用同步 `ureq` 彻底规避了这个问题
+3. 手写的约 500 行代码完全可控——遇到厂商非标准实现可以立即修改解析逻辑，而修改第三方 crate 需要发 PR 等待合并
+
+权衡的代价是失去了 `onvif-rs` 提供的类型安全 WSDL 绑定，但通过严格的单元测试（参见 6）弥补。
 
 ### 决策 2：WS-Security PasswordDigest 而非 PasswordText
 
@@ -474,7 +490,13 @@ sequenceDiagram
 
 **替代方案**：使用 `reqwest` + `async/await`，利用 tokio 异步 IO 并发处理多个设备。
 
-**理由**：(1) ONVIF 设备响应通常在 50ms~500ms，并发量极低（一个安装现场通常不超过 20 台摄像头），同步阻塞的开销远小于异步运行时的复杂度；(2) onvif-bridge 作为 `.dylib`/`.so` 动态库加载到 NeoMind 主进程中，主进程已有自己的 tokio runtime——如果扩展内部再创建嵌套的 tokio runtime（`reqwest` 需要），会引发 `panicked at 'Cannot start a runtime from within a runtime'`，手写 SOAP 客户端用同步 `ureq` 彻底规避了这个问题（参见 `lib.rs` L18-L23 的架构注释）；(3) `ureq` 依赖树极小（不含 `hyper`、`mio`、`tokio`），编译产物体积比 `reqwest` 小约 2MB，对 `.nep` 分发包有意义。权衡的代价是无法并行请求多台设备，但 `execute_command` 本身是 async 的，NeoMind 主进程可以在多设备场景下并行调用不同命令。
+**理由**：
+
+1. ONVIF 设备响应通常在 50ms~500ms，并发量极低（一个安装现场通常不超过 20 台摄像头），同步阻塞的开销远小于异步运行时的复杂度
+2. onvif-bridge 作为 `.dylib`/`.so` 动态库加载到 NeoMind 主进程中，主进程已有自己的 tokio runtime——如果扩展内部再创建嵌套的 tokio runtime（`reqwest` 需要），会引发 `panicked at 'Cannot start a runtime from within a runtime'`，手写 SOAP 客户端用同步 `ureq` 彻底规避了这个问题（参见 `lib.rs` L18-L23 的架构注释）
+3. `ureq` 依赖树极小（不含 `hyper`、`mio`、`tokio`），编译产物体积比 `reqwest` 小约 2MB，对 `.nep` 分发包有意义
+
+权衡的代价是无法并行请求多台设备，但 `execute_command` 本身是 async 的，NeoMind 主进程可以在多设备场景下并行调用不同命令。
 
 ### 决策 4：find_local_ipv4 而非 bind 0.0.0.0
 
@@ -594,7 +616,7 @@ Agent 调用 yolo-video-v2.start_stream(source_url="rtsp://192.168.1.100:554/...
 // metadata.json L1-L12
 {
   "id": "onvif-bridge",
-  "name": "onvif uridge",
+  "name": "onvif bridge",
   "version": "2.7.6",
   "description": "ONVIF camera bridge extension for NeoMind — discover IP cameras, get RTSP streams, PTZ control",
   "author": "NeoMind Team",

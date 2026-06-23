@@ -87,24 +87,6 @@ components/metric_card/
 View full manifest: [`manifest.json`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/metric_card/manifest.json#L1-L49)
 
 ```json
-{
-  "id": "metric_card",
-  "name": { "en": "Metric Card", "zh": "指标卡片" },
-  "category": "display",
-  "version": "1.7.0",
-  "size_constraints": {
-    "min_w": 2, "min_h": 2,
-    "default_w": 3, "default_h": 2,
-    "max_w": 6, "max_h": 4
-  },
-  "has_data_source": true,
-  "max_data_sources": 12,
-  "has_device_binding": false,
-  "config_schema": { "type": "object", "properties": { "metrics": { ... } } }
-}
-```
-
-```json
 // manifest.json L1-L30 (trimmed)
 {
   "id": "metric_card",
@@ -162,14 +144,6 @@ var NeoMind_MetricCard = (function () {
 })();
 ```
 
-```js
-// bundle.js L1-L4
-var NeoMind_MetricCard = (function () {
-  var React = window.React;
-  var jsx = window.jsxRuntime.jsx;
-  var jsxs = window.jsxRuntime.jsxs;
-```
-
 [Source: bundle.js L1-L4](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/metric_card/bundle.js#L1-L4)
 
 **Why IIFE + `window.*` injection instead of ESM?**
@@ -195,26 +169,14 @@ The core constraint of the NeoMind component marketplace is: **components are di
 View source: [`bundle.js`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/metric_card/bundle.js#L9-L18) L9-18
 
 ```javascript
-var glassContainer = {
-  background: 'linear-gradient(135deg, oklch(1 0 0 / 6%) 0%, oklch(0.75 0.06 270 / 5%) 40%, ...)',
-  backgroundSize: '300% 300%',
-  animation: 'mc-shimmer 12s ease infinite',
-  border: '1px solid var(--border)',           // why var: follows theme switch
-  borderRadius: '12px',
-  backdropFilter: 'blur(16px)',                // why 16px: core of glass effect, diffuses background
-  boxShadow: '0 1px 3px oklch(0 0 0 / 12%), inset 0 1px 0 oklch(1 0 0 / 6%)'
-};
-```
-
-```js
 // bundle.js L9-L18
 var glassContainer = {
   background: 'linear-gradient(135deg, oklch(1 0 0 / 6%) 0%, oklch(0.75 0.06 270 / 5%) 40%, oklch(1 0 0 / 3%) 60%, oklch(0.75 0.06 200 / 4%) 100%)',
   backgroundSize: '300% 300%',
   animation: 'mc-shimmer 12s ease infinite',
-  border: '1px solid var(--border)',
+  border: '1px solid var(--border)',           // why var: follows theme switch
   borderRadius: '12px',
-  backdropFilter: 'blur(16px)',
+  backdropFilter: 'blur(16px)',                // why 16px: core of glass effect, diffuses background
   WebkitBackdropFilter: 'blur(16px)',
   boxShadow: '0 1px 3px oklch(0 0 0 / 12%), inset 0 1px 0 oklch(1 0 0 / 6%)'
 };
@@ -238,6 +200,7 @@ metric_card has no build step (see 3.2), so it cannot use Tailwind classes (requ
 View source: [`bundle.js`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/metric_card/bundle.js#L40-L60) L40-60
 
 ```javascript
+// bundle.js L40-L60
 function extractValue(result) {
   if (result == null) return null;                    // why null: empty value does not render a slot
   if (typeof result === 'number') return result;      // raw number (backward compat)
@@ -250,26 +213,6 @@ function extractValue(result) {
   }
   if (result.series != null && Array.isArray(result.series) && result.series.length) {
     var last = result.series[result.series.length - 1];  // why last: take the newest point
-    // ... same recursion for number / string / {value}
-  }
-  return null;
-}
-```
-
-```js
-// bundle.js L40-L60
-function extractValue(result) {
-  if (result == null) return null;
-  if (typeof result === 'number') return result;
-  if (typeof result === 'string') return result;
-  if (typeof result === 'boolean') return result ? 'Yes' : 'No';
-  if (result.value != null) {
-    if (typeof result.value === 'number') return result.value;
-    if (typeof result.value === 'string') return result.value;
-    if (typeof result.value === 'boolean') return result.value ? 'Yes' : 'No';
-  }
-  if (result.series != null && Array.isArray(result.series) && result.series.length) {
-    var last = result.series[result.series.length - 1];
     if (typeof last === 'number') return last;
     if (typeof last === 'string') return last;
     if (last && last.value != null) {

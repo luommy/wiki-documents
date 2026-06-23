@@ -9,7 +9,9 @@ sidebar_label: "1. weather-forecast-v2"
 
 ## 1 案例背景
 
-**weather-forecast-v2** 是 NeoMind 生态中最简单的「数据型扩展」——它定时从 [Open-Meteo API](https://open-meteo.com/) 拉取天气数据，将温度、湿度、风速等指标写入 NeoMind 指标系统，同时提供一个 React 卡片组件用于仪表板展示。整个扩展约 700 行 Rust + 560 行 TypeScript，没有任何 AI 推理、流式处理或协议桥接逻辑，是新手理解「一个扩展由哪些部分组成」的最短路径。
+**weather-forecast-v2** 是 NeoMind 生态中最简单的「数据型扩展」——它定时从 [Open-Meteo API](https://open-meteo.com/) 拉取天气数据，将温度、湿度、风速等指标写入 NeoMind 指标系统。
+
+同时提供一个 React 卡片组件用于仪表板展示。整个扩展约 700 行 Rust + 560 行 TypeScript，没有任何 AI 推理、流式处理或协议桥接逻辑，是新手理解「一个扩展由哪些部分组成」的最短路径。
 
 **它解决了什么问题？** NeoMind 仪表板需要展示实时环境数据（温度、湿度、风速），但这些数据来自外部 HTTP API 而非本地设备。weather-forecast-v2 充当「数据代理」——把外部 API 的数据拉取到 NeoMind 指标系统，使仪表板组件可以像消费任何本地设备指标一样消费天气数据。
 
@@ -17,7 +19,12 @@ sidebar_label: "1. weather-forecast-v2"
 
 **在生态中的位置**：weather-forecast-v2 是「数据型扩展」的范本——它不依赖任何硬件设备、不涉及 AI 模型、不桥接工业协议。后续案例中，#2（yolo-device-inference）会在它的基础上增加模型加载，#4（onvif-bridge）会增加协议栈复杂度。掌握了本案例的 8 节内容，你就掌握了所有数据型扩展的骨架。
 
-**你将学到**：如何用 `ExtensionMetadata::new()` 构建器声明扩展元数据；如何用 `metric_float!` / `ExtensionMetricValue` 产出周期指标；为什么在动态库场景下选择同步 HTTP 客户端（`ureq`）而非 `reqwest`；如何把 React 组件通过 Vite UMD 包暴露给 NeoMind 仪表板加载器。
+**你将学到**：
+
+1. 如何用 `ExtensionMetadata::new()` 构建器声明扩展元数据
+2. 如何用 `metric_float!` / `ExtensionMetricValue` 产出周期指标
+3. 为什么在动态库场景下选择同步 HTTP 客户端（`ureq`）而非 `reqwest`
+4. 如何把 React 组件通过 Vite UMD 包暴露给 NeoMind 仪表板加载器
 
 ---
 
@@ -384,7 +391,9 @@ sequenceDiagram
 
 **权衡代价**：同步调用会阻塞调用线程。`execute_command` 是 async 方法，但内部的 `get_weather_sync` 是同步阻塞的——调用期间该 task 无法让出控制权。**这是可接受的**，因为天气 API 响应通常 &lt;2s，而 NeoMind 的命令超时默认 30s。
 
-量化阻塞影响：典型负载（1 次请求 / 30s 采集周期）下，Open-Meteo 的 200–500ms 响应仅占扩展线程时序的 &lt;2%。即使未来支持多城市并行拉取，受益于异步并发的也只是少数高并发场景，而 SDK 当前同步的 `execute_command` 契约让异步化收益被抹平——一旦宿主以同步方式调用 `produce_metrics()`，再快的 HTTP 客户端也无法缩短整体调用链。
+量化阻塞影响：典型负载（1 次请求 / 30s 采集周期）下，Open-Meteo 的 200–500ms 响应仅占扩展线程时序的 &lt;2%。
+
+即使未来支持多城市并行拉取，受益于异步并发的也只是少数高并发场景，而 SDK 当前同步的 `execute_command` 契约让异步化收益被抹平——一旦宿主以同步方式调用 `produce_metrics()`，再快的 HTTP 客户端也无法缩短整体调用链。
 
 ### 4.2 RwLock 包装 default_city vs Mutex vs AtomicPtr
 

@@ -7,7 +7,7 @@ sidebar_label: "5. Frontend Consume"
 
 # 5 前端消费：从 detections 到 SVG 叠加的渲染全链路
 
-> 本节是 ne101_camera MVP 阶段的**前端渲染参考页**。读完你应当能：(1) 描述从 props 到 SVG 叠加的完整渲染管线，并解释为什么这条管线是 effect-driven 的；(2) 复述 `classColor(label)` 用字符串哈希 + 黄金角 137.508° 旋转生成 HSV 色相的算法，说出它相对于固定调色板的优势；(3) 解释 SVG 叠加渲染的 polygon + rect fallback 分支，以及 OCR polygon 顶点 `[x,y]` 与 `{x,y}` 两种格式的兼容处理；(4) 推导 object-cover 坐标变换的数学：当图像宽高比大于容器时两侧裁剪、小于时上下裁剪，各自的 `sx/sy/ox/oy` 公式；(5) 说出为什么用 callback ref 而不是 `useEffect` 来挂载 ResizeObserver——这是异步挂载元素的唯一正确写法。所有行号锚点都指向源码仓库 `main` 分支的 [`bundle.js`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js) 和 [`manifest.json`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json)。
+> 本节是 ne101_camera MVP 阶段的**前端渲染参考页**，覆盖 effect-driven 渲染管线、按类别上色（golden-angle HSV）、SVG 叠加渲染、object-cover 坐标变换以及 ResizeObserver callback ref 模式。
 
 ---
 
@@ -203,25 +203,15 @@ Source: [`bundle.js` L879-L899](https://github.com/camthink-ai/NeoMind-Dashboard
 
 这个变换在渲染时被应用到每一个检测框的每一个坐标上：polygon 顶点在 [L1185-L1187](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1185-L1187)（ROI 多边形）和 [L1229-L1230](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1229-L1230)（检测框 polygon），bbox 四角在 [L1241-L1244](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1241-L1244)，标签位置在 [L1259-L1260](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1259-L1260)。变换公式统一是 `tx = (px * ovTf.sx + ovTf.ox) * 100`（乘以 100 是因为 SVG viewBox 是 100x100）。
 
-```js
-// ROI polygon 顶点 (L1185-L1187):
-var tx = ovTf ? ((p.x * ovTf.sx + ovTf.ox) * 100) : (p.x * 100);
-var ty = ovTf ? ((p.y * ovTf.sy + ovTf.oy) * 100) : (p.y * 100);
+以检测框 polygon 顶点为例：
 
+```js
 // detection polygon 顶点 (L1229-L1230):
 var dtx = ovTf ? ((px * ovTf.sx + ovTf.ox) * 100) : (px * 100);
 var dty = ovTf ? ((py * ovTf.sy + ovTf.oy) * 100) : (py * 100);
-
-// bbox 四角 (L1241-L1244):
-var rx1 = ovTf ? (bx1 * ovTf.sx + ovTf.ox) * 100 : bx1 * 100;
-var ry1 = ovTf ? (by1 * ovTf.sy + ovTf.oy) * 100 : by1 * 100;
-var rx2 = ovTf ? (bx2 * ovTf.sx + ovTf.ox) * 100 : bx2 * 100;
-var ry2 = ovTf ? (by2 * ovTf.sy + ovTf.oy) * 100 : by2 * 100;
-
-// 标签位置 (L1259-L1260):
-var lx = ovTf ? ((lpx * ovTf.sx + ovTf.ox) * 100) : (lpx * 100);
-var ly = (ovTf ? ((lpy * ovTf.sy + ovTf.oy) * 100) : (lpy * 100)) - 1.5;
 ```
+
+同一变换也应用于 ROI polygon 顶点（L1185-L1187）、bbox 四角（L1241-L1244）和标签位置（L1259-L1260），公式完全一致。
 
 Source: [`bundle.js` L1185-L1260](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1185-L1260)
 

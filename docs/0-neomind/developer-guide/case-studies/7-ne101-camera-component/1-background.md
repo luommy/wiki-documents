@@ -7,13 +7,15 @@ sidebar_label: "1. Background"
 
 # 1 业务背景：为什么 NeoMind 需要 ne101_camera 组件
 
-> 本节回答三个问题：**NE101 是什么硬件**、**为什么不能用通用 metric_card 凑合**、**ne101_camera 在 NeoMind 生态中处于什么位置**。读完你就能解释为什么 manifest 里写 `has_device_binding: true` + `has_data_source: false`——这是设备绑定组件的典型签名。
+> 本节回答三个问题：**NE101 是什么硬件**、**为什么不能用通用 metric_card 凑合**、**ne101_camera 在 NeoMind 生态中处于什么位置**——覆盖硬件能力、组件定位和 manifest 设备绑定签名。
 
 ---
 
 ## 1.1 NE101 设备：CamThink 感知摄像头
 
-**CamThink NE101** 是一款电池供电的边缘 AI 感知摄像头，由 CamThink 团队（也是 NeoMind Dashboard 的维护方）设计。它的核心能力是「按需抓拍 + 边缘指标上报」：不像传统 IPC 摄像头持续推流，NE101 大部分时间处于低功耗休眠状态，只有在三种触发条件下才醒来抓拍一张 JPEG 静图——(1) 用户主动调用 `trigger_capture` 命令；(2) 内置定时器到点（cron 形式的 `set_schedule`）；(3) 外部系统通过 MQTT `cmd` 主题下发指令。每次抓拍完成后，设备会上报一组遥测：最新 JPEG 图像（通过 REST 拉取，URL 存在 `values.image_url` 里）+ 电池百分比 + 蜂窝信号强度 + 机壳温度。这种「事件驱动 + 低频采样」的设计让一节电池能撑 3-6 个月，但也意味着组件不能用「订阅视频流」的思路，而必须用「拉取最新一张」的轮询/事件模式。
+**CamThink NE101** 是一款电池供电的边缘 AI 感知摄像头，由 CamThink 团队（也是 NeoMind Dashboard 的维护方）设计。它的核心能力是「按需抓拍 + 边缘指标上报」：不像传统 IPC 摄像头持续推流，NE101 大部分时间处于低功耗休眠状态，只有在三种触发条件下才醒来抓拍一张 JPEG 静图——(1) 用户主动调用 `trigger_capture` 命令；(2) 内置定时器到点（cron 形式的 `set_schedule`）；(3) 外部系统通过 MQTT `cmd` 主题下发指令。
+
+每次抓拍完成后，设备会上报一组遥测：最新 JPEG 图像（通过 REST 拉取，URL 存在 `values.image_url` 里）+ 电池百分比 + 蜂窝信号强度 + 机壳温度。这种「事件驱动 + 低频采样」的设计让一节电池能撑 3-6 个月，但也意味着组件不能用「订阅视频流」的思路，而必须用「拉取最新一张」的轮询/事件模式。
 
 NE101 与 NeoMind 主控之间走 MQTT 协议：设备把遥测发到 `devices/{device_id}/telemetry` 主题，NeoMind 订阅后通过 WebSocket 把增量推给前端组件。这种链路决定了 ne101_camera 组件的数据接入方式不是「数据源绑定」（DataSource 是为「扩展周期产出的指标」设计的），而是「设备绑定」（DeviceBinding 直接订阅某个具体设备的遥测流）。
 
@@ -114,7 +116,9 @@ graph TB
 
 ne101_camera 的 manifest 只有 40 行，但信息密度极高。除了 1.3 讲的两个绑定字段，还有三个字段是本案例的核心创新点，后续章节会反复引用：
 
-**`processingExtensionId: ""`（[manifest.json L24](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L24)）——可配置的 AI 扩展消费者契约。** 这是本案例最重要的设计决策（详见 1.6 设计决策 #1）。字段值是空字符串，意味着「默认不启用 AI 处理」；用户在配置面板里可以从下拉框选一个已安装的 AI 扩展（object_detection / ocr / describe 等），组件会把抓拍到的图像 URL + 配置参数发给该扩展，扩展推理完成后把检测结果写回设备的虚拟指标，组件再读取并叠加渲染。这套契约让 ne101_camera 不绑死任何特定 AI 能力——同一个组件配不同扩展就能做不同任务。
+**`processingExtensionId: ""`（[manifest.json L24](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L24)）——可配置的 AI 扩展消费者契约。** 这是本案例最重要的设计决策（详见 1.6 设计决策 #1）。字段值是空字符串，意味着「默认不启用 AI 处理」；用户在配置面板里可以从下拉框选一个已安装的 AI 扩展（object_detection / ocr / describe 等），组件会把抓拍到的图像 URL + 配置参数发给该扩展，扩展推理完成后把检测结果写回设备的虚拟指标，组件再读取并叠加渲染。
+
+这套契约让 ne101_camera 不绑死任何特定 AI 能力——同一个组件配不同扩展就能做不同任务。
 
 **`processingRoiOverlap: 0.6`（[manifest.json L31](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L31)）——基于 IoU 的 ROI 判定阈值。** 这个字段决定了「一个检测框算不算落在某个 ROI 内」的判定方式：当检测框与 ROI 的交并比（Intersection over Union）≥ 0.6 时算命中。早期的实现用「中心点是否落在 ROI 内」判定（commit `2109c45` 之前的版本），但中心点判定对「大目标偏出 ROI 边界」的情况过于宽松，因此 commit `2109c45`（`feat(ne101_camera): overlap-based ROI detection instead of center point`）切换到了 IoU 模式，随后 commit `636a8ae`（`feat(ne101_camera): make ROI overlap threshold configurable`）把这个阈值暴露成用户可调字段。
 

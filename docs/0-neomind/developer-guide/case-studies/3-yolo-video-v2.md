@@ -9,9 +9,13 @@ sidebar_label: "3. yolo-video-v2"
 
 ## 1 案例背景
 
-**yolo-video-v2** 是 NeoMind 生态中**最复杂的流式扩展**——它把 Ultralytics YOLOv11 目标检测模型挂到实时视频流上，支持三类数据来源（RTSP/RTMP/HLS 网络流、本地摄像头、前端 base64 帧推送），在 Push 模式下持续把带检测框的 JPEG 帧和结构化检测 JSON 推回前端，并附带 ROI 区域计数、越线计数、智能抓拍规则（阈值/出现/消失触发）等业务能力。当前版本 2.7.6，核心代码约 2829 行 Rust（`src/lib.rs`）+ 721 行（`src/detector.rs`）+ 387 行（`src/video_source.rs`），是本系列单 crate 代码量最大的扩展，也是唯一一个完整使用 SDK `StreamCapability` + `StreamMode::Push` + `send_push_output` FFI 链路的扩展。
+**yolo-video-v2** 是 NeoMind 生态中**最复杂的流式扩展**——它把 Ultralytics YOLOv11 目标检测模型挂到实时视频流上，支持三类数据来源（RTSP/RTMP/HLS 网络流、本地摄像头、前端 base64 帧推送），在 Push 模式下持续把带检测框的 JPEG 帧和结构化检测 JSON 推回前端。
 
-**它解决了什么问题？** NeoMind 的同步能力桥（参考 [案例 #2](./2-yolo-device-inference.md)）适合「事件驱动 + 单帧推理」——设备图像更新时跑一次 YOLO。但视频分析场景是「连续帧流」：一个 RTSP 摄像头每秒产出 25~30 帧，每帧都需要推理、统计、可视化。如果用同步能力桥轮询，每秒要发起 30 次跨进程调用，延迟和开销都不可接受。yolo-video-v2 用 Push 模式解决了这个问题：扩展在 `init_session` 时拉起一条专用的 OS 线程跑帧循环，每帧通过 `send_push_output` FFI 直接把结果灌入 SDK 的输出通道，再由 `UnifiedExtensionService` 中转到前端 WebSocket，全程不阻塞 runtime 主线程。
+并附带 ROI 区域计数、越线计数、智能抓拍规则（阈值/出现/消失触发）等业务能力。当前版本 2.7.6，核心代码约 2829 行 Rust（`src/lib.rs`）+ 721 行（`src/detector.rs`）+ 387 行（`src/video_source.rs`），是本系列单 crate 代码量最大的扩展，也是唯一一个完整使用 SDK `StreamCapability` + `StreamMode::Push` + `send_push_output` FFI 链路的扩展。
+
+**它解决了什么问题？** NeoMind 的同步能力桥（参考 [案例 #2](./2-yolo-device-inference.md)）适合「事件驱动 + 单帧推理」——设备图像更新时跑一次 YOLO。但视频分析场景是「连续帧流」：一个 RTSP 摄像头每秒产出 25~30 帧，每帧都需要推理、统计、可视化。如果用同步能力桥轮询，每秒要发起 30 次跨进程调用，延迟和开销都不可接受。
+
+yolo-video-v2 用 Push 模式解决了这个问题：扩展在 `init_session` 时拉起一条专用的 OS 线程跑帧循环，每帧通过 `send_push_output` FFI 直接把结果灌入 SDK 的输出通道，再由 `UnifiedExtensionService` 中转到前端 WebSocket，全程不阻塞 runtime 主线程。
 
 **与 yolo-device-inference 的关键区别**（这是理解本案例最重要的对比维度）：
 
@@ -25,7 +29,13 @@ sidebar_label: "3. yolo-video-v2"
 
 **目标读者**：(1) 要在 NeoMind 上跑实时视频分析的视觉工程师——你会看到完整的 RTSP 取流 + YOLO 推理 + JPEG 编码 + Push 推送链路；(2) 想理解 Push 流模式的 SDK 开发者——本案例是 SDK `StreamCapability` 接口唯一的「完整生产级」参考实现。
 
-**你将学到**：(1) Push 模式的语义——为什么视频流必须用 Push 而非 Pull，`StreamMode::Push` 在 SDK 层到底做了什么；(2) 会话生命周期管理——`init_session` → `start_push` → 帧循环 → `stop_stream` 的完整状态机和清理逻辑；(3) 多后端视频源抽象——为什么 RTSP 用 ffmpeg-next 而本地摄像头用 nokhwa，base64 推流又走哪条路径；(4) 跨平台 ONNX Runtime 动态库治理——从 `libonnxruntime.so.N` 版本化符号链接到 Windows DLL 路径再到 macOS `DYLD_LIBRARY_PATH`；(5) 源码卫生反例——为什么 `detector.rs.backup` 这类备份文件不应该提交到仓库。
+**你将学到**：
+
+1. Push 模式的语义——为什么视频流必须用 Push 而非 Pull，`StreamMode::Push` 在 SDK 层到底做了什么
+2. 会话生命周期管理——`init_session` → `start_push` → 帧循环 → `stop_stream` 的完整状态机和清理逻辑
+3. 多后端视频源抽象——为什么 RTSP 用 ffmpeg-next 而本地摄像头用 nokhwa，base64 推流又走哪条路径
+4. 跨平台 ONNX Runtime 动态库治理——从 `libonnxruntime.so.N` 版本化符号链接到 Windows DLL 路径再到 macOS `DYLD_LIBRARY_PATH`
+5. 源码卫生反例——为什么 `detector.rs.backup` 这类备份文件不应该提交到仓库
 
 ---
 
@@ -174,7 +184,15 @@ async fn init_session(&self, session: &StreamSession) -> Result<()> {
 ```
 [Source: lib.rs L1290-L1360](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/yolo-video-v2/src/lib.rs#L1290-L1360)
 
-关键逻辑：(1) 从 `session.config` 反序列化 `StreamConfig`（包含 `source_url`、`confidence_threshold`、`max_objects`、`target_fps`、`rois`、`lines`、`capture_rules`）；(2) 通过 `source_url` 前缀判断 `is_network_stream`（RTSP/RTMP/HLS/HTTP/File 走 ffmpeg，其余走本地摄像头或 base64）；(3) 构造 `ActiveStream` 结构体（`running: true`、空的 `tracker` / `line_counts` / `capture_rule_states`）；(4) 检查 session 是否已存在，若存在则先停止旧 session（设置 `running = false` 并丢弃旧 `push_task`）；(5) 插入 registry。注意 `init_session` 本身**不启动帧循环**——帧循环在 `start_push` 中启动，这样设计是为了让 SDK 有机会在帧循环开始前完成 output sender 的绑定。
+关键逻辑：
+
+1. 从 `session.config` 反序列化 `StreamConfig`（包含 `source_url`、`confidence_threshold`、`max_objects`、`target_fps`、`rois`、`lines`、`capture_rules`）
+2. 通过 `source_url` 前缀判断 `is_network_stream`（RTSP/RTMP/HLS/HTTP/File 走 ffmpeg，其余走本地摄像头或 base64）
+3. 构造 `ActiveStream` 结构体（`running: true`、空的 `tracker` / `line_counts` / `capture_rule_states`）
+4. 检查 session 是否已存在，若存在则先停止旧 session（设置 `running = false` 并丢弃旧 `push_task`）
+5. 插入 registry
+
+注意 `init_session` 本身**不启动帧循环**——帧循环在 `start_push` 中启动，这样设计是为了让 SDK 有机会在帧循环开始前完成 output sender 的绑定。
 
 ### 3.3 execute_command：start_stream / stop_stream 调度
 

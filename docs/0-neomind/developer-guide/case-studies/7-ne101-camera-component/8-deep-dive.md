@@ -7,7 +7,7 @@ sidebar_label: "8. Deep Dive"
 
 # 8 深度复盘：133 commits 的版本演进与工程复盘
 
-> 本节是 ne101_camera 案例的**收尾深度复盘页**，从 133 个 git commits 的历史视角回看整个组件的演进轨迹。读完你应当能：(1) 画出 7 个主要开发阶段的 gantt 图，说出哪个阶段最耗 commits（ROI 叠加，10+ commits）；(2) 复述 8.2 的「调试 trace 兴衰」——5 个 debug commit（[`0731cf8`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/0731cf8) → [`1c0730b`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/1c0730b) → [`5b1d6a1`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/5b1d6a1) → [`3f05cae`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/3f05cae)）如何被最终的 [`00a59cc`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/00a59cc) 一次性清除，留下生产洁净的代码；(3) 解释 8.3 的 Boa 引擎 `console.log` 崩溃事件——为什么在 Transform JS 里写 `console.log` 会让 Rust 沙箱崩溃（commit [`c16d803`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/c16d803)）；(4) 描述 `_configHash`（[L655-L659](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L655-L659)）的三层 fast-path 优化，以及 commit [`a8c1212`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/a8c1212) 为什么 revert 了「auto-bump」尝试；(5) 复盘源码卫生——为什么 `components/ne101_camera/` 目录至今保持「3 文件零备份」的极简纪律，这是 NeoMind 市场 6 个组件中最干净的一个。所有行号锚点指向源码仓库 `main` 分支的 [`bundle.js`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js)。
+> 本节是 ne101_camera 案例的**收尾深度复盘页**，从 133 个 git commits 的历史视角回看整个组件的演进轨迹，覆盖版本演进时间轴、调试 trace 兴衰、Boa 引擎崩溃事件、`_configHash` 性能优化和源码卫生复盘。
 
 ---
 

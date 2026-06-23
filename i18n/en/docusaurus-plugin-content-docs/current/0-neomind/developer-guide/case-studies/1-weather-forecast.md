@@ -9,7 +9,9 @@ sidebar_label: "1. weather-forecast-v2"
 
 ## 1 Case Background
 
-**weather-forecast-v2** is the simplest "data-type extension" in the NeoMind ecosystem. It periodically fetches weather data from the [Open-Meteo API](https://open-meteo.com/), writes temperature, humidity, wind speed, and other metrics into the NeoMind metric system, and provides a React card component for dashboard display. The entire extension is about 700 lines of Rust + 560 lines of TypeScript, with no AI inference, stream processing, or protocol bridging — making it the shortest path for newcomers to understand "what makes up an extension."
+**weather-forecast-v2** is the simplest "data-type extension" in the NeoMind ecosystem. It periodically fetches weather data from the [Open-Meteo API](https://open-meteo.com/), writes temperature, humidity, wind speed, and other metrics into the NeoMind metric system.
+
+It also provides a React card component for dashboard display. The entire extension is about 700 lines of Rust + 560 lines of TypeScript, with no AI inference, stream processing, or protocol bridging — making it the shortest path for newcomers to understand "what makes up an extension."
 
 **What problem does it solve?** The NeoMind dashboard needs to display real-time environmental data (temperature, humidity, wind speed), but this data comes from an external HTTP API rather than a local device. weather-forecast-v2 acts as a "data proxy" — pulling external API data into the NeoMind metric system so that dashboard components can consume weather data just like any local device metric.
 
@@ -17,7 +19,12 @@ sidebar_label: "1. weather-forecast-v2"
 
 **Position in the ecosystem**: weather-forecast-v2 is the reference template for "data-type extensions" — it has no hardware dependencies, no AI models, no industrial protocol stacks. Later cases build on this foundation: 2 (yolo-device-inference) adds model loading, 4 (onvif-bridge) adds protocol stack complexity. Master this case's 8 sections and you have the skeleton for all data-type extensions.
 
-**What you'll learn**: How to build extension metadata with the `ExtensionMetadata::new()` builder chain; how to produce periodic metrics with `ExtensionMetricValue`; why a sync HTTP client (`ureq`) is chosen over `reqwest` in the dynamic library context; how to expose a React component via a Vite UMD bundle for the NeoMind dashboard loader.
+**What you'll learn**:
+
+1. How to build extension metadata with the `ExtensionMetadata::new()` builder chain
+2. How to produce periodic metrics with `ExtensionMetricValue`
+3. Why a sync HTTP client (`ureq`) is chosen over `reqwest` in the dynamic library context
+4. How to expose a React component via a Vite UMD bundle for the NeoMind dashboard loader
 
 ---
 
@@ -384,7 +391,9 @@ The frontend calls backend commands via `fetch('/api/extensions/weather-forecast
 
 **Trade-off cost**: Synchronous calls block the calling thread. `execute_command` is an async method, but the internal `get_weather_sync` is synchronous and blocking — during the call, the task cannot yield control. **This is acceptable** because weather API responses typically complete in &lt;2s, and NeoMind's default command timeout is 30s.
 
-Quantifying the blocking impact: under typical load (1 request / 30s collection cycle), Open-Meteo's 200–500ms response occupies &lt;2% of the extension thread's duty cycle. Even if multi-city parallel fetches were supported in the future, only a handful of high-concurrency scenarios would benefit from async — and the SDK's current synchronous `execute_command` contract moots that advantage. Once the host invokes `produce_metrics()` synchronously, no HTTP client — however fast — can shorten the overall call chain.
+Quantifying the blocking impact: under typical load (1 request / 30s collection cycle), Open-Meteo's 200–500ms response occupies &lt;2% of the extension thread's duty cycle.
+
+Even if multi-city parallel fetches were supported in the future, only a handful of high-concurrency scenarios would benefit from async — and the SDK's current synchronous `execute_command` contract moots that advantage. Once the host invokes `produce_metrics()` synchronously, no HTTP client — however fast — can shorten the overall call chain.
 
 ### 4.2 RwLock Wrapping default_city vs Mutex vs AtomicPtr
 

@@ -7,7 +7,7 @@ sidebar_label: "2. Architecture"
 
 # 2 Architecture Overview
 
-> This section cracks open [`bundle.js`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js) — the 1972-line hand-written IIFE — and lays it flat. After reading you should be able to: (1) draw the IIFE top-level structure and the `window.*` injection boundary; (2) explain the responsibilities of the five layers (helper / template / sub-component / main / export); (3) reproduce the component tree (root `NE101CameraPanel` plus the `ConfigPanel` / `AdvancedPanel` exported siblings) and the semantics of the core hooks; (4) describe the dual-channel "WebSocket-priority + REST-fallback" data flow; and (5) articulate, via the comparison with [6 metric_card](../6-metric-card-component.md), the architectural gulf between a "device-bound component" and a "display component". All line numbers reference the `main` branch of the source repo; links carry `#L<start>-L<end>` anchors.
+> This section cracks open the 1972-line hand-written IIFE [`bundle.js`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js), covering the five-layer architecture (helper / template / sub-component / main / export), the three exported components, the dual-channel data flow, and the architectural gulf versus metric_card.
 
 ---
 
@@ -633,6 +633,10 @@ The table below compares ne101_camera and [6 metric_card](../6-metric-card-compo
 | **Component count** | 1 exported component (`MetricCard`) | 3 exported components (`NE101CameraPanel` + `ConfigPanel` + `AdvancedPanel`) + 5 internal sub-components | metric_card's "single component" means it has no configuration-dialog tab structure; ne101's three-piece set is the platform's requirement for components with `has_device_binding` or complex `config_schema`. |
 | **Data access** | `has_data_source: true` + `fetchData` prop (generic) | `has_device_binding: true` + `device_type_filter: ["ne101_camera"]` (specific) | metric_card consumes any DataSource (device telemetry / extension metrics / system metrics); ne101 only consumes devices where `device.type === "ne101_camera"`. This is the fundamental "generic vs specific" divide. |
 | **Configuration complexity** | Simple display config (`label` / `unit` / `decimalPlaces`) | 18-field `default_config` ([manifest.json L18-L37](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L18-L37)): processing pipeline + ROI + NMS + categories + phrase | ne101 has 3x the config fields of metric_card, each with defaults and compatibility fallback (`processingRois` array vs single rectangle). |
+| **Export style** | `default + MetricCard` dual exposure (but only default is used) | `default + NE101CameraPanel + ConfigPanel + AdvancedPanel` four-field exposure | metric_card's default dual exposure is "forward-compatible insurance"; ne101's named exports are "a contract the configuration dialog must use". |
+| **Applicable scenarios** | Any scalar metric (temperature, battery, latency, count) | Only `ne101_camera` device type | metric_card is a "universal value card"; ne101 is a "dedicated camera panel". If the NE101 device is retired, the ne101 component is also deprecated; metric_card never becomes invalid because some device type disappears. |
+
+The full 18-field `default_config` of ne101_camera is as follows:
 
 ```js
 // manifest.json L18-L37 — default_config (18 fields)
@@ -659,8 +663,6 @@ The table below compares ne101_camera and [6 metric_card](../6-metric-card-compo
 ```
 
 Source: [manifest.json L18-L37](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L18-L37)
-| **Export style** | `default + MetricCard` dual exposure (but only default is used) | `default + NE101CameraPanel + ConfigPanel + AdvancedPanel` four-field exposure | metric_card's default dual exposure is "forward-compatible insurance"; ne101's named exports are "a contract the configuration dialog must use". |
-| **Applicable scenarios** | Any scalar metric (temperature, battery, latency, count) | Only `ne101_camera` device type | metric_card is a "universal value card"; ne101 is a "dedicated camera panel". If the NE101 device is retired, the ne101 component is also deprecated; metric_card never becomes invalid because some device type disappears. |
 
 **One-sentence summary**: metric_card is "thin component + thick generality"; ne101_camera is "thick component + thin specificity". The former's value is wide coverage; the latter's value is collapsing a complex device link into a single panel. The two are not substitutes but a progression — ne101_camera builds on metric_card's three-piece set (IIFE injection + manifest contract + inline style) and adds four new capability layers: device binding, image canvas, AI processing pipeline, and ROI overlay.
 

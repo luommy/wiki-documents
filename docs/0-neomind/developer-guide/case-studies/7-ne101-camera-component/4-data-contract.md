@@ -7,7 +7,7 @@ sidebar_label: "4. Data Contract"
 
 # 4 数据契约：从 MQTT 遥测到 virtual 指标的全链路 schema
 
-> 本节是 ne101_camera 案例 MVP 阶段的**契约参考页**。读完你应当能：(1) 画出「设备遥测 → 扩展响应 → virtual 指标」三层契约的边界；(2) 复述四种 `responseType`（`boxes_x1y1x2y2` / `objects_bbox` / `detections_bbox` / `ocr_text_blocks`）如何归一化到统一的 `{bbox, label, confidence}` 内部形状；(3) 解释 `virtual.<ext_id_normalized>.detections` 输出前缀的拼接规则和 `source_ts` 对齐机制；(4) 说出后端把 detections 序列化成 JSON string 的坑点以及组件的防御性 `JSON.parse` 策略；(5) 描述基于 Sutherland-Hodgman 多边形裁剪的 ROI 重叠判定算法及其 0.6 阈值的权衡。所有行号锚点都指向源码仓库 `main` 分支的 [`bundle.js`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js) 和 [`manifest.json`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json)。
+> 本节是 ne101_camera 案例 MVP 阶段的**契约参考页**，覆盖三层契约（设备遥测 → 扩展响应 → virtual 指标）、四种 responseType 归一化、JSON string 解析坑点以及 ROI 重叠判定算法。
 
 ---
 
@@ -119,84 +119,22 @@ if (!rawImageSrc) {
 
 AI 扩展的响应格式由扩展作者决定，ne101_camera 不能控制。为了在组件内部统一处理，`generateTransformJsCode` 在生成 Transform 代码时把四种 `responseType` 都归一化成同一个内部形状：`{bbox: [x1, y1, x2, y2], label, confidence}`（坐标归一化到 0-1）。这四种 responseType 的分发逻辑在 [`bundle.js` L288-L329](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L288-L329)：
 
-```js
-// bundle.js L288-L329
-if (mode.responseType === 'boxes_x1y1x2y2') {
-  L.push('var rawBoxes = r.boxes || [];');
-  L.push('var refTags = (r.answer || \'\').match(/<ref>(.*?)<\\/ref>/g) || [];');
-  L.push('var dets = rawBoxes.map(function(b, i) {');
-  L.push('  return { bbox: [b.x1 / W, b.y1 / H, b.x2 / W, b.y2 / H],');
-  L.push('    label: (refTags[i] || \'\').replace(/<\\/?ref>/g, \'\'), confidence: b.score || b.confidence || null };');
-  L.push('});');
-} else if (mode.responseType === 'objects_bbox') {
-  L.push('var dets = (r.objects || []).map(function(o) {');
-  L.push('  var b = o.bbox || {};');
-  L.push('  return { bbox: [(b.x||0)/W, (b.y||0)/H, ((b.x||0)+(b.width||0))/W, ((b.y||0)+(b.height||0))/H],');
-  L.push('    label: o.label || \'\', confidence: o.confidence || null };');
-  L.push('});');
-} else if (mode.responseType === 'detections_bbox') {
-  L.push('var dets = (r.detections || []).map(function(d) {');
-  L.push('  var b = d.bbox || {};');
-  L.push('  return { bbox: [(b.x||0)/W, (b.y||0)/H, ((b.x||0)+(b.width||0))/W, ((b.y||0)+(b.height||0))/H],');
-  L.push('    label: d.label || \'\', confidence: d.confidence || null };');
-  L.push('});');
-} else if (mode.responseType === 'ocr_text_blocks') {
-  // ... (omitted for brevity — see L316-L328 below)
-}
-```
-[Source: bundle.js L288-L329](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L288-L329)
+四种 responseType 的数据路径和字段格式对照如下：
 
-**`boxes_x1y1x2y2`（locate-anything-v2 系）** —— 见 [`bundle.js` L288-L297](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L288-L297)。响应结构是 `r.boxes[]`，每个 box 有 `x1, y1, x2, y2`（像素坐标）+ `score`/`confidence`。标签不在 box 里，而在 `r.answer` 字符串里以 `<ref>label</ref>` 标签形式按顺序排列——所以代码用正则 `match(/<ref>(.*?)<\/ref>/g)` 提取标签数组，再按下标 `refTags[i]` 配对。归一化时坐标除以图像宽高 `W/H` 得到 0-1 范围。commit `8656148`（`feat(ne101): pass NMS IoU threshold 0.5 to locate-anything-v2`）在 L282 给这个扩展额外透传了 `nms_iou_threshold: 0.5` 参数，控制非极大值抑制的阈值：
+| responseType | 数据路径 | 字段格式 |
+|---|---|---|
+| `boxes_x1y1x2y2` | `r.boxes` | `{x1,y1,x2,y2}` 归一化坐标 |
+| `objects_bbox` | `r.objects[].bbox` | `{x,y,w,h}` 像素坐标 |
+| `detections_bbox` | `r.detections[].bbox` | `{x,y,w,h}` 像素坐标 |
+| `ocr_text_blocks` | `r.text_blocks` | 见下方代码块（有 polygon） |
 
-```js
-// bundle.js L288-L297
-if (mode.responseType === 'boxes_x1y1x2y2') {
-  L.push('var rawBoxes = r.boxes || [];');
-  L.push('var refTags = (r.answer || \'\').match(/<ref>(.*?)<\\/ref>/g) || [];');
-  L.push('var dets = rawBoxes.map(function(b, i) {');
-  L.push('  return {');
-  L.push('    bbox: [b.x1 / W, b.y1 / H, b.x2 / W, b.y2 / H],');
-  L.push('    label: (refTags[i] || \'\').replace(/<\\/?ref>/g, \'\'),');
-  L.push('    confidence: b.score || b.confidence || null');
-  L.push('  };');
-  L.push('});');
-}
-```
-[Source: bundle.js L288-L297](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L288-L297)
+分发逻辑在 [`bundle.js` L288-L329](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L288-L329)。其中前三种 responseType 的归一化逻辑高度相似——都是把各自格式的坐标转换成 `[x1,y1,x2,y2]` 并除以图像宽高 `W/H` 得到 0-1 范围。
 
-**`objects_bbox`（image-analyzer-v2）** —— 见 [`bundle.js` L298-L306](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L298-L306)。响应结构是 `r.objects[]`，每个 object 有 `label`、`confidence` 和 `bbox: {x, y, width, height}`（像素坐标）。归一化时把 `{x, y, width, height}` 转成 `[x1, y1, x2, y2]`：`x2 = x + width`，`y2 = y + height`，再除以 `W/H`：
+**`boxes_x1y1x2y2`（locate-anything-v2 系）** —— 标签不在 box 里，而在 `r.answer` 字符串里以 `<ref>label</ref>` 标签形式按顺序排列，代码用正则提取配对。commit `8656148` 在 L282 给这个扩展额外透传了 `nms_iou_threshold: 0.5` 参数。
 
-```js
-// bundle.js L298-L306
-} else if (mode.responseType === 'objects_bbox') {
-  L.push('var dets = (r.objects || []).map(function(o) {');
-  L.push('  var b = o.bbox || {};');
-  L.push('  return {');
-  L.push('    bbox: [(b.x||0)/W, (b.y||0)/H, ((b.x||0)+(b.width||0))/W, ((b.y||0)+(b.height||0))/H],');
-  L.push('    label: o.label || \'\',');
-  L.push('    confidence: o.confidence || null');
-  L.push('  };');
-  L.push('});');
-}
-```
-[Source: bundle.js L298-L306](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L298-L306)
+**`objects_bbox`（image-analyzer-v2）** —— 归一化时把 `{x, y, width, height}` 转成 `[x1, y1, x2, y2]`（`x2 = x + width`），再除以 `W/H`。
 
-**`detections_bbox`（yolo-device-inference）** —— 见 [`bundle.js` L307-L315](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L307-L315)。响应结构是 `r.detections[]`，字段结构与 `objects_bbox` 几乎一样（`label`、`confidence`、`bbox: {x, y, width, height}`），只是顶层 key 从 `objects` 变成了 `detections`。之所以单独列为一种 responseType 而不是复用 `objects_bbox`，是因为这两个扩展的调用命令不同（`analyze_image` vs `detect`），且未来 yolo-device-inference 可能在响应里增加设备端独有的字段（如推理耗时、模型版本）：
-
-```js
-// bundle.js L307-L315
-} else if (mode.responseType === 'detections_bbox') {
-  L.push('var dets = (r.detections || []).map(function(d) {');
-  L.push('  var b = d.bbox || {};');
-  L.push('  return {');
-  L.push('    bbox: [(b.x||0)/W, (b.y||0)/H, ((b.x||0)+(b.width||0))/W, ((b.y||0)+(b.height||0))/H],');
-  L.push('    label: d.label || \'\',');
-  L.push('    confidence: d.confidence || null');
-  L.push('  };');
-  L.push('});');
-}
-```
-[Source: bundle.js L307-L315](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L307-L315)
+**`detections_bbox`（yolo-device-inference）** —— 字段结构与 `objects_bbox` 几乎一样，只是顶层 key 从 `objects` 变成了 `detections`。之所以单独列为一种 responseType 而不是复用 `objects_bbox`，是因为这两个扩展的调用命令不同（`analyze_image` vs `detect`），且未来 yolo-device-inference 可能在响应里增加设备端独有的字段（如推理耗时、模型版本）。
 
 **`ocr_text_blocks`（ocr-device-inference）** —— 见 [`bundle.js` L316-L328](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L316-L328)。响应结构是 `r.data.text_blocks[]`，每个 block 有 `text`、`confidence`、`bbox: {x, y, width, height}` 和可选的 `polygon`（多边形顶点数组）。归一化时 **保留 `polygon` 字段**（`polygon: b.polygon || null`），因为 OCR 文本框通常不是轴对齐矩形（倾斜文本），多边形比 bbox 更贴合。坐标已经是 0-1 归一化的，不再除以 `W/H`。commit `403c0f1`（`fix(ne101): handle {x,y} object format for OCR polygon detection boxes`）修复了 polygon 顶点可能是 `{x, y}` 对象格式也可能是 `[x, y]` 数组格式的兼容问题：
 

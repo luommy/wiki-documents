@@ -9,7 +9,9 @@ sidebar_label: "4. onvif-bridge"
 
 ## 1 Case Background
 
-**onvif-bridge** is the **standard protocol bridge** case study in the NeoMind ecosystem. ONVIF (Open Network Video Interface Forum) is an open standard for network video devices, defining specifications for device discovery (WS-Discovery), media stream negotiation (RTSP URL retrieval), PTZ control, and event subscription. It covers multiple profiles including Profile S (streaming), Profile T (advanced streaming), and Profile G (video storage). Any IP camera compliant with ONVIF Profile S — Hikvision, Dahua, Vivotek, Tiandy — can be integrated into NeoMind via onvif-bridge without vendor-specific SDKs or adaptation layers. The current version is 2.7.6, with approximately 2700 lines of core code distributed across 5 Rust source files: `lib.rs` (1646 lines, Extension trait + command dispatch), `soap_client.rs` (516 lines, SOAP envelope + WS-Security), `discovery.rs` (211 lines, WS-Discovery UDP multicast), `ptz.rs` (214 lines, PTZ commands), and `types.rs` (78 lines, data structures).
+**onvif-bridge** is the **standard protocol bridge** case study in the NeoMind ecosystem. ONVIF (Open Network Video Interface Forum) is an open standard for network video devices, defining specifications for device discovery (WS-Discovery), media stream negotiation (RTSP URL retrieval), PTZ control, and event subscription. It covers multiple profiles including Profile S (streaming), Profile T (advanced streaming), and Profile G (video storage). Any IP camera compliant with ONVIF Profile S — Hikvision, Dahua, Vivotek, Tiandy — can be integrated into NeoMind via onvif-bridge without vendor-specific SDKs or adaptation layers.
+
+The current version is 2.7.6, with approximately 2700 lines of core code distributed across 5 Rust source files: `lib.rs` (1646 lines, Extension trait + command dispatch), `soap_client.rs` (516 lines, SOAP envelope + WS-Security), `discovery.rs` (211 lines, WS-Discovery UDP multicast), `ptz.rs` (214 lines, PTZ commands), and `types.rs` (78 lines, data structures).
 
 **What problem does it solve?** NeoMind's frontend needs unified management of heterogeneous IP cameras. If every vendor used its own SDK (Hikvision SDK, Dahua SDK, Tiandy SDK), the codebase would explode, maintenance costs would be prohibitive, and onboarding new vendors would take weeks. onvif-bridge wraps the ONVIF standard protocol into NeoMind's commands and metrics, so the frontend only needs to call unified commands like `discover` / `get_stream_uri` / `ptz_move` to operate any ONVIF-compliant camera. This is an **open-standard-driven integration strategy** — adapting to the protocol, not to the vendor.
 
@@ -17,11 +19,19 @@ sidebar_label: "4. onvif-bridge"
 
 **Relationship with NeoEyes camera product line**: NeoEyes NE101 / NE301 hardware devices partially support the ONVIF protocol stack, and onvif-bridge can serve as a universal integration path for these self-developed devices. When customers deploy a mix of NeoEyes cameras and third-party ONVIF cameras, onvif-bridge provides a unified management interface.
 
-**Two key pain points drove the decision to hand-write rather than depend on existing crates**: (1) The ONVIF protocol stack is complex — SOAP 1.2 envelope + WS-Security UsernameToken Profile + WS-Discovery UDP multicast. Existing Rust crates (like `onvif-rs`) are maintained sporadically and do not cover PTZ/event subscription, so missing functionality would need to be hand-written anyway; (2) Vendor implementations vary significantly — some devices return Probe responses with non-standard XML namespace prefixes (`SOAP-ENV:` vs `s:` vs `soap:`), some devices have non-standard SOAP Fault formats, so parsing logic must tolerate these differences.
+**Two key pain points drove the decision to hand-write rather than depend on existing crates**:
+
+1. The ONVIF protocol stack is complex — SOAP 1.2 envelope + WS-Security UsernameToken Profile + WS-Discovery UDP multicast. Existing Rust crates (like `onvif-rs`) are maintained sporadically and do not cover PTZ/event subscription, so missing functionality would need to be hand-written anyway
+2. Vendor implementations vary significantly — some devices return Probe responses with non-standard XML namespace prefixes (`SOAP-ENV:` vs `s:` vs `soap:`), some devices have non-standard SOAP Fault formats, so parsing logic must tolerate these differences
 
 **Target audience**: (1) System integrators connecting third-party IP cameras — you will see the complete command chain from device discovery to PTZ control; (2) Protocol developers who want to understand how SOAP / WS-Discovery / WS-Security are hand-implemented in Rust — this case study has zero dependencies on any ONVIF/SOAP crate, making it an excellent reference for pure protocol engineering.
 
-**What you will learn**: (1) WS-Discovery multicast discovery engineering — UDP multicast socket binding, TTL control, Probe/ProbeMatch message formats, macOS multicast pitfalls; (2) SOAP 1.2 + WS-Security UsernameToken Profile PasswordDigest algorithm — the Rust implementation of SHA1(nonce+created+password) and why PasswordDigest was chosen over PasswordText; (3) ONVIF device capability negotiation chain — GetDeviceInformation → GetProfiles → GetStreamUri → optional PTZ; (4) Pure backend bridge extension architecture — no frontend component, no ONNX model, synchronous HTTP, and how to integrate with NeoMind core via the command system and virtual metrics.
+**What you will learn**:
+
+1. WS-Discovery multicast discovery engineering — UDP multicast socket binding, TTL control, Probe/ProbeMatch message formats, macOS multicast pitfalls
+2. SOAP 1.2 + WS-Security UsernameToken Profile PasswordDigest algorithm — the Rust implementation of SHA1(nonce+created+password) and why PasswordDigest was chosen over PasswordText
+3. ONVIF device capability negotiation chain — GetDeviceInformation → GetProfiles → GetStreamUri → optional PTZ
+4. Pure backend bridge extension architecture — no frontend component, no ONNX model, synchronous HTTP, and how to integrate with NeoMind core via the command system and virtual metrics
 
 ---
 
@@ -458,7 +468,13 @@ This sequence diagram reveals an important fact: onvif-bridge **never touches an
 
 **Alternative**: Use the community crate `onvif-rs` (the most prominent ONVIF client library in the Rust ecosystem).
 
-**Rationale**: (1) `onvif-rs` maintenance is lagging — the last substantive update was over a year old at the time of our investigation, and it does not cover critical operations like PTZ ContinuousMove / GotoPreset / GetPresets; (2) `onvif-rs` depends on the `hyper` + `tokio` async stack, and when onvif-bridge is loaded as a `.dylib`/`.so` dynamic library into the NeoMind host process, nested tokio runtimes cause panics — a hand-written client using synchronous `ureq` eliminates this problem entirely; (3) The ~500 lines of hand-written code are fully controllable — when encountering vendor non-standard implementations, parsing logic can be modified immediately, whereas modifying a third-party crate requires submitting a PR and waiting for a merge. The tradeoff is losing the type-safe WSDL bindings provided by `onvif-rs`, but this is mitigated through rigorous unit testing (see 6).
+**Rationale**:
+
+1. `onvif-rs` maintenance is lagging — the last substantive update was over a year old at the time of our investigation, and it does not cover critical operations like PTZ ContinuousMove / GotoPreset / GetPresets
+2. `onvif-rs` depends on the `hyper` + `tokio` async stack, and when onvif-bridge is loaded as a `.dylib`/`.so` dynamic library into the NeoMind host process, nested tokio runtimes cause panics — a hand-written client using synchronous `ureq` eliminates this problem entirely
+3. The ~500 lines of hand-written code are fully controllable — when encountering vendor non-standard implementations, parsing logic can be modified immediately, whereas modifying a third-party crate requires submitting a PR and waiting for a merge
+
+The tradeoff is losing the type-safe WSDL bindings provided by `onvif-rs`, but this is mitigated through rigorous unit testing (see 6).
 
 ### Decision 2: WS-Security PasswordDigest instead of PasswordText
 
@@ -474,7 +490,13 @@ This sequence diagram reveals an important fact: onvif-bridge **never touches an
 
 **Alternative**: Use `reqwest` + `async/await`, leveraging tokio async IO for concurrent multi-device handling.
 
-**Rationale**: (1) ONVIF device responses typically take 50ms-500ms, and concurrency is extremely low (a single deployment site usually has no more than 20 cameras), so the overhead of synchronous blocking is far less than the complexity of an async runtime; (2) onvif-bridge is loaded as a `.dylib`/`.so` dynamic library into the NeoMind host process, which already has its own tokio runtime — if the extension internally creates another nested tokio runtime (which `reqwest` requires), it triggers `panicked at 'Cannot start a runtime from within a runtime'`; the hand-written SOAP client using synchronous `ureq` completely avoids this issue (see the architecture note at `lib.rs` L18-L23); (3) `ureq`'s dependency tree is minimal (no `hyper`, `mio`, or `tokio`), producing a compiled artifact approximately 2MB smaller than `reqwest`, which matters for `.nep` distribution packages. The tradeoff is the inability to make parallel requests to multiple devices, but `execute_command` itself is async, so the NeoMind host process can call different commands in parallel across multiple devices.
+**Rationale**:
+
+1. ONVIF device responses typically take 50ms-500ms, and concurrency is extremely low (a single deployment site usually has no more than 20 cameras), so the overhead of synchronous blocking is far less than the complexity of an async runtime
+2. onvif-bridge is loaded as a `.dylib`/`.so` dynamic library into the NeoMind host process, which already has its own tokio runtime — if the extension internally creates another nested tokio runtime (which `reqwest` requires), it triggers `panicked at 'Cannot start a runtime from within a runtime'`; the hand-written SOAP client using synchronous `ureq` completely avoids this issue (see the architecture note at `lib.rs` L18-L23)
+3. `ureq`'s dependency tree is minimal (no `hyper`, `mio`, or `tokio`), producing a compiled artifact approximately 2MB smaller than `reqwest`, which matters for `.nep` distribution packages
+
+The tradeoff is the inability to make parallel requests to multiple devices, but `execute_command` itself is async, so the NeoMind host process can call different commands in parallel across multiple devices.
 
 ### Decision 4: find_local_ipv4 instead of bind 0.0.0.0
 
@@ -594,7 +616,7 @@ The [`metadata.json`](https://github.com/camthink-ai/NeoMind-Extensions/blob/mai
 // metadata.json L1-L12
 {
   "id": "onvif-bridge",
-  "name": "onvif uridge",
+  "name": "onvif bridge",
   "version": "2.7.6",
   "description": "ONVIF camera bridge extension for NeoMind — discover IP cameras, get RTSP streams, PTZ control",
   "author": "NeoMind Team",

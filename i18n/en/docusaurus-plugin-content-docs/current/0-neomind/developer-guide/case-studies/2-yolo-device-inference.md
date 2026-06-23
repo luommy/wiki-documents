@@ -9,15 +9,29 @@ sidebar_label: "2. yolo-device-inference"
 
 ## 1 Case Background
 
-**yolo-device-inference** is the first "AI inference extension" in the NeoMind ecosystem. It deploys an Ultralytics YOLOv8 object detection model to edge nodes, automatically consumes bound device image metric streams (snapshot / image / frame), writes detection boxes, classes, and confidence back to the device as virtual metrics, and optionally produces annotated JPEG thumbnails for dashboard display. The entire extension is about 1950 lines of Rust (single file `src/lib.rs`), contains no Python runtime, and serves as the reference for "pure Rust end-to-end AI inference."
+**yolo-device-inference** is the first "AI inference extension" in the NeoMind ecosystem. It deploys an Ultralytics YOLOv8 object detection model to edge nodes, automatically consumes bound device image metric streams (snapshot / image / frame), writes detection boxes, classes, and confidence back to the device as virtual metrics.
 
-**What problem does it solve?** Camera devices on the NeoMind dashboard (e.g., NE101) only produce raw image frames (base64 / JPEG). To let the frontend "see detection results" instead of "see raw video," a resident inference service is needed on the device side that can: (1) subscribe to device image update events, (2) spin up ONNX Runtime for a YOLO forward pass when an event fires, (3) write structured results (boxes, classes, confidence) back as virtual metrics, (4) simultaneously write the visualization (annotated JPEG) as another metric for direct `<img>` rendering. yolo-device-inference is the "middleware" of this data chain.
+It optionally produces annotated JPEG thumbnails for dashboard display. The entire extension is about 1950 lines of Rust (single file `src/lib.rs`), contains no Python runtime, and serves as the reference for "pure Rust end-to-end AI inference."
+
+**What problem does it solve?** Camera devices on the NeoMind dashboard (e.g., NE101) only produce raw image frames (base64 / JPEG). To let the frontend "see detection results" instead of "see raw video," a resident inference service is needed on the device side that can:
+
+1. Subscribe to device image update events
+2. Spin up ONNX Runtime for a YOLO forward pass when an event fires
+3. Write structured results (boxes, classes, confidence) back as virtual metrics
+4. Simultaneously write the visualization (annotated JPEG) as another metric for direct `<img>` rendering
+
+yolo-device-inference is the "middleware" of this data chain.
 
 **Difference from yolo-video-v2**: yolo-video-v2 receives user-pushed video streams (base64 frame sequences), suited for "manual trigger analysis" scenarios; yolo-device-inference subscribes to image update events of **bound devices** via the NeoMind capability system, operating in "always-on automatic" mode — once `bind_device` completes, the extension runs inference on every device image update without frontend polling. This is the canonical pattern for edge AI deployment. Case 3 in this series covers the streaming variant yolo-video-v2.
 
 **Target reader**: AI engineers preparing to deploy trained ONNX models to NeoMind edge nodes; platform developers wanting to understand how extensions access device data through the capability system. Requires intermediate Rust proficiency (async, traits, `cfg` conditional compilation) and basic familiarity with ONNX Runtime's dynamic library loading mechanism.
 
-**What you'll learn**: (1) Model lifecycle management — why lazy loading matters, how `YOLODetector` combines `Option<YOLO>` + a `load_attempted` flag into "load-once" semantics; (2) Cross-platform ONNX Runtime dylib governance — `ORT_DYLIB_PATH`, versioned symlinks, and the trap of macOS `DYLD_LIBRARY_PATH` being ignored by `dlopen` when set via runtime `set_var`; (3) Capability-based device frame acquisition — reading device images and writing virtual metrics through the `device_metrics_read` / `device_metrics_write` sync capability bridge, and why `block_in_place` is mandatory under a multi-thread runtime; (4) Detection-result-to-metric data shape mapping — why `BoundingBox` chose `{x, y, width, height}` over `{xmin, ymin, xmax, ymax}`.
+**What you'll learn**:
+
+1. Model lifecycle management — why lazy loading matters, how `YOLODetector` combines `Option<YOLO>` + a `load_attempted` flag into "load-once" semantics
+2. Cross-platform ONNX Runtime dylib governance — `ORT_DYLIB_PATH`, versioned symlinks, and the trap of macOS `DYLD_LIBRARY_PATH` being ignored by `dlopen` when set via runtime `set_var`
+3. Capability-based device frame acquisition — reading device images and writing virtual metrics through the `device_metrics_read` / `device_metrics_write` sync capability bridge, and why `block_in_place` is mandatory under a multi-thread runtime
+4. Detection-result-to-metric data shape mapping — why `BoundingBox` chose `{x, y, width, height}` over `{xmin, ymin, xmax, ymax}`
 
 ---
 

@@ -9,11 +9,21 @@ sidebar_label: "5. uink-rms-bridge"
 
 ## 1 案例背景
 
-**uink-rms-bridge** 是 NeoMind 生态中**生产验证的厂商专有协议桥接**案例。Uink-RMS 是一个面向 e-paper（电子纸 / 电子墨水屏）显示设备的云管理平台：设备通过 LPWAN / 蜂窝网络连入厂商云，云端提供 REST API 供第三方集成。uink-rms-bridge 让 NeoMind 能够完成三件事：(1) 在 Uink-RMS 平台上注册 e-paper 设备模板（`device_type = "uink_epaper"`，由扩展侧通过 `device_template_register` capability 一次性写入）；(2) 周期性拉取设备遥测（电量百分比、信号强度 dBm、温度、刷新计数）；(3) 把用户编辑的 Markdown / 纯文本 / 图像转换为 JPEG 并推送到 e-paper 屏幕上刷新显示。当前版本 `2.7.6`，核心实现集中在单个 [`src/lib.rs`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs) 文件共 2250 行，外加 React + TypeScript 编写的 [`DisplayEditorCard`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/frontend/) 前端组件（entrypoint `uink-rms-bridge-components.umd.cjs`）。
+**uink-rms-bridge** 是 NeoMind 生态中**生产验证的厂商专有协议桥接**案例。Uink-RMS 是一个面向 e-paper（电子纸 / 电子墨水屏）显示设备的云管理平台：设备通过 LPWAN / 蜂窝网络连入厂商云，云端提供 REST API 供第三方集成。uink-rms-bridge 让 NeoMind 能够完成三件事：
+
+1. 在 Uink-RMS 平台上注册 e-paper 设备模板（`device_type = "uink_epaper"`，由扩展侧通过 `device_template_register` capability 一次性写入）
+2. 周期性拉取设备遥测（电量百分比、信号强度 dBm、温度、刷新计数）
+3. 把用户编辑的 Markdown / 纯文本 / 图像转换为 JPEG 并推送到 e-paper 屏幕上刷新显示
+
+当前版本 `2.7.6`，核心实现集中在单个 [`src/lib.rs`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs) 文件共 2250 行，外加 React + TypeScript 编写的 [`DisplayEditorCard`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/frontend/) 前端组件（entrypoint `uink-rms-bridge-components.umd.cjs`）。
 
 **与 [案例 4 onvif-bridge](./4-onvif-bridge.md) 的对比（本案例核心叙事轴）**：onvif-bridge 是**标准协议桥接**（ONVIF 是开放规范，任何 Profile S 摄像头通用），uink-rms-bridge 是**厂商专有协议桥接**（Uink-RMS 云 API 是封闭的私有接口，仅 Uink 自家设备可用）。两者代表 NeoMind 生态中两种截然不同的集成策略：标准协议桥接走「局域网 UDP/HTTP 直连设备 + 设备级 WS-Security 鉴权」的路径，演进风险低（标准稳定），不依赖任何外部云；厂商专有桥接走「公网 HTTPS 经厂商云中转 + 账号级 JWT 鉴权」的路径，演进风险高（厂商 API v1.0.1 可能变），强依赖 Uink-RMS 云服务可用性。理解这种对比，是选择 NeoMind 集成策略的关键——本系列把 4 / 5 称为「协议桥接双子星」。
 
-**三大痛点驱动了该扩展的设计**：(1) Uink-RMS API 是**云中转**的，e-paper 刷新一次需要数秒（通过 LPWAN / 蜂窝下行），不能像普通 IoT 设备那样实时控制，必须在 UI 层做好延迟预期管理；(2) **Markdown → image 渲染必须在扩展侧完成**——Uink-RMS 的 `POST /api/v1/devices/{id}/image` 只接受 JPEG/PNG 二进制，不接受文本格式，所以 pulldown-cmark 解析 + ab_glyph 字体渲染 + imageproc 绘制 + image crate 编码 JPEG 这条管线完全由 Rust 侧负责；(3) 厂商云存在**区域分割**——中国大陆用户必须走 `https://cn.rms.uink.com`，海外用户走 `https://eu.rms.uink.com`，两者账号不互通，扩展必须支持区域路由。
+**三大痛点驱动了该扩展的设计**：
+
+1. Uink-RMS API 是**云中转**的，e-paper 刷新一次需要数秒（通过 LPWAN / 蜂窝下行），不能像普通 IoT 设备那样实时控制，必须在 UI 层做好延迟预期管理
+2. **Markdown → image 渲染必须在扩展侧完成**——Uink-RMS 的 `POST /api/v1/devices/{id}/image` 只接受 JPEG/PNG 二进制，不接受文本格式，所以 pulldown-cmark 解析 + ab_glyph 字体渲染 + imageproc 绘制 + image crate 编码 JPEG 这条管线完全由 Rust 侧负责
+3. 厂商云存在**区域分割**——中国大陆用户必须走 `https://cn.rms.uink.com`，海外用户走 `https://eu.rms.uink.com`，两者账号不互通，扩展必须支持区域路由
 
 **目标读者**：(1) 要接入第三方厂商云平台（尤其是 IoT 云、显示云）的集成商——你会看到从 JWT 登录到设备注册、遥测拉取、图像推送的完整闭环；(2) 想理解 NeoMind 如何把一个「封闭系统」桥接到统一设备模型的开发者——uink-rms-bridge 是「厂商 API 包一层」模式的范本。**「生产验证」的具体含义**：该扩展经历了至少 4 轮针对性修复（[`f4c73cd`](https://github.com/camthink-ai/NeoMind-Extensions/commit/f4c73cd) 初始发布、[`261d8e6`](https://github.com/camthink-ai/NeoMind-Extensions/commit/261d8e6) 翻转与数据源、[`39587eb`](https://github.com/camthink-ai/NeoMind-Extensions/commit/39587eb) SDK 升级、[`422ba8d`](https://github.com/camthink-ai/NeoMind-Extensions/commit/422ba8d) 安全加固），跨 6 个版本（v2.7.0 → v2.7.6）回归，目前在生产部署运行。
 

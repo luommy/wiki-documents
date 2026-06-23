@@ -7,7 +7,7 @@ sidebar_label: "5. Frontend Consume"
 
 # 5 Frontend Consume: From detections to SVG overlay rendering pipeline
 
-> This page is the **frontend rendering reference** for the ne101_camera MVP. After reading it you should be able to: (1) describe the full rendering pipeline from props to SVG overlay and explain why it is effect-driven; (2) reproduce the `classColor(label)` algorithm that uses string hashing + golden-angle 137.508° rotation to generate HSV hue, and articulate its advantages over a fixed palette; (3) explain the polygon + rect fallback branching in SVG overlay rendering, plus the `[x,y]` vs `{x,y}` polygon vertex format compatibility; (4) derive the object-cover coordinate transform math: when the image aspect ratio is greater than the container, sides are cropped, otherwise top/bottom are cropped, with their respective `sx/sy/ox/oy` formulas; (5) explain why callback ref is used instead of `useEffect` to attach the ResizeObserver — the only correct pattern for asynchronously mounted elements. All line-number anchors point to the `main` branch of the source repo's [`bundle.js`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js) and [`manifest.json`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json).
+> This page is the **frontend rendering reference** for the ne101_camera MVP, covering the effect-driven rendering pipeline, per-class coloring (golden-angle HSV), SVG overlay rendering, object-cover coordinate transform, and the ResizeObserver callback-ref pattern.
 
 ---
 
@@ -204,25 +204,15 @@ if (imgNat.w > 0 && imgNat.h > 0 && ctrSize.w > 0 && ctrSize.h > 0) {
 
 At render time this transform is applied to every coordinate of every detection box: polygon vertices at [L1185-L1187](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1185-L1187) (ROI polygons) and [L1229-L1230](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1229-L1230) (detection polygons), bbox corners at [L1241-L1244](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1241-L1244), and label positions at [L1259-L1260](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1259-L1260). The transform formula is uniformly `tx = (px * ovTf.sx + ovTf.ox) * 100` (the multiply by 100 is because the SVG viewBox is 100x100).
 
-```js
-// ROI polygon vertices (L1185-L1187):
-var tx = ovTf ? ((p.x * ovTf.sx + ovTf.ox) * 100) : (p.x * 100);
-var ty = ovTf ? ((p.y * ovTf.sy + ovTf.oy) * 100) : (p.y * 100);
+Using detection polygon vertices as an example:
 
+```js
 // detection polygon vertices (L1229-L1230):
 var dtx = ovTf ? ((px * ovTf.sx + ovTf.ox) * 100) : (px * 100);
 var dty = ovTf ? ((py * ovTf.sy + ovTf.oy) * 100) : (py * 100);
-
-// bbox corners (L1241-L1244):
-var rx1 = ovTf ? (bx1 * ovTf.sx + ovTf.ox) * 100 : bx1 * 100;
-var ry1 = ovTf ? (by1 * ovTf.sy + ovTf.oy) * 100 : by1 * 100;
-var rx2 = ovTf ? (bx2 * ovTf.sx + ovTf.ox) * 100 : bx2 * 100;
-var ry2 = ovTf ? (by2 * ovTf.sy + ovTf.oy) * 100 : by2 * 100;
-
-// label position (L1259-L1260):
-var lx = ovTf ? ((lpx * ovTf.sx + ovTf.ox) * 100) : (lpx * 100);
-var ly = (ovTf ? ((lpy * ovTf.sy + ovTf.oy) * 100) : (lpy * 100)) - 1.5;
 ```
+
+The same transform is also applied to ROI polygon vertices (L1185-L1187), bbox corners (L1241-L1244), and label positions (L1259-L1260), with an identical formula.
 
 Source: [`bundle.js` L1185-L1260](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1185-L1260)
 

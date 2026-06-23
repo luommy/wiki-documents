@@ -7,7 +7,7 @@ sidebar_label: "3. Extension Side"
 
 # 3 扩展侧：processingExtensionId 通用 AI 处理契约
 
-> 本节是 ne101_camera 案例的**扩展侧契约参考页**，也是「组件 + 可插拔扩展」范式的核心定义页。读完你应当能：(1) 解释为什么 ne101_camera 这个看起来在做「AI 检测」的组件，其自身 `bundle.js` 里一行 AI 推理代码都没有——真正的推理被外包给了通过 `processingExtensionId` 字段选中的用户安装扩展，这种「组件只负责编排，扩展负责推理」的切分是 NeoMind 全生态 AI 复用的模板；(2) 复述 `AI_EXT_IDS` 白名单的四个成员（locate-anything-v2 / image-analyzer-v2 / yolo-device-inference / ocr-device-inference）以及它们为何被硬编码进组件而不是用元数据驱动；(3) 画出 `EXT_MODES` 模式目录的结构，说出每个模式三元组 `command` + `imageArg` + `responseType` 如何决定了 Transform 生成代码的形状，以及 `args` 字段（`['categories']` vs `['phrase']`）如何驱动 `AdvancedPanel` 的输入框；(4) 解释 `__imageData` 注入机制——为什么 Transform 不自己去拉图像，而是等平台在执行时把 base64 注入进来；(5) 复述 `locate-anything-v2` 的 NMS IoU 0.5 阈值特例（commit `8656148`）以及「未在 `EXT_MODES` 注册的新扩展走默认 `boxes_x1y1x2y2` 兜底」这种宽容降级的设计动机。所有行号锚点都指向源码仓库 `main` 分支的 [`bundle.js`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js) 和 [`manifest.json`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json)。
+> 本节是 ne101_camera 案例的**扩展侧契约参考页**，覆盖 `processingExtensionId` 通用 AI 处理契约：白名单校验（`AI_EXT_IDS`）、模式映射（`EXT_MODES`）、`__imageData` 注入机制和降级策略。
 
 ---
 

@@ -7,7 +7,7 @@ sidebar_label: "2. Architecture"
 
 # 2 架构总览
 
-> 本节是把 [`bundle.js`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js) 1972 行手写 IIFE「拆开看」的章节。读完你应当能：(1) 画出 IIFE 顶层结构与 `window.*` 注入的依赖边界；(2) 解释 helper / template / sub-component / main / export 五层的职责切分；(3) 复述组件树（根节点 `NE101CameraPanel` 加上 `ConfigPanel` / `AdvancedPanel` 两个对外子组件）以及核心 hooks 的语义；(4) 描述「WebSocket 优先 + REST 回退」的双通道数据流；(5) 在与 [6 metric_card](../6-metric-card-component.md) 的对比里说清「设备绑定组件」与「显示型组件」的架构代差。所有行号都基于源码仓库的 `main` 分支，链接带 `#L<start>-L<end>` 锚点。
+> 本节把 1972 行手写 IIFE 的 [`bundle.js`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js) 「拆开看」，覆盖五层架构（helper / template / sub-component / main / export）、三对外组件的组件树、双通道数据流，以及与 metric_card 的架构代差对比。
 
 ---
 
@@ -637,6 +637,10 @@ Source: [`bundle.js` L523-L524](https://github.com/camthink-ai/NeoMind-Dashboard
 | **组件数** | 1 个对外组件（`MetricCard`） | 3 个对外组件（`NE101CameraPanel` + `ConfigPanel` + `AdvancedPanel`）+ 5 个内部 sub-component | metric_card 的「单组件」意味着它没有配置对话框的 tab 结构；ne101 的三件套是平台对「有 `has_device_binding` 或复杂 `config_schema` 的组件」的要求。 |
 | **数据接入** | `has_data_source: true` + `fetchData` prop（通用） | `has_device_binding: true` + `device_type_filter: ["ne101_camera"]`（专用） | metric_card 消费任何 DataSource（设备遥测 / 扩展指标 / 系统指标），ne101 只消费 `device.type === "ne101_camera"` 的设备。这是「通用 vs 专用」的根本分野。 |
 | **配置复杂度** | 简单 display config（`label` / `unit` / `decimalPlaces`） | 18 字段 `default_config`（[manifest.json L18-L37](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L18-L37)）：processing pipeline + ROI + NMS + categories + phrase | ne101 的配置字段数是 metric_card 的 3 倍以上，且每个字段都有默认值和兼容性回退逻辑（`processingRois` 数组 vs 单矩形）。 |
+| **导出方式** | `default + MetricCard` 双暴露（但只用 default） | `default + NE101CameraPanel + ConfigPanel + AdvancedPanel` 四字段暴露 | metric_card 的 default 双暴露是「向前兼容的保险」；ne101 的命名导出是「配置对话框必须用的契约」。 |
+| **适用场景** | 任何标量指标（温度、电池、延迟、计数） | 仅 `ne101_camera` 设备类型 | metric_card 是「万能数值卡」，ne101 是「专用摄像头面板」。如果 NE101 设备被淘汰，ne101 组件也会随之废弃；metric_card 永远不会因为某个设备类型消失而失效。 |
+
+ne101_camera 的 18 字段 `default_config` 完整内容如下：
 
 ```js
 // manifest.json L18-L37 — default_config (18 fields)
@@ -663,8 +667,6 @@ Source: [`bundle.js` L523-L524](https://github.com/camthink-ai/NeoMind-Dashboard
 ```
 
 Source: [manifest.json L18-L37](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L18-L37)
-| **导出方式** | `default + MetricCard` 双暴露（但只用 default） | `default + NE101CameraPanel + ConfigPanel + AdvancedPanel` 四字段暴露 | metric_card 的 default 双暴露是「向前兼容的保险」；ne101 的命名导出是「配置对话框必须用的契约」。 |
-| **适用场景** | 任何标量指标（温度、电池、延迟、计数） | 仅 `ne101_camera` 设备类型 | metric_card 是「万能数值卡」，ne101 是「专用摄像头面板」。如果 NE101 设备被淘汰，ne101 组件也会随之废弃；metric_card 永远不会因为某个设备类型消失而失效。 |
 
 **总结一句话**：metric_card 是「薄组件 + 厚通用性」，ne101_camera 是「厚组件 + 薄专用性」。前者的价值在于覆盖面广，后者的价值在于把一条复杂的设备链路收敛成单一面板。两者不是替代关系，而是递进关系——ne101_camera 在 metric_card 的 IIFE 注入 + manifest 契约 + 内联 style 三件套基础上，增加了设备绑定、图像画布、AI 处理流水线、ROI 叠加四层新能力。
 

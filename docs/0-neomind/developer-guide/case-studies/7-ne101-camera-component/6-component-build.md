@@ -7,7 +7,7 @@ sidebar_label: "6. Component Build"
 
 # 6 组件构建：从 IIFE 注入到 shadcn 复刻的工程范式
 
-> 本节是 ne101_camera MVP 阶段的**组件构建参考页**，也是 MVP 核心三页的收尾篇。读完你应当能：(1) 解释为什么 `bundle.js` 第一行不是 import 而是 `var React = window.React`——这套「IIFE 注入范式」是 NeoMind 组件市场的底层约定，与 ESM 打包方案的根本差异在哪里；(2) 复述 L1971 那个 `return { default, NE101CameraPanel, ConfigPanel, AdvancedPanel }` 四键导出对象的设计动机，说出平台加载器如何通过 `global_name` + `export_name` 路由到正确的组件；(3) 画出 1972 行 IIFE 的五层模块结构（helper / template engine / main component / shared UI / settings panels），解释为什么「同一闭包内的函数提升」能替代打包器的模块解析；(4) 复述 React hooks 在 IIFE 中踩过的三个经典坑（commit `0601cd4` 的条件 useState 导致 #310、commit `44f1fa5` 的共享 composingRef 导致输入冻结、commit `b060a25` 的最终 uncontrolled 修复），并说出为什么这些坑在 ESM + ESLint 项目里不会出现；(5) 描述 shadcn CSS 类复刻策略（`INPUT_CLS` / `SwitchControl` / `ExtDropdown`），解释为什么选择复制 className 字符串而不是内联样式或请求平台组件 API。所有行号锚点都指向源码仓库 `main` 分支的 [`bundle.js`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js) 和 [`manifest.json`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json)。
+> 本节是 ne101_camera MVP 阶段的**组件构建参考页**（MVP 核心三页收尾），覆盖 IIFE 注入范式、四键命名导出、五层模块结构、React hooks 在 IIFE 中的三大陷阱以及 shadcn CSS 类复刻策略。
 
 ---
 

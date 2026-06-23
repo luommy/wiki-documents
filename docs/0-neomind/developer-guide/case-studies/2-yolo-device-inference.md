@@ -9,15 +9,29 @@ sidebar_label: "2. yolo-device-inference"
 
 ## 1 案例背景
 
-**yolo-device-inference** 是 NeoMind 生态中第一个「AI 推理扩展」——它把 Ultralytics YOLOv8 目标检测模型部署到边缘节点，自动消费绑定设备的图像指标流（snapshot / image / frame），将检测框、类别、置信度作为虚拟指标写回设备，并可选地产出带标注的 JPEG 缩略图供仪表板展示。整个扩展约 1950 行 Rust（单文件 `src/lib.rs`），不包含任何 Python 运行时，是「纯 Rust 端到端 AI 推理」的范本。
+**yolo-device-inference** 是 NeoMind 生态中第一个「AI 推理扩展」——它把 Ultralytics YOLOv8 目标检测模型部署到边缘节点，自动消费绑定设备的图像指标流（snapshot / image / frame），将检测框、类别、置信度作为虚拟指标写回设备，并可选地产出带标注的 JPEG 缩略图供仪表板展示。
 
-**它解决了什么问题？** NeoMind 仪表板上的摄像头设备（如 NE101）只会产出原始图像帧（base64 / JPEG）。要让前端「看到目标检测结果」而非「看到原始视频」，需要一个常驻在设备侧的推理服务，能够：(1) 订阅设备图像更新事件，(2) 在事件触发时拉起 ONNX Runtime 跑一次 YOLO 前向传播，(3) 把结构化结果（框、类别、置信度）回写为虚拟指标，(4) 同时把可视化结果（带框 JPEG）回写为另一条指标供 `<img>` 直接渲染。yolo-device-inference 就是这条数据链的「中间件」。
+整个扩展约 1950 行 Rust（单文件 `src/lib.rs`），不包含任何 Python 运行时，是「纯 Rust 端到端 AI 推理」的范本。
+
+**它解决了什么问题？** NeoMind 仪表板上的摄像头设备（如 NE101）只会产出原始图像帧（base64 / JPEG）。要让前端「看到目标检测结果」而非「看到原始视频」，需要一个常驻在设备侧的推理服务，能够：
+
+1. 订阅设备图像更新事件
+2. 在事件触发时拉起 ONNX Runtime 跑一次 YOLO 前向传播
+3. 把结构化结果（框、类别、置信度）回写为虚拟指标
+4. 同时把可视化结果（带框 JPEG）回写为另一条指标供 `<img>` 直接渲染
+
+yolo-device-inference 就是这条数据链的「中间件」。
 
 **与 yolo-video-v2 的区别**：yolo-video-v2 接收用户主动推送的视频流（base64 帧序列），适合「人工触发分析」场景；而 yolo-device-inference 通过 NeoMind 能力系统订阅**已绑定设备**的图像更新事件，是「自动常驻」模式——一旦 `bind_device` 完成，扩展就会在每次设备图像更新时自动推理，不需要前端轮询。这是边缘 AI 部署的典型形态。本系列 3 会专门剖析 yolo-video-v2 的流式版本。
 
 **目标读者**：准备把训练好的 ONNX 模型部署到 NeoMind 边缘节点的 AI 工程师；想理解扩展如何通过能力系统访问设备数据的平台开发者。需要 Rust 中级水平（async、trait、`cfg` 条件编译），并对 ONNX Runtime 的动态库加载机制有基本概念。
 
-**你将学到**：(1) 模型生命周期管理——为什么要懒加载、`YOLODetector` 如何把 `Option<YOLO>` + `load_attempted` 标志组合成「单次加载」语义；(2) ONNX Runtime 跨平台动态库治理——`ORT_DYLIB_PATH`、版本化符号链接、macOS `DYLD_LIBRARY_PATH` 在运行时 `set_var` 的失效陷阱；(3) 能力化设备取流——通过 `device_metrics_read` / `device_metrics_write` 同步能力桥获取设备图像、写回虚拟指标，并理解为什么在多线程 runtime 下必须用 `block_in_place` 包裹；(4) 检测结果到指标的数据形态映射——为什么 `BoundingBox` 选 `{x, y, width, height}` 而不是 `{xmin, ymin, xmax, ymax}`。
+**你将学到**：
+
+1. 模型生命周期管理——为什么要懒加载、`YOLODetector` 如何把 `Option<YOLO>` + `load_attempted` 标志组合成「单次加载」语义
+2. ONNX Runtime 跨平台动态库治理——`ORT_DYLIB_PATH`、版本化符号链接、macOS `DYLD_LIBRARY_PATH` 在运行时 `set_var` 的失效陷阱
+3. 能力化设备取流——通过 `device_metrics_read` / `device_metrics_write` 同步能力桥获取设备图像、写回虚拟指标，并理解为什么在多线程 runtime 下必须用 `block_in_place` 包裹
+4. 检测结果到指标的数据形态映射——为什么 `BoundingBox` 选 `{x, y, width, height}` 而不是 `{xmin, ymin, xmax, ymax}`
 
 ---
 
