@@ -2,12 +2,12 @@
 description: Write your first NeoMind dashboard component — a complete engineering walkthrough of metric_card (IIFE injection + OKLCH glass + multi-format normalization)
 keywords: [NeoMind, metric_card, dashboard component, engineering case study]
 tags: [NeoMind, case study, component]
-sidebar_label: "#6 metric_card"
+sidebar_label: "6. metric_card"
 ---
 
 # #6 metric_card: Introductory Dashboard Component
 
-## §1 Case Background
+## 1 Case Background
 
 **metric_card** is the simplest "meaningful component" in the NeoMind dashboard component marketplace. It renders one or more numeric values (temperature, battery level, inference latency, detected object count) as a frosted-glass card with labels, units, and decimal precision. The entire component is 352 lines of hand-written IIFE JavaScript with zero build step — the shortest path for a newcomer to understand "what makes up a NeoMind component."
 
@@ -21,7 +21,7 @@ sidebar_label: "#6 metric_card"
 
 ---
 
-## §2 Architecture Overview
+## 2 Architecture Overview
 
 metric_card is a collaboration between three parts: the component bundle (IIFE, self-registering to `window.NeoMind_MetricCard`), the NeoMind dashboard runtime (host page providing React/jsxRuntime + `fetchData` injection + grid container), and data sources (device telemetry / extension metrics / system metrics). The diagram below shows the load sequence and dependency injection boundaries.
 
@@ -72,9 +72,9 @@ graph TB
 
 ---
 
-## §3 Implementation Walkthrough
+## 3 Implementation Walkthrough
 
-### §3.1 Directory Structure & Manifest Contract
+### 3.1 Directory Structure & Manifest Contract
 
 ```
 components/metric_card/
@@ -113,7 +113,7 @@ View full manifest: [`manifest.json`](https://github.com/camthink-ai/NeoMind-Das
 - `has_device_binding: false` — metric_card does not bind to a specific device type; it can consume any data source (device telemetry, extension metrics, system metrics all work). If set to `true`, the runtime requires the user to first select a device instance and additionally injects a `deviceContext` prop.
 - `config_schema` — A JSON Schema that the runtime uses to auto-generate the configuration form. Each item in the `metrics` array has `label` / `unit` / `decimalPlaces`, corresponding one-to-one with the `config.metrics[i]` reads in `bundle.js`.
 
-### §3.2 IIFE Injection Pattern (Critical Design)
+### 3.2 IIFE Injection Pattern (Critical Design)
 
 View source: [`bundle.js`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/metric_card/bundle.js#L1-L4) L1-4
 
@@ -145,7 +145,7 @@ The core constraint of the NeoMind component marketplace is: **components are di
 
 `window.jsxRuntime` is React 17+'s "automatic JSX runtime." The traditional approach requires `import React from 'react'` to use JSX; the automatic runtime exposes `jsx()` / `jsxs()` as standalone functions, so the component only needs `var jsx = window.jsxRuntime.jsx` to render, further reducing dependence on the React namespace.
 
-### §3.3 Glass Container Design (OKLCH + CSS Variables)
+### 3.3 Glass Container Design (OKLCH + CSS Variables)
 
 View source: [`bundle.js`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/metric_card/bundle.js#L9-L18) L9-18
 
@@ -170,9 +170,9 @@ var glassContainer = {
 
 **Why inline style objects instead of CSS-in-JS / Tailwind?**
 
-metric_card has no build step (see §3.2), so it cannot use Tailwind classes (requires PostCSS compilation) or CSS-in-JS (requires a runtime library). Inline style objects are the zero-dependency solution. The trade-off is that dynamic values (like `opacity` percentages) cannot use Tailwind's `/10` syntax and must be written as `'oklch(1 0 0 / 10%)'`. STYLE_GUIDE §1 explicitly warns about this.
+metric_card has no build step (see 3.2), so it cannot use Tailwind classes (requires PostCSS compilation) or CSS-in-JS (requires a runtime library). Inline style objects are the zero-dependency solution. The trade-off is that dynamic values (like `opacity` percentages) cannot use Tailwind's `/10` syntax and must be written as `'oklch(1 0 0 / 10%)'`. STYLE_GUIDE 1 explicitly warns about this.
 
-### §3.4 `extractValue()` — Multi-Format Data Normalization (Core Engineering Insight)
+### 3.4 `extractValue()` — Multi-Format Data Normalization (Core Engineering Insight)
 
 View source: [`bundle.js`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/metric_card/bundle.js#L40-L60) L40-60
 
@@ -214,7 +214,7 @@ As a general-purpose component, metric_card **must tolerate all of these formats
 
 **Design principle of `extractValue`: progressive degradation.** It checks formats in order from "most specific" to "most general": first `.value` (standard format), then `.series` (timeseries format), finally falling back to "raw scalar." This guarantees forward compatibility with future formats — if NeoMind adds a `{data: ...}` format, only a new branch in `extractValue` is needed; old components will not crash.
 
-### §3.5 Render & Props Contract
+### 3.5 Render & Props Contract
 
 View source: [`bundle.js`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/metric_card/bundle.js#L130-L148) L130-148 (state), [L156-176](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/metric_card/bundle.js#L156-L176) (doFetch), [L288-322](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/metric_card/bundle.js#L288-L322) (renderCell)
 
@@ -238,7 +238,7 @@ The `doFetch()` function (L156-176) is the core of data retrieval. It does three
 2. **Normalizes results to array** — `Array.isArray(result) ? result : [result]`, so single-source and multi-source share the same rendering path.
 3. **Runs `extractValue` on each result** — Stores normalized scalars into `values[]`; `renderCell` then formats based on `config.metrics[i]`.
 
-### §3.6 Data Flow Sequence Diagram
+### 3.6 Data Flow Sequence Diagram
 
 The diagram below shows the complete lifecycle of metric_card in the dashboard: from mount to 30-second polling updates.
 
@@ -286,7 +286,7 @@ sequenceDiagram
 
 ---
 
-## §4 Design Trade-offs
+## 4 Design Trade-offs
 
 ### Decision 1: IIFE + `window.*` Injection vs ESM Bundling
 
@@ -320,7 +320,7 @@ sequenceDiagram
 | Perceptual uniformity | Same lightness = visual consistency | hex space is non-uniform |
 | Browser support | Modern browsers (Chrome 111+) | Fully compatible |
 
-**Cost of choosing OKLCH**: Older browsers (Safari < 15.4) do not support it. NeoMind dashboard is a modern web app targeting evergreen browsers only, so this cost is acceptable. See [STYLE_GUIDE §1](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/STYLE_GUIDE.md#1-color-system).
+**Cost of choosing OKLCH**: Older browsers (Safari < 15.4) do not support it. NeoMind dashboard is a modern web app targeting evergreen browsers only, so this cost is acceptable. See [STYLE_GUIDE 1](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/STYLE_GUIDE.md#1-color-system).
 
 ### Decision 4: Multi-format `extractValue` vs Strict Schema Validation
 
@@ -331,11 +331,11 @@ sequenceDiagram
 | Forward compatibility | Add a new branch | Breaking change |
 | Error handling | Silently returns null, skips slot | Throws exception, component crashes |
 
-**Cost of multi-format**: `extractValue` has many logic branches; test coverage must be careful. metric_card has two commits in git history specifically fixing `extractValue` bugs (see §7).
+**Cost of multi-format**: `extractValue` has many logic branches; test coverage must be careful. metric_card has two commits in git history specifically fixing `extractValue` bugs (see 7).
 
 ---
 
-## §5 Tech Stack Breakdown
+## 5 Tech Stack Breakdown
 
 | Component | Choice | Why |
 |-----------|--------|-----|
@@ -351,22 +351,22 @@ sequenceDiagram
 
 ---
 
-## §6 Standards in Practice
+## 6 Standards in Practice
 
 This section shows how metric_card implements the rules from the [Engineering Standards Appendix](./appendix-standards.md) and [STYLE_GUIDE](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/STYLE_GUIDE.md).
 
 ### manifest.json Field Practice
 
-metric_card's manifest fully follows the schema in Appendix §1. Key field mapping:
+metric_card's manifest fully follows the schema in Appendix 1. Key field mapping:
 
 | Standard field | metric_card actual value | Standard source |
 |---------------|-------------------------|-----------------|
-| `id` | `"metric_card"` | Appendix §1.1 |
-| `name` | `{ "en": "Metric Card", "zh": "指标卡片" }` | Appendix §1.1 (component multilingual object) |
-| `version` | `"1.7.0"` | Appendix §1.1 (semver) |
-| `size_constraints` | `{ min_w: 2, ... max_w: 6 }` | Appendix §1.4 (component-specific) |
-| `has_data_source` | `true` | Appendix §1.5 |
-| `config_schema` | JSON Schema object | Appendix §1.6 |
+| `id` | `"metric_card"` | Appendix 1.1 |
+| `name` | `{ "en": "Metric Card", "zh": "指标卡片" }` | Appendix 1.1 (component multilingual object) |
+| `version` | `"1.7.0"` | Appendix 1.1 (semver) |
+| `size_constraints` | `{ min_w: 2, ... max_w: 6 }` | Appendix 1.4 (component-specific) |
+| `has_data_source` | `true` | Appendix 1.5 |
+| `config_schema` | JSON Schema object | Appendix 1.6 |
 
 ### How Size Constraints Shape the Grid
 
@@ -381,23 +381,23 @@ The four values in `size_constraints` (`min_w/h`, `default_w/h`, `max_w/h`) dire
 metric_card's `renderCell` function strictly follows the STYLE_GUIDE patterns:
 
 ```javascript
-// Follows STYLE_GUIDE §7 "Value Display" pattern
+// Follows STYLE_GUIDE 7 "Value Display" pattern
 jsx('span', {
   className: 'font-bold font-mono tabular-nums truncate ' + valueClass,
-  // why tabular-nums: numbers align evenly; STYLE_GUIDE §2 requires it
+  // why tabular-nums: numbers align evenly; STYLE_GUIDE 2 requires it
   // why truncate: long values are truncated to prevent overflow
   style: { color: 'var(--foreground)', letterSpacing: '-0.02em' },
   children: displayValue
 })
 ```
 
-- `font-mono tabular-nums` — STYLE_GUIDE §2 explicitly requires "numeric displays must use `tabular-nums`; using `font-mono` alone results in non-monospaced digits."
-- `var(--foreground)` — Instead of the `text-foreground` class. This is because metric_card's text color is dynamically calculated (based on slot state); inline style is more flexible. STYLE_GUIDE §1 permits this usage.
-- `text-[10px]` — STYLE_GUIDE §2's "Tiny metadata" size, used for labels.
+- `font-mono tabular-nums` — STYLE_GUIDE 2 explicitly requires "numeric displays must use `tabular-nums`; using `font-mono` alone results in non-monospaced digits."
+- `var(--foreground)` — Instead of the `text-foreground` class. This is because metric_card's text color is dynamically calculated (based on slot state); inline style is more flexible. STYLE_GUIDE 1 permits this usage.
+- `text-[10px]` — STYLE_GUIDE 2's "Tiny metadata" size, used for labels.
 
 ### Reverse Example: Hardcoded Palette Colors
 
-> **Wrong approach (explicitly forbidden by STYLE_GUIDE §1):**
+> **Wrong approach (explicitly forbidden by STYLE_GUIDE 1):**
 >
 > ```javascript
 > // WRONG - hardcoded hex color
@@ -419,11 +419,11 @@ jsx('span', {
 > })
 > ```
 >
-> metric_card does not use any Tailwind palette colors (`green-*` / `red-*` / `blue-*`) anywhere in `bundle.js`. Everything uses CSS variables like `var(--foreground)` / `var(--muted-foreground)` / `var(--border)`. This is a direct implementation of the STYLE_GUIDE §9 "Do's and Don'ts" table.
+> metric_card does not use any Tailwind palette colors (`green-*` / `red-*` / `blue-*`) anywhere in `bundle.js`. Everything uses CSS variables like `var(--foreground)` / `var(--muted-foreground)` / `var(--border)`. This is a direct implementation of the STYLE_GUIDE 9 "Do's and Don'ts" table.
 
 ---
 
-## §7 Common Pitfalls & Best Practices
+## 7 Common Pitfalls & Best Practices
 
 ### Engineering Evolution: Two Refactors of `extractValue`
 
@@ -449,7 +449,7 @@ metric_card's git history records the evolution of `extractValue` from "numbers 
 
 ### Best Practices Checklist
 
-1. **Always use semantic CSS variables** (`text-success` / `bg-muted` / `var(--border)`), never hardcoded palette colors (`text-green-600` / `#e5e7eb`). The former auto-follows theme switches; the latter desynchronizes. STYLE_GUIDE §1 explicitly forbids this.
+1. **Always use semantic CSS variables** (`text-success` / `bg-muted` / `var(--border)`), never hardcoded palette colors (`text-green-600` / `#e5e7eb`). The former auto-follows theme switches; the latter desynchronizes. STYLE_GUIDE 1 explicitly forbids this.
 
 2. **Wrap `extractValue` in try/catch**. Although the current implementation is synchronous and does not throw, future versions might have `result.value` as a getter (dynamically computed) that could throw. metric_card v1.7 lacks try/catch — this is known technical debt. Adding `try { ... } catch(e) { continue; }` around `slots.push` would isolate single-slot failures from affecting other slots.
 
@@ -461,7 +461,7 @@ metric_card's git history records the evolution of `extractValue` from "numbers 
 
 ---
 
-## §8 Further Reading
+## 8 Further Reading
 
 - [Engineering Standards Appendix](./appendix-standards.md) — Central reference for manifest schema, size constraints, and STYLE_GUIDE rules.
 - [Case Study Overview](./0-overview.md) — Version alignment table and reading paths for all 7 cases.

@@ -2,12 +2,12 @@
 description: "NeoMind standard protocol bridge case study: hand-written WS-Discovery multicast discovery, SOAP/WS-Security PasswordDigest client, PTZ control — no onvif-rs dependency, ~2700 lines of pure Rust covering ONVIF Profile S core capabilities"
 keywords: [NeoMind, onvif-bridge, ONVIF, WS-Discovery, SOAP, protocol bridge]
 tags: [NeoMind, case-study, protocol-bridge]
-sidebar_label: "#4 onvif-bridge"
+sidebar_label: "4. onvif-bridge"
 ---
 
 # #4 onvif-bridge: Standard Protocol Bridge
 
-## §1 Case Background
+## 1 Case Background
 
 **onvif-bridge** is the **standard protocol bridge** case study in the NeoMind ecosystem. ONVIF (Open Network Video Interface Forum) is an open standard for network video devices, defining specifications for device discovery (WS-Discovery), media stream negotiation (RTSP URL retrieval), PTZ control, and event subscription. It covers multiple profiles including Profile S (streaming), Profile T (advanced streaming), and Profile G (video storage). Any IP camera compliant with ONVIF Profile S — Hikvision, Dahua, Vivotek, Tiandy — can be integrated into NeoMind via onvif-bridge without vendor-specific SDKs or adaptation layers. The current version is 2.7.6, with approximately 2700 lines of core code distributed across 5 Rust source files: `lib.rs` (1646 lines, Extension trait + command dispatch), `soap_client.rs` (516 lines, SOAP envelope + WS-Security), `discovery.rs` (211 lines, WS-Discovery UDP multicast), `ptz.rs` (214 lines, PTZ commands), and `types.rs` (78 lines, data structures).
 
@@ -25,7 +25,7 @@ sidebar_label: "#4 onvif-bridge"
 
 ---
 
-## §2 Architecture Overview
+## 2 Architecture Overview
 
 onvif-bridge is a **pure backend protocol bridge extension** — no frontend component, no ONNX model, no video decoding logic. Its sole responsibility is to communicate with ONVIF cameras using standard protocols (WS-Discovery + SOAP) and translate results into NeoMind command return values and virtual metrics. The extension manages a `HashMap<String, OnvifDevice>` device registry in-process via `parking_lot::RwLock`, and all command operations revolve around this registry.
 
@@ -105,9 +105,9 @@ This comparison table reveals a key fact: onvif-bridge is architecturally nearly
 
 ---
 
-## §3 Core Implementation
+## 3 Core Implementation
 
-### §3.1 WS-Discovery Multicast Discovery (discovery.rs)
+### 3.1 WS-Discovery Multicast Discovery (discovery.rs)
 
 WS-Discovery is an OASIS standard for local network device discovery, and ONVIF uses its UDP multicast mode. onvif-bridge implements complete multicast discovery logic by hand in [`src/discovery.rs`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/discovery.rs#L1-L211).
 
@@ -132,7 +132,7 @@ const MULTICAST_PORT: u16 = 3702;
 
 **Necessity of find_local_ipv4** ([`src/discovery.rs` L119-L131](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/discovery.rs#L119-L131)): On macOS, when a multicast socket is bound to `0.0.0.0` (INADDR_ANY), the kernel cannot determine which network interface to use for sending multicast packets, resulting in `No route to host`. The solution is to create a temporary UDP socket connected to `8.8.8.8:80` (which doesn't actually send packets — it just triggers the kernel's route lookup), then read the socket's `local_addr()` to get the machine's real IP. This fix was introduced in commit `59d3490`.
 
-### §3.2 SOAP Client and WS-Security (soap_client.rs)
+### 3.2 SOAP Client and WS-Security (soap_client.rs)
 
 All ONVIF control interfaces use SOAP 1.2 over HTTP. onvif-bridge implements a complete SOAP client by hand in [`src/soap_client.rs`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/soap_client.rs#L1-L516), **with zero dependencies on any SOAP/ONVIF crate**.
 
@@ -169,7 +169,7 @@ The algorithm formula: `Digest = Base64(SHA-1(Nonce + Created + Password))`. Thi
 
 **soap_request_raw** ([`src/soap_client.rs` L68-L124](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/soap_client.rs#L68-L124)) constructs the complete SOAP envelope, including the WS-Security header (if credentials are provided) and SOAP Body, then sends it synchronously via `ureq::post(url)`. Key security measures include a 10MB response size limit (to prevent memory exhaustion) and automatic SOAP Fault detection with formatted error messages.
 
-### §3.3 Device Capability Negotiation
+### 3.3 Device Capability Negotiation
 
 onvif-bridge implements the core negotiation functions from the ONVIF Core and Media specifications:
 
@@ -183,7 +183,7 @@ onvif-bridge implements the core negotiation functions from the ONVIF Core and M
 
 **resolve_service_url** ([`src/soap_client.rs` L390-L407](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/soap_client.rs#L390-L407)) is an easily overlooked but critical function — different ONVIF services (device/media/ptz) have different URL paths (`/onvif/device_service`, `/onvif/media_service`, `/onvif/ptz_service`). The device URL returned by WS-Discovery typically already ends with `/onvif/device_service`, so when calling the media service, the path suffix must be replaced rather than appended.
 
-### §3.4 PTZ Control (ptz.rs)
+### 3.4 PTZ Control (ptz.rs)
 
 [`src/ptz.rs`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/ptz.rs#L1-L214) wraps six PTZ commands, all built on `soap_client::soap_request_raw` to construct SOAP bodies:
 
@@ -196,7 +196,7 @@ onvif-bridge implements the core negotiation functions from the ONVIF Core and M
 
 Each command determines the service URL via `resolve_ptz_url`, then embeds the corresponding ONVIF PTZ WSDL operation name and parameters (PanTilt space, Zoom space, Speed vector, etc.) into the SOAP body.
 
-### §3.5 Command Dispatch (lib.rs execute_command)
+### 3.5 Command Dispatch (lib.rs execute_command)
 
 [`src/lib.rs` L696-L717](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/lib.rs#L696-L717) is the extension's core entry point — a `match` that routes string commands to corresponding handler functions:
 
@@ -226,7 +226,7 @@ async fn execute_command(&self, command: &str, args: &serde_json::Value) -> Resu
 
 The 14 commands cover the complete ONVIF device management lifecycle: discovery (`discover`), manual addition (`add_device`), listing (`list_devices`), details (`get_device`), stream retrieval (`get_stream_uri`), snapshot (`get_snapshot`), PTZ control (6 commands), status query (`get_status`), removal (`remove_device`), and configuration (`configure`).
 
-### §3.6 Discovery-to-Stream Complete Sequence
+### 3.6 Discovery-to-Stream Complete Sequence
 
 The following diagram shows the complete protocol interaction from when the frontend issues a `discover` command to obtaining the RTSP stream URL (optional PTZ control at the end):
 
@@ -280,7 +280,7 @@ This sequence diagram reveals an important fact: onvif-bridge **never touches an
 
 ---
 
-## §4 Key Design Decisions
+## 4 Key Design Decisions
 
 ### Decision 1: Hand-written SOAP Client instead of onvif-rs crate
 
@@ -288,7 +288,7 @@ This sequence diagram reveals an important fact: onvif-bridge **never touches an
 
 **Alternative**: Use the community crate `onvif-rs` (the most prominent ONVIF client library in the Rust ecosystem).
 
-**Rationale**: (1) `onvif-rs` maintenance is lagging — the last substantive update was over a year old at the time of our investigation, and it does not cover critical operations like PTZ ContinuousMove / GotoPreset / GetPresets; (2) `onvif-rs` depends on the `hyper` + `tokio` async stack, and when onvif-bridge is loaded as a `.dylib`/`.so` dynamic library into the NeoMind host process, nested tokio runtimes cause panics — a hand-written client using synchronous `ureq` eliminates this problem entirely; (3) The ~500 lines of hand-written code are fully controllable — when encountering vendor non-standard implementations, parsing logic can be modified immediately, whereas modifying a third-party crate requires submitting a PR and waiting for a merge. The tradeoff is losing the type-safe WSDL bindings provided by `onvif-rs`, but this is mitigated through rigorous unit testing (see §6).
+**Rationale**: (1) `onvif-rs` maintenance is lagging — the last substantive update was over a year old at the time of our investigation, and it does not cover critical operations like PTZ ContinuousMove / GotoPreset / GetPresets; (2) `onvif-rs` depends on the `hyper` + `tokio` async stack, and when onvif-bridge is loaded as a `.dylib`/`.so` dynamic library into the NeoMind host process, nested tokio runtimes cause panics — a hand-written client using synchronous `ureq` eliminates this problem entirely; (3) The ~500 lines of hand-written code are fully controllable — when encountering vendor non-standard implementations, parsing logic can be modified immediately, whereas modifying a third-party crate requires submitting a PR and waiting for a merge. The tradeoff is losing the type-safe WSDL bindings provided by `onvif-rs`, but this is mitigated through rigorous unit testing (see 6).
 
 ### Decision 2: WS-Security PasswordDigest instead of PasswordText
 
@@ -324,7 +324,7 @@ This sequence diagram reveals an important fact: onvif-bridge **never touches an
 
 ---
 
-## §5 Integration with NeoMind Core
+## 5 Integration with NeoMind Core
 
 onvif-bridge integrates with the NeoMind host through the standard Extension SDK interfaces, relying on no private APIs or hacks. Integration occurs at three levels: the command system, metric production, and cross-extension collaboration.
 
@@ -370,7 +370,7 @@ The [`metadata.json`](https://github.com/camthink-ai/NeoMind-Extensions/blob/mai
 
 ---
 
-## §6 Testing & Verification
+## 6 Testing & Verification
 
 onvif-bridge's testing strategy is divided into three layers: SOAP client unit tests, extension logic unit tests, and cross-platform end-to-end verification.
 
@@ -422,7 +422,7 @@ The following tools are recommended for cross-validation of onvif-bridge's compa
 
 ---
 
-## §7 Deployment / Ops / Troubleshooting
+## 7 Deployment / Ops / Troubleshooting
 
 ### 5-Platform .nep Distribution
 
@@ -487,7 +487,7 @@ This contrasts sharply with [Case #2 yolo-device-inference](./2-yolo-device-infe
 
 ---
 
-## §8 Further Reading & Summary
+## 8 Further Reading & Summary
 
 ### Evolution Milestones
 

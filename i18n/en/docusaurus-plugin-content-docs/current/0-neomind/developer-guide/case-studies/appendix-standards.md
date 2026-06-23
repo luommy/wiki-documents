@@ -57,7 +57,7 @@ The `builds` field is **extension-only** and lists download URLs for 5 cross-pla
 }
 ```
 
-The full list of 5 targets is described in [§4 Cross-Platform Build Target Matrix](#4-cross-platform-build-target-matrix).
+The full list of 5 targets is described in [4 Cross-Platform Build Target Matrix](#4-cross-platform-build-target-matrix).
 
 ### 1.4 Frontend Declaration (Extension-only)
 

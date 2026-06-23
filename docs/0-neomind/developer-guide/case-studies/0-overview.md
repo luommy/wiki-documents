@@ -2,7 +2,7 @@
 description: 工程实践案例集 — 从 17 个扩展 + 6 个组件中精选 7 个真实案例，做完整工程剖析
 keywords: [NeoMind, 扩展开发, 工程案例, 最佳实践]
 tags: [NeoMind, 开发者指南, 案例集]
-sidebar_label: 总览
+sidebar_label: Overview
 ---
 
 # 案例集总览

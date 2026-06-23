@@ -2,12 +2,12 @@
 description: Build your first NeoMind data-type extension — full engineering walkthrough of weather-forecast-v2 (HTTP polling + periodic metrics + React frontend)
 keywords: [NeoMind, weather-forecast, extension development, case study]
 tags: [NeoMind, case study, data extension]
-sidebar_label: "#1 weather-forecast-v2"
+sidebar_label: "1. weather-forecast-v2"
 ---
 
 # #1 weather-forecast-v2: Starter Data Extension
 
-## §1 Case Background
+## 1 Case Background
 
 **weather-forecast-v2** is the simplest "data-type extension" in the NeoMind ecosystem. It periodically fetches weather data from the [Open-Meteo API](https://open-meteo.com/), writes temperature, humidity, wind speed, and other metrics into the NeoMind metric system, and provides a React card component for dashboard display. The entire extension is about 700 lines of Rust + 560 lines of TypeScript, with no AI inference, stream processing, or protocol bridging — making it the shortest path for newcomers to understand "what makes up an extension."
 
@@ -21,7 +21,7 @@ sidebar_label: "#1 weather-forecast-v2"
 
 ---
 
-## §2 Architecture Overview
+## 2 Architecture Overview
 
 weather-forecast-v2 consists of three parts: a Rust extension core (data fetching + metric production), a React frontend component (card UI), and the NeoMind runtime (loading + scheduling). The diagram below shows the data flow and process boundaries.
 
@@ -70,7 +70,7 @@ graph TB
 
 ---
 
-## §3 Implementation Walkthrough
+## 3 Implementation Walkthrough
 
 ### 3.1 Directory Structure
 
@@ -187,7 +187,7 @@ fn geocode_sync(&self, city: &str) -> std::result::Result<GeoLocation, String> {
 }
 ```
 
-`Cargo.toml` line 21 has an explicit comment: `# Use sync HTTP client to avoid Tokio runtime issues in dynamic libraries`. This is the most critical design decision in this case — see §4.1.
+`Cargo.toml` line 21 has an explicit comment: `# Use sync HTTP client to avoid Tokio runtime issues in dynamic libraries`. This is the most critical design decision in this case — see 4.1.
 
 ### 3.5 Command Flow Sequence: get_weather End-to-End Call Chain
 
@@ -229,7 +229,7 @@ The frontend calls backend commands via `fetch('/api/extensions/weather-forecast
 
 ---
 
-## §4 Design Trade-offs
+## 4 Design Trade-offs
 
 ### 4.1 Sync HTTP Client (ureq) vs Async (reqwest)
 
@@ -249,7 +249,7 @@ Quantifying the blocking impact: under typical load (1 request / 30s collection 
 
 **Alternatives rejected**:
 - **A. `Mutex<String>`** → Rejected because: Although `produce_metrics()` doesn't directly read `default_city`, the `refresh` command does. If `configure` is writing while `refresh` is reading, `Mutex` would block the read. `RwLock` allows multiple concurrent reads.
-- **B. `Arc<AtomicPtr<str>>`** → Rejected because: Strings are not fixed-size types and cannot be swapped directly with atomic operations. This would require `Box::leak` or similar tricks, introducing unsafe code in violation of [Appendix §7.1](./appendix-standards.md#71-unsafe-rust)'s "avoid unsafe" principle.
+- **B. `Arc<AtomicPtr<str>>`** → Rejected because: Strings are not fixed-size types and cannot be swapped directly with atomic operations. This would require `Box::leak` or similar tricks, introducing unsafe code in violation of [Appendix 7.1](./appendix-standards.md#71-unsafe-rust)'s "avoid unsafe" principle.
 - **C. Immutable design (create new `String` each time)** → Rejected because: Would require wrapping the entire `WeatherExtension` in `Arc<Mutex<>>` or `Arc<RwLock<>>`, changing all method signatures — too invasive.
 
 **Trade-off cost**: `RwLock` is slightly slower than `Mutex` on Linux (kernel-level overhead), but under weather-forecast-v2's load (one write every 5 minutes), the difference is negligible. The read/write ratio is roughly N:1 — every `produce_metrics()` call indirectly reads city-derived data (every 30s), while only user-issued `get_weather` commands perform writes. Under default config this is a 30:1 ratio, exactly the regime where `RwLock` beats `Mutex`. If a future "hot city-swap" feature (e.g., auto-switching based on geolocation) introduces high-frequency writes, reconsider switching to a lock-free structure like `ArcSwap<String>`.
@@ -267,12 +267,12 @@ Quantifying the blocking impact: under typical load (1 request / 30s collection 
 
 ---
 
-## §5 Tech Stack Breakdown
+## 5 Tech Stack Breakdown
 
 | Component | Choice | Why Chosen Over Alternatives |
 |-----------|--------|------------------------------|
 | Rust SDK | `neomind-extension-sdk` (workspace dep) | Official SDK providing `Extension` trait + FFI export macro. Alternative is hand-written FFI, but every extension would duplicate hundreds of lines of boilerplate |
-| HTTP client | `ureq 2.x` + `json` feature | Sync, lightweight, no runtime dependency. Alternative `reqwest` pulls in the entire Tokio stack (see §4.1) |
+| HTTP client | `ureq 2.x` + `json` feature | Sync, lightweight, no runtime dependency. Alternative `reqwest` pulls in the entire Tokio stack (see 4.1) |
 | Async trait | `async-trait 0.1` | SDK's `Extension` trait uses async fns; Rust pre-1.75 requires this crate. Can be removed once native async traits stabilize |
 | Datetime | `chrono 0.4` | `Utc::now().timestamp_millis()` for metric timestamps. Alternative `time` crate has a more modern API but poorer ecosystem compatibility |
 | Tokio | `1` + `rt` + `sync` features | Used only for the SDK's FFI macro RwLock wrapper, does not start a runtime. Alternative `parking_lot` exists, but SDK internally depends on `tokio::sync::RwLock` |
@@ -281,20 +281,20 @@ Quantifying the blocking impact: under typical load (1 request / 30s collection 
 
 ---
 
-## §6 Standards in Practice
+## 6 Standards in Practice
 
 ### 6.1 metadata.json Field Mapping
 
-Cross-referencing [Appendix §1](./appendix-standards.md#1-metadatajson--manifestjson-schema), field-by-field inspection of weather-forecast-v2's `metadata.json`:
+Cross-referencing [Appendix 1](./appendix-standards.md#1-metadatajson--manifestjson-schema), field-by-field inspection of weather-forecast-v2's `metadata.json`:
 
 | Field | Value | Appendix Section | Notes |
 |-------|-------|-----------------|-------|
-| `id` | `"weather-forecast-v2"` | [§1.1](./appendix-standards.md#11-basic-information) | kebab-case, matches directory name |
-| `name` | `"weather forecast"` | [§1.1](./appendix-standards.md#11-basic-information) | lowercase display name |
-| `version` | `"2.7.6"` | [§1.1](./appendix-standards.md#11-basic-information) | auto-read from Cargo.toml |
-| `type` | `"native"` | [§1.2](./appendix-standards.md#12-type-and-category) | Rust cdylib |
-| `builds` | 5 targets | [§1.3](./appendix-standards.md#13-build-artifacts-extension-only) | see §6.3 |
-| `frontend` | `{ components, entrypoint }` | [§1.4](./appendix-standards.md#14-frontend-declaration-extension-only) | UMD entrypoint |
+| `id` | `"weather-forecast-v2"` | [1.1](./appendix-standards.md#11-basic-information) | kebab-case, matches directory name |
+| `name` | `"weather forecast"` | [1.1](./appendix-standards.md#11-basic-information) | lowercase display name |
+| `version` | `"2.7.6"` | [1.1](./appendix-standards.md#11-basic-information) | auto-read from Cargo.toml |
+| `type` | `"native"` | [1.2](./appendix-standards.md#12-type-and-category) | Rust cdylib |
+| `builds` | 5 targets | [1.3](./appendix-standards.md#13-build-artifacts-extension-only) | see 6.3 |
+| `frontend` | `{ components, entrypoint }` | [1.4](./appendix-standards.md#14-frontend-declaration-extension-only) | UMD entrypoint |
 
 ### 6.2 Capability Declaration & Reverse Example
 
@@ -310,7 +310,7 @@ ctx.invoke_capability("device_metrics_write", &json!({
     "value": 25.5
 })).await?;
 // Consequence: runtime panics (not graceful degradation), extension process crashes
-// See Appendix §7.2 Capability Explicit Declaration
+// See Appendix 7.2 Capability Explicit Declaration
 ```
 
 The correct approach is to declare required capabilities in `metadata.json` (weather-forecast-v2 doesn't need any, so this field is absent).
@@ -329,7 +329,7 @@ Note: `src/lib.rs` passes `"2.0.0"` to `ExtensionMetadata::new()` — this is th
 
 ### 6.4 Cross-Platform Builds
 
-The `metadata.json` `builds` field lists 5 targets covering the complete matrix from [Appendix §4](./appendix-standards.md#4-cross-platform-build-target-matrix):
+The `metadata.json` `builds` field lists 5 targets covering the complete matrix from [Appendix 4](./appendix-standards.md#4-cross-platform-build-target-matrix):
 
 ```json
 "builds": {
@@ -345,7 +345,7 @@ weather-forecast-v2 is pure Rust + HTTP with no C dependencies, so all 5 targets
 
 ---
 
-## §7 Pitfalls & Best Practices
+## 7 Pitfalls & Best Practices
 
 ### 7.1 Engineering Evolution Story: From Inline semver to crates.io SDK Isolation
 
@@ -375,7 +375,7 @@ weather-forecast-v2 is pure Rust + HTTP with no C dependencies, so all 5 targets
 
 ---
 
-## §8 Further Reading
+## 8 Further Reading
 
 - [Appendix: Engineering Standards](./appendix-standards.md) — Complete reference for metadata schema, capabilities, version consistency, and build matrix
 - [Overview: All Case Studies](./0-overview.md) — Index of 7 case studies and 4 reading paths

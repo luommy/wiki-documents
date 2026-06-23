@@ -2,12 +2,12 @@
 description: 从零编写第一个 NeoMind 仪表板组件——metric_card 完整工程剖析（IIFE 注入 + OKLCH 毛玻璃 + 多格式数据归一化）
 keywords: [NeoMind, metric_card, 仪表板组件, 工程案例]
 tags: [NeoMind, 案例, 组件]
-sidebar_label: "#6 metric_card"
+sidebar_label: "6. metric_card"
 ---
 
 # #6 metric_card：入门仪表板组件
 
-## §1 案例背景
+## 1 案例背景
 
 **metric_card** 是 NeoMind 仪表板组件市场中最简单的「有意义的组件」——它把一个或多个数值（温度、电池电量、推理延迟、检测到的目标数）渲染成一张毛玻璃卡片，带标签、单位、小数位精度。整个组件 352 行手写 IIFE JavaScript，不依赖任何构建步骤，是新手理解「一个 NeoMind 组件由哪些部分组成」的最短路径。
 
@@ -21,7 +21,7 @@ sidebar_label: "#6 metric_card"
 
 ---
 
-## §2 架构总览
+## 2 架构总览
 
 metric_card 由三部分协作：组件 bundle（IIFE，自包含注册到 `window.NeoMind_MetricCard`）、NeoMind 仪表板运行时（Host 页面，提供 React/jsxRuntime + `fetchData` 注入 + 网格容器）、数据源（设备遥测 / 扩展指标 / 系统指标）。下图展示了加载时序和依赖注入边界。
 
@@ -72,9 +72,9 @@ graph TB
 
 ---
 
-## §3 实现剖析
+## 3 实现剖析
 
-### §3.1 目录结构与 manifest 契约
+### 3.1 目录结构与 manifest 契约
 
 ```
 components/metric_card/
@@ -113,7 +113,7 @@ components/metric_card/
 - `has_device_binding: false` — metric_card 不绑定特定设备类型，可以消费任何数据源（设备遥测、扩展指标、系统指标都行）。如果设为 `true`，运行时会要求用户先选一个设备实例，并额外注入 `deviceContext` prop。
 - `config_schema` — JSON Schema，运行时用它自动生成配置表单。`metrics` 数组的每一项有 `label` / `unit` / `decimalPlaces`，与 `bundle.js` 中 `config.metrics[i]` 的读取一一对应。
 
-### §3.2 IIFE 注入模式（关键设计）
+### 3.2 IIFE 注入模式（关键设计）
 
 查看源码：[`bundle.js`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/metric_card/bundle.js#L1-L4) L1-4
 
@@ -145,7 +145,7 @@ NeoMind 组件市场的核心约束是：**组件以 drop-in bundle 分发，不
 
 `window.jsxRuntime` 是 React 17+ 的「automatic JSX runtime」。传统写法需要 `import React from 'react'` 才能用 JSX；自动运行时把 `jsx()` / `jsxs()` 作为独立函数暴露，组件只需要 `var jsx = window.jsxRuntime.jsx` 就能渲染，进一步减少了对 React 命名空间的依赖。
 
-### §3.3 毛玻璃容器设计（OKLCH + CSS 变量）
+### 3.3 毛玻璃容器设计（OKLCH + CSS 变量）
 
 查看源码：[`bundle.js`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/metric_card/bundle.js#L9-L18) L9-18
 
@@ -170,9 +170,9 @@ var glassContainer = {
 
 **为什么用内联 style 对象而不是 CSS-in-JS / Tailwind？**
 
-metric_card 没有构建步骤（见 §3.2），所以无法用 Tailwind class（需要 PostCSS 编译）或 CSS-in-JS（需要运行时库）。内联 style 对象是零依赖方案。代价是动态值（如 `opacity` 百分比）不能用 Tailwind 的 `/10` 语法，必须写 `'oklch(1 0 0 / 10%)'`。STYLE_GUIDE 第 1 节明确警告了这一点。
+metric_card 没有构建步骤（见 3.2），所以无法用 Tailwind class（需要 PostCSS 编译）或 CSS-in-JS（需要运行时库）。内联 style 对象是零依赖方案。代价是动态值（如 `opacity` 百分比）不能用 Tailwind 的 `/10` 语法，必须写 `'oklch(1 0 0 / 10%)'`。STYLE_GUIDE 第 1 节明确警告了这一点。
 
-### §3.4 `extractValue()` —— 多格式数据归一化（核心工程洞察）
+### 3.4 `extractValue()` —— 多格式数据归一化（核心工程洞察）
 
 查看源码：[`bundle.js`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/metric_card/bundle.js#L40-L60) L40-60
 
@@ -214,7 +214,7 @@ metric_card 作为通用组件，**必须容忍所有这些格式**。如果要�
 
 **`extractValue` 的设计原则：渐进式降级**。它按「最具体 → 最宽泛」的顺序检查格式：先看有没有 `.value`（标准格式），再看有没有 `.series`（时序格式），最后才退化到「裸标量」。这保证了对未来新格式的向前兼容——如果 NeoMind 新增一种 `{data: ...}` 格式，只需在 `extractValue` 里加一个分支，旧组件不会崩溃。
 
-### §3.5 渲染与 props 契约
+### 3.5 渲染与 props 契约
 
 查看源码：[`bundle.js`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/metric_card/bundle.js#L130-L148) L130-148（状态定义）、[L156-176](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/metric_card/bundle.js#L156-L176)（doFetch）、[L288-322](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/metric_card/bundle.js#L288-L322)（renderCell）
 
@@ -238,7 +238,7 @@ props 流向：`data` (来自 `fetchData`) → `extractValue` 归一化 → `val
 2. **规范化结果为数组** — `Array.isArray(result) ? result : [result]`，让单数据源和多数据源走同一套渲染路径。
 3. **`extractValue` 每个结果** — 把归一化后的标量存入 `values[]`，`renderCell` 再根据 `config.metrics[i]` 格式化。
 
-### §3.6 数据流时序图
+### 3.6 数据流时序图
 
 下图是 metric_card 在仪表板中的完整生命周期：从挂载到 30 秒轮询更新的数据流。
 
@@ -286,7 +286,7 @@ sequenceDiagram
 
 ---
 
-## §4 设计权衡
+## 4 设计权衡
 
 ### 决策 1：IIFE + `window.*` 注入 vs ESM 打包
 
@@ -320,7 +320,7 @@ sequenceDiagram
 | 感知均匀性 | 相同 lightness 视觉一致 | hex 空间非均匀 |
 | 浏览器支持 | 现代浏览器（Chrome 111+） | 全兼容 |
 
-**选择 OKLCH 的代价**：旧浏览器（Safari < 15.4）不支持。NeoMind 仪表板是现代 Web 应用，目标浏览器都是 evergreen，这个代价可接受。详见 [STYLE_GUIDE §1](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/STYLE_GUIDE.md#1-color-system)。
+**选择 OKLCH 的代价**：旧浏览器（Safari < 15.4）不支持。NeoMind 仪表板是现代 Web 应用，目标浏览器都是 evergreen，这个代价可接受。详见 [STYLE_GUIDE 1](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/STYLE_GUIDE.md#1-color-system)。
 
 ### 决策 4：多格式 `extractValue` vs 严格 schema 校验
 
@@ -331,11 +331,11 @@ sequenceDiagram
 | 向前兼容 | 加新分支即可 | 破坏性变更 |
 | 错误处理 | 静默返回 null，不渲染 slot | 抛异常，组件崩溃 |
 
-**选择多格式的代价**：`extractValue` 的逻辑分支多，测试覆盖需谨慎。metric_card 在 git 历史中有两次专门修复 `extractValue` 的提交（见 §7）。
+**选择多格式的代价**：`extractValue` 的逻辑分支多，测试覆盖需谨慎。metric_card 在 git 历史中有两次专门修复 `extractValue` 的提交（见 7）。
 
 ---
 
-## §5 技术栈拆解
+## 5 技术栈拆解
 
 | 组件 | 选择 | 为什么 |
 |------|------|--------|
@@ -351,22 +351,22 @@ sequenceDiagram
 
 ---
 
-## §6 标准落地
+## 6 标准落地
 
 本节展示 metric_card 如何落地 [工程标准附录](./appendix-standards.md) 和 [STYLE_GUIDE](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/STYLE_GUIDE.md) 的规则。
 
 ### manifest.json 字段实践
 
-metric_card 的 manifest 完整遵循附录 §1 的 schema。关键字段对照：
+metric_card 的 manifest 完整遵循附录 1 的 schema。关键字段对照：
 
 | 标准字段 | metric_card 实际值 | 标准来源 |
 |---------|------------------|---------|
-| `id` | `"metric_card"` | 附录 §1.1 |
-| `name` | `{ "en": "Metric Card", "zh": "指标卡片" }` | 附录 §1.1（组件多语言对象） |
-| `version` | `"1.7.0"` | 附录 §1.1（semver） |
-| `size_constraints` | `{ min_w: 2, ... max_w: 6 }` | 附录 §1.4（组件独有） |
-| `has_data_source` | `true` | 附录 §1.5 |
-| `config_schema` | JSON Schema 对象 | 附录 §1.6 |
+| `id` | `"metric_card"` | 附录 1.1 |
+| `name` | `{ "en": "Metric Card", "zh": "指标卡片" }` | 附录 1.1（组件多语言对象） |
+| `version` | `"1.7.0"` | 附录 1.1（semver） |
+| `size_constraints` | `{ min_w: 2, ... max_w: 6 }` | 附录 1.4（组件独有） |
+| `has_data_source` | `true` | 附录 1.5 |
+| `config_schema` | JSON Schema 对象 | 附录 1.6 |
 
 ### 尺寸约束如何塑造网格
 
@@ -381,23 +381,23 @@ metric_card 的 manifest 完整遵循附录 §1 的 schema。关键字段对照�
 metric_card 的 `renderCell` 函数严格遵循 STYLE_GUIDE 的模式：
 
 ```javascript
-// 遵循 STYLE_GUIDE §7 "Value Display" 模式
+// 遵循 STYLE_GUIDE 7 "Value Display" 模式
 jsx('span', {
   className: 'font-bold font-mono tabular-nums truncate ' + valueClass,
-  // why tabular-nums: 数字等宽对齐，STYLE_GUIDE §2 要求
+  // why tabular-nums: 数字等宽对齐，STYLE_GUIDE 2 要求
   // why truncate: 长值截断，防止溢出
   style: { color: 'var(--foreground)', letterSpacing: '-0.02em' },
   children: displayValue
 })
 ```
 
-- `font-mono tabular-nums` — STYLE_GUIDE §2 明确要求「数字显示必须用 `tabular-nums`，否则 `font-mono` 单独用会导致数字不等宽」。
-- `var(--foreground)` — 而非 `text-foreground` class。这是因为 metric_card 的文字颜色是动态计算的（基于 slot 状态），用 inline style 更灵活。STYLE_GUIDE §1 允许这种用法。
-- `text-[10px]` — STYLE_GUIDE §2 的「Tiny metadata」尺寸，用于标签。
+- `font-mono tabular-nums` — STYLE_GUIDE 2 明确要求「数字显示必须用 `tabular-nums`，否则 `font-mono` 单独用会导致数字不等宽」。
+- `var(--foreground)` — 而非 `text-foreground` class。这是因为 metric_card 的文字颜色是动态计算的（基于 slot 状态），用 inline style 更灵活。STYLE_GUIDE 1 允许这种用法。
+- `text-[10px]` — STYLE_GUIDE 2 的「Tiny metadata」尺寸，用于标签。
 
 ### 反面示例：硬编码调色板色值
 
-> **错误做法（STYLE_GUIDE §1 明确禁止）：**
+> **错误做法（STYLE_GUIDE 1 明确禁止）：**
 >
 > ```javascript
 > // ❌ 错误 - 硬编码 hex 色值
@@ -419,11 +419,11 @@ jsx('span', {
 > })
 > ```
 >
-> metric_card 在整个 `bundle.js` 中没有使用任何 Tailwind 调色板色值（`green-*` / `red-*` / `blue-*`），全部用 `var(--foreground)` / `var(--muted-foreground)` / `var(--border)` 等 CSS 变量。这是 STYLE_GUIDE §9 「Do's and Don'ts」表的直接实践。
+> metric_card 在整个 `bundle.js` 中没有使用任何 Tailwind 调色板色值（`green-*` / `red-*` / `blue-*`），全部用 `var(--foreground)` / `var(--muted-foreground)` / `var(--border)` 等 CSS 变量。这是 STYLE_GUIDE 9 「Do's and Don'ts」表的直接实践。
 
 ---
 
-## §7 常见坑与最佳实践
+## 7 常见坑与最佳实践
 
 ### 工程演进：`extractValue` 的两次重构
 
@@ -449,7 +449,7 @@ metric_card 的 git 历史记录了 `extractValue` 函数从「只处理数字�
 
 ### 最佳实践清单
 
-1. **永远用语义 CSS 变量**（`text-success` / `bg-muted` / `var(--border)`），绝不硬编码调色板色值（`text-green-600` / `#e5e7eb`）。主题切换时前者自动跟随，后者会脱节。STYLE_GUIDE §1 明确禁止。
+1. **永远用语义 CSS 变量**（`text-success` / `bg-muted` / `var(--border)`），绝不硬编码调色板色值（`text-green-600` / `#e5e7eb`）。主题切换时前者自动跟随，后者会脱节。STYLE_GUIDE 1 明确禁止。
 
 2. **`extractValue` 用 try/catch 包裹**。虽然当前实现是同步的且不会抛异常，但未来如果 `result.value` 是一个 getter（动态计算），可能会抛。metric_card 的 v1.7 实现没有 try/catch，这是一个已知的技术债——在 `slots.push` 外层加 `try { ... } catch(e) { continue; }` 可以让单个 slot 失败不影响其他 slot。
 
@@ -461,7 +461,7 @@ metric_card 的 git 历史记录了 `extractValue` 函数从「只处理数字�
 
 ---
 
-## §8 延伸阅读
+## 8 延伸阅读
 
 - [工程标准附录](./appendix-standards.md) —— manifest schema、尺寸约束、STYLE_GUIDE 规则的集中参考。
 - [案例集总览](./0-overview.md) —— 7 个案例的版本对齐表和阅读路径。

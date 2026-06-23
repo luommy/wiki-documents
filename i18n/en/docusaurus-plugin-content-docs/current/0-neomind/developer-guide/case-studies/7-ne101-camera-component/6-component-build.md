@@ -2,16 +2,16 @@
 description: "ne101_camera component build: IIFE injection pattern (window.React + jsxRuntime), named export object, five-layer module structure, three React-in-IIFE pitfalls (#310 hook order, frozen input, conditional useState), ConfigPanel/AdvancedPanel/ExtDropdown sub-components, shadcn CSS class replica"
 keywords: [ne101_camera, IIFE, React-in-IIFE, named export, hooks pitfalls, shadcn, ConfigPanel]
 tags: [NeoMind, case study, MVP]
-sidebar_label: "§6 Component Build ★"
+sidebar_label: "6. Component Build"
 ---
 
-# §6 Component Build: From IIFE Injection to shadcn Replica
+# 6 Component Build: From IIFE Injection to shadcn Replica
 
 > This page is the **component build reference** for the ne101_camera MVP phase, and the final page of the MVP core trio. After reading you should be able to: (1) explain why the first line of `bundle.js` is not an `import` but `var React = window.React` — and how this "IIFE injection pattern" is the foundational convention of the NeoMind component marketplace, fundamentally different from ESM bundling; (2) recount the design motivation behind the four-key export object `return { default, NE101CameraPanel, ConfigPanel, AdvancedPanel }` at L1971, and describe how the platform loader routes to the correct component via `global_name` + `export_name`; (3) draw the five-layer module structure of the 1972-line IIFE (helper / template engine / main component / shared UI / settings panels) and explain why "function hoisting in the same closure" substitutes for a bundler's module resolution; (4) recount the three classic React-in-IIFE hooks pitfalls (commit `0601cd4`'s conditional useState causing #310, commit `44f1fa5`'s shared composingRef causing frozen inputs, commit `b060a25`'s final uncontrolled fix) and explain why these pitfalls do not surface in an ESM + ESLint project; (5) describe the shadcn CSS class replica strategy (`INPUT_CLS` / `SwitchControl` / `ExtDropdown`) and explain why copying className strings is chosen over inline styles or requesting a platform component API. All line-number anchors point to the `main` branch of the source repo's [`bundle.js`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js) and [`manifest.json`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json).
 
 ---
 
-## §6.1 The IIFE Injection Pattern
+## 6.1 The IIFE Injection Pattern
 
 The first line of ne101_camera's `bundle.js` is not an `import` statement — it is the entry of an IIFE (Immediately Invoked Function Expression). See source: [`bundle.js` L1-L5](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1-L5).
 
@@ -36,11 +36,11 @@ The last line of the IIFE is the closure's closing and export, at [`bundle.js` L
 - **Alternative A**: ESM bundle (Vite / Rollup output, `import React from 'react'`). Rejected because: ESM requires platform support for `<script type="module">` + import maps or bundler resolution, while NeoMind loads components via plain `<script>` tags; more critically, once an ESM `external` config slips, React gets bundled into the chunk, breaking the single-instance guarantee.
 - **Alternative B**: UMD (Universal Module Definition). Rejected because: UMD probes three branches (`define` for AMD / `module.exports` for CommonJS / `window` for global), which is redundant for a platform that only uses `<script>` — two of the three branches never fire, needlessly increasing bundle size.
 - **Rationale**: IIFE is the only zero-dependency mechanism that simulates a private namespace via "function scope + closure," naturally fitting the platform's `<script>` loading model. The core premise of this ecosystem is "the platform guarantees one React instance," and the IIFE pattern makes it impossible for component code to violate that premise.
-- **Cost**: No tree-shaking (unused helper functions still enter the bundle), no TypeScript type checking, no ESLint `rules-of-hooks` plugin (this is the root cause of the §6.4 hook order bug). ne101_camera accepts this cost, relying on `test_bundle.js` for logic test coverage.
+- **Cost**: No tree-shaking (unused helper functions still enter the bundle), no TypeScript type checking, no ESLint `rules-of-hooks` plugin (this is the root cause of the 6.4 hook order bug). ne101_camera accepts this cost, relying on `test_bundle.js` for logic test coverage.
 
 ---
 
-## §6.2 The Named Export Object
+## 6.2 The Named Export Object
 
 The IIFE's `return` statement returns a **multi-key object**, not a single function. See source: [`bundle.js` L1971](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1971-L1971).
 
@@ -94,9 +94,9 @@ graph LR
 
 ---
 
-## §6.3 The Five-Layer Module Structure
+## 6.3 The Five-Layer Module Structure
 
-The 1972-line IIFE is not a flat slab of code — it is organized into five layers by responsibility. The layering here aligns with [§2.2](./2-architecture.md)'s five-layer architecture overview, but this section focuses on the **build perspective** — why this layering works without a bundler, and what the build characteristics of each layer are. The five layer boundaries are:
+The 1972-line IIFE is not a flat slab of code — it is organized into five layers by responsibility. The layering here aligns with [2.2](./2-architecture.md)'s five-layer architecture overview, but this section focuses on the **build perspective** — why this layering works without a bundler, and what the build characteristics of each layer are. The five layer boundaries are:
 
 1. **Helper layer** ([L7-L230](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L7-L230)): pure function toolset — `batteryMeta`, `formatValue`, `unitStr`, `timeAgo`, `getVal`, `getFirst`, `classColor`, `pipeRois`, `PinIcon`, `ModeIcon`. No React dependency, no state, no side effects; can be extracted to run in Node.js for unit testing.
 2. **Template engine layer** ([L239-L456](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L239-L456)): `generateTransformJsCode(pipe)` + `fillTemplate` — generates the Transform's JS code string from pipeline config. Pure string building, no React.
@@ -136,7 +136,7 @@ The dashed lines in the diagram represent "called by" direction: upper layers (s
 
 ---
 
-## §6.4 React-in-IIFE Pitfall #1: Hook Order
+## 6.4 React-in-IIFE Pitfall #1: Hook Order
 
 React's Rules of Hooks mandates: **hooks must be called at the top level of the component function, never inside conditionals, loops, or nested functions**. The essence of this rule is that React internally tracks each hook's state by "call order index" — if one render calls 3 hooks and the next calls 4, the indices shift, and React throws error #310 ("Rendered more hooks than during the previous render") or worse, silent state corruption.
 
@@ -173,7 +173,7 @@ The comment `// ROI hooks — MUST be called unconditionally, before any conditi
 
 ---
 
-## §6.5 React-in-IIFE Pitfall #2: Frozen Input
+## 6.5 React-in-IIFE Pitfall #2: Frozen Input
 
 The second hooks pitfall is more insidious than the first — it does not crash React, but makes **input fields appear frozen** (the user types but nothing shows in the box). The fix for this bug went through two iterations, involving two commits: [`44f1fa5`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/44f1fa5) (`fix(ne101_camera): input fields frozen — use local state instead of shared composingRef`) and [`b060a25`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/b060a25) (`fix(ne101_camera): React error #310 — use defaultValue instead of hooks in imeInput`).
 
@@ -235,7 +235,7 @@ graph LR
 
 ---
 
-## §6.6 ConfigPanel vs AdvancedPanel Division
+## 6.6 ConfigPanel vs AdvancedPanel Division
 
 The NeoMind platform's ComponentConfigDialog convention specifies two tabs: **Display** (user-visible display configuration) and **Advanced** (power-user-oriented advanced configuration). ne101_camera fills these two tabs with two exported functions — `ConfigPanel` and `AdvancedPanel` — which form a stark contrast in code volume and complexity.
 
@@ -264,7 +264,7 @@ This function is only 5 lines, returning an empty `<div>`. The reason is in the 
 
 ---
 
-## §6.7 The shadcn CSS Class Replica Strategy
+## 6.7 The shadcn CSS Class Replica Strategy
 
 The NeoMind Dashboard UI is built with the [shadcn/ui](https://ui.shadcn.com/) component library. The defining characteristic of shadcn/ui is not "install an npm package" but **copy component source code into the project's `components/ui/` directory** — meaning the platform page already has shadcn's Tailwind CSS class definitions loaded (e.g., `bg-background` / `text-muted-foreground` / `data-[state=checked]:bg-primary`). ne101_camera's component **cannot import these shadcn components** (IIFE has no module resolution), but it can **replicate the className strings** of shadcn components, letting Tailwind's JIT compiler (already running on the platform) apply the same styles to the component's DOM elements.
 
@@ -291,13 +291,13 @@ var DESC_CLS = 'text-sm text-muted-foreground';
 
 - **Choice**: verbatim copy shadcn component className strings into IIFE constants/JSX.
 - **Alternative A**: use inline styles (`style={{ background: 'hsl(var(--background))' }}`). Rejected because: inline styles **cannot match Tailwind's pseudo-class and state variants** — `hover:` / `focus-visible:` / `data-[state=checked]:` selectors can only be implemented via CSS classes or `<style>` tags, not in `style` attributes. Inline styles handle only static styling; interactive states (hover color change, focus ring) are completely lost.
-- **Alternative B**: request the platform to expose a component registry API (e.g., `window.neomind.ui.Input`) so components can "borrow" shadcn component instances from the platform. Rejected because: the platform does not currently expose such an API (see [§2.1](./2-architecture.md)'s injection trio — only `React` + `jsxRuntime` are injected). Designing such an API requires addressing version compatibility, props contracts, style isolation, and more — unlikely in the short term. className replica is the only feasible approach today.
+- **Alternative B**: request the platform to expose a component registry API (e.g., `window.neomind.ui.Input`) so components can "borrow" shadcn component instances from the platform. Rejected because: the platform does not currently expose such an API (see [2.1](./2-architecture.md)'s injection trio — only `React` + `jsxRuntime` are injected). Designing such an API requires addressing version compatibility, props contracts, style isolation, and more — unlikely in the short term. className replica is the only feasible approach today.
 - **Rationale**: className replica leverages Tailwind JIT compiler's global scanning mechanism — as long as class names appear in the DOM (whether from the platform's shadcn components or ne101_camera's JSX), Tailwind generates the corresponding CSS rules. This gives ne101_camera **pixel-perfect** visual parity with platform-native components, with zero additional dependencies.
 - **Cost**: if the platform upgrades its shadcn components (modifying Input's className), ne101_camera's replica will **desync** — the platform's Input changes padding while ne101_camera's `INPUT_CLS` remains old. This requires component maintainers to periodically sync className strings. In practice, this cost is acceptable: shadcn component classNames rarely undergo major changes, and differences are typically minor visual adjustments (e.g., padding from `py-2` to `py-2.5`) that do not break functionality.
 
 ---
 
-## §6.8 Design Decisions Summary
+## 6.8 Design Decisions Summary
 
 The 7 design decisions from this page are consolidated below, each with "choice / alternative / rationale."
 
@@ -317,19 +317,19 @@ The common theme across these 7 decisions: **choosing the simplest approach that
 
 | Commit | Type | One-line summary | Section |
 |---------|------|------------------|---------|
-| [`0601cd4`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/0601cd4) | fix | move conditional useState hook to fix React error #310 | §6.4 |
-| [`44f1fa5`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/44f1fa5) | fix | input fields frozen — use local state instead of shared composingRef | §6.5 |
-| [`b060a25`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/b060a25) | fix | React error #310 — use defaultValue instead of hooks in imeInput | §6.5 |
-| [`a8c1212`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/a8c1212) | revert | remove auto hash bump, preserve user transform edits | §6.3 (template engine evolution) |
-| [`8656148`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/8656148) | feat | pass NMS IoU threshold 0.5 to locate-anything-v2 | §6.6 (AdvancedPanel slider) |
-| [`c276c23`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/c276c23) | feat | per-class detection colors via golden-angle HSV rotation | §6.3 (Helper layer classColor) |
+| [`0601cd4`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/0601cd4) | fix | move conditional useState hook to fix React error #310 | 6.4 |
+| [`44f1fa5`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/44f1fa5) | fix | input fields frozen — use local state instead of shared composingRef | 6.5 |
+| [`b060a25`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/b060a25) | fix | React error #310 — use defaultValue instead of hooks in imeInput | 6.5 |
+| [`a8c1212`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/a8c1212) | revert | remove auto hash bump, preserve user transform edits | 6.3 (template engine evolution) |
+| [`8656148`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/8656148) | feat | pass NMS IoU threshold 0.5 to locate-anything-v2 | 6.6 (AdvancedPanel slider) |
+| [`c276c23`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/c276c23) | feat | per-class detection colors via golden-angle HSV rotation | 6.3 (Helper layer classColor) |
 
 ### Cross-references
 
-- Back to [§2 Architecture](./2-architecture.md) — the five-layer module structure of this section complements §2.2's five-layer architecture overview: §2 focuses on "what," §6 focuses on "how to build." §2.5 decision #1 (IIFE + window.React) has a deeper build-perspective analysis in §6.1.
-- Back to [§5 Frontend Consumption](./5-frontend-consume.md) — §5's callback ref pattern (commit `d7836b8`) and §6.4's hooks order fix (commit `0601cd4`) are two sides of the same coin: both are pitfalls of writing React in an IIFE.
-- [§7 Integration Test](./7-integration-test.md) — the hooks pitfalls, frozen input, and shadcn class desync issues mentioned here have corresponding verification cases in §7's test matrix.
-- [§8 Deep Dive](./8-deep-dive.md) — the version evolution (133 commits), debug trace saga, and `_configHash` performance optimization of the 1972-line IIFE are fully recapped in §8.
+- Back to [2 Architecture](./2-architecture.md) — the five-layer module structure of this section complements 2.2's five-layer architecture overview: 2 focuses on "what," 6 focuses on "how to build." 2.5 decision #1 (IIFE + window.React) has a deeper build-perspective analysis in 6.1.
+- Back to [5 Frontend Consumption](./5-frontend-consume.md) — 5's callback ref pattern (commit `d7836b8`) and 6.4's hooks order fix (commit `0601cd4`) are two sides of the same coin: both are pitfalls of writing React in an IIFE.
+- [7 Integration Test](./7-integration-test.md) — the hooks pitfalls, frozen input, and shadcn class desync issues mentioned here have corresponding verification cases in 7's test matrix.
+- [8 Deep Dive](./8-deep-dive.md) — the version evolution (133 commits), debug trace saga, and `_configHash` performance optimization of the 1972-line IIFE are fully recapped in 8.
 
 ---
 

@@ -2,12 +2,12 @@
 description: 从零编写第一个 NeoMind 数据型扩展——weather-forecast-v2 完整工程剖析（HTTP 拉取 + 周期指标 + React 前端）
 keywords: [NeoMind, weather-forecast, 扩展开发, 工程案例]
 tags: [NeoMind, 案例, 数据型扩展]
-sidebar_label: "#1 weather-forecast-v2"
+sidebar_label: "1. weather-forecast-v2"
 ---
 
 # #1 weather-forecast-v2：入门数据型扩展
 
-## §1 案例背景
+## 1 案例背景
 
 **weather-forecast-v2** 是 NeoMind 生态中最简单的「数据型扩展」——它定时从 [Open-Meteo API](https://open-meteo.com/) 拉取天气数据，将温度、湿度、风速等指标写入 NeoMind 指标系统，同时提供一个 React 卡片组件用于仪表板展示。整个扩展约 700 行 Rust + 560 行 TypeScript，没有任何 AI 推理、流式处理或协议桥接逻辑，是新手理解「一个扩展由哪些部分组成」的最短路径。
 
@@ -21,7 +21,7 @@ sidebar_label: "#1 weather-forecast-v2"
 
 ---
 
-## §2 架构总览
+## 2 架构总览
 
 weather-forecast-v2 由三部分组成：Rust 扩展核心（数据拉取 + 指标产出）、React 前端组件（卡片 UI）、NeoMind 运行时（加载 + 调度）。下图展示了数据流向和进程边界。
 
@@ -70,7 +70,7 @@ graph TB
 
 ---
 
-## §3 实现剖析
+## 3 实现剖析
 
 ### 3.1 目录结构
 
@@ -187,7 +187,7 @@ fn geocode_sync(&self, city: &str) -> std::result::Result<GeoLocation, String> {
 }
 ```
 
-`Cargo.toml` 第 21 行有明确注释：`# Use sync HTTP client to avoid Tokio runtime issues in dynamic libraries`。这是整个案例最关键的设计决策，详见 §4.1。
+`Cargo.toml` 第 21 行有明确注释：`# Use sync HTTP client to avoid Tokio runtime issues in dynamic libraries`。这是整个案例最关键的设计决策，详见 4.1。
 
 ### 3.5 命令流时序：get_weather 端到端调用链
 
@@ -229,7 +229,7 @@ sequenceDiagram
 
 ---
 
-## §4 设计权衡
+## 4 设计权衡
 
 ### 4.1 同步 HTTP 客户端（ureq）vs 异步（reqwest）
 
@@ -249,7 +249,7 @@ sequenceDiagram
 
 **被否决的方案**：
 - **A. `Mutex<String>`** → 否决原因：`produce_metrics()` 虽然不直接读 `default_city`，但 `refresh` 命令会读它。如果 `configure` 正在写而 `refresh` 正在读，`Mutex` 会让读操作也阻塞。`RwLock` 允许多个读操作并发。
-- **B. `Arc<AtomicPtr<str>>`** → 否决原因：字符串不是定长类型，无法用原子操作直接交换。需要 `Box::leak` 或类似技巧，引入 unsafe 代码，违反 [附录 §7.1](./appendix-standards.md#71-unsafe-rust) 的「尽量避免 unsafe」原则。
+- **B. `Arc<AtomicPtr<str>>`** → 否决原因：字符串不是定长类型，无法用原子操作直接交换。需要 `Box::leak` 或类似技巧，引入 unsafe 代码，违反 [附录 7.1](./appendix-standards.md#71-unsafe-rust) 的「尽量避免 unsafe」原则。
 - **C. 每次创建新的 `String`（不可变设计）** → 否决原因：需要把整个 `WeatherExtension` 放在 `Arc<Mutex<>>` 或 `Arc<RwLock<>>` 里，改变所有方法的签名，侵入性太大。
 
 **权衡代价**：`RwLock` 在 Linux 上比 `Mutex` 略慢（内核态开销），但在 weather-forecast-v2 的负载下（每 5 分钟一次写），差异可忽略。读写比大致为 N:1——每次 `produce_metrics()` 都会间接读取与城市相关的派生数据（每 30s 一次），而用户触发的 `get_weather` 命令才是写者。默认配置下读写比约为 30:1，正是 `RwLock` 优于 `Mutex` 的典型区间。若未来引入「城市热切换」类高频写场景（如跟随定位自动切换），应重新评估是否改用 `ArcSwap<String>` 等无锁结构。
@@ -267,12 +267,12 @@ sequenceDiagram
 
 ---
 
-## §5 技术栈拆解
+## 5 技术栈拆解
 
 | 组件 | 选型 | 为什么选它而非替代品 |
 |------|------|---------------------|
 | Rust SDK | `neomind-extension-sdk`（workspace dep） | 官方 SDK，提供 `Extension` trait + FFI 导出宏。替代品是手写 FFI，但那样每个扩展都要重复数百行样板代码 |
-| HTTP 客户端 | `ureq 2.x` + `json` feature | 同步、轻量、无 runtime 依赖。替代品 `reqwest` 会拉入整个 Tokio（见 §4.1） |
+| HTTP 客户端 | `ureq 2.x` + `json` feature | 同步、轻量、无 runtime 依赖。替代品 `reqwest` 会拉入整个 Tokio（见 4.1） |
 | async trait | `async-trait 0.1` | SDK 的 `Extension` trait 用了 async fn，Rust 1.75 前需要此 crate。未来 Rust 原生 async trait 稳定后可移除 |
 | 时间处理 | `chrono 0.4` | `Utc::now().timestamp_millis()` 生成指标时间戳。替代品 `time` crate API 更现代但生态兼容性不如 chrono |
 | Tokio | `1` + `rt` + `sync` features | 仅用于 SDK FFI 宏的 RwLock wrapper，不启动 runtime。替代品是 `parking_lot`，但 SDK 内部依赖 tokio::sync::RwLock |
@@ -281,20 +281,20 @@ sequenceDiagram
 
 ---
 
-## §6 标准落地
+## 6 标准落地
 
 ### 6.1 metadata.json 字段映射
 
-对照 [附录 §1](./appendix-standards.md#1-metadatajson--manifestjson-schema)，逐字段检查 weather-forecast-v2 的 `metadata.json`：
+对照 [附录 1](./appendix-standards.md#1-metadatajson--manifestjson-schema)，逐字段检查 weather-forecast-v2 的 `metadata.json`：
 
 | 字段 | 值 | 附录章节 | 备注 |
 |------|----|---------|------|
-| `id` | `"weather-forecast-v2"` | [§1.1](./appendix-standards.md#11-基础信息) | kebab-case，与目录名一致 |
-| `name` | `"weather forecast"` | [§1.1](./appendix-standards.md#11-基础信息) | 小写展示名 |
-| `version` | `"2.7.6"` | [§1.1](./appendix-standards.md#11-基础信息) | 从 Cargo.toml 自动读取 |
-| `type` | `"native"` | [§1.2](./appendix-standards.md#12-类型与分类) | Rust cdylib |
-| `builds` | 5 个 target | [§1.3](./appendix-standards.md#13-构建产物扩展独有) | 见 §6.3 |
-| `frontend` | `{ components, entrypoint }` | [§1.4](./appendix-standards.md#14-前端声明扩展独有) | UMD 入口 |
+| `id` | `"weather-forecast-v2"` | [1.1](./appendix-standards.md#11-基础信息) | kebab-case，与目录名一致 |
+| `name` | `"weather forecast"` | [1.1](./appendix-standards.md#11-基础信息) | 小写展示名 |
+| `version` | `"2.7.6"` | [1.1](./appendix-standards.md#11-基础信息) | 从 Cargo.toml 自动读取 |
+| `type` | `"native"` | [1.2](./appendix-standards.md#12-类型与分类) | Rust cdylib |
+| `builds` | 5 个 target | [1.3](./appendix-standards.md#13-构建产物扩展独有) | 见 6.3 |
+| `frontend` | `{ components, entrypoint }` | [1.4](./appendix-standards.md#14-前端声明扩展独有) | UMD 入口 |
 
 ### 6.2 Capability 声明与反向示例
 
@@ -310,7 +310,7 @@ ctx.invoke_capability("device_metrics_write", &json!({
     "value": 25.5
 })).await?;
 // 后果：运行时 panic（非降级），扩展进程崩溃
-// 详见附录 §7.2 Capability 显式申请
+// 详见附录 7.2 Capability 显式申请
 ```
 
 正确做法是在 `metadata.json` 中声明所需 capability（当前 weather-forecast-v2 不需要，所以没有此字段）。
@@ -329,7 +329,7 @@ ctx.invoke_capability("device_metrics_write", &json!({
 
 ### 6.4 跨平台构建
 
-`metadata.json` 的 `builds` 字段列出 5 个 target，覆盖 [附录 §4](./appendix-standards.md#4-跨平台构建目标矩阵) 的完整矩阵：
+`metadata.json` 的 `builds` 字段列出 5 个 target，覆盖 [附录 4](./appendix-standards.md#4-跨平台构建目标矩阵) 的完整矩阵：
 
 ```json
 "builds": {
@@ -345,7 +345,7 @@ weather-forecast-v2 是纯 Rust + HTTP，没有 C 依赖，5 个 target 都能�
 
 ---
 
-## §7 常见坑与最佳实践
+## 7 常见坑与最佳实践
 
 ### 7.1 工程演进故事：从 inline semver 到 crates.io SDK 隔离
 
@@ -375,7 +375,7 @@ weather-forecast-v2 是纯 Rust + HTTP，没有 C 依赖，5 个 target 都能�
 
 ---
 
-## §8 延伸阅读
+## 8 延伸阅读
 
 - [共享工程标准附录](./appendix-standards.md) —— metadata schema、capability、版本一致性、构建矩阵的完整参考
 - [案例集总览](./0-overview.md) —— 7 个案例的索引和 4 条阅读路径

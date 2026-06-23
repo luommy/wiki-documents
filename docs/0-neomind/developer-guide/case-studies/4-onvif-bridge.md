@@ -2,12 +2,12 @@
 description: "NeoMind 标准协议桥接案例：手写 WS-Discovery 多播发现、SOAP/WS-Security PasswordDigest 客户端、PTZ 控制的完整工程剖析——无 onvif-rs 依赖、纯 Rust ~2700 行覆盖 ONVIF Profile S 核心能力"
 keywords: [NeoMind, onvif-bridge, ONVIF, WS-Discovery, SOAP, 协议桥接]
 tags: [NeoMind, 案例, 协议桥接]
-sidebar_label: "#4 onvif-bridge"
+sidebar_label: "4. onvif-bridge"
 ---
 
 # #4 onvif-bridge：标准协议桥接
 
-## §1 案例背景
+## 1 案例背景
 
 **onvif-bridge** 是 NeoMind 生态中的**标准协议桥接**案例。ONVIF（Open Network Video Interface Forum）是网络视频设备的开放标准，定义了设备发现（WS-Discovery）、媒体流协商（RTSP URL 获取）、PTZ 控制、事件订阅等接口规范。覆盖 Profile S（流媒体）、Profile T（高级流媒体）、Profile G（视频存储）等多个 profile。任何符合 ONVIF Profile S 的 IP 摄像头——海康、大华、安讯威、Tiandy——都可以通过 onvif-bridge 接入 NeoMind，无需厂商私有 SDK，无需适配层。当前版本 2.7.6，核心代码分布在 5 个 Rust 源文件中约 2700 行：`lib.rs`（1646 行，Extension trait + 命令分发）、`soap_client.rs`（516 行，SOAP envelope + WS-Security）、`discovery.rs`（211 行，WS-Discovery UDP 多播）、`ptz.rs`（214 行，PTZ 命令）、`types.rs`（78 行，数据结构）。
 
@@ -25,7 +25,7 @@ sidebar_label: "#4 onvif-bridge"
 
 ---
 
-## §2 架构总览
+## 2 架构总览
 
 onvif-bridge 是一个**纯后端协议桥接扩展**——没有 frontend 组件、没有 ONNX 模型、没有视频解码逻辑。它的职责是：用标准协议（WS-Discovery + SOAP）与 ONVIF 摄像头通信，把结果转化为 NeoMind 的命令返回值和虚拟指标。扩展进程内通过 `parking_lot::RwLock` 管理 `HashMap<String, OnvifDevice>` 设备注册表，所有命令操作都围绕这个注册表展开。
 
@@ -105,9 +105,9 @@ graph TB
 
 ---
 
-## §3 核心实现剖析
+## 3 核心实现剖析
 
-### §3.1 WS-Discovery 多播发现（discovery.rs）
+### 3.1 WS-Discovery 多播发现（discovery.rs）
 
 WS-Discovery 是 OASIS 标准的局域网设备发现协议，ONVIF 使用其 UDP 多播模式。onvif-bridge 在 [`src/discovery.rs`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/discovery.rs#L1-L211) 手写了完整的多播发现逻辑。
 
@@ -132,7 +132,7 @@ const MULTICAST_PORT: u16 = 3702;
 
 **find_local_ipv4 的必要性**（[`src/discovery.rs` L119-L131](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/discovery.rs#L119-L131)）：macOS 的网络栈在多播绑定时，如果绑定到 `0.0.0.0`（INADDR_ANY），内核不知道用哪个网卡接口发送多播包，会报 `No route to host`。解决方案是先创建一个临时 UDP socket 连接到 `8.8.8.8:80`（不实际发包，只是让内核选择默认路由的网卡），然后读取该 socket 的 `local_addr()` 获取本机真实 IP。这个修复在 commit `59d3490` 中引入。
 
-### §3.2 SOAP 客户端与 WS-Security（soap_client.rs）
+### 3.2 SOAP 客户端与 WS-Security（soap_client.rs）
 
 ONVIF 的所有控制接口都走 SOAP 1.2 over HTTP。onvif-bridge 在 [`src/soap_client.rs`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/soap_client.rs#L1-L516) 手写了完整的 SOAP 客户端，**没有依赖任何 SOAP/ONVIF crate**。
 
@@ -169,7 +169,7 @@ fn compute_password_digest(password: &str) -> (String, String, String) {
 
 **soap_request_raw**（[`src/soap_client.rs` L68-L124](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/soap_client.rs#L68-L124)）构建完整的 SOAP envelope，包含 WS-Security header（如果提供了凭据）和 SOAP Body，然后通过 `ureq::post(url)` 同步发送。关键安全措施包括：响应体大小限制 10MB（防内存耗尽）、SOAP Fault 自动检测和格式化错误消息。
 
-### §3.3 设备能力协商
+### 3.3 设备能力协商
 
 onvif-bridge 实现了 ONVIF Core 和 Media 规范中的核心协商函数：
 
@@ -183,7 +183,7 @@ onvif-bridge 实现了 ONVIF Core 和 Media 规范中的核心协商函数：
 
 **resolve_service_url**（[`src/soap_client.rs` L390-L407](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/soap_client.rs#L390-L407)）是一个容易被忽略但很关键的函数——ONVIF 设备的不同服务（device/media/ptz）有不同的 URL 路径（`/onvif/device_service`、`/onvif/media_service`、`/onvif/ptz_service`）。WS-Discovery 返回的 device URL 通常已经是 `/onvif/device_service` 结尾，调用 media 服务时需要替换路径后缀而非追加。
 
-### §3.4 PTZ 控制（ptz.rs）
+### 3.4 PTZ 控制（ptz.rs）
 
 [`src/ptz.rs`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/ptz.rs#L1-L214) 封装了六个 PTZ 命令，全部基于 `soap_client::soap_request_raw` 构建 SOAP body：
 
@@ -196,7 +196,7 @@ onvif-bridge 实现了 ONVIF Core 和 Media 规范中的核心协商函数：
 
 每个命令都通过 `resolve_ptz_url` 确定服务的 URL，然后在 SOAP body 中嵌入对应的 ONVIF PTZ WSDL 操作名和参数（PanTilt 空间、Zoom 空间、Speed 向量等）。
 
-### §3.5 命令分发（lib.rs execute_command）
+### 3.5 命令分发（lib.rs execute_command）
 
 [`src/lib.rs` L696-L717](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/lib.rs#L696-L717) 是扩展的核心入口——一个 `match` 把字符串命令路由到对应的处理函数：
 
@@ -226,7 +226,7 @@ async fn execute_command(&self, command: &str, args: &serde_json::Value) -> Resu
 
 共 14 个命令覆盖了 ONVIF 设备管理的完整生命周期：发现（`discover`）、手动添加（`add_device`）、列表（`list_devices`）、详情（`get_device`）、取流（`get_stream_uri`）、抓拍（`get_snapshot`）、PTZ 控制（6 个命令）、状态查询（`get_status`）、移除（`remove_device`）、配置（`configure`）。
 
-### §3.6 发现到取流的完整时序
+### 3.6 发现到取流的完整时序
 
 下图展示前端发起 `discover` 命令后，到拿到 RTSP 流地址的完整协议交互过程（可选 PTZ 控制在最后）：
 
@@ -280,7 +280,7 @@ sequenceDiagram
 
 ---
 
-## §4 关键设计决策（含权衡与替代方案）
+## 4 关键设计决策（含权衡与替代方案）
 
 ### 决策 1：手写 SOAP 客户端而非使用 onvif-rs crate
 
@@ -288,7 +288,7 @@ sequenceDiagram
 
 **替代方案**：使用社区 crate `onvif-rs`（Rust 生态中最知名的 ONVIF 客户端库）。
 
-**理由**：(1) `onvif-rs` 维护滞后——最后一次实质性更新距离我们调研已超过一年，且不覆盖 PTZ ContinuousMove / GotoPreset / GetPresets 等关键操作；(2) `onvif-rs` 依赖 `hyper` + `tokio` 异步栈，而 onvif-bridge 作为 `.dylib`/`.so` 动态库加载到 NeoMind 主进程时，嵌套 tokio runtime 会引发 panic，手写客户端用同步 `ureq` 彻底规避了这个问题；(3) 手写的约 500 行代码完全可控——遇到厂商非标准实现可以立即修改解析逻辑，而修改第三方 crate 需要发 PR 等待合并。权衡的代价是失去了 `onvif-rs` 提供的类型安全 WSDL 绑定，但通过严格的单元测试（参见 §6）弥补。
+**理由**：(1) `onvif-rs` 维护滞后——最后一次实质性更新距离我们调研已超过一年，且不覆盖 PTZ ContinuousMove / GotoPreset / GetPresets 等关键操作；(2) `onvif-rs` 依赖 `hyper` + `tokio` 异步栈，而 onvif-bridge 作为 `.dylib`/`.so` 动态库加载到 NeoMind 主进程时，嵌套 tokio runtime 会引发 panic，手写客户端用同步 `ureq` 彻底规避了这个问题；(3) 手写的约 500 行代码完全可控——遇到厂商非标准实现可以立即修改解析逻辑，而修改第三方 crate 需要发 PR 等待合并。权衡的代价是失去了 `onvif-rs` 提供的类型安全 WSDL 绑定，但通过严格的单元测试（参见 6）弥补。
 
 ### 决策 2：WS-Security PasswordDigest 而非 PasswordText
 
@@ -324,7 +324,7 @@ sequenceDiagram
 
 ---
 
-## §5 与 NeoMind 主体的集成
+## 5 与 NeoMind 主体的集成
 
 onvif-bridge 通过 NeoMind Extension SDK 的标准接口与主体集成，不依赖任何私有 API 或 hack。集成体现在三个层面：命令系统、指标产出、跨扩展协作。
 
@@ -370,7 +370,7 @@ Agent 调用 yolo-video-v2.start_stream(source_url="rtsp://192.168.1.100:554/...
 
 ---
 
-## §6 测试与验证策略
+## 6 测试与验证策略
 
 onvif-bridge 的测试分为三层：SOAP 客户端单元测试、扩展逻辑单元测试、跨平台端到端验证。
 
@@ -422,7 +422,7 @@ WS-Discovery 的 UDP 多播行为在不同操作系统上差异显著，无法�
 
 ---
 
-## §7 部署运维与排障（含源码卫生反例）
+## 7 部署运维与排障（含源码卫生反例）
 
 ### 5 平台 .nep 分发
 
@@ -487,7 +487,7 @@ src/
 
 ---
 
-## §8 延伸阅读与小结
+## 8 延伸阅读与小结
 
 ### 演进里程碑
 

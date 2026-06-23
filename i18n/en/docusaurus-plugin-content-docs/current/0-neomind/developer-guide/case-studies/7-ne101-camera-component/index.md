@@ -13,7 +13,7 @@ This is the "flagship deep-dive case" of the NeoMind component marketplace. The 
 
 ---
 
-## §0 Recommended Reading Path
+## 0 Recommended Reading Path
 
 The flagship case has eight subpages organized by dependency. Read them in the order below; pages marked ★ are MVP core (required reading for the v1 release), the rest are v1.1 increments.
 
@@ -21,11 +21,11 @@ The flagship case has eight subpages organized by dependency. Read them in the o
 1 Background → 2 Architecture → 3 Extension Side → 4 Data Contract ★ → 5 Frontend Consume ★ → 6 Component Build ★ → 7 ROI Overlay → 8 Ops & Extensions
 ```
 
-If you are short on time and only want to understand "how this component works", read §1 + §2 + §4 + §5 + §6. If you plan to fork the component or retarget it to another camera device, also read §3 (the extension-side contract) and §7 (ROI rendering).
+If you are short on time and only want to understand "how this component works", read 1 + 2 + 4 + 5 + 6. If you plan to fork the component or retarget it to another camera device, also read 3 (the extension-side contract) and 7 (ROI rendering).
 
 ---
 
-## §1 Eight-Subpage Index
+## 1 Eight-Subpage Index
 
 | # | Title | Role | Status |
 |---|-------|------|--------|
@@ -40,7 +40,7 @@ If you are short on time and only want to understand "how this component works",
 
 ---
 
-## §2 Relationship to #6 metric_card: From Starter to Flagship
+## 2 Relationship to #6 metric_card: From Starter to Flagship
 
 This case is a direct continuation of [#6 metric_card](../6-metric-card-component.md), but **an order of magnitude more complex**. The table below maps the two cases so you can build a "starter → flagship" cognitive ladder.
 
@@ -54,27 +54,27 @@ This case is a direct continuation of [#6 metric_card](../6-metric-card-componen
 | Named export | `NeoMind_MetricCard` | `NE101CameraPanel` (note: **not** `default`) |
 | Hardest topic | OKLCH + CSS variable glass | ROI normalized coords + `processingRoiOverlap` threshold + React-in-IIFE hooks pitfalls |
 
-**Recommendation**: if you have not read the metric_card case yet, read its §1-§3 first. metric_card teaches the triple "IIFE injection + manifest contract + fetchData pull"; that triple remains the underlying skeleton of ne101_camera, with two additional layers (device binding and AI processing) stacked on top.
+**Recommendation**: if you have not read the metric_card case yet, read its 1-3 first. metric_card teaches the triple "IIFE injection + manifest contract + fetchData pull"; that triple remains the underlying skeleton of ne101_camera, with two additional layers (device binding and AI processing) stacked on top.
 
 ---
 
-## §3 What You Will Learn
+## 3 What You Will Learn
 
 Reading all eight sections will give you five key capabilities:
 
-1. **The essential difference between device binding and data source** — why NE101 uses `has_device_binding: true` + `device_type_filter: ["ne101_camera"]` instead of `has_data_source: true`. This determines whether the dashboard editor shows a "bind device" panel and whether the component can invoke device commands like `trigger_capture`. See [§1 Business Background](./1-background.md).
+1. **The essential difference between device binding and data source** — why NE101 uses `has_device_binding: true` + `device_type_filter: ["ne101_camera"]` instead of `has_data_source: true`. This determines whether the dashboard editor shows a "bind device" panel and whether the component can invoke device commands like `trigger_capture`. See [1 Business Background](./1-background.md).
 
-2. **How a 1972-line IIFE stays maintainable** — `bundle.js` has no build step at all; it is entirely hand-written IIFE. We break down its module layers (helpers / data layer / canvas layer / React layer / settings panel layer) and explain why NeoMind chose this pattern over ESM. See [§6 Component Build](./6-component-build.md) (v1.1).
+2. **How a 1972-line IIFE stays maintainable** — `bundle.js` has no build step at all; it is entirely hand-written IIFE. We break down its module layers (helpers / data layer / canvas layer / React layer / settings panel layer) and explain why NeoMind chose this pattern over ESM. See [6 Component Build](./6-component-build.md) (v1.1).
 
-3. **The `processingExtensionId` generic AI processing contract** — the most important design innovation in this case: the component does not run AI itself; instead, the `processingExtensionId: ""` field lets the user pick an installed extension (object_detection / ocr / describe / any `locate-anything-v2`-compatible extension) to "outsource" the image to. This "component + pluggable extension" contract is the template for AI reuse across the NeoMind ecosystem. See [§3 Extension Side](./3-extension-side.md) (v1.1).
+3. **The `processingExtensionId` generic AI processing contract** — the most important design innovation in this case: the component does not run AI itself; instead, the `processingExtensionId: ""` field lets the user pick an installed extension (object_detection / ocr / describe / any `locate-anything-v2`-compatible extension) to "outsource" the image to. This "component + pluggable extension" contract is the template for AI reuse across the NeoMind ecosystem. See [3 Extension Side](./3-extension-side.md) (v1.1).
 
-4. **Engineering details of ROI overlay rendering** — from single-rectangle ROI (`processingRoiX/Y/W/H`, normalized 0-1) to multi-ROI arrays (`processingRois: []`), from center-point detection (deprecated) to the `processingRoiOverlap: 0.6` IoU-threshold detection. This involves Canvas coordinate mapping, the non-linear scaling of `objectFit: contain`, and the async setup of ResizeObserver. See [§5 Frontend Consume](./5-frontend-consume.md) and [§7 Integration Test](./7-integration-test.md).
+4. **Engineering details of ROI overlay rendering** — from single-rectangle ROI (`processingRoiX/Y/W/H`, normalized 0-1) to multi-ROI arrays (`processingRois: []`), from center-point detection (deprecated) to the `processingRoiOverlap: 0.6` IoU-threshold detection. This involves Canvas coordinate mapping, the non-linear scaling of `objectFit: contain`, and the async setup of ResizeObserver. See [5 Frontend Consume](./5-frontend-consume.md) and [7 Integration Test](./7-integration-test.md).
 
-5. **The React-in-IIFE pattern and its pitfalls** — writing React hooks inside a 1972-line IIFE has surprising traps: for example, `b060a25` fixes React error #310 (a useEffect that used hooks depending on uninitialized state), and `0601cd4` moves a conditional useState to the top level to keep hook order stable. These traps do not arise in bundled React projects but must be handled explicitly in the IIFE pattern. See [§6 Component Build](./6-component-build.md) (v1.1).
+5. **The React-in-IIFE pattern and its pitfalls** — writing React hooks inside a 1972-line IIFE has surprising traps: for example, `b060a25` fixes React error #310 (a useEffect that used hooks depending on uninitialized state), and `0601cd4` moves a conditional useState to the top level to keep hook order stable. These traps do not arise in bundled React projects but must be handled explicitly in the IIFE pattern. See [6 Component Build](./6-component-build.md) (v1.1).
 
 ---
 
-## §4 Reading Dependency Graph
+## 4 Reading Dependency Graph
 
 The diagram below shows the knowledge dependencies among the eight subpages. Solid arrows mean "must read prerequisite first"; dashed arrows mean "recommended but skippable". ★ marks MVP core (required for v1).
 
@@ -105,13 +105,13 @@ graph LR
     class DATA,FE,BUILD mvp
 ```
 
-**Shortest learning path (MVP only)**: §1 Background → §4 Data Contract → §5 Frontend Consume → §6 Component Build. These four sections are enough to understand the full "NE101 capture → MQTT → NeoMind → extension inference → component render" chain.
+**Shortest learning path (MVP only)**: 1 Background → 4 Data Contract → 5 Frontend Consume → 6 Component Build. These four sections are enough to understand the full "NE101 capture → MQTT → NeoMind → extension inference → component render" chain.
 
-**Full learning path (all eight)**: read in order §1 → §2 → §3 → §4 → §5 → §6 → §7 → §8. Best for developers planning to fork the component or retarget it to another camera device.
+**Full learning path (all eight)**: read in order 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8. Best for developers planning to fork the component or retarget it to another camera device.
 
 ---
 
-## §5 Case Info Card
+## 5 Case Info Card
 
 | Field | Value |
 |-------|-------|
@@ -127,12 +127,12 @@ graph LR
 
 ---
 
-## §6 Next
+## 6 Next
 
-- Want to understand "why NE101 needs a dedicated component" → [§1 Business Background](./1-background.md)
-- Want to jump straight to code structure → §2 Architecture (v1.1)
-- Want to understand the AI processing contract → §3 Extension Side (v1.1) + §4 Data Contract (MVP)
-- Want React implementation details → §5 Frontend Consume (MVP) + §6 Component Build (MVP)
+- Want to understand "why NE101 needs a dedicated component" → [1 Business Background](./1-background.md)
+- Want to jump straight to code structure → 2 Architecture (v1.1)
+- Want to understand the AI processing contract → 3 Extension Side (v1.1) + 4 Data Contract (MVP)
+- Want React implementation details → 5 Frontend Consume (MVP) + 6 Component Build (MVP)
 
 ---
 

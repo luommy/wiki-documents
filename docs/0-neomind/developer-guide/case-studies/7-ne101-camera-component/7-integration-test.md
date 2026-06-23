@@ -2,22 +2,22 @@
 description: "ne101_camera 集成测试：端到端测试矩阵（test_bundle.js 35KB）、ROI 叠加验证（Sutherland-Hodgman 裁剪 + object-cover 映射）、多扩展切换测试（locate-anything-v2 / image-analyzer-v2 / yolo-device-inference / ocr-device-inference）、source_ts 对齐验证、WS+REST 双通道测试"
 keywords: [ne101_camera, 集成测试, test_bundle.js, ROI 验证, 多扩展切换, 测试矩阵]
 tags: [NeoMind, 案例]
-sidebar_label: "§7 集成测试"
+sidebar_label: "7. Integration Test"
 ---
 
-# §7 集成测试：从沙箱执行到双通道对齐的验证矩阵
+# 7 集成测试：从沙箱执行到双通道对齐的验证矩阵
 
-> 本节是 ne101_camera 案例的**集成测试参考页**，覆盖从纯函数单测到 WS+REST 双通道契约的全栈验证。读完你应当能：(1) 解释为什么 `test_bundle.js`（35KB / 35021 字节）不能直接用 Jest/Vitest，而是用 Node.js `assert` 模块 + 正则提取 IIFE 内部函数来跑——这套「沙箱提取」范式与平台 Boa 引擎执行 Transform JS 的运行时是平行的两件事；(2) 复述 §7.3 的 ROI 双坐标变换一致性矩阵——为什么 Sutherland-Hodgman 裁剪（[`bundle.js` L342-L372](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L342-L372)）和 `object-cover` SVG 变换（[L879-L899](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L879-L899)）必须在 3 种宽高比 × 2 种 ROI 形状 × 3 种阈值下都通过；(3) 画出 4 个白名单扩展（[`L144`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L144-L144)）两两切换的状态机，说出每个 `responseType`（`boxes_x1y1x2y2` / `objects_bbox` / `detections_bbox` / `ocr_text_blocks`）对应的归一化器；(4) 描述 `source_ts` 对齐三态机（match → 显示、stale → 缓存但不显示、cache-replay → 命中缓存）如何阻止「ghost detections」（[L858-L874](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L858-L874)）；(5) 解释 [`L631`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L631-L631) 的 `Object.assign({}, wsValues, imageData || {}, virtualDataState[0] || {})` 三层合并顺序为什么必须 WS-base → REST-overlay → virtual，以及 commit [`b0be12b`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/b0be12b) + [`0eedd27`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/0eedd27) 修过的合并时序坑。所有行号锚点指向源码仓库 `main` 分支的 [`bundle.js`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js) 和 [`test_bundle.js`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/test_bundle.js)。
+> 本节是 ne101_camera 案例的**集成测试参考页**，覆盖从纯函数单测到 WS+REST 双通道契约的全栈验证。读完你应当能：(1) 解释为什么 `test_bundle.js`（35KB / 35021 字节）不能直接用 Jest/Vitest，而是用 Node.js `assert` 模块 + 正则提取 IIFE 内部函数来跑——这套「沙箱提取」范式与平台 Boa 引擎执行 Transform JS 的运行时是平行的两件事；(2) 复述 7.3 的 ROI 双坐标变换一致性矩阵——为什么 Sutherland-Hodgman 裁剪（[`bundle.js` L342-L372](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L342-L372)）和 `object-cover` SVG 变换（[L879-L899](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L879-L899)）必须在 3 种宽高比 × 2 种 ROI 形状 × 3 种阈值下都通过；(3) 画出 4 个白名单扩展（[`L144`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L144-L144)）两两切换的状态机，说出每个 `responseType`（`boxes_x1y1x2y2` / `objects_bbox` / `detections_bbox` / `ocr_text_blocks`）对应的归一化器；(4) 描述 `source_ts` 对齐三态机（match → 显示、stale → 缓存但不显示、cache-replay → 命中缓存）如何阻止「ghost detections」（[L858-L874](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L858-L874)）；(5) 解释 [`L631`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L631-L631) 的 `Object.assign({}, wsValues, imageData || {}, virtualDataState[0] || {})` 三层合并顺序为什么必须 WS-base → REST-overlay → virtual，以及 commit [`b0be12b`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/b0be12b) + [`0eedd27`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/0eedd27) 修过的合并时序坑。所有行号锚点指向源码仓库 `main` 分支的 [`bundle.js`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js) 和 [`test_bundle.js`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/test_bundle.js)。
 
 ---
 
-## §7.1 测试策略总览
+## 7.1 测试策略总览
 
 ne101_camera 的 `components/ne101_camera/` 目录里**同时**发布两份 JS：业务代码 `bundle.js`（1972 行 / 95353 字节）和测试代码 `test_bundle.js`（960 行 / 35021 字节）。测试文件不是事后补的脚手架，而是与组件一起在 manifest 中登记的可执行制品——平台运营方和二次开发者都能直接 `node components/ne101_camera/test_bundle.js` 在本地复现完整的纯函数回归。这种「**组件自带测试**」的纪律是 NeoMind 市场对上架组件的软性要求，也是 ne101_camera 区别于其它 5 个案例的显著特征。
 
-测试哲学的第一性原理来自 IIFE 范式：`bundle.js` 是一个 `var NE101CameraPanel = (function(){ ... })()` 形式的立即调用表达式，没有 `module.exports`、没有 `export`、没有可被 Jest/Vitest `import` 的入口。**直接 `require('bundle.js')` 会报 `NE101CameraPanel is not defined`**（因为 `window` 在 Node.js 里不存在）。因此 `test_bundle.js` 选择了**正则提取 + 沙箱 eval** 的范式：用 [`extractFunction`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/test_bundle.js#L16-L35) 通过括号计数定位某个内部函数的源码字符串，再用 `new Function(...)` 在隔离作用域里求值，最后对返回值做 Node.js `assert` 断言。这个范式只测**纯函数**（`classColor` / `batteryMeta` / `computeOvTf` / `mapBbox` / `pipeRois`），不测 React 渲染——后者在 §7.4-§7.6 用「契约 + 行为矩阵」的方式间接验证。
+测试哲学的第一性原理来自 IIFE 范式：`bundle.js` 是一个 `var NE101CameraPanel = (function(){ ... })()` 形式的立即调用表达式，没有 `module.exports`、没有 `export`、没有可被 Jest/Vitest `import` 的入口。**直接 `require('bundle.js')` 会报 `NE101CameraPanel is not defined`**（因为 `window` 在 Node.js 里不存在）。因此 `test_bundle.js` 选择了**正则提取 + 沙箱 eval** 的范式：用 [`extractFunction`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/test_bundle.js#L16-L35) 通过括号计数定位某个内部函数的源码字符串，再用 `new Function(...)` 在隔离作用域里求值，最后对返回值做 Node.js `assert` 断言。这个范式只测**纯函数**（`classColor` / `batteryMeta` / `computeOvTf` / `mapBbox` / `pipeRois`），不测 React 渲染——后者在 7.4-7.6 用「契约 + 行为矩阵」的方式间接验证。
 
-需要特别区分的是：**`test_bundle.js` 跑在 Node.js 上**，而**生产环境的 Transform JS 跑在平台的 Boa 引擎上**（一个 Rust 实现的 JS 解释器，用于沙箱执行 Transform 代码）。两者是平行的两套执行环境，不要混淆——`test_bundle.js` 测的是组件 helper 纯函数，Boa 引擎跑的是 `generateTransformJsCode`（[L239-L456](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L239-L456)）吐出的另一份 JS 字符串。Boa 的限制（无 `console.log`、不完整的 ES5 shim）在 §8.3 单独复盘；本节聚焦 Node.js 侧的 `test_bundle.js`。这套双轨测试策略的价值在 §7.3 ROI 矩阵里体现得最明显：纯函数 `computeOvTf` / `mapBbox` 在 Node 里验证数学正确性，生成出的 Transform JS 在 Boa 里跑实际推理。
+需要特别区分的是：**`test_bundle.js` 跑在 Node.js 上**，而**生产环境的 Transform JS 跑在平台的 Boa 引擎上**（一个 Rust 实现的 JS 解释器，用于沙箱执行 Transform 代码）。两者是平行的两套执行环境，不要混淆——`test_bundle.js` 测的是组件 helper 纯函数，Boa 引擎跑的是 `generateTransformJsCode`（[L239-L456](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L239-L456)）吐出的另一份 JS 字符串。Boa 的限制（无 `console.log`、不完整的 ES5 shim）在 8.3 单独复盘；本节聚焦 Node.js 侧的 `test_bundle.js`。这套双轨测试策略的价值在 7.3 ROI 矩阵里体现得最明显：纯函数 `computeOvTf` / `mapBbox` 在 Node 里验证数学正确性，生成出的 Transform JS 在 Boa 里跑实际推理。
 
 ```mermaid
 graph TB
@@ -47,11 +47,11 @@ graph TB
     TEST --> NODE
 ```
 
-图中的两条路径分别对应「测试时」（Node.js + 正则提取 + 沙箱）和「运行时」（浏览器加载 IIFE + 平台 Boa 引擎跑 Transform JS）。`test_bundle.js` 的设计目标是覆盖**纯函数的数学正确性**（坐标变换、颜色生成、单位格式化），把容易写错的几何运算从运行时观察转为离线断言；React 渲染、effects 副作用、WS/REST 合并这些动态行为则用 §7.4-§7.6 的「契约矩阵」覆盖。
+图中的两条路径分别对应「测试时」（Node.js + 正则提取 + 沙箱）和「运行时」（浏览器加载 IIFE + 平台 Boa 引擎跑 Transform JS）。`test_bundle.js` 的设计目标是覆盖**纯函数的数学正确性**（坐标变换、颜色生成、单位格式化），把容易写错的几何运算从运行时观察转为离线断言；React 渲染、effects 副作用、WS/REST 合并这些动态行为则用 7.4-7.6 的「契约矩阵」覆盖。
 
 ---
 
-## §7.2 导出对象契约测试
+## 7.2 导出对象契约测试
 
 IIFE 的最后一行 `return` 语句是组件与平台加载器之间的** ABI（应用二进制接口）契约**——任何加载器版本的破坏性变更都会让组件在网格里白屏。`test_bundle.js` 用一条契约断言守住这层契约：IIFE 求值后挂到 `window.NE101CameraPanel` 上的对象必须**至少**包含 `default` / `NE101CameraPanel` / `ConfigPanel` / `AdvancedPanel` 四个键，且每个键的值是 `function` 类型。查看源码 [`bundle.js` L1971](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1971-L1971)。
 
@@ -92,7 +92,7 @@ sequenceDiagram
 
 ---
 
-## §7.3 ROI 叠加验证矩阵
+## 7.3 ROI 叠加验证矩阵
 
 ROI（Region of Interest）是 ne101_camera 最复杂的子模块，因为它在**两个独立的坐标系**里做几何运算，且两者的结果必须一致才能让用户在画面上看到正确的检测框。第一个坐标系是 **Transform JS 内部的「检测 vs ROI 多边形」裁剪**，由 `generateTransformJsCode` 生成的 Sutherland-Hodgman 多边形裁剪算法实现（[`bundle.js` L342-L372](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L342-L372)），它决定哪些检测「属于 ROI 内」。第二个坐标系是 **React 组件的 `object-cover` SVG 变换**（[L879-L899](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L879-L899)），它把归一化的检测框坐标映射到浏览器容器的屏幕像素，让 SVG `<rect>` 叠加在 `<img>` 上的位置与裁剪算法的判断一致。如果两者不一致，用户会看到「检测框明明在 ROI 多边形外面却被标红」或反之的诡异画面。
 
@@ -139,7 +139,7 @@ graph LR
 
 ---
 
-## §7.4 多扩展切换测试
+## 7.4 多扩展切换测试
 
 `AI_EXT_IDS`（[`bundle.js` L144`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L144-L144)）硬编码了 4 个白名单扩展，每个扩展有不同的 `responseType` 契约——也就是 AI 推理结果的 JSON 形状不同。当用户在 AdvancedPanel 的 `ExtDropdown`（[L1371-L1446](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1371-L1446)）里切换 `processingExtensionId` 时，组件必须同时完成三个动作：(a) `AdvancedPanel` 用 `AI_EXT_IDS.indexOf(arr[i].id) >= 0` 过滤扩展列表（[L1490](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1490-L1490)），只显示白名单内的扩展；(b) 主组件的 effect 检测到 `processingExtId` 变化，重新调用 `generateTransformJsCode(pipe)` 生成新的 Transform JS（[L277-L278](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L277-L278)），新 JS 用新扩展的 `mode.command` / `mode.imageArg` / `mode.responseType` 调用 `extensions.invoke`；(c) 检测结果的归一化器（normalizer）根据 `responseType` 切换：`boxes_x1y1x2y2` 走 `[x1,y1,x2,y2]` 到 bbox 对象的转换、`objects_bbox` / `detections_bbox` 已经是 bbox 对象形状直接用、`ocr_text_blocks` 还要把对象坐标转成数组并渲染为多边形（commit [`403c0f1`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/403c0f1) + [`b746c02`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/b746c02)）。
 
@@ -166,12 +166,12 @@ stateDiagram-v2
 - **选择**：4×4 = 16 种切换路径的穷举有向完全图（含自环）。
 - **备选方案 A**：pairwise testing——用正交表挑 6-8 条「代表性」切换路径。否决理由：NMS 阈值泄漏这种 bug 是「特定源 → 特定目标」的组合问题，pairwise 会随机跳过某些组合，可能漏掉「locate-anything-v2 → ocr-device-inference」这种关键回归路径。
 - **备选方案 B**：只测「切换到每个扩展」4 条路径（不动起点的源扩展）。否决理由：不能捕获「从 A 切到 B 再切到 C」的累积副作用（如配置脏字段未清理）。
-- **理由**：4 个扩展的有向完全图只有 16 条边，穷举成本完全可接受，且每次新增扩展只需扩展矩阵（不需要重设计）。穷举的另一个价值是它**自动覆盖了 mode 自切换**（同一扩展内切换 `object_detection` → `grounding` → `point` 等 mode），这是 §6.6 AdvancedPanel 模板下拉框的常见用户路径。
+- **理由**：4 个扩展的有向完全图只有 16 条边，穷举成本完全可接受，且每次新增扩展只需扩展矩阵（不需要重设计）。穷举的另一个价值是它**自动覆盖了 mode 自切换**（同一扩展内切换 `object_detection` → `grounding` → `point` 等 mode），这是 6.6 AdvancedPanel 模板下拉框的常见用户路径。
 - **代价**：测试矩阵的运行时间随扩展数平方增长，但目前白名单只有 4 个扩展，远未触及瓶颈。
 
 ---
 
-## §7.5 source_ts 对齐验证
+## 7.5 source_ts 对齐验证
 
 `source_ts`（source timestamp）是 ne101_camera 防「ghost detections」的核心机制。摄像头每秒推 2-5 帧新图，AI 推理需要 200-800ms，这意味着**当推理结果返回时，画面上显示的可能已经是下一帧了**——如果把上一帧的检测结果直接画在当前帧上，就会出现「人已经走出了画面，但检测框还停在原位」的鬼影。`source_ts` 解决方案：Transform JS 在生成检测结果时同时输出 `source_ts`（取自输入图像的 `ts` / `timestamp` 字段，[`bundle.js` L436`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L436-L436)），主组件在收到 virtual data 时严格比对 `source_ts` 与当前图像的 `imgTs`，只有匹配才显示。
 
@@ -202,11 +202,11 @@ stateDiagram-v2
 
 ---
 
-## §7.6 WS+REST 双通道测试
+## 7.6 WS+REST 双通道测试
 
 NeoMind 平台为每个设备组件提供两条数据通道：(1) **WebSocket 推送**——高频小数据（电池、温度、ts），每秒多次；(2) **REST 轮询**——低频大数据（图像 base64 / URL、推理结果），秒级间隔。ne101_camera 在 [`bundle.js` L631`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L631-L631) 用一行 `Object.assign({}, wsValues, imageData || {}, virtualDataState[0] || {})` 合并三条流，合并顺序是严格的 **WS-base → REST-overlay → virtual**——WS 提供实时小指标的基线，REST 用最新图像覆盖图像字段，virtual data（Transform 输出的检测结果）最后覆盖检测相关字段。这个顺序看似显然，但 commit [`b0be12b`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/b0be12b)（initial fetch on mount）和 [`0eedd27`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/0eedd27)（update virtual data on WS-triggered REST fetch）都修过与合并顺序相关的时序 bug。
 
-最常见的故障模式是「**WS 先到、REST 后到**」：组件挂载时，平台立即开始推 WS 数据（电池、温度），但 REST fetch 需要几百毫秒才返回第一张图像。如果合并顺序写反（REST-base → WS-overlay），WS 的小指标会覆盖 REST 的图像字段（因为两者都用 `ts` 字段），导致首屏没有图像只有小指标。`b0be12b` 修的就是这个——它在组件挂载时主动触发一次 REST fetch，而不是被动等平台的轮询调度，让图像字段尽早进入 `imageData` state。另一个故障是「**virtual data 滞后于图像**」：推理慢于图像更新，新的图像已经显示，但检测结果还对应上一帧——这个坑在 §7.5 用 `source_ts` 解决，但前提是 virtual data 必须在合并的**最后一层**覆盖，否则 WS 的 `ts` 更新会先于 virtual 的 `source_ts` 到达，导致对齐失败。`0eedd27` 修了这个：WS 触发的 REST fetch 完成后，必须**同步刷新** virtual data state，而不是等下一次 Transform 周期。
+最常见的故障模式是「**WS 先到、REST 后到**」：组件挂载时，平台立即开始推 WS 数据（电池、温度），但 REST fetch 需要几百毫秒才返回第一张图像。如果合并顺序写反（REST-base → WS-overlay），WS 的小指标会覆盖 REST 的图像字段（因为两者都用 `ts` 字段），导致首屏没有图像只有小指标。`b0be12b` 修的就是这个——它在组件挂载时主动触发一次 REST fetch，而不是被动等平台的轮询调度，让图像字段尽早进入 `imageData` state。另一个故障是「**virtual data 滞后于图像**」：推理慢于图像更新，新的图像已经显示，但检测结果还对应上一帧——这个坑在 7.5 用 `source_ts` 解决，但前提是 virtual data 必须在合并的**最后一层**覆盖，否则 WS 的 `ts` 更新会先于 virtual 的 `source_ts` 到达，导致对齐失败。`0eedd27` 修了这个：WS 触发的 REST fetch 完成后，必须**同步刷新** virtual data state，而不是等下一次 Transform 周期。
 
 测试矩阵覆盖三个通道的两两组合：(a) WS-only（有 ts 和小指标，无图像）→ REST fetch 填充图像字段；(b) REST-only（完整数据但 ts 陈旧）→ WS 的 ts 更新触发新的 REST fetch；(c) WS+REST 都有 → 合并结果在 `ts` 字段上一致；(d) 加入 virtual data → 检测字段被 virtual 覆盖、图像字段保持 REST 不变。最后一条断言是关键：**virtual data 不能覆盖图像字段**（否则一张低分辨率推理缩略图会替换原始高清图像），这要求 virtual data 的字段集合是「检测专属」的（`detections` / `roi_count` / `texts` / `inference_time_ms` / `source_ts`），不能与图像字段冲突。commit [`c4fe7bf`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/c4fe7bf) 还加了一个守卫：`rawImageSrc` 必须是 `string` 类型（L636），防止 WS 推来的非图像 metric（数字 / 对象）被误认为图像源导致 `.indexOf()` 崩溃。
 
@@ -228,7 +228,7 @@ graph LR
 
     subgraph GUARD["守卫"]
         G1["typeof rawImageSrc<br/>=== 'string' (L636)<br/>commit c4fe7bf"]
-        G2["String(source_ts)<br/>=== String(imgTs)<br/>§7.5 对齐"]
+        G2["String(source_ts)<br/>=== String(imgTs)<br/>7.5 对齐"]
     end
 
     WS --> M2
@@ -242,12 +242,12 @@ graph LR
 
 - **选择**：固定三层 `Object.assign` 顺序，每层有明确的语义角色（基线 / 图像 / 检测）。引用 [`L631`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L631-L631)。
 - **备选方案**：last-writer-wins——按数据到达顺序合并，最后到达的覆盖前面的。否决理由：三条流的到达顺序不确定（WS 可能先到也可能后到），last-writer-wins 会让合并结果不可预测，难以测试。
-- **理由**：固定顺序让合并结果是**输入的确定性函数**——只要三条流的内容确定，合并结果就唯一。这让 §7.5 的 `source_ts` 对齐成为可能（如果合并顺序不确定，`source_ts` 和 `imgTs` 可能来自不同的流，永远无法对齐）。commit `b0be12b` + `0eedd27` 的修复经验表明，任何打破这个顺序的优化（如「谁先到先用谁」）都会引入难以复现的时序 bug。
+- **理由**：固定顺序让合并结果是**输入的确定性函数**——只要三条流的内容确定，合并结果就唯一。这让 7.5 的 `source_ts` 对齐成为可能（如果合并顺序不确定，`source_ts` 和 `imgTs` 可能来自不同的流，永远无法对齐）。commit `b0be12b` + `0eedd27` 的修复经验表明，任何打破这个顺序的优化（如「谁先到先用谁」）都会引入难以复现的时序 bug。
 - **代价**：如果某条流的数据有错（如 WS 推了一个错误的 `ts`），错误的字段会通过固定顺序传播到合并结果。这要求每条流的「自洁」逻辑（如 WS 的 ts 必须是数字、REST 的 imageUrl 必须是字符串）在进入 `Object.assign` 之前完成，不能依赖合并后的守卫。
 
 ---
 
-## §7.7 设计决策汇总
+## 7.7 设计决策汇总
 
 本页涉及的 6 个设计决策汇总如下，每个都包含「选择 / 备选 / 理由」三段式。
 
@@ -266,19 +266,19 @@ graph LR
 
 | Commit | 类型 | 一句话说明 | 涉及小节 |
 |--------|------|------------|----------|
-| [`2109c45`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/2109c45) | feat | overlap-based ROI detection instead of center point | §7.3 |
-| [`636a8ae`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/636a8ae) | feat | make ROI overlap threshold configurable | §7.3 |
-| [`8656148`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/8656148) | feat | pass NMS IoU threshold 0.5 to locate-anything-v2 | §7.4 |
-| [`e3a70be`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/e3a70be) | fix | parse JSON string detections from backend virtual metrics | §7.5 |
-| [`b0be12b`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/b0be12b) | fix | initial fetch on mount for image + virtual metrics | §7.6 |
-| [`0eedd27`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/0eedd27) | fix | update virtual data on WS-triggered REST fetch | §7.6 |
-| [`c4fe7bf`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/c4fe7bf) | fix | guard rawImageSrc against non-string metric values | §7.6 |
+| [`2109c45`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/2109c45) | feat | overlap-based ROI detection instead of center point | 7.3 |
+| [`636a8ae`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/636a8ae) | feat | make ROI overlap threshold configurable | 7.3 |
+| [`8656148`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/8656148) | feat | pass NMS IoU threshold 0.5 to locate-anything-v2 | 7.4 |
+| [`e3a70be`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/e3a70be) | fix | parse JSON string detections from backend virtual metrics | 7.5 |
+| [`b0be12b`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/b0be12b) | fix | initial fetch on mount for image + virtual metrics | 7.6 |
+| [`0eedd27`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/0eedd27) | fix | update virtual data on WS-triggered REST fetch | 7.6 |
+| [`c4fe7bf`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/c4fe7bf) | fix | guard rawImageSrc against non-string metric values | 7.6 |
 
 ### 后续章节桥接
 
-- 回到 [§6 组件构建](./6-component-build.md) —— §6.5 的 IME 输入修复（commits `44f1fa5` + `b060a25`）是「确定性优先」哲学的另一个例子：uncontrolled input 把输入状态交给浏览器原生管理，比共享 ref + state 更确定。
-- 回到 [§5 前端消费](./5-frontend-consume.md) —— §5 的 callback ref 模式是 §7.3 双坐标变换验证的基础——如果没有 ResizeObserver 准确测量容器尺寸，`object-cover` 变换的输入就是错的。
-- [§8 深度复盘](./8-deep-dive.md) —— 本节的 source_ts 对齐、WS+REST 合并顺序、ROI 矩阵等机制，在 §8 有从 133 commits 历史视角的演进复盘，能看到每个机制的「第 0 版」是如何被现实场景打磨成当前形态的。
+- 回到 [6 组件构建](./6-component-build.md) —— 6.5 的 IME 输入修复（commits `44f1fa5` + `b060a25`）是「确定性优先」哲学的另一个例子：uncontrolled input 把输入状态交给浏览器原生管理，比共享 ref + state 更确定。
+- 回到 [5 前端消费](./5-frontend-consume.md) —— 5 的 callback ref 模式是 7.3 双坐标变换验证的基础——如果没有 ResizeObserver 准确测量容器尺寸，`object-cover` 变换的输入就是错的。
+- [8 深度复盘](./8-deep-dive.md) —— 本节的 source_ts 对齐、WS+REST 合并顺序、ROI 矩阵等机制，在 8 有从 133 commits 历史视角的演进复盘，能看到每个机制的「第 0 版」是如何被现实场景打磨成当前形态的。
 
 ---
 

@@ -2,7 +2,7 @@
 description: 共享工程标准 — metadata/capability/版本/构建/测试/发布/安全的集中参考，被所有案例引用
 keywords: [NeoMind, 工程标准, metadata, capability, 构建]
 tags: [NeoMind, 开发者指南, 标准]
-sidebar_label: 工程标准附录
+sidebar_label: Engineering Standards
 ---
 
 # 共享工程标准附录
@@ -57,7 +57,7 @@ NeoMind 生态有两类可发布工件——**扩展**（Rust cdylib + 可选 Re
 }
 ```
 
-完整的 5 个 target 说明见 [§4 跨平台构建目标矩阵](#4-跨平台构建目标矩阵)。
+完整的 5 个 target 说明见 [4 跨平台构建目标矩阵](#4-跨平台构建目标矩阵)。
 
 ### 1.4 前端声明（扩展独有）
 

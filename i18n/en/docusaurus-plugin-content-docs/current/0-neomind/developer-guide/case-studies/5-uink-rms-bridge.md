@@ -2,12 +2,12 @@
 description: "NeoMind production-verified vendor bridge case study: Uink-RMS e-paper cloud platform bridging, JWT auth chain, Markdown→Image rendering (pulldown-cmark + ab_glyph + imageproc), regional endpoint routing, DisplayEditorCard frontend integration — contrast with #4 onvif-bridge as proprietary vs standard"
 keywords: [NeoMind, uink-rms-bridge, vendor bridge, e-paper, Markdown rendering, JWT]
 tags: [NeoMind, case-study, vendor-bridge]
-sidebar_label: "#5 uink-rms-bridge"
+sidebar_label: "5. uink-rms-bridge"
 ---
 
 # #5 uink-rms-bridge: Production-Verified Vendor Bridge
 
-## §1 Case Background
+## 1 Case Background
 
 **uink-rms-bridge** is the **production-verified vendor-proprietary protocol bridge** case in the NeoMind ecosystem. Uink-RMS is a cloud management platform for e-paper (electronic paper / e-ink) display devices: devices connect to the vendor cloud over LPWAN / cellular networks, and the cloud exposes a REST API for third-party integration. uink-rms-bridge enables NeoMind to do three things: (1) register an e-paper device template on the Uink-RMS platform (`device_type = "uink_epaper"`, written once via the `device_template_register` capability on the extension side); (2) periodically pull device telemetry (battery percentage, signal strength in dBm, temperature, refresh count); (3) convert user-edited Markdown / plain text / images to JPEG and push them to the e-paper screen for display refresh. The current version is `2.7.6`, with the core implementation concentrated in a single [`src/lib.rs`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs) file totaling 2250 lines, plus the [`DisplayEditorCard`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/frontend/) React + TypeScript frontend component (entrypoint `uink-rms-bridge-components.umd.cjs`).
 
@@ -19,7 +19,7 @@ sidebar_label: "#5 uink-rms-bridge"
 
 ---
 
-## §2 Architecture Overview
+## 2 Architecture Overview
 
 uink-rms-bridge is a **full-stack vendor bridge extension** — the backend is a 2250-line `lib.rs` (Rust cdylib), and the frontend is `DisplayEditorCard` (React 18 + Vite + TypeScript UMD bundle). The backend communicates with the Uink-RMS regional cloud via synchronous HTTPS using ureq, and the frontend provides users with Markdown editing + real-time preview canvas. At runtime, after NeoMind Runtime loads the `.nep` package, the extension exposes 7 commands (sync_devices / list_devices / push_content / push_image / get_display_size / get_display / refresh_auth) through the Extension trait, with command routing dispatched centrally by [`execute_command`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L1445-L1475). All runtime state is protected by `parking_lot::RwLock`, including `config: RwLock<UinkConfig>`, `access_token: RwLock<Option<String>>`, and the device ID mapping `neo_to_rms_id: RwLock<HashMap<String, String>>`.
 
@@ -107,33 +107,33 @@ Note that the `src/` directory contains **only `lib.rs`** (verified with `ls src
 
 ---
 
-## §3 Core Implementation
+## 3 Core Implementation
 
-### §3.1 JWT Auth Chain (login → refresh → retry + backoff)
+### 3.1 JWT Auth Chain (login → refresh → retry + backoff)
 
 Uink-RMS uses account-level JWT authentication (unlike onvif-bridge's device-level WS-Security). Auth state is managed by three fields: `access_token: RwLock<Option<String>>`, `refresh_token: RwLock<Option<String>>`, `token_expiry: AtomicI64`. The core entry point is [`ensure_token`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L794-L823): first checks `token_expiry - now > 120` (refresh 2 minutes early), and if expired, tries `refresh()` first (exchange refresh_token for a new access_token), falling back to `login()` (email + password re-login) on failure. The key design is **login failure backoff** — `last_login_failure_ts: AtomicI64` records the last failure time, and retries are suppressed for 5 minutes (to avoid hammering the RMS server on wrong credentials). The login function subtracts 120 seconds from `expires_in` as the local expiry, leaving a refresh window.
 
-### §3.2 Regional Endpoint Routing (UinkConfig::api_base_url)
+### 3.2 Regional Endpoint Routing (UinkConfig::api_base_url)
 
 [`UinkConfig`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L685-L721) is the extension's sole configuration struct, containing `server_region: String` (enum China / Europe / Custom), `custom_server_url: String`, `email`, `password`, `sync_interval_secs` (default 300), and `poll_interval_secs` (default 60). The `api_base_url()` method does a simple match: `"China" => "https://cn.rms.uink.com"`, `"Europe" => "https://eu.rms.uink.com"`, otherwise uses `custom_server_url`. This bakes the regional selection into config, so users just pick from a dropdown in the UI to switch. The default region is China (see `impl Default`).
 
-### §3.3 Markdown → Image Rendering Pipeline (pulldown-cmark + ab_glyph + imageproc)
+### 3.3 Markdown → Image Rendering Pipeline (pulldown-cmark + ab_glyph + imageproc)
 
 This is the most complex part of the extension, about 400 lines of code (L230-L640). The pipeline has four steps: (1) [`parse_markdown`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L248-L376) uses pulldown-cmark 0.12 to parse Markdown into `Vec<TextBlock>` (Heading / Paragraph blocks, with Paragraph containing Plain / Bold / Code inline parts); (2) [`load_system_font_data`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L215-L225) loads fonts from macOS PingFang or Linux Noto Sans CJK paths (`eprintln!("[uink-rms-bridge] Loaded font: {}", path)` at L218); (3) [`render_markdown_to_image`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L475-L640) iterates over blocks, using ab_glyph's `PxScale` + imageproc's `draw_text_mut` to draw line by line onto `ImageBuffer::<Rgb<u8>>` — the heading scale rule is documented at [L504 comment](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L504): "H1 = 2.0x base, decreasing by 0.2 per level" (H1=2.0x, H2=1.8x, H3=1.6x...); (4) `wrap_line` does CJK + Latin mixed auto-wrapping (CJK characters can break anywhere, Latin accumulates by word width). The final result is encoded as PNG bytes using the image crate.
 
-### §3.4 Image Push (push_image_to_device)
+### 3.4 Image Push (push_image_to_device)
 
 The rendered PNG/JPEG bytes are POSTed via [`push_image_to_device`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L1445-L1523) as `multipart/form-data` to `POST /api/v1/devices/{id}/image`. If the user passes `dither_algorithm` / `resize_mode` / `padding_color` parameters, it goes through the processing endpoint; otherwise it uses the raw endpoint to push the original image directly. Supported dithering algorithms include 8 options (ordered / floyd-steinberg / atkinson / burkes / sierra / stucki / jarvis-judice-ninke / threshold), and resize modes include fit / cover / fill. The image size limit is 10MB.
 
-### §3.5 Device Registration and ID Mapping (uink_epaper device template)
+### 3.5 Device Registration and ID Mapping (uink_epaper device template)
 
 On first sync, the extension registers the `uink_epaper` device template via the `device_template_register` capability (including 14 metrics: battery / temperature / signal_strength / refresh_count / online_status / sn / model, etc.). Then [`fetch_rms_devices`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L877) paginates the RMS device list, and for each device generates `neo_device_id = format!("uink-{}", device.device_id)` and calls `device_register`. The key ID mapping is stored in `neo_to_rms_id: RwLock<HashMap<String, String>>` ([L730](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L730)) — all push commands first translate the NeoMind device_id back to the RMS device_id via `resolve_rms_id()`.
 
-### §3.6 configure() Hot Reload
+### 3.6 configure() Hot Reload
 
 [`configure`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L1523-L1540) accepts a JSON config, writes it into the `UinkConfig` RwLock, then **actively clears access_token / refresh_token / token_expiry** — this forces the next operation to re-login, avoiding using a stale token against a new regional endpoint. It also resets `template_registered` and `last_sync_ts` so auto-sync runs immediately with the new config on the next `produce_metrics` cycle.
 
-### §3.7 Image Push Sequence Diagram
+### 3.7 Image Push Sequence Diagram
 
 ```mermaid
 sequenceDiagram
@@ -173,7 +173,7 @@ sequenceDiagram
 
 ---
 
-## §4 Key Design Decisions
+## 4 Key Design Decisions
 
 ### Decision 1: ureq synchronous HTTP (not reqwest async)
 
@@ -201,7 +201,7 @@ sequenceDiagram
 
 ---
 
-## §5 Integration with NeoMind Core
+## 5 Integration with NeoMind Core
 
 uink-rms-bridge integrates with the NeoMind core at four levels:
 
@@ -217,7 +217,7 @@ uink-rms-bridge integrates with the NeoMind core at four levels:
 
 ---
 
-## §6 Testing & Verification
+## 6 Testing & Verification
 
 ### Unit Tests (inlined in lib.rs L2107-L2250)
 
@@ -246,7 +246,7 @@ The complete manual verification flow: (1) configure server_region + email + pas
 
 ---
 
-## §7 Deployment / Ops / Troubleshooting
+## 7 Deployment / Ops / Troubleshooting
 
 ### 5-Platform .nep Distribution
 
@@ -290,7 +290,7 @@ uink-rms-bridge's `src/` directory contains **only `lib.rs`, totaling 2250 lines
 
 ---
 
-## §8 Further Reading & Summary
+## 8 Further Reading & Summary
 
 ### Evolution Milestones
 

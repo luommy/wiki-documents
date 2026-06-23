@@ -2,32 +2,32 @@
 description: "ne101_camera 前端消费：detections 拉取、JSON string 解析、按类别上色（golden-angle HSV）、SVG 叠加渲染（polygon + rect fallback）、object-cover 坐标变换、ResizeObserver 回调 ref 模式、Transform 三级生命周期"
 keywords: [ne101_camera, 前端渲染, classColor, golden-angle, ResizeObserver, object-cover, SVG overlay]
 tags: [NeoMind, 案例, MVP]
-sidebar_label: "§5 前端消费 ★"
+sidebar_label: "5. Frontend Consume"
 ---
 
-# §5 前端消费：从 detections 到 SVG 叠加的渲染全链路
+# 5 前端消费：从 detections 到 SVG 叠加的渲染全链路
 
 > 本节是 ne101_camera MVP 阶段的**前端渲染参考页**。读完你应当能：(1) 描述从 props 到 SVG 叠加的完整渲染管线，并解释为什么这条管线是 effect-driven 的；(2) 复述 `classColor(label)` 用字符串哈希 + 黄金角 137.508° 旋转生成 HSV 色相的算法，说出它相对于固定调色板的优势；(3) 解释 SVG 叠加渲染的 polygon + rect fallback 分支，以及 OCR polygon 顶点 `[x,y]` 与 `{x,y}` 两种格式的兼容处理；(4) 推导 object-cover 坐标变换的数学：当图像宽高比大于容器时两侧裁剪、小于时上下裁剪，各自的 `sx/sy/ox/oy` 公式；(5) 说出为什么用 callback ref 而不是 `useEffect` 来挂载 ResizeObserver——这是异步挂载元素的唯一正确写法。所有行号锚点都指向源码仓库 `main` 分支的 [`bundle.js`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js) 和 [`manifest.json`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json)。
 
 ---
 
-## §5.1 渲染管线总览
+## 5.1 渲染管线总览
 
-ne101_camera 的渲染不是一次性的 JSX 模板，而是一条由多个 effect 驱动的**状态管线**。这条管线的起点是平台注入的 props（`device` / `deviceImageSrc` / `virtualMetrics` / `config` / `onConfigChange`），终点是挂载在媒体 `<div>` 上的 SVG 叠加层。中间穿过五个状态节点：(1) Transform lifecycle effect（创建/更新/删除后端 Transform，见 §5.7）；(2) WS + REST 合并 effect（拉取图像和 virtual 指标，见 [§4.7](./4-data-contract.md)）；(3) `imageData` / `wsValues` / `virtualData` 三个 state 的 `setState`；(4) `imgNatState`（图像原始宽高）+ `ctrSizeState`（容器宽高）驱动的 `ovTf` 坐标变换计算（见 §5.4）；(5) detections 数组按类别上色后映射成 SVG `<g>` 元素（见 §5.2 / §5.3）。任何一个节点的状态变化都会触发 React 重渲染，重新走一遍从 `ovTf` 计算到 SVG 映射的路径。
+ne101_camera 的渲染不是一次性的 JSX 模板，而是一条由多个 effect 驱动的**状态管线**。这条管线的起点是平台注入的 props（`device` / `deviceImageSrc` / `virtualMetrics` / `config` / `onConfigChange`），终点是挂载在媒体 `<div>` 上的 SVG 叠加层。中间穿过五个状态节点：(1) Transform lifecycle effect（创建/更新/删除后端 Transform，见 5.7）；(2) WS + REST 合并 effect（拉取图像和 virtual 指标，见 [4.7](./4-data-contract.md)）；(3) `imageData` / `wsValues` / `virtualData` 三个 state 的 `setState`；(4) `imgNatState`（图像原始宽高）+ `ctrSizeState`（容器宽高）驱动的 `ovTf` 坐标变换计算（见 5.4）；(5) detections 数组按类别上色后映射成 SVG `<g>` 元素（见 5.2 / 5.3）。任何一个节点的状态变化都会触发 React 重渲染，重新走一遍从 `ovTf` 计算到 SVG 映射的路径。
 
 下图把这条 effect-driven 管线画成流程图，标出每一步的输入/输出和触发条件。
 
 ```mermaid
 graph TB
     PROPS["props 注入<br/>device / deviceImageSrc<br/>virtualMetrics / config"]
-    EFFECT_TR["useEffect: Transform lifecycle<br/>(§5.7 三级: verify / update / create)"]
-    EFFECT_FETCH["useEffect: WS + REST 合并<br/>(§4.7 双通道)"]
+    EFFECT_TR["useEffect: Transform lifecycle<br/>(5.7 三级: verify / update / create)"]
+    EFFECT_FETCH["useEffect: WS + REST 合并<br/>(4.7 双通道)"]
     STATE["setState 三件套<br/>imageData / wsValues / virtualData"]
     RERENDER["React re-render"]
-    OVTF["计算 ovTf<br/>(§5.4 object-cover 变换)<br/>依赖 imgNatState + ctrSizeState"]
-    MAPDET["map detections → SVG &lt;g&gt;<br/>(§5.2 classColor 上色<br/>§5.3 polygon / rect / label)"]
+    OVTF["计算 ovTf<br/>(5.4 object-cover 变换)<br/>依赖 imgNatState + ctrSizeState"]
+    MAPDET["map detections → SVG &lt;g&gt;<br/>(5.2 classColor 上色<br/>5.3 polygon / rect / label)"]
     SVG["SVG 叠加层<br/>viewBox=0 0 100 100<br/>preserveAspectRatio=none"]
-    BADGES["检测摘要徽章<br/>(§5.6 metric-driven)"]
+    BADGES["检测摘要徽章<br/>(5.6 metric-driven)"]
 
     PROPS --> EFFECT_TR
     PROPS --> EFFECT_FETCH
@@ -40,11 +40,11 @@ graph TB
     RERENDER --> BADGES
 ```
 
-**为什么这条管线是 effect-driven 的**：ne101_camera 是 NeoMind 平台的「React-in-IIFE」组件（见 [§2.1](./2-architecture.md)），它没有 Redux / Zustand 这类外部状态管理，所有跨帧状态都用 `React.useState` + `React.useRef` 管理。React 的核心心智模型就是「UI = f(state)」——只要 state 变了，渲染函数就会重跑。组件把 WS 推送、REST 回填、图像 `onLoad`、ResizeObserver 回调都接到了 `setState` 上，每一次外部事件都通过 state 变更驱动一次完整的重渲染。这种模式的代价是：没有虚拟 DOM diffing 的优化空间（每次都全量重算 `ovTf` 和 detections 映射），但因为单组件的 DOM 节点数在 50 以内（一个 `<svg>` + N 个 `<g>`），全量重渲染的开销可以忽略。真正昂贵的是 `neomind.createTransform` 这类异步 API 调用，它们被严格限制在 effect 里、用 `cancelled` 标志位做取消保护（见 [`bundle.js` L709](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L709-L709)）。
+**为什么这条管线是 effect-driven 的**：ne101_camera 是 NeoMind 平台的「React-in-IIFE」组件（见 [2.1](./2-architecture.md)），它没有 Redux / Zustand 这类外部状态管理，所有跨帧状态都用 `React.useState` + `React.useRef` 管理。React 的核心心智模型就是「UI = f(state)」——只要 state 变了，渲染函数就会重跑。组件把 WS 推送、REST 回填、图像 `onLoad`、ResizeObserver 回调都接到了 `setState` 上，每一次外部事件都通过 state 变更驱动一次完整的重渲染。这种模式的代价是：没有虚拟 DOM diffing 的优化空间（每次都全量重算 `ovTf` 和 detections 映射），但因为单组件的 DOM 节点数在 50 以内（一个 `<svg>` + N 个 `<g>`），全量重渲染的开销可以忽略。真正昂贵的是 `neomind.createTransform` 这类异步 API 调用，它们被严格限制在 effect 里、用 `cancelled` 标志位做取消保护（见 [`bundle.js` L709](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L709-L709)）。
 
 ---
 
-## §5.2 按类别上色：Golden-Angle HSV
+## 5.2 按类别上色：Golden-Angle HSV
 
 检测框的颜色不是固定的，而是由类别标签（`det.label`）决定的。commit [`c276c23`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/c276c23)（`feat(ne101): per-class detection colors via golden-angle HSV rotation`）引入了 `classColor(label)` 函数，位于 [`bundle.js` L55-L72](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L55-L72)。这个函数做了三件事：
 
@@ -63,11 +63,11 @@ graph TB
 
 ---
 
-## §5.3 SVG 叠加渲染：Polygon + Rect Fallback
+## 5.3 SVG 叠加渲染：Polygon + Rect Fallback
 
 检测框的渲染不是画在 Canvas 上，而是用一层 SVG 叠加在 `<img>` 之上。这层 SVG 的渲染逻辑在 [`bundle.js` L1210-L1272](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1210-L1272)，核心是一个 `detections.map(...)` 调用，每个 detection 生成一个 `<g>` 元素，内含形状（polygon 或 rect）+ 标签文字。
 
-**Polygon 模式（L1224-L1237）**：当 `det.polygon` 存在且顶点数 ≥ 3 时，渲染 `<polygon>`。这是 OCR 场景（`ocr_text_blocks` responseType）的精确轮廓——OCR 文本框通常不是轴对齐矩形（倾斜文本、弯曲文本行），多边形比 bbox 更贴合。顶点坐标在 L1226-L1231 遍历，每个顶点先经过 `ovTf` 变换（见 §5.4），再拼接成 SVG `points` 字符串。
+**Polygon 模式（L1224-L1237）**：当 `det.polygon` 存在且顶点数 ≥ 3 时，渲染 `<polygon>`。这是 OCR 场景（`ocr_text_blocks` responseType）的精确轮廓——OCR 文本框通常不是轴对齐矩形（倾斜文本、弯曲文本行），多边形比 bbox 更贴合。顶点坐标在 L1226-L1231 遍历，每个顶点先经过 `ovTf` 变换（见 5.4），再拼接成 SVG `points` 字符串。
 
 **Rect fallback（L1238-L1252）**：当只有 `det.bbox`（4 元素数组 `[x1, y1, x2, y2]`）时，渲染 `<rect>`。这是 object detection 场景（`objects_bbox` / `detections_bbox` responseType）的标准矩形框。bbox 的四个坐标值分别经过 `ovTf` 变换后，拼成 `<rect>` 的 `x / y / width / height`。
 
@@ -86,7 +86,7 @@ commit [`b746c02`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/c
 
 ---
 
-## §5.4 object-cover 坐标变换
+## 5.4 object-cover 坐标变换
 
 检测框的坐标是**归一化到图像空间的**（0-1 表示相对于原始图像宽高的比例），但图像在 DOM 里是用 `object-cover` 渲染的——图像会被缩放以完全覆盖容器，多余的部分被裁剪。这意味着图像的可见区域只是原始图像的一个子集，检测框坐标必须经过一个变换才能正确叠加在可见区域上。这个变换就是 `ovTf`，计算逻辑在 [`bundle.js` L879-L899](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L879-L899)。
 
@@ -123,7 +123,7 @@ graph LR
 
 ---
 
-## §5.5 ResizeObserver 回调 Ref 模式
+## 5.5 ResizeObserver 回调 Ref 模式
 
 `ovTf` 的计算依赖两个状态：图像原始尺寸（`imgNatState`）和容器尺寸（`ctrSizeState`）。图像尺寸通过 `<img onLoad>` 回调写入（[L1165-L1168](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1165-L1168)），容器尺寸通过 ResizeObserver 监听媒体 `<div>` 的尺寸变化写入。但这里有一个 React 的经典陷阱：**媒体 `<div>` 是条件渲染的**——只有当 `hasImage` 为 true 时才挂载（[L1153-L1156](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1153-L1156)），而图像是异步到达的（WS 推送或 REST 回填）。这意味着组件首次渲染时媒体 `<div>` 还不存在，一个普通的 `useEffect(() => { new ResizeObserver(mediaRef.current) }, [])` 会拿到 `mediaRef.current === null`，ResizeObserver 永远不会被挂载。
 
@@ -162,7 +162,7 @@ commit [`7c92a19`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/c
 
 ---
 
-## §5.6 检测摘要徽章
+## 5.6 检测摘要徽章
 
 图像底部的叠加栏（[`bundle.js` L1067-L1145](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1067-L1145)）渲染一组检测摘要徽章，让用户在不看检测框细节的情况下也能快速掌握「这一帧检测到了什么」。这组徽章的设计原则是 **metric-driven**——数据来源是 Transform 已经计算好的 virtual 指标，而不是在组件里重新从 detections 数组聚合。
 
@@ -178,12 +178,12 @@ commit [`7c92a19`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/c
 
 - **选择**：从 virtual metrics（`total_count` / `count_by_class` / `roi_count` / `texts`）读取数据。
 - **备选方案**：在组件渲染函数里从 `detections` 数组实时聚合（`detections.length`、`detections.reduce(...)` 按 label 分组计数）。
-- **理由**：Transform 在后端沙箱里**已经**计算了这些聚合（见 [§4.4](./4-data-contract.md) 的 `total_count` / `count_by_class` / `roi_count` 输出契约）。如果组件再算一次，就是重复计算，且有两个风险：(1) 两次计算的逻辑可能不一致（比如 Transform 用了 ROI 过滤后的 detections 算 `roi_count`，但组件拿到的 detections 是过滤前的），导致徽章数字与检测框数量对不上；(2) 每次 render 都重新 reduce 一个可能很长的数组，浪费 CPU。metric-driven 方案让组件只做「展示」，不做「计算」，职责清晰。
-- **代价**：如果 Transform 出 bug 算错了 metric，组件会忠实地展示错误数字。这个代价用 §4.8 的「宽容降级」哲学来缓解——metric 缺失时回退到 `detections.length`，不会白屏。
+- **理由**：Transform 在后端沙箱里**已经**计算了这些聚合（见 [4.4](./4-data-contract.md) 的 `total_count` / `count_by_class` / `roi_count` 输出契约）。如果组件再算一次，就是重复计算，且有两个风险：(1) 两次计算的逻辑可能不一致（比如 Transform 用了 ROI 过滤后的 detections 算 `roi_count`，但组件拿到的 detections 是过滤前的），导致徽章数字与检测框数量对不上；(2) 每次 render 都重新 reduce 一个可能很长的数组，浪费 CPU。metric-driven 方案让组件只做「展示」，不做「计算」，职责清晰。
+- **代价**：如果 Transform 出 bug 算错了 metric，组件会忠实地展示错误数字。这个代价用 4.8 的「宽容降级」哲学来缓解——metric 缺失时回退到 `detections.length`，不会白屏。
 
 ---
 
-## §5.7 Transform 三级生命周期
+## 5.7 Transform 三级生命周期
 
 Transform 的 create/update/delete 逻辑在 [`bundle.js` L661-L824](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L661-L824)，是一个 `React.useEffect`，依赖数组是 `[device.id, processingEnabled, _configHash, _storedTid, _storedHash]`（L824）。这个 effect 内部按三级分发：
 
@@ -238,7 +238,7 @@ stateDiagram-v2
 
 ---
 
-## §5.8 设计决策汇总
+## 5.8 设计决策汇总
 
 本页涉及的 6 个设计决策汇总如下，每个都包含「选择 / 备选 / 理由」三段式。
 
@@ -257,20 +257,20 @@ stateDiagram-v2
 
 | Commit | 类型 | 一句话说明 | 涉及小节 |
 |--------|------|------------|----------|
-| [`c276c23`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/c276c23) | feat | per-class detection colors via golden-angle HSV rotation | §5.2 |
-| [`3cf1b27`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/3cf1b27) | style | change detection box and label color from blue to red | §5.2 |
-| [`b746c02`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/b746c02) | feat | render OCR detection boxes as polygons with rect fallback | §5.3 |
-| [`403c0f1`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/403c0f1) | fix | handle `{x,y}` object format for OCR polygon detection boxes | §5.3 |
-| [`d7836b8`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/d7836b8) | fix | ResizeObserver never set up when image loads async | §5.5 |
-| [`7c92a19`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/7c92a19) | fix | fix ROI canvas coordinate mapping for objectFit contain | §5.5 |
-| [`ac06344`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/ac06344) | fix | verify stored Transform exists in Tier 1 | §5.7 |
-| [`e3a70be`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/e3a70be) | fix | parse JSON string detections from backend virtual metrics | §5.1 |
+| [`c276c23`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/c276c23) | feat | per-class detection colors via golden-angle HSV rotation | 5.2 |
+| [`3cf1b27`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/3cf1b27) | style | change detection box and label color from blue to red | 5.2 |
+| [`b746c02`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/b746c02) | feat | render OCR detection boxes as polygons with rect fallback | 5.3 |
+| [`403c0f1`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/403c0f1) | fix | handle `{x,y}` object format for OCR polygon detection boxes | 5.3 |
+| [`d7836b8`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/d7836b8) | fix | ResizeObserver never set up when image loads async | 5.5 |
+| [`7c92a19`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/7c92a19) | fix | fix ROI canvas coordinate mapping for objectFit contain | 5.5 |
+| [`ac06344`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/ac06344) | fix | verify stored Transform exists in Tier 1 | 5.7 |
+| [`e3a70be`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/e3a70be) | fix | parse JSON string detections from backend virtual metrics | 5.1 |
 
 ### 后续章节桥接
 
-- [§6 组件构建](./6-component-build.md)（MVP）—— `NE101CameraPanel` 命名导出的写法、React hooks 在 IIFE 中的陷阱（commit `0601cd4`）、`AdvancedPanel` 的分层设计。本节的 callback ref 模式和三级 Transform 生命周期在 §6 会有构建视角的复盘。
-- 回到 [§4 数据契约](./4-data-contract.md) —— 本节消费的 `detections` / `total_count` / `count_by_class` 等 virtual 指标的 schema 和输出前缀规则在 §4.4 定义。
-- 回到 [§2 架构总览](./2-architecture.md) —— 本节提到的 effect-driven 管线和五层架构的关系在 §2.2 / §2.3 展开。
+- [6 组件构建](./6-component-build.md)（MVP）—— `NE101CameraPanel` 命名导出的写法、React hooks 在 IIFE 中的陷阱（commit `0601cd4`）、`AdvancedPanel` 的分层设计。本节的 callback ref 模式和三级 Transform 生命周期在 6 会有构建视角的复盘。
+- 回到 [4 数据契约](./4-data-contract.md) —— 本节消费的 `detections` / `total_count` / `count_by_class` 等 virtual 指标的 schema 和输出前缀规则在 4.4 定义。
+- 回到 [2 架构总览](./2-architecture.md) —— 本节提到的 effect-driven 管线和五层架构的关系在 2.2 / 2.3 展开。
 
 ---
 

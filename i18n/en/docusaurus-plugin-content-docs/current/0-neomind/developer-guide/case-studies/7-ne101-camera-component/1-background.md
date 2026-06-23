@@ -5,13 +5,13 @@ tags: [NeoMind, case, business background]
 sidebar_label: "1. Business Background"
 ---
 
-# §1 Business Background: Why NeoMind Needs the ne101_camera Component
+# 1 Business Background: Why NeoMind Needs the ne101_camera Component
 
 > This section answers three questions: **what is the NE101 hardware**, **why the generic metric_card cannot do the job**, and **where ne101_camera sits in the NeoMind ecosystem**. After reading it you will be able to explain why the manifest declares `has_device_binding: true` + `has_data_source: false` — the canonical signature of a device-bound component.
 
 ---
 
-## §1.1 The NE101 Device: CamThink Sensing Camera
+## 1.1 The NE101 Device: CamThink Sensing Camera
 
 **CamThink NE101** is a battery-powered edge-AI sensing camera designed by the CamThink team (which also maintains the NeoMind Dashboard). Its core capability is "on-demand capture + edge metric reporting": unlike a traditional IPC camera that streams continuously, NE101 spends most of its time in low-power sleep and wakes up to capture a single JPEG still only under three trigger conditions — (1) an explicit `trigger_capture` command from a user; (2) the built-in scheduler firing (cron-style `set_schedule`); (3) an external system issuing a command via the MQTT `cmd` topic. After each capture the device reports a telemetry bundle: the latest JPEG image (fetched via REST, URL stored in `values.image_url`), the battery percentage, the cellular signal strength, and the enclosure temperature. This "event-driven + low-frequency sampling" design lets a single battery last 3-6 months, but it also means the component cannot use a "subscribe to video stream" model — it must use a "fetch the latest still" polling/event pattern.
 
@@ -24,13 +24,13 @@ The device commands NE101 supports are the source of the component's command but
 - `reboot` — remotely reboots the device, useful for troubleshooting cellular dropouts. This command gets a confirmation dialog in the UI to prevent accidental triggers.
 - `set_capture_params` — tunes capture parameters (resolution, JPEG quality, whether to enable IR illumination); an advanced setting collapsed by default.
 
-The existence of these four command types further reinforces the §1.2 argument: a purely display-oriented component like metric_card cannot carry command-triggering capability at all; a dedicated device-bound component is required to render command buttons and call the device-command API.
+The existence of these four command types further reinforces the 1.2 argument: a purely display-oriented component like metric_card cannot carry command-triggering capability at all; a dedicated device-bound component is required to render command buttons and call the device-command API.
 
 > **Source evidence**: the manifest's `description.en` literally says "displays latest capture, battery status, and trigger controls" — this trio mirrors the NE101 device capabilities. See [manifest.json L4-L7](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L4-L7).
 
 ---
 
-## §1.2 Why metric_card Cannot Fill In
+## 1.2 Why metric_card Cannot Fill In
 
 A natural first reaction is: "NE101 just reports battery, signal, and temperature numbers — can't I bind a data source to [#6 metric_card](../6-metric-card-component.md) and be done?" The answer is no, for four reasons:
 
@@ -46,7 +46,7 @@ In short, NE101 needs a **dedicated device-bound component** that bundles "image
 
 ---
 
-## §1.3 Position in the NeoMind Ecosystem: A Device-Bound Component
+## 1.3 Position in the NeoMind Ecosystem: A Device-Bound Component
 
 The NeoMind component marketplace has four `category` values: `display` (e.g. metric_card), `device` (e.g. ne101_camera), `extension` (extension drivers), and `bridge` (protocol bridges like onvif-bridge). ne101_camera is the flagship sample of the `device` category and currently the only `device`-category component in the marketplace.
 
@@ -90,15 +90,15 @@ graph TB
     class NE101 flagship
 ```
 
-The dashed arrow is the most important cross-category relationship in this case: the `device`-category ne101_camera consumes `extension`-category AI extensions through the `processingExtensionId` field. This "device component + pluggable extension" cooperation model is the core mechanism for AI reuse in the NeoMind ecosystem and is covered in depth in §3 Extension Side (v1.1).
+The dashed arrow is the most important cross-category relationship in this case: the `device`-category ne101_camera consumes `extension`-category AI extensions through the `processingExtensionId` field. This "device component + pluggable extension" cooperation model is the core mechanism for AI reuse in the NeoMind ecosystem and is covered in depth in 3 Extension Side (v1.1).
 
 ---
 
-## §1.4 Deep Analysis of Key manifest.json Fields
+## 1.4 Deep Analysis of Key manifest.json Fields
 
-ne101_camera's manifest is only 40 lines but extremely dense. Beyond the two binding fields covered in §1.3, three fields are the core innovations of this case and will be referenced repeatedly in later sections:
+ne101_camera's manifest is only 40 lines but extremely dense. Beyond the two binding fields covered in 1.3, three fields are the core innovations of this case and will be referenced repeatedly in later sections:
 
-**`processingExtensionId: ""` ([manifest.json L24](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L24)) — the configurable AI-extension consumer contract.** This is the most important design decision in this case (see §1.6 decision #1). The empty string means "AI processing is off by default"; in the config panel the user picks an installed AI extension (object_detection / ocr / describe, etc.) from a dropdown, and the component sends the captured image URL + config params to that extension. The extension runs inference, writes the detections back to the device's virtual metrics, and the component reads them back and overlays them. This contract means ne101_camera is not hard-wired to any specific AI capability — the same component does different tasks when paired with different extensions.
+**`processingExtensionId: ""` ([manifest.json L24](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L24)) — the configurable AI-extension consumer contract.** This is the most important design decision in this case (see 1.6 decision #1). The empty string means "AI processing is off by default"; in the config panel the user picks an installed AI extension (object_detection / ocr / describe, etc.) from a dropdown, and the component sends the captured image URL + config params to that extension. The extension runs inference, writes the detections back to the device's virtual metrics, and the component reads them back and overlays them. This contract means ne101_camera is not hard-wired to any specific AI capability — the same component does different tasks when paired with different extensions.
 
 **`processingRoiOverlap: 0.6` ([manifest.json L31](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L31)) — the IoU-based ROI hit threshold.** This field decides "whether a detection box counts as falling inside an ROI": a box counts as a hit when its Intersection over Union with the ROI is ≥ 0.6. The earlier implementation used "center point inside ROI" (before commit `2109c45`), but center-point was too lenient for large targets straddling the ROI edge. Commit `2109c45` (`feat(ne101_camera): overlap-based ROI detection instead of center point`) switched to IoU, and commit `636a8ae` (`feat(ne101_camera): make ROI overlap threshold configurable`) then exposed the threshold as a user-tunable field.
 
@@ -106,7 +106,7 @@ ne101_camera's manifest is only 40 lines but extremely dense. Beyond the two bin
 
 ---
 
-## §1.5 User Pain Points Before the Component Existed
+## 1.5 User Pain Points Before the Component Existed
 
 Before ne101_camera was built, monitoring an NE101 camera on NeoMind required "assembling" at least three components plus manual REST calls:
 
@@ -133,7 +133,7 @@ This contrast also explains why ne101_camera's `bundle.js` is 1972 lines while m
 
 ---
 
-## §1.6 Key Design Decisions (with Alternatives)
+## 1.6 Key Design Decisions (with Alternatives)
 
 This section lists 4 key design decisions and the alternatives that were rejected. These decisions shaped ne101_camera into its current form; understanding them helps you avoid detours when forking the component.
 
@@ -173,11 +173,11 @@ This section lists 4 key design decisions and the alternatives that were rejecte
 
 ### Design decision recap
 
-These four decisions share a common theme: **push complexity to the edges and keep the component itself "thin"**. ne101_camera does not bake in AI, does not pretend to be a data source, does not lock the detection algorithm, and does not force a config-format migration — each decision leaves the choice to the user or to the downstream extension. This "thin component + thick contract" philosophy is the core design principle of the NeoMind component marketplace, and it is why a 1972-line component can be called "flagship" rather than "bloated": the vast majority of those 1972 lines are glue code that "exposes choice correctly", not monolithic logic that "does everything itself". Later sections (especially §3 Extension Side and §6 Component Build) will return to this theme repeatedly.
+These four decisions share a common theme: **push complexity to the edges and keep the component itself "thin"**. ne101_camera does not bake in AI, does not pretend to be a data source, does not lock the detection algorithm, and does not force a config-format migration — each decision leaves the choice to the user or to the downstream extension. This "thin component + thick contract" philosophy is the core design principle of the NeoMind component marketplace, and it is why a 1972-line component can be called "flagship" rather than "bloated": the vast majority of those 1972 lines are glue code that "exposes choice correctly", not monolithic logic that "does everything itself". Later sections (especially 3 Extension Side and 6 Component Build) will return to this theme repeatedly.
 
 ---
 
-## §1.7 End-to-End Data Flow
+## 1.7 End-to-End Data Flow
 
 The diagram below shows the complete chain from NE101 device capture to the user seeing an annotated image. This chain involves five roles: the NE101 device, the MQTT broker, the NeoMind controller, the AI extension, and the ne101_camera component.
 
@@ -209,51 +209,51 @@ sequenceDiagram
 **Key points on the chain**:
 
 - Steps 3-4 ("WebSocket pushes delta → component fetches JPEG") are asynchronous. The component must hold the latest `image_url` in state and handle "image still loading, Canvas not yet set up" edge cases (commit `d7836b8` fixes ResizeObserver not being set up when the image loads async).
-- Steps 8-10 ("component → controller → extension → write back") are ne101_camera's most innovative chain, called the **Transform lifecycle**. When `processingEnabled: true`, the component creates a named Transform (`ne101-{deviceId}-{extId}-{template}`); the controller schedules it, the extension runs inference, and the result is written back via the `detections` virtual metric. See §3 Extension Side (v1.1) + §4 Data Contract (MVP).
+- Steps 8-10 ("component → controller → extension → write back") are ne101_camera's most innovative chain, called the **Transform lifecycle**. When `processingEnabled: true`, the component creates a named Transform (`ne101-{deviceId}-{extId}-{template}`); the controller schedules it, the extension runs inference, and the result is written back via the `detections` virtual metric. See 3 Extension Side (v1.1) + 4 Data Contract (MVP).
 - Step 11 ("parse JSON string") is needed because the `detections` virtual metric is serialized as a string (commit `e3a70be` fixed this parsing); the component must `JSON.parse` before using it.
 
 ---
 
-## §1.8 Target Readers
+## 1.8 Target Readers
 
 This case targets two audiences:
 
-**First: component developers who are writing a dedicated panel for a specific device type.** If you have an ONVIF camera, a Modbus sensor, or a Zigbee actuator and want to know "how do I write a NeoMind component for this device", this case is your template. Focus on §1 (this section) + §2 Architecture (v1.1) + §6 Component Build (MVP) to learn the triple "device binding + command trigger + config panel".
+**First: component developers who are writing a dedicated panel for a specific device type.** If you have an ONVIF camera, a Modbus sensor, or a Zigbee actuator and want to know "how do I write a NeoMind component for this device", this case is your template. Focus on 1 (this section) + 2 Architecture (v1.1) + 6 Component Build (MVP) to learn the triple "device binding + command trigger + config panel".
 
-**Second: integrators who want to wire an AI extension to a camera device.** If you develop AI extensions and want your extension to be consumable by ne101_camera (or any other device-bound component), focus on §1 (this section) + §3 Extension Side (v1.1) + §4 Data Contract (MVP) to learn the input/output format of the `processingExtensionId` contract, the schema of the `detections` virtual metric, and the rules of the Transform lifecycle.
+**Second: integrators who want to wire an AI extension to a camera device.** If you develop AI extensions and want your extension to be consumable by ne101_camera (or any other device-bound component), focus on 1 (this section) + 3 Extension Side (v1.1) + 4 Data Contract (MVP) to learn the input/output format of the `processingExtensionId` contract, the schema of the `detections` virtual metric, and the rules of the Transform lifecycle.
 
-Both audiences should first read §1-§3 of the [#6 metric_card](../6-metric-card-component.md) case, because the "IIFE injection + manifest contract + fetchData pull" triple taught there is the underlying skeleton of this case.
-
----
-
-## §1.9 What Comes Next
-
-- **§2 Architecture (v1.1)**: breaks down the 1972-line IIFE into module layers and draws the component tree and data flow.
-- **§3 Extension Side (v1.1)**: dives into the `processingExtensionId` contract — how extensions consume images and write detections back.
-- **§4 Data Contract ★ (MVP)**: MQTT topic naming, WebSocket delta message format, the `detections` field schema, and the JSON structure of single-rectangle ROI vs multi-ROI array.
-- **§5 Frontend Consume ★ (MVP)**: how the component fetches detections, parses the JSON string, colors per class (commit `c276c23`'s golden-angle HSV rotation), and draws detection boxes.
-- **§6 Component Build ★ (MVP)**: the `NE101CameraPanel` named export pattern, React-hooks-in-IIFE pitfalls (commits `b060a25` / `0601cd4`), and the layered design of the config panel.
-- **§7 ROI Overlay (v1.1)**: rendering differences between single rectangle and multi-ROI array, normalized-to-pixel coordinate mapping, and handling the non-linear scaling of `objectFit: contain`.
-- **§8 Ops & Extensions (v1.1)**: version evolution (key nodes across 25+ commits), debug-trace techniques, and performance tuning (avoiding duplicate Transform creation, throttling Canvas redraws).
+Both audiences should first read 1-3 of the [#6 metric_card](../6-metric-card-component.md) case, because the "IIFE injection + manifest contract + fetchData pull" triple taught there is the underlying skeleton of this case.
 
 ---
 
-## §1.10 Key Commit Index
+## 1.9 What Comes Next
+
+- **2 Architecture (v1.1)**: breaks down the 1972-line IIFE into module layers and draws the component tree and data flow.
+- **3 Extension Side (v1.1)**: dives into the `processingExtensionId` contract — how extensions consume images and write detections back.
+- **4 Data Contract ★ (MVP)**: MQTT topic naming, WebSocket delta message format, the `detections` field schema, and the JSON structure of single-rectangle ROI vs multi-ROI array.
+- **5 Frontend Consume ★ (MVP)**: how the component fetches detections, parses the JSON string, colors per class (commit `c276c23`'s golden-angle HSV rotation), and draws detection boxes.
+- **6 Component Build ★ (MVP)**: the `NE101CameraPanel` named export pattern, React-hooks-in-IIFE pitfalls (commits `b060a25` / `0601cd4`), and the layered design of the config panel.
+- **7 ROI Overlay (v1.1)**: rendering differences between single rectangle and multi-ROI array, normalized-to-pixel coordinate mapping, and handling the non-linear scaling of `objectFit: contain`.
+- **8 Ops & Extensions (v1.1)**: version evolution (key nodes across 25+ commits), debug-trace techniques, and performance tuning (avoiding duplicate Transform creation, throttling Canvas redraws).
+
+---
+
+## 1.10 Key Commit Index
 
 Later sections reference the commits below; they are listed here for convenience. For the full history, run `git log --oneline -- components/ne101_camera/` in the [source repo](https://github.com/camthink-ai/NeoMind-Dashboard-Components).
 
 | Commit | Type | One-liner | Section |
 |--------|------|-----------|---------|
-| `c276c23` | feat | per-class detection colors via golden-angle HSV rotation | §5 Frontend Consume |
-| `8656148` | feat | pass NMS IoU threshold 0.5 to locate-anything-v2 | §3 Extension Side |
-| `636a8ae` | feat | make ROI overlap threshold configurable (the `processingRoiOverlap` field) | §7 ROI Overlay |
-| `2109c45` | feat | overlap-based ROI detection instead of center point (IoU replaces center) | §7 ROI Overlay |
-| `b746c02` | feat | render OCR detection boxes as polygons with rect fallback | §5 Frontend Consume |
-| `d7836b8` | fix | ResizeObserver never set up when image loads async (async Canvas pitfall) | §6 Component Build |
-| `b060a25` | fix | React error #310 — use defaultValue instead of hooks in ImageInput (hooks pitfall) | §6 Component Build |
-| `0601cd4` | fix | move conditional useState hook to fix React error #310 (hook-order pitfall) | §6 Component Build |
-| `e3a70be` | fix | parse JSON string detections from backend virtual metrics (JSON string parsing) | §4 Data Contract |
-| `c4fe7bf` | fix | guard rawImageSrc against non-string metric values (type guard) | §5 Frontend Consume |
+| `c276c23` | feat | per-class detection colors via golden-angle HSV rotation | 5 Frontend Consume |
+| `8656148` | feat | pass NMS IoU threshold 0.5 to locate-anything-v2 | 3 Extension Side |
+| `636a8ae` | feat | make ROI overlap threshold configurable (the `processingRoiOverlap` field) | 7 ROI Overlay |
+| `2109c45` | feat | overlap-based ROI detection instead of center point (IoU replaces center) | 7 ROI Overlay |
+| `b746c02` | feat | render OCR detection boxes as polygons with rect fallback | 5 Frontend Consume |
+| `d7836b8` | fix | ResizeObserver never set up when image loads async (async Canvas pitfall) | 6 Component Build |
+| `b060a25` | fix | React error #310 — use defaultValue instead of hooks in ImageInput (hooks pitfall) | 6 Component Build |
+| `0601cd4` | fix | move conditional useState hook to fix React error #310 (hook-order pitfall) | 6 Component Build |
+| `e3a70be` | fix | parse JSON string detections from backend virtual metrics (JSON string parsing) | 4 Data Contract |
+| `c4fe7bf` | fix | guard rawImageSrc against non-string metric values (type guard) | 5 Frontend Consume |
 
 ---
 

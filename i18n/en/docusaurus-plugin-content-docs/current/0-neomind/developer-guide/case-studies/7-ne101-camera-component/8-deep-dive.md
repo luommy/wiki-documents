@@ -2,16 +2,16 @@
 description: "ne101_camera deep dive: 133-commit version evolution, the rise and fall of Transform lifecycle debug traces (5 debug commits finally cleaned up by 00a59cc), the Boa engine console.log crash incident, the _configHash performance optimization, source hygiene recap (3 files, zero backups)"
 keywords: [ne101_camera, deep dive, version evolution, debug trace, Boa engine, _configHash, source hygiene]
 tags: [NeoMind, Case Study]
-sidebar_label: "§8 Deep Dive"
+sidebar_label: "8. Deep Dive"
 ---
 
-# §8 Deep Dive: Version Evolution and Engineering Retrospective Across 133 Commits
+# 8 Deep Dive: Version Evolution and Engineering Retrospective Across 133 Commits
 
-> This page is the **closing deep-dive retrospective** for the ne101_camera case, looking back at the component's evolution from the 133-commit historical perspective. After reading you should be able to: (1) draw the gantt chart of the 7 main development phases and name which phase consumed the most commits (ROI overlay, 10+ commits); (2) reproduce the "rise and fall of debug traces" in §8.2 — how 5 debug commits ([`0731cf8`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/0731cf8) → [`1c0730b`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/1c0730b) → [`5b1d6a1`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/5b1d6a1) → [`3f05cae`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/3f05cae)) were swept clean in a single pass by [`00a59cc`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/00a59cc), leaving production-clean code; (3) explain the §8.3 Boa engine `console.log` crash incident — why a `console.log` in Transform JS crashes the Rust sandbox (commit [`c16d803`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/c16d803)); (4) describe the three-tier fast-path optimization powered by `_configHash` ([L655-L659](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L655-L659)) and why commit [`a8c1212`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/a8c1212) reverted the "auto-bump" attempt; (5) recap source hygiene — why `components/ne101_camera/` has stayed at "3 files, zero backups" discipline, the cleanest component in the NeoMind marketplace. All line anchors point to the `main` branch of [`bundle.js`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js).
+> This page is the **closing deep-dive retrospective** for the ne101_camera case, looking back at the component's evolution from the 133-commit historical perspective. After reading you should be able to: (1) draw the gantt chart of the 7 main development phases and name which phase consumed the most commits (ROI overlay, 10+ commits); (2) reproduce the "rise and fall of debug traces" in 8.2 — how 5 debug commits ([`0731cf8`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/0731cf8) → [`1c0730b`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/1c0730b) → [`5b1d6a1`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/5b1d6a1) → [`3f05cae`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/3f05cae)) were swept clean in a single pass by [`00a59cc`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/00a59cc), leaving production-clean code; (3) explain the 8.3 Boa engine `console.log` crash incident — why a `console.log` in Transform JS crashes the Rust sandbox (commit [`c16d803`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/c16d803)); (4) describe the three-tier fast-path optimization powered by `_configHash` ([L655-L659](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L655-L659)) and why commit [`a8c1212`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/a8c1212) reverted the "auto-bump" attempt; (5) recap source hygiene — why `components/ne101_camera/` has stayed at "3 files, zero backups" discipline, the cleanest component in the NeoMind marketplace. All line anchors point to the `main` branch of [`bundle.js`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js).
 
 ---
 
-## §8.1 Version Evolution Timeline
+## 8.1 Version Evolution Timeline
 
 The source repo [`camthink-ai/NeoMind-Dashboard-Components`](https://github.com/camthink-ai/NeoMind-Dashboard-Components) has accumulated **133 git commits** under `components/ne101_camera/`, spanning roughly 7 major development phases. This commit count is **the absolute highest** among the 6 NeoMind marketplace components — the runner-up, metric_card, has only ~30 commits, and the other 4 average 10-20. The number 133 reflects ne101_camera's complexity: it is the only component that simultaneously involves real-time video streaming, AI inference, multi-extension contracts, geometric coordinate transforms, React hooks lifecycle, and dual-channel data merging — each dimension contributing 10-30 commits of iteration.
 
@@ -50,13 +50,13 @@ gantt
     Debug trace cleanup + source hygiene    :e3, after e2, 7d
 ```
 
-Phase 4 (ROI overlay) is the most commit-heavy phase because it does geometry in two independent coordinate systems (detailed in §7.3), and those two systems execute in the Boa engine and the browser respectively, with no shared debugger. Each coordinate bug fix requires: (a) changing the Transform JS generation logic; (b) changing the SVG transform's React code; (c) manually verifying alignment in the browser. The cost of this debug loop drove the commit count inflation, and directly triggered the "rise and fall of debug traces" in §8.2 — the developer added a series of console.logs to locate ROI coordinate misalignment, then cleaned them up in a single sweep.
+Phase 4 (ROI overlay) is the most commit-heavy phase because it does geometry in two independent coordinate systems (detailed in 7.3), and those two systems execute in the Boa engine and the browser respectively, with no shared debugger. Each coordinate bug fix requires: (a) changing the Transform JS generation logic; (b) changing the SVG transform's React code; (c) manually verifying alignment in the browser. The cost of this debug loop drove the commit count inflation, and directly triggered the "rise and fall of debug traces" in 8.2 — the developer added a series of console.logs to locate ROI coordinate misalignment, then cleaned them up in a single sweep.
 
 ---
 
-## §8.2 The Rise and Fall of Transform Lifecycle Debug Traces
+## 8.2 The Rise and Fall of Transform Lifecycle Debug Traces
 
-ne101_camera's Transform three-tier lifecycle (detailed in [§5.7](./5-frontend-consume.md): Tier 1 = ID + hash match fast-path, Tier 2 = ID exists but hash changed → update, Tier 3 = no ID → create) is the subsystem most prone to bugs. React StrictMode's double mounting, frequent config changes, concurrent effect races, and a host of other factors made the Transform "create-update-delete" state machine produce over a dozen bugs in real-world runs. The diagnostic process for those bugs gave rise to a unique "debug trace rise and fall" cycle in ne101_camera's history.
+ne101_camera's Transform three-tier lifecycle (detailed in [5.7](./5-frontend-consume.md): Tier 1 = ID + hash match fast-path, Tier 2 = ID exists but hash changed → update, Tier 3 = no ID → create) is the subsystem most prone to bugs. React StrictMode's double mounting, frequent config changes, concurrent effect races, and a host of other factors made the Transform "create-update-delete" state machine produce over a dozen bugs in real-world runs. The diagnostic process for those bugs gave rise to a unique "debug trace rise and fall" cycle in ne101_camera's history.
 
 The cycle starts with commit [`0731cf8`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/0731cf8) (`debug(ne101): add console.log to trace Transform lifecycle`) — the developer added `console.log('Transform effect entered', { storedTid, configHash, ... })` at the entry of the Transform effect to observe which Tier path was triggered. A single log was insufficient to diagnose every case, so more were added: [`1c0730b`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/1c0730b) (`add Transform lifecycle debug logs`, covering Tier 2/3 branches), [`5b1d6a1`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/5b1d6a1) (`add detailed Transform lifecycle trace logs`, logging before and after every neomind API call), [`3f05cae`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/3f05cae) (`add overlay diagnostic to trace detection rendering`, extending trace coverage to the detection rendering pipeline). At this point, bundle.js was littered with 20+ console.logs, and the developer's browser console would spew dozens of colored log entries on every config change — diagnostic efficiency improved dramatically, but the code was unreadable.
 
@@ -100,13 +100,13 @@ graph LR
 
 ---
 
-## §8.3 The Boa Engine console.log Crash Incident
+## 8.3 The Boa Engine console.log Crash Incident
 
 Commit [`c16d803`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/c16d803) (`fix(ne101): remove console.log from Transform JS that crashes Boa engine`) is one of the most unusual fixes in ne101_camera's history — it doesn't fix business logic, it fixes a crash caused by a **runtime environment mismatch**. The root cause: ne101_camera's Transform JS is a **generated JS string** (assembled by `generateTransformJsCode`, [`bundle.js` L239-L456`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L239-L456)), and that string does not run in the browser or in Node.js — it runs in the platform's **Boa engine**, a Rust-based JS interpreter used to sandbox user-submitted Transform code (preventing malicious code from reaching the main process).
 
 The Boa engine at a certain version **did not fully implement the `console` shim** — `console.log` was `undefined` in Boa, calling it threw `TypeError: console.log is not a function`, and the entire Transform execution aborted. Writing `console.log(...)` is absolutely safe in browsers or Node.js (it's JavaScript's "hello world"), so the developer dropped in a `console.log('detection count:', dets.length)` while debugging Transform generation logic. The log worked fine in browser testing, but crashed immediately when deployed to production (where Transform runs in Boa). That is what c16d803 fixed: removing `console.log` from the Transform JS string.
 
-The engineering lesson: **in cross-runtime code, never assume the host environment**. Transform JS is the canonical "cross-runtime code" — its source string is generated by the component but executed in the platform sandbox, and the two runtimes have different capability sets (browser has full `console` / `window` / `fetch`; Boa has only the JS language core plus the platform-injected `extensions.invoke`). Any assumption about the host environment (`console.log` exists, `Date.now` exists, `JSON.stringify` exists) can fail in some runtime. After the fix, ne101_camera completely banned `console.log` in generated Transform code; subsequent debug traces (the 4 debug commits mentioned in §8.2) were added only on the **component side** (which runs in the browser, where console.log is safe), never in the Transform string. This distinction — component side can log, Transform side cannot — became a hard rule for ne101_camera debugging.
+The engineering lesson: **in cross-runtime code, never assume the host environment**. Transform JS is the canonical "cross-runtime code" — its source string is generated by the component but executed in the platform sandbox, and the two runtimes have different capability sets (browser has full `console` / `window` / `fetch`; Boa has only the JS language core plus the platform-injected `extensions.invoke`). Any assumption about the host environment (`console.log` exists, `Date.now` exists, `JSON.stringify` exists) can fail in some runtime. After the fix, ne101_camera completely banned `console.log` in generated Transform code; subsequent debug traces (the 4 debug commits mentioned in 8.2) were added only on the **component side** (which runs in the browser, where console.log is safe), never in the Transform string. This distinction — component side can log, Transform side cannot — became a hard rule for ne101_camera debugging.
 
 ```mermaid
 graph TB
@@ -143,7 +143,7 @@ graph TB
 
 ---
 
-## §8.4 The `_configHash` Performance Optimization
+## 8.4 The `_configHash` Performance Optimization
 
 `_configHash` ([`bundle.js` L655-L659`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L655-L659)) is the **Tier 1 fast-path predicate** for ne101_camera's Transform three-tier lifecycle — a string concatenation of all processing-related config fields, serving as a digest of "has the config changed". On every React render, the component recomputes the current `_configHash` and compares it against the stored `_storedHash` (`config._transformHash`, [L660](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L660-L660)). If equal, the Tier 1 fast-path fires ([L723-L742](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L723-L742)): the component skips all Transform create/update/delete API calls, only verifies that the ID still exists on the backend, and returns immediately. This fast-path short-circuits 99% of renders (window drag, ResizeObserver firing, shallow prop changes), avoiding multiple-per-second Transform API calls that would overwhelm the backend.
 
@@ -196,7 +196,7 @@ graph TB
 
 ---
 
-## §8.5 The ROI Iteration History: Center Point to IoU Threshold
+## 8.5 The ROI Iteration History: Center Point to IoU Threshold
 
 The ROI (Region of Interest) detection algorithm is the submodule in ne101_camera that has undergone the **most generational replacements** — it evolved from the initial "center-point judgment" to the current "configurable threshold area-overlap judgment", each generation fixing a real user complaint. The current judgment logic lives in [`bundle.js` L365-L372`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L365-L372) (the generated code for the `detOverlapsRoi` function).
 
@@ -243,9 +243,9 @@ graph LR
 
 ---
 
-## §8.6 The IME Input Three-Iteration Saga
+## 8.6 The IME Input Three-Iteration Saga
 
-§6.5 covered the technical details of the IME (Input Method Editor) input freeze bug; this section reviews the three iterations from the **engineering process** perspective, extracting reusable lessons. The bug's lifecycle spanned two commits: [`44f1fa5`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/44f1fa5) (`fix(ne101_camera): input fields frozen — use local state instead of shared composingRef`) and [`b060a25`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/b060a25) (`fix(ne101_camera): React error #310 — use defaultValue instead of hooks in imeInput`).
+6.5 covered the technical details of the IME (Input Method Editor) input freeze bug; this section reviews the three iterations from the **engineering process** perspective, extracting reusable lessons. The bug's lifecycle spanned two commits: [`44f1fa5`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/44f1fa5) (`fix(ne101_camera): input fields frozen — use local state instead of shared composingRef`) and [`b060a25`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/b060a25) (`fix(ne101_camera): React error #310 — use defaultValue instead of hooks in imeInput`).
 
 **Bug discovery path**: this bug was originally reported by a Chinese-language user — they typed in the "category filter" input in AdvancedPanel, and the input field showed no response (appeared "frozen"). The developer could not reproduce it in an English environment (English doesn't trigger IME composition), and initially suspected a user environment issue (browser version, extension conflict). It wasn't until a Japanese user reported the same symptom that the developer realized this was an IME-related bug, strongly tied to language environment. The lesson: **internationalization bug reproduction requires internationalization environments**; pure English-speaking development teams easily miss CJK (Chinese/Japanese/Korean) user-specific issues.
 
@@ -265,7 +265,7 @@ graph LR
 
 ---
 
-## §8.7 Source Hygiene Recap
+## 8.7 Source Hygiene Recap
 
 The `components/ne101_camera/` directory maintains the **cleanest source hygiene record** among the 6 NeoMind marketplace components. The directory has only 3 files:
 
@@ -321,7 +321,7 @@ graph TB
 
 ---
 
-## §8.8 Design Decisions Summary
+## 8.8 Design Decisions Summary
 
 The 6 design decisions on this page are summarized below, each with the "choice / alternative / rationale" triad.
 
@@ -340,21 +340,21 @@ The common theme across these 6 decisions is "**defensive minimalism**". Whether
 
 | Commit | Type | One-line description | Section |
 |--------|------|----------------------|---------|
-| [`0731cf8`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/0731cf8) | debug | add console.log to trace Transform lifecycle | §8.2 |
-| [`1c0730b`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/1c0730b) | debug | add Transform lifecycle debug logs | §8.2 |
-| [`5b1d6a1`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/5b1d6a1) | debug | add detailed Transform lifecycle trace logs | §8.2 |
-| [`3f05cae`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/3f05cae) | debug | add overlay diagnostic to trace detection rendering | §8.2 |
-| [`00a59cc`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/00a59cc) | chore | remove debug console.logs from Transform lifecycle | §8.2, §8.7 |
-| [`c16d803`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/c16d803) | fix | remove console.log from Transform JS that crashes Boa engine | §8.3 |
-| [`a8c1212`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/a8c1212) | revert | remove auto hash bump, preserve user transform edits | §8.4 |
-| [`2109c45`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/2109c45) | feat | overlap-based ROI detection instead of center point | §8.5 |
-| [`636a8ae`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/636a8ae) | feat | make ROI overlap threshold configurable | §8.5 |
-| [`44f1fa5`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/44f1fa5) | fix | input fields frozen — use local state instead of shared composingRef | §8.6 |
-| [`b060a25`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/b060a25) | fix | React error #310 — use defaultValue instead of hooks in imeInput | §8.6 |
+| [`0731cf8`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/0731cf8) | debug | add console.log to trace Transform lifecycle | 8.2 |
+| [`1c0730b`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/1c0730b) | debug | add Transform lifecycle debug logs | 8.2 |
+| [`5b1d6a1`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/5b1d6a1) | debug | add detailed Transform lifecycle trace logs | 8.2 |
+| [`3f05cae`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/3f05cae) | debug | add overlay diagnostic to trace detection rendering | 8.2 |
+| [`00a59cc`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/00a59cc) | chore | remove debug console.logs from Transform lifecycle | 8.2, 8.7 |
+| [`c16d803`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/c16d803) | fix | remove console.log from Transform JS that crashes Boa engine | 8.3 |
+| [`a8c1212`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/a8c1212) | revert | remove auto hash bump, preserve user transform edits | 8.4 |
+| [`2109c45`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/2109c45) | feat | overlap-based ROI detection instead of center point | 8.5 |
+| [`636a8ae`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/636a8ae) | feat | make ROI overlap threshold configurable | 8.5 |
+| [`44f1fa5`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/44f1fa5) | fix | input fields frozen — use local state instead of shared composingRef | 8.6 |
+| [`b060a25`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/b060a25) | fix | React error #310 — use defaultValue instead of hooks in imeInput | 8.6 |
 
 ### Case study closing
 
-This page is the final page of the ne101_camera case study. Returning to the [case index](./index.md), you can see the complete 8-section structure — from §1 device background, §2 architecture overview, §3 extension-side contract, §4 data contract, §5 frontend consumption, §6 component build, §7 integration testing, to this deep dive, forming a complete knowledge chain from "**what it is**" to "**how to build it**" to "**why it evolved this way**". ne101_camera, as the flagship case of the NeoMind marketplace, has a 133-commit iteration history that is in itself a "history of React component engineering under the zero-build pattern" — every commit is a practice of "making tradeoffs under constraints", every revert is an act of "admitting the mistake and fixing it" courage. We hope this retrospective provides reusable engineering experience for future component developers.
+This page is the final page of the ne101_camera case study. Returning to the [case index](./index.md), you can see the complete 8-section structure — from 1 device background, 2 architecture overview, 3 extension-side contract, 4 data contract, 5 frontend consumption, 6 component build, 7 integration testing, to this deep dive, forming a complete knowledge chain from "**what it is**" to "**how to build it**" to "**why it evolved this way**". ne101_camera, as the flagship case of the NeoMind marketplace, has a 133-commit iteration history that is in itself a "history of React component engineering under the zero-build pattern" — every commit is a practice of "making tradeoffs under constraints", every revert is an act of "admitting the mistake and fixing it" courage. We hope this retrospective provides reusable engineering experience for future component developers.
 
 ---
 

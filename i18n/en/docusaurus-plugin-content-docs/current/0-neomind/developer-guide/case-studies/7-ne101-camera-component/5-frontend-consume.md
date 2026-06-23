@@ -2,32 +2,32 @@
 description: "ne101_camera frontend consumption: detections fetching, JSON string parsing, per-class coloring (golden-angle HSV), SVG overlay rendering (polygon + rect fallback), object-cover coordinate transform, ResizeObserver callback-ref pattern, Transform tiered lifecycle"
 keywords: [ne101_camera, frontend rendering, classColor, golden-angle, ResizeObserver, object-cover, SVG overlay]
 tags: [NeoMind, case study, MVP]
-sidebar_label: "§5 Frontend Consume ★"
+sidebar_label: "5. Frontend Consume"
 ---
 
-# §5 Frontend Consume: From detections to SVG overlay rendering pipeline
+# 5 Frontend Consume: From detections to SVG overlay rendering pipeline
 
 > This page is the **frontend rendering reference** for the ne101_camera MVP. After reading it you should be able to: (1) describe the full rendering pipeline from props to SVG overlay and explain why it is effect-driven; (2) reproduce the `classColor(label)` algorithm that uses string hashing + golden-angle 137.508° rotation to generate HSV hue, and articulate its advantages over a fixed palette; (3) explain the polygon + rect fallback branching in SVG overlay rendering, plus the `[x,y]` vs `{x,y}` polygon vertex format compatibility; (4) derive the object-cover coordinate transform math: when the image aspect ratio is greater than the container, sides are cropped, otherwise top/bottom are cropped, with their respective `sx/sy/ox/oy` formulas; (5) explain why callback ref is used instead of `useEffect` to attach the ResizeObserver — the only correct pattern for asynchronously mounted elements. All line-number anchors point to the `main` branch of the source repo's [`bundle.js`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js) and [`manifest.json`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json).
 
 ---
 
-## §5.1 Rendering Pipeline Overview
+## 5.1 Rendering Pipeline Overview
 
-The ne101_camera rendering path is not a one-shot JSX template but a **state pipeline** driven by multiple effects. The pipeline starts from platform-injected props (`device` / `deviceImageSrc` / `virtualMetrics` / `config` / `onConfigChange`) and ends at the SVG overlay layer mounted on the media `<div>`. In between it passes through five state nodes: (1) the Transform lifecycle effect (create/update/delete the backend Transform, see §5.7); (2) the WS + REST merge effect (fetch image and virtual metrics, see [§4.7](./4-data-contract.md)); (3) the `imageData` / `wsValues` / `virtualData` triplet of `setState` calls; (4) the `ovTf` coordinate transform computation driven by `imgNatState` (image natural dimensions) + `ctrSizeState` (container dimensions, see §5.4); (5) the detections array, colored per-class, mapped into SVG `<g>` elements (see §5.2 / §5.3). Any state change at any node triggers a React re-render that re-runs the path from `ovTf` computation through SVG mapping.
+The ne101_camera rendering path is not a one-shot JSX template but a **state pipeline** driven by multiple effects. The pipeline starts from platform-injected props (`device` / `deviceImageSrc` / `virtualMetrics` / `config` / `onConfigChange`) and ends at the SVG overlay layer mounted on the media `<div>`. In between it passes through five state nodes: (1) the Transform lifecycle effect (create/update/delete the backend Transform, see 5.7); (2) the WS + REST merge effect (fetch image and virtual metrics, see [4.7](./4-data-contract.md)); (3) the `imageData` / `wsValues` / `virtualData` triplet of `setState` calls; (4) the `ovTf` coordinate transform computation driven by `imgNatState` (image natural dimensions) + `ctrSizeState` (container dimensions, see 5.4); (5) the detections array, colored per-class, mapped into SVG `<g>` elements (see 5.2 / 5.3). Any state change at any node triggers a React re-render that re-runs the path from `ovTf` computation through SVG mapping.
 
 The diagram below renders this effect-driven pipeline as a flowchart, annotating each step's inputs/outputs and trigger conditions.
 
 ```mermaid
 graph TB
     PROPS["props injection<br/>device / deviceImageSrc<br/>virtualMetrics / config"]
-    EFFECT_TR["useEffect: Transform lifecycle<br/>(§5.7 three tiers: verify / update / create)"]
-    EFFECT_FETCH["useEffect: WS + REST merge<br/>(§4.7 dual-channel)"]
+    EFFECT_TR["useEffect: Transform lifecycle<br/>(5.7 three tiers: verify / update / create)"]
+    EFFECT_FETCH["useEffect: WS + REST merge<br/>(4.7 dual-channel)"]
     STATE["setState triplet<br/>imageData / wsValues / virtualData"]
     RERENDER["React re-render"]
-    OVTF["compute ovTf<br/>(§5.4 object-cover transform)<br/>depends on imgNatState + ctrSizeState"]
-    MAPDET["map detections → SVG &lt;g&gt;<br/>(§5.2 classColor coloring<br/>§5.3 polygon / rect / label)"]
+    OVTF["compute ovTf<br/>(5.4 object-cover transform)<br/>depends on imgNatState + ctrSizeState"]
+    MAPDET["map detections → SVG &lt;g&gt;<br/>(5.2 classColor coloring<br/>5.3 polygon / rect / label)"]
     SVG["SVG overlay layer<br/>viewBox=0 0 100 100<br/>preserveAspectRatio=none"]
-    BADGES["detection summary badges<br/>(§5.6 metric-driven)"]
+    BADGES["detection summary badges<br/>(5.6 metric-driven)"]
 
     PROPS --> EFFECT_TR
     PROPS --> EFFECT_FETCH
@@ -40,11 +40,11 @@ graph TB
     RERENDER --> BADGES
 ```
 
-**Why this pipeline is effect-driven**: ne101_camera is a "React-in-IIFE" component on the NeoMind platform (see [§2.1](./2-architecture.md)). It has no external state management (Redux / Zustand); all cross-frame state is managed with `React.useState` + `React.useRef`. React's core mental model is "UI = f(state)" — whenever state changes, the render function re-runs. The component wires WS pushes, REST backfill, image `onLoad`, and ResizeObserver callbacks all into `setState`, so every external event drives a full re-render through state mutation. The cost of this pattern is the absence of virtual-DOM diffing optimizations (every render recomputes `ovTf` and the detections mapping from scratch), but since a single component's DOM node count stays under 50 (one `<svg>` + N `<g>` elements), the full-rerender overhead is negligible. What is genuinely expensive are async API calls like `neomind.createTransform`; these are strictly confined to effects and guarded by a `cancelled` flag (see [`bundle.js` L709](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L709-L709)).
+**Why this pipeline is effect-driven**: ne101_camera is a "React-in-IIFE" component on the NeoMind platform (see [2.1](./2-architecture.md)). It has no external state management (Redux / Zustand); all cross-frame state is managed with `React.useState` + `React.useRef`. React's core mental model is "UI = f(state)" — whenever state changes, the render function re-runs. The component wires WS pushes, REST backfill, image `onLoad`, and ResizeObserver callbacks all into `setState`, so every external event drives a full re-render through state mutation. The cost of this pattern is the absence of virtual-DOM diffing optimizations (every render recomputes `ovTf` and the detections mapping from scratch), but since a single component's DOM node count stays under 50 (one `<svg>` + N `<g>` elements), the full-rerender overhead is negligible. What is genuinely expensive are async API calls like `neomind.createTransform`; these are strictly confined to effects and guarded by a `cancelled` flag (see [`bundle.js` L709](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L709-L709)).
 
 ---
 
-## §5.2 Per-Class Coloring: Golden-Angle HSV
+## 5.2 Per-Class Coloring: Golden-Angle HSV
 
 Detection-box color is not fixed; it is determined by the class label (`det.label`). Commit [`c276c23`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/c276c23) (`feat(ne101): per-class detection colors via golden-angle HSV rotation`) introduced the `classColor(label)` function at [`bundle.js` L55-L72](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L55-L72). The function does three things:
 
@@ -63,11 +63,11 @@ Before `c276c23`, detection-box color went through two iterations. The earliest 
 
 ---
 
-## §5.3 SVG Overlay: Polygon + Rect Fallback
+## 5.3 SVG Overlay: Polygon + Rect Fallback
 
 Detection boxes are not drawn on a Canvas but overlaid on the `<img>` via an SVG layer. The rendering logic for this SVG layer lives at [`bundle.js` L1210-L1272](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1210-L1272); its core is a `detections.map(...)` call that produces one `<g>` element per detection, containing a shape (polygon or rect) plus a label text node.
 
-**Polygon mode (L1224-L1237)**: when `det.polygon` exists and has ≥ 3 vertices, an `<polygon>` is rendered. This is the precise contour for OCR scenarios (`ocr_text_blocks` responseType) — OCR text boxes are often not axis-aligned rectangles (tilted text, curved text lines), and a polygon hugs the boundary far better than a bbox. Vertices are iterated at L1226-L1231; each vertex is first passed through the `ovTf` transform (see §5.4) and then concatenated into the SVG `points` string.
+**Polygon mode (L1224-L1237)**: when `det.polygon` exists and has ≥ 3 vertices, an `<polygon>` is rendered. This is the precise contour for OCR scenarios (`ocr_text_blocks` responseType) — OCR text boxes are often not axis-aligned rectangles (tilted text, curved text lines), and a polygon hugs the boundary far better than a bbox. Vertices are iterated at L1226-L1231; each vertex is first passed through the `ovTf` transform (see 5.4) and then concatenated into the SVG `points` string.
 
 **Rect fallback (L1238-L1252)**: when only `det.bbox` (a 4-element array `[x1, y1, x2, y2]`) is available, an `<rect>` is rendered. This is the standard rectangular box for object-detection scenarios (`objects_bbox` / `detections_bbox` responseType). The four bbox corner values are each passed through `ovTf` and assembled into the `<rect>` `x / y / width / height` attributes.
 
@@ -86,7 +86,7 @@ Commit [`b746c02`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/c
 
 ---
 
-## §5.4 The object-cover Coordinate Transform
+## 5.4 The object-cover Coordinate Transform
 
 Detection-box coordinates are **normalized to image space** (0-1 means the ratio relative to the original image width/height), but the image is rendered in the DOM with `object-cover` — the image is scaled to completely cover the container, with excess cropped. This means only a subset of the original image is visible in the container, and detection-box coordinates must pass through a transform to overlay correctly on the visible region. This transform is `ovTf`, computed at [`bundle.js` L879-L899](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L879-L899).
 
@@ -123,7 +123,7 @@ graph LR
 
 ---
 
-## §5.5 The ResizeObserver Callback-Ref Pattern
+## 5.5 The ResizeObserver Callback-Ref Pattern
 
 The `ovTf` computation depends on two pieces of state: the image's natural dimensions (`imgNatState`) and the container dimensions (`ctrSizeState`). The image dimensions are written via the `<img onLoad>` callback ([L1165-L1168](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1165-L1168)); the container dimensions are written via a ResizeObserver listening to the media `<div>`'s size changes. But there is a classic React trap here: **the media `<div>` is conditionally rendered** — it only mounts when `hasImage` is true ([L1153-L1156](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1153-L1156)), and the image arrives asynchronously (WS push or REST backfill). This means on the component's first render the media `<div>` does not yet exist, and a naive `useEffect(() => { new ResizeObserver(mediaRef.current) }, [])` would find `mediaRef.current === null`, so the ResizeObserver would never be attached.
 
@@ -162,7 +162,7 @@ Commit [`7c92a19`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/c
 
 ---
 
-## §5.6 Detection Summary Badges
+## 5.6 Detection Summary Badges
 
 The bottom overlay bar ([`bundle.js` L1067-L1145](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1067-L1145)) renders a set of detection summary badges that let users quickly grasp "what was detected in this frame" without inspecting detection-box details. The design principle for these badges is **metric-driven** — the data source is the virtual metrics already computed by the Transform, not re-aggregated inside the component from the detections array.
 
@@ -178,12 +178,12 @@ The rendering condition is `hasAnySummary` (L1063), meaning at least `total_coun
 
 - **Choice**: read data from virtual metrics (`total_count` / `count_by_class` / `roi_count` / `texts`).
 - **Alternative**: aggregate in real time from the `detections` array inside the component's render function (`detections.length`, `detections.reduce(...)` to group-count by label).
-- **Rationale**: the Transform **already** computed these aggregations in the backend sandbox (see the `total_count` / `count_by_class` / `roi_count` output contracts in [§4.4](./4-data-contract.md)). If the component computed them again, it would be duplicate computation with two risks: (1) the two computations' logic could diverge (e.g. the Transform computed `roi_count` from ROI-filtered detections, but the component received unfiltered detections), causing badge numbers to disagree with the visible detection-box count; (2) every render would re-reduce a potentially long array, wasting CPU. The metric-driven approach keeps the component purely a "presenter" that does no "computation," keeping responsibilities clean.
-- **Cost**: if the Transform has a bug and computes a metric incorrectly, the component will faithfully display the wrong number. This cost is mitigated by the "graceful degradation" philosophy of §4.8 — when a metric is missing, it falls back to `detections.length`, never producing a blank screen.
+- **Rationale**: the Transform **already** computed these aggregations in the backend sandbox (see the `total_count` / `count_by_class` / `roi_count` output contracts in [4.4](./4-data-contract.md)). If the component computed them again, it would be duplicate computation with two risks: (1) the two computations' logic could diverge (e.g. the Transform computed `roi_count` from ROI-filtered detections, but the component received unfiltered detections), causing badge numbers to disagree with the visible detection-box count; (2) every render would re-reduce a potentially long array, wasting CPU. The metric-driven approach keeps the component purely a "presenter" that does no "computation," keeping responsibilities clean.
+- **Cost**: if the Transform has a bug and computes a metric incorrectly, the component will faithfully display the wrong number. This cost is mitigated by the "graceful degradation" philosophy of 4.8 — when a metric is missing, it falls back to `detections.length`, never producing a blank screen.
 
 ---
 
-## §5.7 Transform Tiered Lifecycle
+## 5.7 Transform Tiered Lifecycle
 
 The Transform's create/update/delete logic lives at [`bundle.js` L661-L824](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L661-L824) inside a `React.useEffect` whose dependency array is `[device.id, processingEnabled, _configHash, _storedTid, _storedHash]` (L824). Inside the effect, dispatching follows three tiers:
 
@@ -238,7 +238,7 @@ stateDiagram-v2
 
 ---
 
-## §5.8 Design Decisions Summary
+## 5.8 Design Decisions Summary
 
 The 6 design decisions covered on this page are consolidated below, each following the "choice / alternative / rationale" triad.
 
@@ -257,20 +257,20 @@ The common theme across these 6 decisions: **at every "boundary" of frontend ren
 
 | Commit | Type | One-line summary | Section |
 |--------|------|------------------|---------|
-| [`c276c23`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/c276c23) | feat | per-class detection colors via golden-angle HSV rotation | §5.2 |
-| [`3cf1b27`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/3cf1b27) | style | change detection box and label color from blue to red | §5.2 |
-| [`b746c02`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/b746c02) | feat | render OCR detection boxes as polygons with rect fallback | §5.3 |
-| [`403c0f1`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/403c0f1) | fix | handle `{x,y}` object format for OCR polygon detection boxes | §5.3 |
-| [`d7836b8`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/d7836b8) | fix | ResizeObserver never set up when image loads async | §5.5 |
-| [`7c92a19`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/7c92a19) | fix | fix ROI canvas coordinate mapping for objectFit contain | §5.5 |
-| [`ac06344`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/ac06344) | fix | verify stored Transform exists in Tier 1 | §5.7 |
-| [`e3a70be`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/e3a70be) | fix | parse JSON string detections from backend virtual metrics | §5.1 |
+| [`c276c23`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/c276c23) | feat | per-class detection colors via golden-angle HSV rotation | 5.2 |
+| [`3cf1b27`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/3cf1b27) | style | change detection box and label color from blue to red | 5.2 |
+| [`b746c02`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/b746c02) | feat | render OCR detection boxes as polygons with rect fallback | 5.3 |
+| [`403c0f1`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/403c0f1) | fix | handle `{x,y}` object format for OCR polygon detection boxes | 5.3 |
+| [`d7836b8`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/d7836b8) | fix | ResizeObserver never set up when image loads async | 5.5 |
+| [`7c92a19`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/7c92a19) | fix | fix ROI canvas coordinate mapping for objectFit contain | 5.5 |
+| [`ac06344`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/ac06344) | fix | verify stored Transform exists in Tier 1 | 5.7 |
+| [`e3a70be`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/e3a70be) | fix | parse JSON string detections from backend virtual metrics | 5.1 |
 
 ### Cross-references
 
-- [§6 Component Build](./6-component-build.md) (MVP) — the named-export pattern for `NE101CameraPanel`, React-hooks pitfalls inside IIFE (commit `0601cd4`), and the layered design of `AdvancedPanel`. The callback ref pattern and three-tier Transform lifecycle from this section are revisited from a build perspective in §6.
-- Back to [§4 Data Contract](./4-data-contract.md) — the schemas and output-prefix rules for the `detections` / `total_count` / `count_by_class` virtual metrics consumed here are defined in §4.4.
-- Back to [§2 Architecture](./2-architecture.md) — the relationship between the effect-driven pipeline described here and the five-layer architecture is expanded in §2.2 / §2.3.
+- [6 Component Build](./6-component-build.md) (MVP) — the named-export pattern for `NE101CameraPanel`, React-hooks pitfalls inside IIFE (commit `0601cd4`), and the layered design of `AdvancedPanel`. The callback ref pattern and three-tier Transform lifecycle from this section are revisited from a build perspective in 6.
+- Back to [4 Data Contract](./4-data-contract.md) — the schemas and output-prefix rules for the `detections` / `total_count` / `count_by_class` virtual metrics consumed here are defined in 4.4.
+- Back to [2 Architecture](./2-architecture.md) — the relationship between the effect-driven pipeline described here and the five-layer architecture is expanded in 2.2 / 2.3.
 
 ---
 

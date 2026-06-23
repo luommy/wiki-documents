@@ -2,12 +2,12 @@
 description: Deploy YOLOv8 object detection to edge devices with NeoMind's first AI inference extension — full engineering walkthrough of lazy model loading, ONNX Runtime dylib governance, and capability-based device frame acquisition
 keywords: [NeoMind, yolo-device-inference, AI inference, lazy model loading]
 tags: [NeoMind, case study, AI inference]
-sidebar_label: "#2 yolo-device-inference"
+sidebar_label: "2. yolo-device-inference"
 ---
 
 # #2 yolo-device-inference: AI Inference Extension
 
-## §1 Case Background
+## 1 Case Background
 
 **yolo-device-inference** is the first "AI inference extension" in the NeoMind ecosystem. It deploys an Ultralytics YOLOv8 object detection model to edge nodes, automatically consumes bound device image metric streams (snapshot / image / frame), writes detection boxes, classes, and confidence back to the device as virtual metrics, and optionally produces annotated JPEG thumbnails for dashboard display. The entire extension is about 1950 lines of Rust (single file `src/lib.rs`), contains no Python runtime, and serves as the reference for "pure Rust end-to-end AI inference."
 
@@ -21,7 +21,7 @@ sidebar_label: "#2 yolo-device-inference"
 
 ---
 
-## §2 Architecture Overview
+## 2 Architecture Overview
 
 yolo-device-inference consists of four layers: NeoMind Runtime (event routing), Extension (YOLODetector + binding state), ONNX Runtime (native inference backend), and Device Capability Bridge (frame acquisition / metric writeback). The diagram below shows data flow and the key state machine.
 
@@ -91,11 +91,11 @@ Why "flat metrics + data URI" instead of "structured JSON passthrough"? Because 
 
 ---
 
-## §3 Implementation Walkthrough
+## 3 Implementation Walkthrough
 
 This section walks through `src/lib.rs` in physical order. All code snippets include GitHub deep links. The source file is 1945 lines — one of the longest single-file extensions in this series.
 
-### §3.1 Platform Conditional Compilation & Hardware Detection
+### 3.1 Platform Conditional Compilation & Hardware Detection
 
 The extension gates all AI-related code behind `cfg(not(target_arch = "wasm32"))`, making it a no-op stub under WASM. This is the standard NeoMind pattern: let the same crate compile in a WASM sandbox (for metadata / command discovery) but defer heavy computation to native.
 
@@ -121,7 +121,7 @@ fn with_device_fallback<M, F>(try_build: F) -> std::result::Result<M, String> {
 
 `with_device_fallback` is a higher-order function — it takes `Fn(Device) -> Result`, tries the auto-detected device first, and falls back to CPU on failure. This lets a single call site (`YOLO::new(cfg)`) gain "hardware adaptivity" automatically, with no platform branches at the call site.
 
-### §3.2 Data Structures: Detection / BoundingBox / InferenceResult
+### 3.2 Data Structures: Detection / BoundingBox / InferenceResult
 
 These three structs form the data contract the extension exposes externally; the frontend React component and downstream virtual metric writes depend on their field names.
 
@@ -145,7 +145,7 @@ pub struct Detection {
 
 **Why `{x, y, width, height}` over `{xmin, ymin, xmax, ymax}`?** Three reasons: (1) `imageproc::rect::Rect::at(x,y).of_size(w,h)` uses top-left + size semantics, so drawing needs zero conversion; (2) frontend CSS `left/top/width/height` matches this exactly, so React components can use `style={bbox}` directly; (3) YOLO native output is `cx, cy, w, h` (center + size), which converts to `x, y, w, h` with just `x = cx - w/2` — fewer ops than converting to `xmax/ymax`. `usls` returns `hbbs` in `xmin/ymin/xmax/ymax` form, and the extension performs an explicit conversion at L832-L837.
 
-### §3.3 Lazy-Loading Model Wrapper (Core Engineering Highlight)
+### 3.3 Lazy-Loading Model Wrapper (Core Engineering Highlight)
 
 This is the most critical engineering pattern in this case. `YOLODetector` decouples "model loading" from "extension construction" — construction only records parameters; actual ONNX Runtime initialization is deferred to first inference.
 
@@ -184,7 +184,7 @@ impl YOLODetector {
 
 **Why not `OnceLock<YOLO>`?** This case's `YOLODetector` does not use `std::sync::OnceLock`, instead managing state manually via `Option<YOLO> + bool`. The reason is that `OnceLock` requires the inner value to be `Send + Sync` and immutable after initialization — but `YOLO::forward(&mut self)` requires a mutable reference, and the extension supports `reload_model()` (L638-L667) for runtime model replacement. The `Mutex<YOLODetector>` + `Option<YOLO>` combination is more flexible, allowing "reset + reload" semantics.
 
-### §3.4 ONNX Runtime Dynamic Library Path Governance (Cross-Platform Pain Point)
+### 3.4 ONNX Runtime Dynamic Library Path Governance (Cross-Platform Pain Point)
 
 This is the second core engineering challenge, corresponding to three consecutive fix commits in the git log (`73f5943` / `61c4bdf` / `1fe9d3b`). Root cause: the `ort` crate's `load-dynamic` feature does not bind the library path; it relies on the OS dynamic loader — and the three platforms have entirely different lookup mechanisms.
 
@@ -227,9 +227,9 @@ fn setup_native_lib_paths() {
 - **macOS**: `libonnxruntime.1.19.2.dylib` (version before `.dylib`). Same symlink need to `libonnxruntime.dylib`. Worse, macOS SIP makes runtime `set_var("DYLD_LIBRARY_PATH")` ineffective for subsequent `dlopen` — so `ORT_DYLIB_PATH` must be set explicitly, letting the `ort` crate load via absolute path.
 - **Windows**: `onnxruntime.dll` (no version suffix). No symlink needed, but the DLL directory must be added to `PATH`.
 
-This logic was iterated across three commits — `73f5943` (Linux symlinks), `61c4bdf` (`ORT_DYLIB_PATH`), `1fe9d3b` (Windows `cfg(unix)` guard) — a textbook case of "cross-platform library loading requires incremental bug-finding" (see §7).
+This logic was iterated across three commits — `73f5943` (Linux symlinks), `61c4bdf` (`ORT_DYLIB_PATH`), `1fe9d3b` (Windows `cfg(unix)` guard) — a textbook case of "cross-platform library loading requires incremental bug-finding" (see 7).
 
-### §3.5 Capability-Based Device Frame Acquisition (Sync Bridge)
+### 3.5 Capability-Based Device Frame Acquisition (Sync Bridge)
 
 The extension reads/writes device metrics through `invoke_capability_sync()`, calling the NeoMind capability system. This method is the key adapter for "synchronous invocation within an async runtime."
 
@@ -255,7 +255,7 @@ fn invoke_capability_sync(&self, capability_name: &str, params: &serde_json::Val
 
 **Virtual metric naming convention** (see L1120-L1124 comment): must start with `transform.` / `virtual.` / `computed.` / `derived.` / `aggregated.`, otherwise the capability bridge rejects the write. This is NeoMind's namespace isolation between "real sensor metrics" and "extension-computed metrics."
 
-### §3.6 Image Annotation Drawing
+### 3.6 Image Annotation Drawing
 
 Detection result visualization is handled by `draw_detections_on_image()` (L192-L292), combining the `image`, `imageproc`, and `ab_glyph` crates. This function was unified in commit `f8478a8` as "the shared annotation style across all inference extensions" — label boxes with filled backgrounds and white text.
 
@@ -271,7 +271,7 @@ let font = FONT_RESULT.get_or_init(|| FontRef::try_from_slice(include_bytes!("..
 
 Note the font file is compiled into the cdylib via `include_bytes!` — this adds about 300KB to the `.nep` package but eliminates runtime file path dependencies. `NotoSans-Regular.ttf` was chosen to support CJK characters (Chinese labels are common in edge device scenarios).
 
-### §3.7 Detection Result to Metric Mapping
+### 3.7 Detection Result to Metric Mapping
 
 `write_inference_results()` (L1101-L1196) splits one `InferenceResult` into four virtual metrics. Each metric calls `device_metrics_write` independently — why not write all in one call? Because the capability bridge API signature is `{ device_id, metric, value, timestamp }`, writing one metric at a time. Batch writes require the extension to loop.
 
@@ -290,7 +290,7 @@ if let Some(img) = &result.annotated_image_base64 {
 }
 ```
 
-### §3.8 Command Sequence Diagram (Lazy-Load Branch)
+### 3.8 Command Sequence Diagram (Lazy-Load Branch)
 
 The diagram below shows the full sequence after a `device.image.updated` event fires, highlighting the lazy-load branch (executed only on first inference).
 
@@ -332,7 +332,7 @@ sequenceDiagram
 
 ---
 
-## §4 Design Trade-offs
+## 4 Design Trade-offs
 
 This case made several key decisions during engineering evolution; each considered at least 2-3 alternatives. The following analyzes each in turn.
 
@@ -354,7 +354,7 @@ This case made several key decisions during engineering evolution; each consider
 | System-installed | High (manual ORT install) | Uncontrolled | Small | Low |
 | Static link at compile time | Zero | Fully controlled | Largest | Extreme (ORT doesn't officially support static linking) |
 
-**Why bundled**: Commit `e8a8f28` explicitly introduced "bundled ONNX Runtime support." Edge device users are typically not developers; requiring `apt install libonnxruntime` would dramatically raise the deployment barrier. The cost of bundling is larger `.nep` packages (~150MB per platform) and the dylib path governance complexity described in §3.4 — but this is a one-time engineering cost traded for a "zero-dependency deployment" user experience.
+**Why bundled**: Commit `e8a8f28` explicitly introduced "bundled ONNX Runtime support." Edge device users are typically not developers; requiring `apt install libonnxruntime` would dramatically raise the deployment barrier. The cost of bundling is larger `.nep` packages (~150MB per platform) and the dylib path governance complexity described in 3.4 — but this is a one-time engineering cost traded for a "zero-dependency deployment" user experience.
 
 ### Decision 3: Sync Capability API + block_in_place vs Async Capability API
 
@@ -373,11 +373,11 @@ This case made several key decisions during engineering evolution; each consider
 | `{xmin, ymin, xmax, ymax}` | Conversion needed | Conversion needed | Zero (usls returns directly) |
 | `{cx, cy, w, h}` | Conversion needed | Conversion needed | Zero (YOLO native) |
 
-Reasons for `{x, y, width, height}` are covered in the three points in §3.2.
+Reasons for `{x, y, width, height}` are covered in the three points in 3.2.
 
 ---
 
-## §5 Tech Stack Breakdown
+## 5 Tech Stack Breakdown
 
 | Component | Choice | Rationale |
 |------|------|------|
@@ -395,7 +395,7 @@ Reasons for `{x, y, width, height}` are covered in the three points in §3.2.
 
 ---
 
-## §6 Standard Compliance
+## 6 Standard Compliance
 
 ### metadata.json Field Walkthrough
 
@@ -448,7 +448,7 @@ The CI pipeline must build natively on each target platform (no cross-compile), 
 
 ---
 
-## §7 Common Pitfalls & Best Practices
+## 7 Common Pitfalls & Best Practices
 
 ### Engineering Evolution 1: Introduction of Lazy Loading (commit `e8a8f28`)
 
@@ -493,7 +493,7 @@ The CI pipeline must build natively on each target platform (no cross-compile), 
 
 ---
 
-## §8 Further Reading
+## 8 Further Reading
 
 - [Case Overview](./0-overview.md) — this case's position in the NeoMind extension ecosystem
 - [Extension Standards Appendix](./appendix-standards.md) — metadata.json field spec, capability declaration checklist

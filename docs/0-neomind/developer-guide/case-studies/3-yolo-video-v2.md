@@ -2,12 +2,12 @@
 description: "NeoMind 最复杂的流式扩展：Push 模式实时视频流处理、YOLOv11 检测、ROI/越线/智能抓拍、ffmpeg-next + nokhwa 双后端、跨平台 ONNX Runtime dylib 治理、前端 MJPEG 联动的完整工程剖析"
 keywords: [NeoMind, yolo-video-v2, 流式扩展, Push 模式, 视频分析, ROI]
 tags: [NeoMind, 案例, 流式]
-sidebar_label: "#3 yolo-video-v2"
+sidebar_label: "3. yolo-video-v2"
 ---
 
 # #3 yolo-video-v2：流式扩展
 
-## §1 案例背景
+## 1 案例背景
 
 **yolo-video-v2** 是 NeoMind 生态中**最复杂的流式扩展**——它把 Ultralytics YOLOv11 目标检测模型挂到实时视频流上，支持三类数据来源（RTSP/RTMP/HLS 网络流、本地摄像头、前端 base64 帧推送），在 Push 模式下持续把带检测框的 JPEG 帧和结构化检测 JSON 推回前端，并附带 ROI 区域计数、越线计数、智能抓拍规则（阈值/出现/消失触发）等业务能力。当前版本 2.7.6，核心代码约 2829 行 Rust（`src/lib.rs`）+ 721 行（`src/detector.rs`）+ 387 行（`src/video_source.rs`），是本系列单 crate 代码量最大的扩展，也是唯一一个完整使用 SDK `StreamCapability` + `StreamMode::Push` + `send_push_output` FFI 链路的扩展。
 
@@ -29,7 +29,7 @@ sidebar_label: "#3 yolo-video-v2"
 
 ---
 
-## §2 架构总览
+## 2 架构总览
 
 yolo-video-v2 采用五层架构：NeoMind Runtime（WebSocket relay）→ Extension（StreamProcessor + ActiveStream map）→ Detector（YoloDetector 懒加载 usls YOLO）→ Video Source（ffmpeg-next / nokhwa / base64 channel）→ Frontend（YoloVideoDisplay React 组件）。下图展示数据流向和关键状态机。
 
@@ -99,9 +99,9 @@ graph TB
 
 ---
 
-## §3 核心实现剖析
+## 3 核心实现剖析
 
-### §3.1 StreamCapability 声明
+### 3.1 StreamCapability 声明
 
 扩展通过 `stream_capability()` 声明自己是 Push 模式流式扩展。查看实现：[`src/lib.rs` L1275-L1288](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/yolo-video-v2/src/lib.rs#L1275-L1288)
 
@@ -124,13 +124,13 @@ fn stream_capability(&self) -> Option<StreamCapability> {
 
 `StreamMode::Push` 的语义是：**扩展主动产出数据**，SDK 不需要轮询。与之对应的 `Pull` 模式是 SDK 主动请求数据（适合低频指标），`Stateless` 模式是无状态请求-响应（适合命令式 API）。视频流每秒产出 25~30 帧，只有 Push 模式能保证不丢帧。`max_concurrent_sessions: 4` 限制了单扩展实例最多同时跑 4 路视频流——这是基于 ONNX Runtime 显存和 CPU 推理吞吐的实测上限。`direction: Bidirectional` 是因为前端既要接收帧（Push output），也要发送 base64 帧（`process_session_chunk`）。
 
-### §3.2 init_session：会话初始化
+### 3.2 init_session：会话初始化
 
 `init_session` 在 SDK 建立 WebSocket 会话后回调，负责构造 `ActiveStream` 状态并插入全局 registry。查看实现：[`src/lib.rs` L1290-L1360](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/yolo-video-v2/src/lib.rs#L1290-L1360)
 
 关键逻辑：(1) 从 `session.config` 反序列化 `StreamConfig`（包含 `source_url`、`confidence_threshold`、`max_objects`、`target_fps`、`rois`、`lines`、`capture_rules`）；(2) 通过 `source_url` 前缀判断 `is_network_stream`（RTSP/RTMP/HLS/HTTP/File 走 ffmpeg，其余走本地摄像头或 base64）；(3) 构造 `ActiveStream` 结构体（`running: true`、空的 `tracker` / `line_counts` / `capture_rule_states`）；(4) 检查 session 是否已存在，若存在则先停止旧 session（设置 `running = false` 并丢弃旧 `push_task`）；(5) 插入 registry。注意 `init_session` 本身**不启动帧循环**——帧循环在 `start_push` 中启动，这样设计是为了让 SDK 有机会在帧循环开始前完成 output sender 的绑定。
 
-### §3.3 execute_command：start_stream / stop_stream 调度
+### 3.3 execute_command：start_stream / stop_stream 调度
 
 扩展暴露了 `start_stream` / `stop_stream` / `get_stream_stats` / `gc_memory` / `update_stream_config` 五个命令。查看调度实现：[`src/lib.rs` L1114-L1215](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/yolo-video-v2/src/lib.rs#L1114-L1215)
 
@@ -157,7 +157,7 @@ async fn execute_command(&self, command: &str, args: &serde_json::Value) -> Resu
 
 `stop_stream` 的实现：[`src/lib.rs` L813-L822](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/yolo-video-v2/src/lib.rs#L813-L822)。它只是 `registry.streams.remove(stream_id)` + `stream.lock().running = false`，帧循环线程在下一次循环检查 `running` 时自然退出——这是协作式取消，比 `thread::abort()`（Rust 标准库没有）更安全。
 
-### §3.4 帧循环：decode → detect → ROI/line → JPEG → send_push_output
+### 3.4 帧循环：decode → detect → ROI/line → JPEG → send_push_output
 
 网络流的帧循环在 `start_push` 内的 `std::thread::spawn` 闭包中：[`src/lib.rs` L1427-L1650](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/yolo-video-v2/src/lib.rs#L1427-L1650)。每帧的处理流水线：
 
@@ -170,7 +170,7 @@ async fn execute_command(&self, command: &str, args: &serde_json::Value) -> Resu
 7. **draw + encode JPEG**：`draw_detections` + `encode_jpeg(&output_image, 75)`（[`src/lib.rs` L1615](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/yolo-video-v2/src/lib.rs#L1615)）。
 8. **send_push_output**：构造 `PushOutputMessage::image_jpeg` + metadata（detections / roi_stats / line_stats / capture_events），通过 FFI 推送（[`src/lib.rs` L1640-L1646](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/yolo-video-v2/src/lib.rs#L1640-L1646)）。
 
-### §3.5 智能抓拍规则
+### 3.5 智能抓拍规则
 
 `CaptureCondition` 是一个 `#[serde(tag = "type")]` 的 tagged enum，支持三种触发条件（[`src/lib.rs` L152-L164](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/yolo-video-v2/src/lib.rs#L152-L164)）：
 
@@ -180,7 +180,7 @@ async fn execute_command(&self, command: &str, args: &serde_json::Value) -> Resu
 
 每条 `CaptureRule` 配置了 `cooldown_seconds`（默认 5 秒，[`src/lib.rs` L179](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/yolo-video-v2/src/lib.rs#L179)），运行时状态 `CaptureRuleState` 记录 `last_triggered` 和 `prev_condition_met`——只有 condition 从 false→true（rising edge）且距上次触发超过 cooldown 才会真正产出 `CaptureEvent`（带 base64 图像）。
 
-### §3.6 流式会话生命周期序列图
+### 3.6 流式会话生命周期序列图
 
 ```mermaid
 sequenceDiagram
@@ -215,17 +215,17 @@ sequenceDiagram
     THR->>THR: loop checks running == false → exit
 ```
 
-### §3.7 YoloDetector 懒加载
+### 3.7 YoloDetector 懒加载
 
 `YoloDetector` 封装 usls::models::YOLO，采用与 #2 相同的懒加载模式：`Option<YOLO>` + `load_attempted` 双字段编码四态状态机。查看 detector 主体：[`src/detector.rs` L1-L80](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/yolo-video-v2/src/detector.rs#L1-L80)。`auto_device()` 优先 CoreML（macOS）/ CUDA（Linux）/ CPU，`with_device_fallback` 在 GPU 不可用时回退 CPU。`setup_native_lib_paths` 在加载模型前设置 `DYLD_LIBRARY_PATH` / `LD_LIBRARY_PATH` / `PATH`，确保 ONNX Runtime dylib 能被定位（[`src/detector.rs` L63-L80](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/yolo-video-v2/src/detector.rs#L63-L80)）。
 
-### §3.8 视频源抽象
+### 3.8 视频源抽象
 
 `video_source.rs` 定义了统一的 `VideoSource` trait 和 `FrameResult` enum（Frame / EndOfStream / NotReady / Error），并通过 `parse_source_url` 把 URL 前缀映射到 `SourceType`（Camera / RTSP / RTMP / HLS / File / Screen）。查看实现：[`src/video_source.rs` L1-L80](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/yolo-video-v2/src/video_source.rs#L1-L80)。`FfmpegVideoSource` 用 ffmpeg-next v7（features: codec / format / software-scaling）解码网络流，`to_rgb_image()` 把 FFmpeg 帧转成 `image::RgbImage`。
 
 ---
 
-## §4 关键设计决策（含权衡与替代方案）
+## 4 关键设计决策（含权衡与替代方案）
 
 本节列出 5 个关键设计决策，每个都给出选型、替代方案和理由。
 
@@ -251,7 +251,7 @@ sequenceDiagram
 
 ---
 
-## §5 与 NeoMind 主体的集成
+## 5 与 NeoMind 主体的集成
 
 ### 命令系统
 
@@ -275,7 +275,7 @@ commit `c41e6a6` 引入了 `stream-player` 扩展——一个纯播放器（不�
 
 ---
 
-## §6 测试与验证策略
+## 6 测试与验证策略
 
 ### 测试目录结构
 
@@ -295,7 +295,7 @@ commit `3919c6a` 修复了 Linux 上 `libonnxruntime.so.N`（N 是版本号）�
 
 ---
 
-## §7 部署运维与排障（含源码卫生反例）
+## 7 部署运维与排障（含源码卫生反例）
 
 ### 5 平台 .nep 分发
 
@@ -338,7 +338,7 @@ commit `60e4e5b` 把 ffmpeg-next 从 v7 升级到 v8（注意：当前 `Cargo.to
 
 ---
 
-## §8 延伸阅读与小结
+## 8 延伸阅读与小结
 
 ### 演进里程碑
 
@@ -364,7 +364,7 @@ commit `60e4e5b` 把 ffmpeg-next 从 v7 升级到 v8（注意：当前 `Cargo.to
 
 ### 推荐阅读顺序
 
-如果你是第一次接触 NeoMind 流式扩展，建议按以下顺序阅读：(1) 先读 [总览](./0-overview.md) 理解扩展模型；(2) 读 [案例 #1](./1-weather-forecast.md) 掌握基础同步扩展；(3) 读 [案例 #2](./2-yolo-device-inference.md) 理解 AI 推理 + 同步能力桥；(4) 最后读本案例 #3，对比 Push 与 Pull 的差异。如果你只关心 SDK 的 StreamCapability 接口设计，可以直接从 §3.1 开始读。
+如果你是第一次接触 NeoMind 流式扩展，建议按以下顺序阅读：(1) 先读 [总览](./0-overview.md) 理解扩展模型；(2) 读 [案例 #1](./1-weather-forecast.md) 掌握基础同步扩展；(3) 读 [案例 #2](./2-yolo-device-inference.md) 理解 AI 推理 + 同步能力桥；(4) 最后读本案例 #3，对比 Push 与 Pull 的差异。如果你只关心 SDK 的 StreamCapability 接口设计，可以直接从 3.1 开始读。
 
 ### 延伸到 ne101_camera
 

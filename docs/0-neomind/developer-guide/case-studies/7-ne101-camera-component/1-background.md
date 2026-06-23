@@ -2,16 +2,16 @@
 description: "CamThink NE101 感知摄像头的产品能力、为什么需要专门组件、在 NeoMind 生态中的设备绑定定位、与 metric_card 的递进关系"
 keywords: [NeoMind, NE101, CamThink, 设备绑定, business background]
 tags: [NeoMind, 案例, 业务背景]
-sidebar_label: "1. 业务背景"
+sidebar_label: "1. Background"
 ---
 
-# §1 业务背景：为什么 NeoMind 需要 ne101_camera 组件
+# 1 业务背景：为什么 NeoMind 需要 ne101_camera 组件
 
 > 本节回答三个问题：**NE101 是什么硬件**、**为什么不能用通用 metric_card 凑合**、**ne101_camera 在 NeoMind 生态中处于什么位置**。读完你就能解释为什么 manifest 里写 `has_device_binding: true` + `has_data_source: false`——这是设备绑定组件的典型签名。
 
 ---
 
-## §1.1 NE101 设备：CamThink 感知摄像头
+## 1.1 NE101 设备：CamThink 感知摄像头
 
 **CamThink NE101** 是一款电池供电的边缘 AI 感知摄像头，由 CamThink 团队（也是 NeoMind Dashboard 的维护方）设计。它的核心能力是「按需抓拍 + 边缘指标上报」：不像传统 IPC 摄像头持续推流，NE101 大部分时间处于低功耗休眠状态，只有在三种触发条件下才醒来抓拍一张 JPEG 静图——(1) 用户主动调用 `trigger_capture` 命令；(2) 内置定时器到点（cron 形式的 `set_schedule`）；(3) 外部系统通过 MQTT `cmd` 主题下发指令。每次抓拍完成后，设备会上报一组遥测：最新 JPEG 图像（通过 REST 拉取，URL 存在 `values.image_url` 里）+ 电池百分比 + 蜂窝信号强度 + 机壳温度。这种「事件驱动 + 低频采样」的设计让一节电池能撑 3-6 个月，但也意味着组件不能用「订阅视频流」的思路，而必须用「拉取最新一张」的轮询/事件模式。
 
@@ -24,13 +24,13 @@ NE101 支持的设备命令（device commands）是组件命令按钮的来源�
 - `reboot` —— 远程重启设备，用于排查蜂窝连接掉线等问题。这个命令在 UI 上做了二次确认，避免误触。
 - `set_capture_params` —— 调整抓拍参数（分辨率、JPEG 质量、是否启用 IR 补光），属于高级配置，默认折叠隐藏。
 
-这四类命令的存在进一步印证了 §1.2 的论点：metric_card 这种纯展示型组件根本无法承载命令触发能力，必须有专门的设备绑定组件来渲染命令按钮 + 调用设备命令 API。
+这四类命令的存在进一步印证了 1.2 的论点：metric_card 这种纯展示型组件根本无法承载命令触发能力，必须有专门的设备绑定组件来渲染命令按钮 + 调用设备命令 API。
 
 > **源码佐证**：manifest 的 `description.zh` 就写明了「显示最新抓拍、电量状态和触发控制」——这三个能力组合正是 NE101 设备能力的镜像。详见 [manifest.json L4-L7](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L4-L7)。
 
 ---
 
-## §1.2 为什么不能拿 metric_card 凑合
+## 1.2 为什么不能拿 metric_card 凑合
 
 读者第一反应可能是：「NE101 不就是上报电池、信号、温度几个数值吗？拿 [#6 metric_card](../6-metric-card-component.md) 绑个数据源不就行了？」答案是不行，原因有四：
 
@@ -46,7 +46,7 @@ NE101 支持的设备命令（device commands）是组件命令按钮的来源�
 
 ---
 
-## §1.3 在 NeoMind 生态中的定位：设备绑定组件
+## 1.3 在 NeoMind 生态中的定位：设备绑定组件
 
 NeoMind 组件市场按 `category` 字段分四大类：`display`（显示型，如 metric_card）、`device`（设备绑定型，如 ne101_camera）、`extension`（扩展驱动型）、`bridge`（协议桥接型，如 onvif-bridge）。ne101_camera 是 `device` 类型的旗舰样本，也是当前组件市场唯一一个 `device` 类型的组件。
 
@@ -90,15 +90,15 @@ graph TB
     class NE101 flagship
 ```
 
-图中的虚线箭头是本案例最重要的跨类关系：`device` 类的 ne101_camera 通过 `processingExtensionId` 字段消费 `extension` 类的 AI 扩展。这种「设备组件 + 可插拔扩展」的协作模式是 NeoMind 生态复用 AI 能力的核心机制，§3 扩展侧（v1.1）会深入讲解。
+图中的虚线箭头是本案例最重要的跨类关系：`device` 类的 ne101_camera 通过 `processingExtensionId` 字段消费 `extension` 类的 AI 扩展。这种「设备组件 + 可插拔扩展」的协作模式是 NeoMind 生态复用 AI 能力的核心机制，3 扩展侧（v1.1）会深入讲解。
 
 ---
 
-## §1.4 manifest.json 关键字段深度分析
+## 1.4 manifest.json 关键字段深度分析
 
-ne101_camera 的 manifest 只有 40 行，但信息密度极高。除了 §1.3 讲的两个绑定字段，还有三个字段是本案例的核心创新点，后续章节会反复引用：
+ne101_camera 的 manifest 只有 40 行，但信息密度极高。除了 1.3 讲的两个绑定字段，还有三个字段是本案例的核心创新点，后续章节会反复引用：
 
-**`processingExtensionId: ""`（[manifest.json L24](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L24)）——可配置的 AI 扩展消费者契约。** 这是本案例最重要的设计决策（详见 §1.6 设计决策 #1）。字段值是空字符串，意味着「默认不启用 AI 处理」；用户在配置面板里可以从下拉框选一个已安装的 AI 扩展（object_detection / ocr / describe 等），组件会把抓拍到的图像 URL + 配置参数发给该扩展，扩展推理完成后把检测结果写回设备的虚拟指标，组件再读取并叠加渲染。这套契约让 ne101_camera 不绑死任何特定 AI 能力——同一个组件配不同扩展就能做不同任务。
+**`processingExtensionId: ""`（[manifest.json L24](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L24)）——可配置的 AI 扩展消费者契约。** 这是本案例最重要的设计决策（详见 1.6 设计决策 #1）。字段值是空字符串，意味着「默认不启用 AI 处理」；用户在配置面板里可以从下拉框选一个已安装的 AI 扩展（object_detection / ocr / describe 等），组件会把抓拍到的图像 URL + 配置参数发给该扩展，扩展推理完成后把检测结果写回设备的虚拟指标，组件再读取并叠加渲染。这套契约让 ne101_camera 不绑死任何特定 AI 能力——同一个组件配不同扩展就能做不同任务。
 
 **`processingRoiOverlap: 0.6`（[manifest.json L31](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L31)）——基于 IoU 的 ROI 判定阈值。** 这个字段决定了「一个检测框算不算落在某个 ROI 内」的判定方式：当检测框与 ROI 的交并比（Intersection over Union）≥ 0.6 时算命中。早期的实现用「中心点是否落在 ROI 内」判定（commit `2109c45` 之前的版本），但中心点判定对「大目标偏出 ROI 边界」的情况过于宽松，因此 commit `2109c45`（`feat(ne101_camera): overlap-based ROI detection instead of center point`）切换到了 IoU 模式，随后 commit `636a8ae`（`feat(ne101_camera): make ROI overlap threshold configurable`）把这个阈值暴露成用户可调字段。
 
@@ -106,7 +106,7 @@ ne101_camera 的 manifest 只有 40 行，但信息密度极高。除了 §1.3 �
 
 ---
 
-## §1.5 组件出现之前的用户痛点
+## 1.5 组件出现之前的用户痛点
 
 在 ne101_camera 组件被开发出来之前，用户要在 NeoMind 上监控一台 NE101 摄像头需要「拼装」至少三个组件 + 手动 REST 调用：
 
@@ -133,7 +133,7 @@ ne101_camera 的 manifest 只有 40 行，但信息密度极高。除了 §1.3 �
 
 ---
 
-## §1.6 关键设计决策（含备选方案）
+## 1.6 关键设计决策（含备选方案）
 
 本节列出 4 个关键设计决策及其被否决的备选方案。这些决策塑造了 ne101_camera 现在的形态，理解它们有助于你在二次开发时避免走弯路。
 
@@ -173,11 +173,11 @@ ne101_camera 的 manifest 只有 40 行，但信息密度极高。除了 §1.3 �
 
 ### 设计决策小结
 
-这四个决策有一个共同的主题：**把复杂度推到边界，让组件自身保持「薄」**。ne101_camera 不内置 AI、不伪装成数据源、不锁死判定算法、不强制升级配置格式——每一处都把选择权留给了用户或下游扩展。这种「薄组件 + 厚契约」的哲学是 NeoMind 组件市场的核心设计原则，也是为什么一个 1972 行的组件能被称为「旗舰」而非「臃肿」的根本原因：1972 行里绝大部分是「把选择权正确地暴露出去」的胶水代码，而不是「自己做一切」的庞大逻辑。后续章节（特别是 §3 扩展侧、§6 组件构建）会反复回到这个主题。
+这四个决策有一个共同的主题：**把复杂度推到边界，让组件自身保持「薄」**。ne101_camera 不内置 AI、不伪装成数据源、不锁死判定算法、不强制升级配置格式——每一处都把选择权留给了用户或下游扩展。这种「薄组件 + 厚契约」的哲学是 NeoMind 组件市场的核心设计原则，也是为什么一个 1972 行的组件能被称为「旗舰」而非「臃肿」的根本原因：1972 行里绝大部分是「把选择权正确地暴露出去」的胶水代码，而不是「自己做一切」的庞大逻辑。后续章节（特别是 3 扩展侧、6 组件构建）会反复回到这个主题。
 
 ---
 
-## §1.7 端到端数据流
+## 1.7 端到端数据流
 
 下图展示从 NE101 设备抓拍到用户看到带检测框图像的完整链路。这条链路涉及 5 个角色：NE101 设备、MQTT Broker、NeoMind 主控、AI 扩展、ne101_camera 组件。
 
@@ -209,51 +209,51 @@ sequenceDiagram
 **链路关键点**：
 
 - 步骤 3-4 的「WebSocket 推增量 → 组件拉 JPEG」是异步的，组件必须用 state 保存最新 image_url，且要处理「image 还在加载、Canvas 还没建立」的边界情况（commit `d7836b8` 修复了 ResizeObserver 在 image 异步加载时没建立的问题）。
-- 步骤 8-10 的「组件 → 主控 → 扩展 → 回写」是 ne101_camera 最核心的创新链路，被称为 **Transform 生命周期**。组件在 `processingEnabled: true` 时创建一个命名 Transform（`ne101-{deviceId}-{extId}-{template}`），主控负责调度，扩展负责推理，结果通过虚拟指标 `detections` 回写。详见 §3 扩展侧（v1.1）+ §4 数据契约（MVP）。
+- 步骤 8-10 的「组件 → 主控 → 扩展 → 回写」是 ne101_camera 最核心的创新链路，被称为 **Transform 生命周期**。组件在 `processingEnabled: true` 时创建一个命名 Transform（`ne101-{deviceId}-{extId}-{template}`），主控负责调度，扩展负责推理，结果通过虚拟指标 `detections` 回写。详见 3 扩展侧（v1.1）+ 4 数据契约（MVP）。
 - 步骤 11 的「解析 JSON string」是因为 `detections` 虚拟指标被序列化成了字符串（commit `e3a70be` 修复了这个解析），组件必须 `JSON.parse` 后才能用。
 
 ---
 
-## §1.8 目标读者
+## 1.8 目标读者
 
 本案例面向两类读者：
 
-**第一类：组件开发者——正在为某个特定设备类型写专用面板。** 如果你手上有一个 ONVIF 摄像头、一个 Modbus 传感器、一个 Zigbee 执行器，想知道「怎么为这个设备写一个 NeoMind 组件」，本案例就是你的范本。你应该重点读 §1（本节）+ §2 架构总览（v1.1）+ §6 组件构建（MVP），理解「设备绑定 + 命令触发 + 配置面板」的三件套写法。
+**第一类：组件开发者——正在为某个特定设备类型写专用面板。** 如果你手上有一个 ONVIF 摄像头、一个 Modbus 传感器、一个 Zigbee 执行器，想知道「怎么为这个设备写一个 NeoMind 组件」，本案例就是你的范本。你应该重点读 1（本节）+ 2 架构总览（v1.1）+ 6 组件构建（MVP），理解「设备绑定 + 命令触发 + 配置面板」的三件套写法。
 
-**第二类：集成者——想把一个 AI 扩展接到摄像头设备上。** 如果你是 AI 扩展的开发者，想让你的扩展能被 ne101_camera（或其它设备绑定组件）消费，你应该重点读 §1（本节）+ §3 扩展侧（v1.1）+ §4 数据契约（MVP），理解 `processingExtensionId` 契约的输入输出格式、`detections` 虚拟指标的 schema、Transform 生命周期的管理规则。
+**第二类：集成者——想把一个 AI 扩展接到摄像头设备上。** 如果你是 AI 扩展的开发者，想让你的扩展能被 ne101_camera（或其它设备绑定组件）消费，你应该重点读 1（本节）+ 3 扩展侧（v1.1）+ 4 数据契约（MVP），理解 `processingExtensionId` 契约的输入输出格式、`detections` 虚拟指标的 schema、Transform 生命周期的管理规则。
 
-两类读者都需要前置读完 [#6 metric_card](../6-metric-card-component.md) 案例的 §1-§3，因为 metric_card 教的「IIFE 注入 + manifest 契约 + fetchData 拉取」是本案例的底层骨架。
-
----
-
-## §1.9 后续章节预告
-
-- **§2 架构总览（v1.1）**：拆解 1972 行 IIFE 的模块分层，画出组件树和数据流图。
-- **§3 扩展侧（v1.1）**：深入 `processingExtensionId` 契约，讲解扩展如何消费图像、如何回写检测结果。
-- **§4 数据契约 ★（MVP）**：MQTT 主题命名、WebSocket 增量消息格式、`detections` 字段 schema、单矩形 ROI vs 多 ROI 数组的 JSON 结构。
-- **§5 前端消费 ★（MVP）**：组件如何拉取 detections、解析 JSON string、按类别上色（commit `c276c23` 的 golden-angle HSV rotation）、画检测框。
-- **§6 组件构建 ★（MVP）**：`NE101CameraPanel` 命名导出的写法、React hooks 在 IIFE 中的陷阱（commit `b060a25` / `0601cd4`）、配置面板的分层设计。
-- **§7 ROI 叠加（v1.1）**：单矩形 vs 多 ROI 数组的渲染差异、归一化坐标到像素坐标的映射、`objectFit: contain` 的非线性缩放处理。
-- **§8 运维与扩展（v1.1）**：版本演进（25+ commits 的关键节点）、调试 Trace 技巧、性能优化（避免重复创建 Transform、Canvas 重绘节流）。
+两类读者都需要前置读完 [#6 metric_card](../6-metric-card-component.md) 案例的 1-3，因为 metric_card 教的「IIFE 注入 + manifest 契约 + fetchData 拉取」是本案例的底层骨架。
 
 ---
 
-## §1.10 关键 commit 索引
+## 1.9 后续章节预告
+
+- **2 架构总览（v1.1）**：拆解 1972 行 IIFE 的模块分层，画出组件树和数据流图。
+- **3 扩展侧（v1.1）**：深入 `processingExtensionId` 契约，讲解扩展如何消费图像、如何回写检测结果。
+- **4 数据契约 ★（MVP）**：MQTT 主题命名、WebSocket 增量消息格式、`detections` 字段 schema、单矩形 ROI vs 多 ROI 数组的 JSON 结构。
+- **5 前端消费 ★（MVP）**：组件如何拉取 detections、解析 JSON string、按类别上色（commit `c276c23` 的 golden-angle HSV rotation）、画检测框。
+- **6 组件构建 ★（MVP）**：`NE101CameraPanel` 命名导出的写法、React hooks 在 IIFE 中的陷阱（commit `b060a25` / `0601cd4`）、配置面板的分层设计。
+- **7 ROI 叠加（v1.1）**：单矩形 vs 多 ROI 数组的渲染差异、归一化坐标到像素坐标的映射、`objectFit: contain` 的非线性缩放处理。
+- **8 运维与扩展（v1.1）**：版本演进（25+ commits 的关键节点）、调试 Trace 技巧、性能优化（避免重复创建 Transform、Canvas 重绘节流）。
+
+---
+
+## 1.10 关键 commit 索引
 
 本案例后续章节会引用以下 commit，这里统一列出方便查阅。完整的 commit 历史可以用 `git log --oneline -- components/ne101_camera/` 在 [源码仓库](https://github.com/camthink-ai/NeoMind-Dashboard-Components) 查看。
 
 | Commit | 类型 | 一句话说明 | 涉及章节 |
 |--------|------|------------|----------|
-| `c276c23` | feat | per-class detection colors via golden-angle HSV rotation（按类别上色，黄金角 HSV 轮转） | §5 前端消费 |
-| `8656148` | feat | pass NMS IoU threshold 0.5 to locate-anything-v2（把 NMS 阈值透传给扩展） | §3 扩展侧 |
-| `636a8ae` | feat | make ROI overlap threshold configurable（`processingRoiOverlap` 字段化） | §7 ROI 叠加 |
-| `2109c45` | feat | overlap-based ROI detection instead of center point（IoU 判定取代中心点） | §7 ROI 叠加 |
-| `b746c02` | feat | render OCR detection boxes as polygons with rect fallback（OCR 多边形框） | §5 前端消费 |
-| `d7836b8` | fix | ResizeObserver never set up when image loads async（异步加载的 Canvas 坑） | §6 组件构建 |
-| `b060a25` | fix | React error #310 — use defaultValue instead of hooks in ImageInput（hooks 陷阱） | §6 组件构建 |
-| `0601cd4` | fix | move conditional useState hook to fix React error #310（hooks 顺序陷阱） | §6 组件构建 |
-| `e3a70be` | fix | parse JSON string detections from backend virtual metrics（JSON string 解析） | §4 数据契约 |
-| `c4fe7bf` | fix | guard rawImageSrc against non-string metric values（类型守卫） | §5 前端消费 |
+| `c276c23` | feat | per-class detection colors via golden-angle HSV rotation（按类别上色，黄金角 HSV 轮转） | 5 前端消费 |
+| `8656148` | feat | pass NMS IoU threshold 0.5 to locate-anything-v2（把 NMS 阈值透传给扩展） | 3 扩展侧 |
+| `636a8ae` | feat | make ROI overlap threshold configurable（`processingRoiOverlap` 字段化） | 7 ROI 叠加 |
+| `2109c45` | feat | overlap-based ROI detection instead of center point（IoU 判定取代中心点） | 7 ROI 叠加 |
+| `b746c02` | feat | render OCR detection boxes as polygons with rect fallback（OCR 多边形框） | 5 前端消费 |
+| `d7836b8` | fix | ResizeObserver never set up when image loads async（异步加载的 Canvas 坑） | 6 组件构建 |
+| `b060a25` | fix | React error #310 — use defaultValue instead of hooks in ImageInput（hooks 陷阱） | 6 组件构建 |
+| `0601cd4` | fix | move conditional useState hook to fix React error #310（hooks 顺序陷阱） | 6 组件构建 |
+| `e3a70be` | fix | parse JSON string detections from backend virtual metrics（JSON string 解析） | 4 数据契约 |
+| `c4fe7bf` | fix | guard rawImageSrc against non-string metric values（类型守卫） | 5 前端消费 |
 
 ---
 

@@ -2,16 +2,16 @@
 description: "ne101_camera 组件构建：IIFE 注入范式（window.React + jsxRuntime）、命名导出对象、五层模块结构、React hooks 在 IIFE 中的三大陷阱（#310 hooks 顺序、frozen input、conditional useState）、ConfigPanel/AdvancedPanel/ExtDropdown 子组件、shadcn CSS 类复刻"
 keywords: [ne101_camera, IIFE, React-in-IIFE, 命名导出, hooks 陷阱, shadcn, ConfigPanel]
 tags: [NeoMind, 案例, MVP]
-sidebar_label: "§6 组件构建 ★"
+sidebar_label: "6. Component Build"
 ---
 
-# §6 组件构建：从 IIFE 注入到 shadcn 复刻的工程范式
+# 6 组件构建：从 IIFE 注入到 shadcn 复刻的工程范式
 
 > 本节是 ne101_camera MVP 阶段的**组件构建参考页**，也是 MVP 核心三页的收尾篇。读完你应当能：(1) 解释为什么 `bundle.js` 第一行不是 import 而是 `var React = window.React`——这套「IIFE 注入范式」是 NeoMind 组件市场的底层约定，与 ESM 打包方案的根本差异在哪里；(2) 复述 L1971 那个 `return { default, NE101CameraPanel, ConfigPanel, AdvancedPanel }` 四键导出对象的设计动机，说出平台加载器如何通过 `global_name` + `export_name` 路由到正确的组件；(3) 画出 1972 行 IIFE 的五层模块结构（helper / template engine / main component / shared UI / settings panels），解释为什么「同一闭包内的函数提升」能替代打包器的模块解析；(4) 复述 React hooks 在 IIFE 中踩过的三个经典坑（commit `0601cd4` 的条件 useState 导致 #310、commit `44f1fa5` 的共享 composingRef 导致输入冻结、commit `b060a25` 的最终 uncontrolled 修复），并说出为什么这些坑在 ESM + ESLint 项目里不会出现；(5) 描述 shadcn CSS 类复刻策略（`INPUT_CLS` / `SwitchControl` / `ExtDropdown`），解释为什么选择复制 className 字符串而不是内联样式或请求平台组件 API。所有行号锚点都指向源码仓库 `main` 分支的 [`bundle.js`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js) 和 [`manifest.json`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json)。
 
 ---
 
-## §6.1 IIFE 注入范式
+## 6.1 IIFE 注入范式
 
 ne101_camera 的 `bundle.js` 第一行不是 `import` 语句，而是一个 IIFE（立即调用函数表达式）的入口。查看源码：[`bundle.js` L1-L5](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1-L5)。
 
@@ -36,11 +36,11 @@ IIFE 的最后一行是闭包的收尾和导出，位于 [`bundle.js` L1971-L197
 - **备选方案 A**：ESM bundle（Vite / Rollup 产物，`import React from 'react'`）。否决理由：ESM 需要平台支持 `<script type="module">` + import map 或 bundler 解析，而 NeoMind 平台用普通 `<script>` 标签加载组件；更重要的是 ESM 的 `external` 配置一旦失误，React 会被打进 chunk，破坏单实例约定。
 - **备选方案 B**：UMD（Universal Module Definition）。否决理由：UMD 会探测 `define`（AMD）/ `module.exports`（CommonJS）/ `window`（global）三个分支，对「只用 `<script>` 加载」的 NeoMind 平台是冗余的——三个分支中有两个永远不会被触发，白白增加 bundle 体积。
 - **理由**：IIFE 是唯一能用「函数作用域 + 闭包」模拟私有命名空间的零依赖手段，且与平台的 `<script>` 加载方式天然契合。这个生态的核心前提是「平台保证一个 React 实例」，IIFE 范式让组件代码无法违反这个前提。
-- **代价**：没有 tree-shaking（helper 层的未使用函数也会进 bundle）、没有 TypeScript 类型检查、没有 ESLint 的 `rules-of-hooks` 插件（这正是 §6.4 那个 hooks 顺序 bug 的根因）。ne101_camera 接受这个代价，靠 `test_bundle.js` 做逻辑测试兜底。
+- **代价**：没有 tree-shaking（helper 层的未使用函数也会进 bundle）、没有 TypeScript 类型检查、没有 ESLint 的 `rules-of-hooks` 插件（这正是 6.4 那个 hooks 顺序 bug 的根因）。ne101_camera 接受这个代价，靠 `test_bundle.js` 做逻辑测试兜底。
 
 ---
 
-## §6.2 命名导出对象
+## 6.2 命名导出对象
 
 IIFE 的 `return` 语句返回的是一个**多键对象**，不是单个函数。查看源码：[`bundle.js` L1971](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1971-L1971)。
 
@@ -94,9 +94,9 @@ graph LR
 
 ---
 
-## §6.3 五层模块结构
+## 6.3 五层模块结构
 
-1972 行的 IIFE 不是一坨平铺代码，而是按职责分成了五层。这一节的分层与 [§2.2](./2-architecture.md) 的五层架构概述一致，但这里聚焦**构建视角**——为什么这种分层能在没有打包器的情况下工作，以及每一层的构建特征。五层的行号边界如下：
+1972 行的 IIFE 不是一坨平铺代码，而是按职责分成了五层。这一节的分层与 [2.2](./2-architecture.md) 的五层架构概述一致，但这里聚焦**构建视角**——为什么这种分层能在没有打包器的情况下工作，以及每一层的构建特征。五层的行号边界如下：
 
 1. **Helper 层**（[L7-L230](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L7-L230)）：纯函数工具集——`batteryMeta`、`formatValue`、`unitStr`、`timeAgo`、`getVal`、`getFirst`、`classColor`、`pipeRois`、`PinIcon`、`ModeIcon`。无 React 依赖、无状态、无副作用，可以单独抽出来跑在 Node.js 里做单元测试。
 2. **Template 引擎层**（[L239-L456](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L239-L456)）：`generateTransformJsCode(pipe)` + `fillTemplate` —— 从 pipeline 配置生成 Transform 的 JS 代码字符串。纯字符串拼接，无 React。
@@ -136,7 +136,7 @@ graph TB
 
 ---
 
-## §6.4 React Hooks 在 IIFE 中的陷阱 #1：Hooks 顺序
+## 6.4 React Hooks 在 IIFE 中的陷阱 #1：Hooks 顺序
 
 React 的 Rules of Hooks 规定：**hooks 必须在组件函数的顶层调用，不能放在条件语句、循环、嵌套函数里**。这条规则的本质是 React 内部用「调用顺序索引」来追踪每个 hook 的状态——如果某次渲染调用了 3 个 hooks、下次渲染调用了 4 个，索引就会错位，React 报错 #310（"Rendered more hooks than during the previous render"）或更隐晦的 state 错乱。
 
@@ -173,7 +173,7 @@ var setEditingIdx = editingIdxState[1];
 
 ---
 
-## §6.5 React Hooks 在 IIFE 中的陷阱 #2：Frozen Input
+## 6.5 React Hooks 在 IIFE 中的陷阱 #2：Frozen Input
 
 第二个 hooks 陷阱比第一个更隐蔽——它不会让 React 崩溃，而是让**输入框看起来冻结了**（用户打字但框里不显示）。这个 bug 的修复经历了两次迭代，涉及两个 commit：[`44f1fa5`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/44f1fa5)（`fix(ne101_camera): input fields frozen — use local state instead of shared composingRef`）和 [`b060a25`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/b060a25)（`fix(ne101_camera): React error #310 — use defaultValue instead of hooks in imeInput`）。
 
@@ -235,7 +235,7 @@ graph LR
 
 ---
 
-## §6.6 ConfigPanel 与 AdvancedPanel 分工
+## 6.6 ConfigPanel 与 AdvancedPanel 分工
 
 NeoMind 平台的 ComponentConfigDialog 约定两个 tab：**Display**（用户可见的显示配置）和 **Advanced**（面向 power user 的高级配置）。ne101_camera 用 `ConfigPanel` 和 `AdvancedPanel` 两个导出函数分别填充这两个 tab，两者在代码量和复杂度上形成了鲜明的反差。
 
@@ -264,7 +264,7 @@ function ConfigPanel(props) {
 
 ---
 
-## §6.7 shadcn CSS 类复刻策略
+## 6.7 shadcn CSS 类复刻策略
 
 NeoMind Dashboard 的 UI 使用 [shadcn/ui](https://ui.shadcn.com/) 组件库构建。shadcn/ui 的特点不是「安装一个 npm 包」，而是**把组件源码复制到项目的 `components/ui/` 目录**——这意味着平台页面上已经加载了 shadcn 的 Tailwind CSS 类定义（如 `bg-background` / `text-muted-foreground` / `data-[state=checked]:bg-primary`）。ne101_camera 的组件**无法 import 这些 shadcn 组件**（IIFE 没有模块解析），但它可以**复刻 shadcn 组件的 className 字符串**，让 Tailwind 的 JIT 编译器（已经在平台上运行）把同样的样式应用到组件的 DOM 元素上。
 
@@ -291,13 +291,13 @@ var DESC_CLS = 'text-sm text-muted-foreground';
 
 - **选择**：逐字复制 shadcn 组件的 className 字符串到 IIFE 常量/JSX。
 - **备选方案 A**：用内联样式（`style={{ background: 'hsl(var(--background))' }}`）。否决理由：内联样式**无法匹配 Tailwind 的伪类和状态变体**——`hover:` / `focus-visible:` / `data-[state=checked]:` 这些选择器只能通过 CSS 类或 `<style>` 标签实现，不能写在 `style` 属性里。内联样式只能做静态样式，交互状态（hover 变色、focus 描边）全部丢失。
-- **备选方案 B**：请求平台暴露一个组件注册 API（如 `window.neomind.ui.Input`），让组件从平台「借」shadcn 组件实例。否决理由：平台目前没有暴露这样的 API（见 [§2.1](./2-architecture.md) 的注入三连，只注入了 `React` + `jsxRuntime`）。设计这样一个 API 需要考虑版本兼容、props 契约、样式隔离等一系列问题，短期内不会实现。className 复刻是当前唯一可行的方案。
+- **备选方案 B**：请求平台暴露一个组件注册 API（如 `window.neomind.ui.Input`），让组件从平台「借」shadcn 组件实例。否决理由：平台目前没有暴露这样的 API（见 [2.1](./2-architecture.md) 的注入三连，只注入了 `React` + `jsxRuntime`）。设计这样一个 API 需要考虑版本兼容、props 契约、样式隔离等一系列问题，短期内不会实现。className 复刻是当前唯一可行的方案。
 - **理由**：className 复刻利用了 Tailwind JIT 编译器的全局扫描机制——只要类名出现在 DOM 里（无论是平台的 shadcn 组件还是 ne101_camera 的 JSX），Tailwind 就会生成对应的 CSS 规则。这让 ne101_camera 的视觉效果与平台原生组件**像素级一致**，且无需任何额外依赖。
 - **代价**：如果平台升级 shadcn 组件（修改了 Input 的 className），ne101_camera 的复刻版本会**不同步**——平台的 Input 变了 padding，ne101_camera 的 `INPUT_CLS` 还是旧的。这需要组件维护者定期同步 className 字符串。实践中这个代价可以接受：shadcn 组件的 className 很少大改，且差异通常是视觉上的微小调整（如 padding 从 `py-2` 变成 `py-2.5`），不会破坏功能。
 
 ---
 
-## §6.8 设计决策汇总
+## 6.8 设计决策汇总
 
 本页涉及的 7 个设计决策汇总如下，每个都包含「选择 / 备选 / 理由」三段式。
 
@@ -317,19 +317,19 @@ var DESC_CLS = 'text-sm text-muted-foreground';
 
 | Commit | 类型 | 一句话说明 | 涉及小节 |
 |--------|------|------------|----------|
-| [`0601cd4`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/0601cd4) | fix | move conditional useState hook to fix React error #310 | §6.4 |
-| [`44f1fa5`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/44f1fa5) | fix | input fields frozen — use local state instead of shared composingRef | §6.5 |
-| [`b060a25`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/b060a25) | fix | React error #310 — use defaultValue instead of hooks in imeInput | §6.5 |
-| [`a8c1212`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/a8c1212) | revert | remove auto hash bump, preserve user transform edits | §6.3（template 引擎层演进） |
-| [`8656148`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/8656148) | feat | pass NMS IoU threshold 0.5 to locate-anything-v2 | §6.6（AdvancedPanel 滑块） |
-| [`c276c23`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/c276c23) | feat | per-class detection colors via golden-angle HSV rotation | §6.3（Helper 层 classColor） |
+| [`0601cd4`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/0601cd4) | fix | move conditional useState hook to fix React error #310 | 6.4 |
+| [`44f1fa5`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/44f1fa5) | fix | input fields frozen — use local state instead of shared composingRef | 6.5 |
+| [`b060a25`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/b060a25) | fix | React error #310 — use defaultValue instead of hooks in imeInput | 6.5 |
+| [`a8c1212`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/a8c1212) | revert | remove auto hash bump, preserve user transform edits | 6.3（template 引擎层演进） |
+| [`8656148`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/8656148) | feat | pass NMS IoU threshold 0.5 to locate-anything-v2 | 6.6（AdvancedPanel 滑块） |
+| [`c276c23`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/c276c23) | feat | per-class detection colors via golden-angle HSV rotation | 6.3（Helper 层 classColor） |
 
 ### 后续章节桥接
 
-- 回到 [§2 架构总览](./2-architecture.md) —— 本节的五层模块结构与 §2.2 的五层架构概述互补：§2 聚焦「是什么」，§6 聚焦「怎么构建」。§2.5 的决策 #1（IIFE + window.React）在 §6.1 有更深入的构建视角分析。
-- 回到 [§5 前端消费](./5-frontend-consume.md) —— §5 的 callback ref 模式（commit `d7836b8`）和 §6.4 的 hooks 顺序修复（commit `0601cd4`）是同一主题的两面：都是在 IIFE 里写 React 时容易踩的坑。
-- [§7 集成测试](./7-integration-test.md)—— 本节提到的 hooks 陷阱、frozen input、shadcn 类不同步等问题，在 §7 的测试矩阵里有对应的验证用例。
-- [§8 深度复盘](./8-deep-dive.md)—— 1972 行 IIFE 的版本演进（133 commits）、调试 trace 兴衰、`_configHash` 性能优化在 §8 有完整复盘。
+- 回到 [2 架构总览](./2-architecture.md) —— 本节的五层模块结构与 2.2 的五层架构概述互补：2 聚焦「是什么」，6 聚焦「怎么构建」。2.5 的决策 #1（IIFE + window.React）在 6.1 有更深入的构建视角分析。
+- 回到 [5 前端消费](./5-frontend-consume.md) —— 5 的 callback ref 模式（commit `d7836b8`）和 6.4 的 hooks 顺序修复（commit `0601cd4`）是同一主题的两面：都是在 IIFE 里写 React 时容易踩的坑。
+- [7 集成测试](./7-integration-test.md)—— 本节提到的 hooks 陷阱、frozen input、shadcn 类不同步等问题，在 7 的测试矩阵里有对应的验证用例。
+- [8 深度复盘](./8-deep-dive.md)—— 1972 行 IIFE 的版本演进（133 commits）、调试 trace 兴衰、`_configHash` 性能优化在 8 有完整复盘。
 
 ---
 
