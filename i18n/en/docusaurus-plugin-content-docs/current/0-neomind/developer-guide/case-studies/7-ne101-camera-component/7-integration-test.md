@@ -240,7 +240,15 @@ graph LR
 
 ## 7.4 Multi-Extension Switching Test
 
-`AI_EXT_IDS` ([`bundle.js` L144](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L144-L144)) hardcodes 4 whitelisted extensions, each with a different `responseType` contract — the JSON shape of the AI inference result. When the user switches `processingExtensionId` via the `ExtDropdown` ([L1371-L1446](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1371-L1446)) in AdvancedPanel:
+`AI_EXT_IDS` ([`bundle.js` L144](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L144-L144)) hardcodes 4 whitelisted extensions, each with a different `responseType` contract — the JSON shape of the AI inference result.
+
+```js
+  var AI_EXT_IDS = ['locate-anything-v2', 'image-analyzer-v2', 'yolo-device-inference', 'ocr-device-inference'];
+```
+
+Source: [`bundle.js` L144`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L144-L144)
+
+When the user switches `processingExtensionId` via the `ExtDropdown` ([L1371-L1446](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1371-L1446)) in AdvancedPanel:
 
 ```js
 // bundle.js L1371-L1402 (trimmed)
@@ -270,9 +278,37 @@ function ExtDropdown(props) {
   }
   // ... (L1403-L1446 render option buttons + dropdown trigger)
 ```
-[Source: bundle.js L1371-L1446](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1371-L1446), the component must simultaneously: (a) `AdvancedPanel` filters the extension list via `AI_EXT_IDS.indexOf(arr[i].id) >= 0` ([L1490](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1490-L1490)), showing only whitelisted extensions; (b) the main component's effect detects the `processingExtId` change and calls `generateTransformJsCode(pipe)` to regenerate the Transform JS ([L277-L278](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L277-L278)), using the new extension's `mode.command` / `mode.imageArg` / `mode.responseType` in `extensions.invoke`; (c) the detection normalizer switches based on `responseType`: `boxes_x1y1x2y2` runs `[x1,y1,x2,y2]` to bbox object conversion, `objects_bbox` / `detections_bbox` already use the bbox object shape directly, and `ocr_text_blocks` additionally converts object coordinates to arrays and renders polygons (commits [`403c0f1`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/403c0f1) + [`b746c02`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/b746c02)).
+[Source: bundle.js L1371-L1446](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1371-L1446), the component must simultaneously: (a) `AdvancedPanel` filters the extension list via `AI_EXT_IDS.indexOf(arr[i].id) >= 0` ([L1490](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1490-L1490)), showing only whitelisted extensions;
 
-The test matrix covers the **directed complete graph** of the 4 extensions — every extension switches to every other extension (4×3 = 12 directed edges), plus 4 self-loops, totaling 16 switching paths. Each path verifies three assertions: (1) the new extension's mode list is loaded correctly (`availableModes.length > 0`); (2) the Transform is rebuilt (the `_configHash` change triggers a Tier 2/3 update); (3) feeding a mock response with the new extension's `responseType` produces a normalized detection array with the correct structure. The most critical regression assertion was introduced by commit [`8656148`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/8656148): **only `locate-anything-v2` hardcodes `nms_iou_threshold: 0.5` in the Transform JS** ([L282](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L282-L282)); the other three extensions do not pass this parameter. The matrix verifies "the JS generated when switching to locate-anything-v2 contains `nms_iou_threshold`; switching away makes this field disappear", preventing the NMS parameter from leaking into extensions that don't support it (which would cause `image-analyzer-v2` to error with "unknown parameter").
+```js
+        for (var i = 0; i < arr.length; i++) {
+          if (AI_EXT_IDS.indexOf(arr[i].id) >= 0) filtered.push(arr[i]);
+        }
+```
+
+Source: [`bundle.js` L1489-L1491`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1489-L1491)
+
+(b) the main component's effect detects the `processingExtId` change and calls `generateTransformJsCode(pipe)` to regenerate the Transform JS ([L277-L278](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L277-L278)), using the new extension's `mode.command` / `mode.imageArg` / `mode.responseType` in `extensions.invoke`;
+
+```js
+    L.push('var r = extensions.invoke(\'' + extensionId + '\', \'' + mode.command + '\', {');
+    L.push('  ' + imageArg + ': __imageData');
+```
+
+Source: [`bundle.js` L277-L278`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L277-L278)
+
+(c) the detection normalizer switches based on `responseType`: `boxes_x1y1x2y2` runs `[x1,y1,x2,y2]` to bbox object conversion, `objects_bbox` / `detections_bbox` already use the bbox object shape directly, and `ocr_text_blocks` additionally converts object coordinates to arrays and renders polygons (commits [`403c0f1`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/403c0f1) + [`b746c02`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/b746c02)).
+
+The test matrix covers the **directed complete graph** of the 4 extensions — every extension switches to every other extension (4×3 = 12 directed edges), plus 4 self-loops, totaling 16 switching paths. Each path verifies three assertions: (1) the new extension's mode list is loaded correctly (`availableModes.length > 0`); (2) the Transform is rebuilt (the `_configHash` change triggers a Tier 2/3 update); (3) feeding a mock response with the new extension's `responseType` produces a normalized detection array with the correct structure. The most critical regression assertion was introduced by commit [`8656148`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/8656148): **only `locate-anything-v2` hardcodes `nms_iou_threshold: 0.5` in the Transform JS** ([L282](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L282-L282)); the other three extensions do not pass this parameter.
+
+```js
+    // Pass NMS threshold to locate-anything-v2 — extension postprocess_args reads it from args
+    if (extensionId === 'locate-anything-v2') L.push(',  nms_iou_threshold: 0.5');
+```
+
+Source: [`bundle.js` L281-L282`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L281-L282)
+
+The matrix verifies "the JS generated when switching to locate-anything-v2 contains `nms_iou_threshold`; switching away makes this field disappear", preventing the NMS parameter from leaking into extensions that don't support it (which would cause `image-analyzer-v2` to error with "unknown parameter").
 
 ```mermaid
 stateDiagram-v2
@@ -303,6 +339,12 @@ stateDiagram-v2
 ## 7.5 source_ts Alignment Verification
 
 `source_ts` (source timestamp) is ne101_camera's core mechanism for preventing "ghost detections". Cameras push 2-5 new frames per second, AI inference takes 200-800ms, which means **by the time the inference result returns, the displayed frame may already be the next one** — if you just draw the previous frame's detections on the current frame, you get a ghost: "the person has already walked out of frame, but the detection box stays in place". The `source_ts` solution: the Transform JS emits `source_ts` alongside detections (taken from the input image's `ts` / `timestamp` field, [`bundle.js` L436`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L436-L436)), and the main component strictly compares `source_ts` against the current image's `imgTs` when receiving virtual data — only matching pairs are displayed.
+
+```js
+    L.push('out[\'' + pfx + 'source_ts\'] = input_raw && (input_raw.ts || input_raw.timestamp) || null;');
+```
+
+Source: [`bundle.js` L436`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L436-L436)
 
 The alignment logic is a three-state machine defined in [`bundle.js` L858-L874](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L858-L874):
 
@@ -355,7 +397,21 @@ stateDiagram-v2
 
 ## 7.6 WS+REST Dual Channel Test
 
-The NeoMind platform provides two data channels for each device component: (1) **WebSocket push** — high-frequency small data (battery, temperature, ts), multiple times per second; (2) **REST polling** — low-frequency large data (image base64 / URL, inference results), at second-level intervals. ne101_camera merges the three streams at [`bundle.js` L631`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L631-L631) with a single `Object.assign({}, wsValues, imageData || {}, virtualDataState[0] || {})`. The merge order is strictly **WS-base → REST-overlay → virtual** — WS provides the baseline of real-time small metrics, REST overlays the image field with the latest image, and virtual data (Transform output of detections) covers detection-related fields last. This order seems obvious, but both commit [`b0be12b`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/b0be12b) (initial fetch on mount) and commit [`0eedd27`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/0eedd27) (update virtual data on WS-triggered REST fetch) fixed timing bugs related to merge order.
+The NeoMind platform provides two data channels for each device component: (1) **WebSocket push** — high-frequency small data (battery, temperature, ts), multiple times per second; (2) **REST polling** — low-frequency large data (image base64 / URL, inference results), at second-level intervals. ne101_camera merges the three streams at [`bundle.js` L631`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L631-L631) with a single `Object.assign({}, wsValues, imageData || {}, virtualDataState[0] || {})`:
+
+```js
+    // Merge: WS values as base (real-time small metrics), REST image data overlay, virtual metrics
+    var _vals = Object.assign({}, wsValues, imageData || {}, virtualDataState[0] || {});
+
+    // Early-extract imageSrc — device may send URL or base64
+    var rawImageSrc = getFirst(_vals, ['values.imageUrl', 'values.image', 'values.photo', 'imageUrl', 'image', 'photo', 'values.picture', 'picture']);
+    // Guard: only strings can be image sources — numbers/objects from metrics crash .indexOf()/.match()
+    if (typeof rawImageSrc !== 'string') rawImageSrc = null;
+```
+
+Source: [`bundle.js` L630-L636`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L630-L636)
+
+The merge order is strictly **WS-base → REST-overlay → virtual** — WS provides the baseline of real-time small metrics, REST overlays the image field with the latest image, and virtual data (Transform output of detections) covers detection-related fields last. This order seems obvious, but both commit [`b0be12b`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/b0be12b) (initial fetch on mount) and commit [`0eedd27`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/0eedd27) (update virtual data on WS-triggered REST fetch) fixed timing bugs related to merge order.
 
 The most common failure mode is "**WS arrives first, REST later**": on component mount, the platform immediately starts pushing WS data (battery, temperature), but the REST fetch takes hundreds of milliseconds to return the first image. If the merge order is reversed (REST-base → WS-overlay), WS's small metrics will overlay REST's image field (because both use the `ts` field), resulting in a first screen with metrics but no image. `b0be12b` fixed exactly this — it actively triggers a REST fetch on mount instead of passively waiting for the platform's polling schedule, getting the image field into `imageData` state early. Another failure is "**virtual data lags behind the image**": inference is slower than image updates, the new image is already displayed, but the detection result still corresponds to the previous frame — this pit is solved in 7.5 with `source_ts`, but the prerequisite is that virtual data must be the **last layer** in the merge, otherwise WS's `ts` update arrives before virtual's `source_ts`, breaking alignment. `0eedd27` fixed this: after a WS-triggered REST fetch completes, the virtual data state must be **refreshed synchronously**, not waiting for the next Transform cycle.
 

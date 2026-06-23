@@ -131,6 +131,23 @@ React.useEffect(function () {
 
 commit [`c16d803`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/c16d803)（`fix(ne101): remove console.log from Transform JS that crashes Boa engine`）是 ne101_camera 历史上最特殊的修复之一——它不是修业务逻辑，而是修一个**运行时环境差异**导致的崩溃。这个 bug 的根因在于：ne101_camera 的 Transform JS 是一份**生成的 JS 字符串**（由 `generateTransformJsCode` 拼接出来，[`bundle.js` L239-L456`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L239-L456)），这份字符串不跑在浏览器里，也不跑在 Node.js 里，而是跑在平台的 **Boa 引擎**里——一个 Rust 实现的 JS 解释器，用于沙箱化执行用户提交的 Transform 代码（防止恶意代码访问主进程）。
 
+```js
+  function generateTransformJsCode(pipe) {
+    var extensionId = pipe.extId;
+    if (extensionId.indexOf('virtual') === 0) {
+      extensionId = extensionId.replace(/^virtual[._-]/, '');
+    }
+    var templateName = pipe.template;
+    var mode = getExtMode(extensionId, templateName);
+    if (!mode) return '';
+    // ... (210 lines omitted: input handling, extension invoke, response parsing,
+    //      ROI clipping, class filter, output metrics)
+    return L.join('\n');
+  }
+```
+
+Source: [`bundle.js` L239-L456`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L239-L456)
+
 Boa 引擎在某个版本里**没有完整实现 `console` shim**——`console.log` 在 Boa 里是 `undefined`，调用它会抛 `TypeError: console.log is not a function`，整个 Transform 执行中断。在浏览器或 Node.js 里写 `console.log(...)` 是绝对安全的（这是 JS 的「hello world」），所以开发者在调试 Transform 生成逻辑时顺手加了一条 `console.log('detection count:', dets.length)`——这条 log 在浏览器里测试时一切正常，但部署到生产环境（Transform 跑在 Boa 里）后立即崩溃。这就是 c16d803 修的 bug：删除 Transform JS 字符串里的 `console.log`。
 
 这个事件的工程教训是：**在跨运行时代码里，必须避免 host-environment 假设**。Transform JS 是「跨运行时代码」的典型——它的源码字符串由组件生成，但执行发生在平台沙箱里，两个运行时的能力集合不同（浏览器有完整的 `console` / `window` / `fetch`，Boa 只有 JS 语言核心 + 平台注入的 `extensions.invoke`）。任何对宿主环境的假设（`console.log` 存在、`Date.now` 存在、`JSON.stringify` 存在）都可能在某个运行时里失败。修复后的 ne101_camera 在 Transform 生成代码里彻底禁用了 `console.log`，后续的调试 trace（8.2 提到的 4 个 debug commit）只加在**组件侧**的 React 代码里（这些跑在浏览器，console.log 安全），不加在 Transform 字符串里。这个区分——组件侧可 log、Transform 侧不可 log——成为 ne101_camera 调试的硬约定。
@@ -268,9 +285,41 @@ L.push('};');
 
 **第一代：中心点判定**。最初的 ROI 算法是「检测框中心点是否落在 ROI 矩形内」——`if (centerX >= roiX1 && centerX <= roiX2 && centerY >= roiY1 && centerY <= roiY2)`。这个实现简单粗暴，但有明显的精度问题：一个 100x100 的检测框只有中心点（1 个像素）落在 ROI 内，整个检测会被判定为「在 ROI 内」，导致大量误报。用户投诉：「我把 ROI 划在门口，但走廊上路过的人也被检测了」。这个投诉暴露了中心点判定的根本缺陷：**它不关心检测框与 ROI 的实际重叠面积**。
 
-**第二代：基于面积重叠的固定 0.6 阈值**。commit [`2109c45`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/2109c45)（`feat(ne101_camera): overlap-based ROI detection instead of center point`）引入了 Sutherland-Hodgman 多边形裁剪算法（[L342-L372](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L342-L372)），计算检测框与 ROI 多边形的交集面积，当交集面积 / 检测框面积 ≥ 0.6 时判定为「在 ROI 内」。这个实现修了第一代的精度问题——一个只有中心点落在 ROI 内的检测框，交集面积是 0（裁剪后面积为 0），不会通过判定。但 0.6 这个固定阈值很快引发了新的投诉：「我监控的是小物体（如鼠标），检测框本身就小，60% 的重叠太严格了，经常漏检」。
+**第二代：基于面积重叠的固定 0.6 阈值**。commit [`2109c45`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/2109c45)（`feat(ne101_camera): overlap-based ROI detection instead of center point`）引入了 Sutherland-Hodgman 多边形裁剪算法（[L342-L372](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L342-L372)），计算检测框与 ROI 多边形的交集面积，当交集面积 / 检测框面积 ≥ 0.6 时判定为「在 ROI 内」。
+
+```js
+// bundle.js L342-L364 (Sutherland-Hodgman 裁剪核心，trimmed)
+L.push('var lerpPt = function(a, b, t) { return [a[0] + t * (b[0] - a[0]), a[1] + t * (b[1] - a[1])]; };');
+L.push('var clipEdge = function(inp, inside, isect) {');
+L.push('  var out = [];');
+L.push('  for (var i = 0; i < inp.length; i++) {');
+L.push('    var j = (i + 1) % inp.length;');
+L.push('    if (inside(inp[i])) { if (inside(inp[j])) out.push(inp[j]); else out.push(isect(inp[i], inp[j])); }');
+L.push('    else if (inside(inp[j])) { out.push(isect(inp[i], inp[j])); out.push(inp[j]); }');
+L.push('  }');
+L.push('  return out;');
+L.push('};');
+L.push('var clipPolyRect = function(poly, rx1, ry1, rx2, ry2) {');
+// ... (8 lines omitted: 4 clipEdge calls for x1/x2/y1/y2 bounds)
+L.push('};');
+L.push('var polyArea = function(p) {');
+L.push('  var a = 0;');
+L.push('  for (var i = 0; i < p.length; i++) { var j = (i + 1) % p.length; a += p[i][0] * p[j][1] - p[j][0] * p[i][1]; }');
+L.push('  return Math.abs(a) / 2;');
+L.push('};');
+```
+
+Source: [`bundle.js` L342-L372`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L342-L372)
+
+这个实现修了第一代的精度问题——一个只有中心点落在 ROI 内的检测框，交集面积是 0（裁剪后面积为 0），不会通过判定。但 0.6 这个固定阈值很快引发了新的投诉：「我监控的是小物体（如鼠标），检测框本身就小，60% 的重叠太严格了，经常漏检」。
 
 **第三代：可配置阈值**。commit [`636a8ae`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/636a8ae)（`feat(ne101_camera): make ROI overlap threshold configurable`）把 0.6 的硬编码换成了 `pipe.overlapThreshold` 参数，用户可以在 AdvancedPanel 里用滑块调整（从 0.1 到 0.9）。这个改动让阈值能适应不同的监控场景——小物体用低阈值（0.3，只要有一点重叠就算「在内」）、大物体用高阈值（0.8，必须大部分在 ROI 内）。当前代码在 [L341](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L341-L341) 把阈值注入到 Transform JS 字符串里。
+
+```js
+      L.push('var OVERLAP_TH = ' + (pipe.overlapThreshold != null ? pipe.overlapThreshold : 0.6) + ';');
+```
+
+Source: [`bundle.js` L341`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L341-L341)
 
 ```mermaid
 graph LR
