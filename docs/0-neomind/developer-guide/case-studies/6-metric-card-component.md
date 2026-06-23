@@ -104,6 +104,41 @@ components/metric_card/
 }
 ```
 
+```json
+// manifest.json L1-L30 (trimmed)
+{
+  "id": "metric_card",
+  "name": { "en": "Metric Card", "zh": "指标卡片" },
+  "description": {
+    "en": "A frosted-glass metric card with adaptive layout and multi-data-source support",
+    "zh": "毛玻璃效果指标卡片，自适应布局，支持多数据源绑定"
+  },
+  "icon": "BarChart3",
+  "category": "display",
+  "version": "1.7.0",
+  "author": "NeoMind Team",
+  "size_constraints": {
+    "min_w": 2,
+    "min_h": 2,
+    "default_w": 3,
+    "default_h": 2,
+    "max_w": 6,
+    "max_h": 4
+  },
+  "has_data_source": true,
+  "max_data_sources": 12,
+  "has_device_binding": false,
+  "has_display_config": true,
+  "has_actions": false,
+  "config_schema": {
+    "type": "object",
+    "properties": {
+      "metrics": {
+        "type": "array",
+```
+
+[Source: manifest.json L1-L49](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/metric_card/manifest.json#L1-L49)
+
 **为什么每个字段是这个形状：**
 
 - `size_constraints.min_w: 2` — 一格太窄，连两位数 + 单位都放不下；两格是「可读数值卡」的最小尺寸。运行时在拖拽缩放时会阻止用户缩到 2 格以下。
@@ -126,6 +161,16 @@ var NeoMind_MetricCard = (function () {
   return { default: MetricCard, MetricCard: MetricCard };
 })();
 ```
+
+```js
+// bundle.js L1-L4
+var NeoMind_MetricCard = (function () {
+  var React = window.React;
+  var jsx = window.jsxRuntime.jsx;
+  var jsxs = window.jsxRuntime.jsxs;
+```
+
+[Source: bundle.js L1-L4](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/metric_card/bundle.js#L1-L4)
 
 **为什么是 IIFE + `window.*` 注入，而不是 ESM？**
 
@@ -161,6 +206,22 @@ var glassContainer = {
 };
 ```
 
+```js
+// bundle.js L9-L18
+var glassContainer = {
+  background: 'linear-gradient(135deg, oklch(1 0 0 / 6%) 0%, oklch(0.75 0.06 270 / 5%) 40%, oklch(1 0 0 / 3%) 60%, oklch(0.75 0.06 200 / 4%) 100%)',
+  backgroundSize: '300% 300%',
+  animation: 'mc-shimmer 12s ease infinite',
+  border: '1px solid var(--border)',
+  borderRadius: '12px',
+  backdropFilter: 'blur(16px)',
+  WebkitBackdropFilter: 'blur(16px)',
+  boxShadow: '0 1px 3px oklch(0 0 0 / 12%), inset 0 1px 0 oklch(1 0 0 / 6%)'
+};
+```
+
+[Source: bundle.js L9-L18](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/metric_card/bundle.js#L9-L18)
+
 **为什么用 OKLCH 而不是 hex / rgb？**
 
 [OKLCH](https://oklch.com/) 是一个感知均匀的颜色空间，意味着「相同 lightness 值的不同色相，人眼看起来亮度一致」。对组件设计有两个实际好处：
@@ -194,6 +255,33 @@ function extractValue(result) {
   return null;
 }
 ```
+
+```js
+// bundle.js L40-L60
+function extractValue(result) {
+  if (result == null) return null;
+  if (typeof result === 'number') return result;
+  if (typeof result === 'string') return result;
+  if (typeof result === 'boolean') return result ? 'Yes' : 'No';
+  if (result.value != null) {
+    if (typeof result.value === 'number') return result.value;
+    if (typeof result.value === 'string') return result.value;
+    if (typeof result.value === 'boolean') return result.value ? 'Yes' : 'No';
+  }
+  if (result.series != null && Array.isArray(result.series) && result.series.length) {
+    var last = result.series[result.series.length - 1];
+    if (typeof last === 'number') return last;
+    if (typeof last === 'string') return last;
+    if (last && last.value != null) {
+      if (typeof last.value === 'number') return last.value;
+      if (typeof last.value === 'string') return last.value;
+    }
+  }
+  return null;
+}
+```
+
+[Source: bundle.js L40-L60](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/metric_card/bundle.js#L40-L60)
 
 **为什么要处理 5+ 种输入格式？**
 
@@ -229,6 +317,88 @@ function MetricCard(props) {
   // ... loading / error 状态 ...
 }
 ```
+
+```js
+// bundle.js L130-L148
+function MetricCard(props) {
+    var config = props.config || {};
+    var fetchData = props.fetchData;
+    var dataSource = props.dataSource;
+
+    var dataSt = React.useState([]);
+    var values = dataSt[0], setValues = dataSt[1];
+    var loadSt = React.useState(true);
+    var loading = loadSt[0], setLoading = loadSt[1];
+    var errSt = React.useState(null);
+    var error = errSt[0], setError = errSt[1];
+
+    var fetchDataRef = React.useRef(fetchData);
+    fetchDataRef.current = fetchData;
+    var configRef = React.useRef(config);
+    configRef.current = config;
+    var fetchIdRef = React.useRef(0);
+    var lastDsKeyRef = React.useRef(null);
+
+    var containerRef = React.useRef(null);
+    var sizeSt = React.useState({ w: 0, h: 0 });
+```
+
+[Source: bundle.js L130-L148](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/metric_card/bundle.js#L130-L148)
+
+```js
+// bundle.js L156-L176
+    function doFetch() {
+      var fn = fetchDataRef.current;
+      var fid = ++fetchIdRef.current;
+      if (!fn) { setLoading(false); return; }
+      setLoading(true);
+      setError(null);
+      fn({ timeRange: 24 }).then(function (result) {
+        if (fid !== fetchIdRef.current) return;
+        var results = Array.isArray(result) ? result : (result ? [result] : []);
+        var vals = results.map(function (r) {
+          return extractValue(r);
+        });
+        setValues(vals);
+      }).catch(function () {
+        if (fid !== fetchIdRef.current) return;
+        setError('fetch');
+      }).finally(function () {
+        if (fid !== fetchIdRef.current) return;
+        setLoading(false);
+      });
+    }
+```
+
+[Source: bundle.js L156-L176](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/metric_card/bundle.js#L156-L176)
+
+```js
+// bundle.js L288-L322 (trimmed)
+    function renderCell(idx) {
+      var slot = slots[idx];
+      var displayValue = String(slot.value);
+
+      return jsxs('div', {
+        className: 'flex flex-col items-center justify-center min-w-0',
+        style: {
+          padding: slotCount === 1 ? '16px' : '10px 6px',
+          background: 'oklch(1 0 0 / 3%)',
+          borderRadius: '8px'
+        },
+        children: [
+          jsx('div', {
+            className: 'text-[10px] uppercase tracking-wider font-semibold truncate max-w-full',
+            style: { color: 'var(--muted-foreground)', marginBottom: '6px' },
+            children: slot.label
+          }),
+          jsxs('div', {
+            className: 'flex items-baseline gap-1 justify-center min-w-0 max-w-full',
+            children: [
+              jsx('span', {
+                className: 'font-bold font-mono tabular-nums truncate ' + valueClass,
+```
+
+[Source: bundle.js L288-L322](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/metric_card/bundle.js#L288-L322)
 
 props 流向：`data` (来自 `fetchData`) → `extractValue` 归一化 → `values[]` 数组 → `renderCell(idx)` 格式化显示（`toFixed(decimalPlaces)` + 单位 + 标签）。
 

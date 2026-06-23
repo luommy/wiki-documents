@@ -122,6 +122,42 @@ fn metadata(&self) -> &ExtensionMetadata {
 }
 ```
 
+```rust
+// lib.rs L219-L273 (trimmed)
+fn metadata(&self) -> &ExtensionMetadata {
+    static META: std::sync::OnceLock<ExtensionMetadata> = std::sync::OnceLock::new();
+    META.get_or_init(|| {
+        ExtensionMetadata::new(
+            "weather-forecast-v2",
+            "Weather Forecast V2",
+            "2.0.0"
+        )
+        .with_description("Weather forecast extension for the NeoMind isolated runtime using a sync HTTP client")
+        .with_author("NeoMind Team")
+        .with_config_parameters(vec![
+            ParameterDefinition {
+                name: "defaultCity".to_string(),
+                display_name: "Default City".to_string(),
+                description: "Default city for weather display".to_string(),
+                param_type: MetricDataType::String,
+                required: false,
+                default_value: Some(ParamMetricValue::String("Beijing".to_string())),
+                min: None,
+                max: None,
+                options: vec![
+                    "Beijing".to_string(),
+                    "Shanghai".to_string(),
+                    "New York".to_string(),
+                    "London".to_string(),
+                    "Tokyo".to_string(),
+                ],
+            },
+            ParameterDefinition {
+                name: "refreshInterval".to_string(),
+```
+
+[Source: lib.rs L219-L273](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/weather-forecast-v2/src/lib.rs#L219-L273)
+
 **为什么用 `OnceLock` 而非 `lazy_static!`？** `OnceLock` 是 Rust 1.70 标准库引入的，不需要额外依赖。metadata 在第一次调用 `metadata()` 时构建，之后所有调用返回同一引用——这对 FFI 边界很重要，因为宿主进程会频繁查询 metadata。
 
 ### 3.3 指标产出：AtomicI64 + 定点小数
@@ -163,6 +199,82 @@ fn produce_metrics(&self) -> Result<Vec<ExtensionMetricValue>> {
 }
 ```
 
+```rust
+// lib.rs L80-L92
+pub struct WeatherExtension {
+    default_city: std::sync::RwLock<String>,
+    request_count: AtomicI64,
+    last_temperature_c: AtomicI64,
+    last_feels_like_c: AtomicI64,
+    last_humidity_percent: AtomicI64,
+    last_wind_speed_kmph: AtomicI64,
+    last_wind_direction_deg: AtomicI64,
+    last_cloud_cover_percent: AtomicI64,
+    last_pressure_hpa: AtomicI64,
+    last_update_ts: AtomicI64,
+    has_data: AtomicBool,
+}
+```
+
+[Source: lib.rs L80-L92](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/weather-forecast-v2/src/lib.rs#L80-L92)
+
+```rust
+// lib.rs L119-L129
+fn store_weather_metrics(&self, weather: &WeatherResult) {
+    self.last_temperature_c.store((weather.temperature_c * 100.0) as i64, Ordering::SeqCst);
+    self.last_feels_like_c.store((weather.feels_like_c * 100.0) as i64, Ordering::SeqCst);
+    self.last_humidity_percent.store(weather.humidity_percent as i64, Ordering::SeqCst);
+    self.last_wind_speed_kmph.store((weather.wind_speed_kmph * 100.0) as i64, Ordering::SeqCst);
+    self.last_wind_direction_deg.store(weather.wind_direction_deg as i64, Ordering::SeqCst);
+    self.last_cloud_cover_percent.store(weather.cloud_cover_percent as i64, Ordering::SeqCst);
+    self.last_pressure_hpa.store((weather.pressure_hpa * 100.0) as i64, Ordering::SeqCst);
+    self.last_update_ts.store(chrono::Utc::now().timestamp_millis(), Ordering::SeqCst);
+    self.has_data.store(true, Ordering::SeqCst);
+}
+```
+
+[Source: lib.rs L119-L129](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/weather-forecast-v2/src/lib.rs#L119-L129)
+
+```rust
+// lib.rs L466-L522 (trimmed)
+fn produce_metrics(&self) -> Result<Vec<ExtensionMetricValue>> {
+    let now = chrono::Utc::now().timestamp_millis();
+    let mut metrics = Vec::with_capacity(9);
+
+    metrics.push(ExtensionMetricValue {
+        name: "request_count".to_string(),
+        value: ParamMetricValue::Integer(self.request_count.load(Ordering::SeqCst)),
+        timestamp: now,
+    });
+
+    if self.has_data.load(Ordering::SeqCst) {
+        metrics.extend(vec![
+            ExtensionMetricValue {
+                name: "temperature_c".to_string(),
+                value: ParamMetricValue::Float(self.last_temperature_c.load(Ordering::SeqCst) as f64 / 100.0),
+                timestamp: now,
+            },
+            ExtensionMetricValue {
+                name: "feels_like_c".to_string(),
+                value: ParamMetricValue::Float(self.last_feels_like_c.load(Ordering::SeqCst) as f64 / 100.0),
+                timestamp: now,
+            },
+            ExtensionMetricValue {
+                name: "humidity_percent".to_string(),
+                value: ParamMetricValue::Integer(self.last_humidity_percent.load(Ordering::SeqCst)),
+                timestamp: now,
+            },
+            ExtensionMetricValue {
+                name: "wind_speed_kmph".to_string(),
+                value: ParamMetricValue::Float(self.last_wind_speed_kmph.load(Ordering::SeqCst) as f64 / 100.0),
+                timestamp: now,
+            },
+            ExtensionMetricValue {
+                name: "wind_direction_deg".to_string(),
+```
+
+[Source: lib.rs L466-L522](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/weather-forecast-v2/src/lib.rs#L466-L522)
+
 **为什么不用 `Mutex<WeatherResult>`？** 因为 `produce_metrics()` 是同步方法，会被运行时周期性高频调用。如果用 `Mutex`，每次读取都要获取锁，在高并发指标采集场景下会造成锁争用。`AtomicI64` 的 `load` 是无锁操作，性能开销最小。
 
 ### 3.4 HTTP 客户端：ureq 同步
@@ -186,6 +298,37 @@ fn geocode_sync(&self, city: &str) -> std::result::Result<GeoLocation, String> {
     // ...
 }
 ```
+
+```rust
+// lib.rs L132-L167 (trimmed)
+fn get_weather_sync(&self, city: &str) -> Result<WeatherResult> {
+    self.request_count.fetch_add(1, Ordering::SeqCst);
+
+    let location = self.geocode_sync(city)
+        .map_err(|e| ExtensionError::ExecutionFailed(e))?;
+
+    let mut weather = self.fetch_weather_sync(&location)
+        .map_err(|e| ExtensionError::ExecutionFailed(e))?;
+
+    weather.timestamp = Some(chrono::Utc::now().to_rfc3339());
+    self.store_weather_metrics(&weather);
+
+    Ok(weather)
+}
+
+fn geocode_sync(&self, city: &str) -> std::result::Result<GeoLocation, String> {
+    let encoded_city = urlencoding::encode(city);
+    let url = format!(
+        "https://geocoding-api.open-meteo.com/v1/search?name={}&count=1&language=en&format=json",
+        encoded_city
+    );
+
+    let response: serde_json::Value = ureq::get(&url)
+        .timeout(std::time::Duration::from_secs(30))
+        .call()
+```
+
+[Source: lib.rs L132-L167](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/weather-forecast-v2/src/lib.rs#L132-L167)
 
 `Cargo.toml` 第 21 行有明确注释：`# Use sync HTTP client to avoid Tokio runtime issues in dynamic libraries`。这是整个案例最关键的设计决策，详见 4.1。
 

@@ -588,7 +588,25 @@ This pipeline demonstrates the **composability** of the NeoMind extension ecosys
 
 ### No Frontend Component
 
-The [`metadata.json`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/metadata.json#L1-L12) has no `frontend` field — this is a pure backend extension. The frontend renders device lists and PTZ control panels through the generic device-display component, without depending on any frontend code bundled with onvif-bridge. This contrasts sharply with [Case #3 yolo-video-v2](./3-yolo-video-v2.md) (which ships its own `YoloVideoDisplay` React component). The pure backend design reduces extension complexity, but at the cost of limited frontend UI customization.
+The [`metadata.json`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/metadata.json#L1-L12) has no `frontend` field — this is a pure backend extension:
+
+```json
+// metadata.json L1-L12
+{
+  "id": "onvif-bridge",
+  "name": "onvif uridge",
+  "version": "2.7.6",
+  "description": "ONVIF camera bridge extension for NeoMind — discover IP cameras, get RTSP streams, PTZ control",
+  "author": "NeoMind Team",
+  "license": "Apache-2.0",
+  "type": "native",
+  "categories": ["iot", "bridge", "device-integration"],
+  "homepage": "https://github.com/camthink-ai/NeoMind-Extensions/tree/main/extensions/onvif-bridge",
+  "builds": {"darwin-aarch64":{"url":"..."},"darwin-x86_64":{"url":"..."},"linux-x86_64":{"url":"..."},"linux-aarch64":{"url":"..."},"windows-x86_64":{"url":"..."}}
+}
+```
+
+[Source: metadata.json L1-L12](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/metadata.json#L1-L12) The frontend renders device lists and PTZ control panels through the generic device-display component, without depending on any frontend code bundled with onvif-bridge. This contrasts sharply with [Case #3 yolo-video-v2](./3-yolo-video-v2.md) (which ships its own `YoloVideoDisplay` React component). The pure backend design reduces extension complexity, but at the cost of limited frontend UI customization.
 
 ---
 

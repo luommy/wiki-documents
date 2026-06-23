@@ -588,7 +588,25 @@ Agent 调用 yolo-video-v2.start_stream(source_url="rtsp://192.168.1.100:554/...
 
 ### 无 frontend 组件
 
-[`metadata.json`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/metadata.json#L1-L12) 中没有 `frontend` 字段——这是一个纯后端扩展。前端通过通用的 device-display 组件渲染设备列表和 PTZ 控制面板，不依赖 onvif-bridge 自带的任何前端代码。这与 [案例 #3 yolo-video-v2](./3-yolo-video-v2.md)（自带 `YoloVideoDisplay` React 组件）形成鲜明对比。纯后端设计降低了扩展的复杂度，但代价是前端 UI 的定制性受限。
+[`metadata.json`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/metadata.json#L1-L12) 中没有 `frontend` 字段——这是一个纯后端扩展：
+
+```json
+// metadata.json L1-L12
+{
+  "id": "onvif-bridge",
+  "name": "onvif uridge",
+  "version": "2.7.6",
+  "description": "ONVIF camera bridge extension for NeoMind — discover IP cameras, get RTSP streams, PTZ control",
+  "author": "NeoMind Team",
+  "license": "Apache-2.0",
+  "type": "native",
+  "categories": ["iot", "bridge", "device-integration"],
+  "homepage": "https://github.com/camthink-ai/NeoMind-Extensions/tree/main/extensions/onvif-bridge",
+  "builds": {"darwin-aarch64":{"url":"..."},"darwin-x86_64":{"url":"..."},"linux-x86_64":{"url":"..."},"linux-aarch64":{"url":"..."},"windows-x86_64":{"url":"..."}}
+}
+```
+
+[Source: metadata.json L1-L12](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/metadata.json#L1-L12)前端通过通用的 device-display 组件渲染设备列表和 PTZ 控制面板，不依赖 onvif-bridge 自带的任何前端代码。这与 [案例 #3 yolo-video-v2](./3-yolo-video-v2.md)（自带 `YoloVideoDisplay` React 组件）形成鲜明对比。纯后端设计降低了扩展的复杂度，但代价是前端 UI 的定制性受限。
 
 ---
 

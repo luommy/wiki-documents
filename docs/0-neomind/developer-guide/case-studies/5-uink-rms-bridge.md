@@ -111,19 +111,190 @@ graph TB
 
 ### 3.1 JWT 鉴权链（login → refresh → 重试 + backoff）
 
-Uink-RMS 采用账号级 JWT 鉴权（区别于 onvif-bridge 的设备级 WS-Security）。鉴权状态由三个字段管理：`access_token: RwLock<Option<String>>`、`refresh_token: RwLock<Option<String>>`、`token_expiry: AtomicI64`。核心入口是 [`ensure_token`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L794-L823)：先检查 `token_expiry - now > 120`（提前 2 分钟刷新），若过期则优先走 `refresh()`（用 refresh_token 换新 access_token），失败再走 `login()`（email + password 重新登录）。关键设计是**登录失败退避**——`last_login_failure_ts: AtomicI64` 记录上次失败时间，5 分钟内不重试（避免密码错误时疯狂打 RMS 服务器）。login 函数把 `expires_in` 减去 120 秒作为本地 expiry，留出刷新窗口。
+Uink-RMS 采用账号级 JWT 鉴权（区别于 onvif-bridge 的设备级 WS-Security）。鉴权状态由三个字段管理：`access_token: RwLock<Option<String>>`、`refresh_token: RwLock<Option<String>>`、`token_expiry: AtomicI64`。核心入口是 [`ensure_token`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L794-L823)：先检查 `token_expiry - now > 120`（提前 2 分钟刷新），若过期则优先走 `refresh()`（用 refresh_token 换新 access_token），失败再走 `login()`（email + password 重新登录）。关键设计是**登录失败退避**——`last_login_failure_ts: AtomicI64` 记录上次失败时间，5 分钟内不重试（避免密码错误时疯狂打 RMS 服务器）。login 函数把 `expires_in` 减去 120 秒作为本地 expiry，留出刷新窗口：
+
+```rust
+// lib.rs L794-L823
+fn ensure_token(&self) -> Result<()> {
+    let now = Utc::now().timestamp();
+    let expiry = self.token_expiry.load(Ordering::SeqCst);
+    if expiry - now > 120 && self.access_token.read().is_some() {
+        return Ok(());
+    }
+
+    // Backoff: if login failed recently, wait at least 5 minutes before retrying
+    let last_failure = self.last_login_failure_ts.load(Ordering::SeqCst);
+    if last_failure > 0 && now - last_failure < 300 {
+        return Err(ExtensionError::ExecutionFailed(format!(
+            "Login retry backoff ({}s remaining)",
+            300 - (now - last_failure)
+        )));
+    }
+
+    if self.refresh_token.read().is_some() {
+        if self.refresh().is_ok() {
+            self.last_login_failure_ts.store(0, Ordering::SeqCst);
+            return Ok(());
+        }
+    }
+    let result = self.login();
+    if result.is_err() {
+        self.last_login_failure_ts.store(now, Ordering::SeqCst);
+    } else {
+        self.last_login_failure_ts.store(0, Ordering::SeqCst);
+    }
+    result
+}
+```
+
+[Source: lib.rs L794-L823](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L794-L823)
 
 ### 3.2 区域端点路由（UinkConfig::api_base_url）
 
-[`UinkConfig`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L685-L721) 是扩展的唯一配置结构，包含 `server_region: String`（枚举 China / Europe / Custom）、`custom_server_url: String`、`email`、`password`、`sync_interval_secs`（默认 300）、`poll_interval_secs`（默认 60）。`api_base_url()` 方法做简单的 match：`"China" => "https://cn.rms.uink.com"`、`"Europe" => "https://eu.rms.uink.com"`、其他则使用 `custom_server_url`。这把区域选择固化在配置里，用户在 UI 上选下拉框即可切换。默认区域是 China（见 `impl Default`）。
+[`UinkConfig`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L685-L721) 是扩展的唯一配置结构，包含 `server_region: String`（枚举 China / Europe / Custom）、`custom_server_url: String`、`email`、`password`、`sync_interval_secs`（默认 300）、`poll_interval_secs`（默认 60）。`api_base_url()` 方法做简单的 match：`"China" => "https://cn.rms.uink.com"`、`"Europe" => "https://eu.rms.uink.com"`、其他则使用 `custom_server_url`。这把区域选择固化在配置里，用户在 UI 上选下拉框即可切换。默认区域是 China（见 `impl Default`）：
+
+```rust
+// lib.rs L685-L721 (trimmed: first 30 lines)
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct UinkConfig {
+    pub server_region: String,
+    pub custom_server_url: String,
+    pub email: String,
+    pub password: String,
+    #[serde(default = "default_sync_interval")]
+    pub sync_interval_secs: u64,
+    #[serde(default = "default_poll_interval")]
+    pub poll_interval_secs: u64,
+}
+
+fn default_sync_interval() -> u64 { 300 }
+fn default_poll_interval() -> u64 { 60 }
+
+impl Default for UinkConfig {
+    fn default() -> Self {
+        Self {
+            server_region: "China".to_string(),
+            custom_server_url: String::new(),
+            email: String::new(),
+            password: String::new(),
+            sync_interval_secs: 300,
+            // ... (7 lines omitted: poll_interval default + api_base_url match)
+        }
+    }
+}
+```
+
+[Source: lib.rs L685-L721](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L685-L721)
 
 ### 3.3 Markdown → Image 渲染管线（pulldown-cmark + ab_glyph + imageproc）
 
-这是本扩展最复杂的部分，约 400 行代码（L230-L640）。管线分四步：(1) [`parse_markdown`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L248-L376) 用 pulldown-cmark 0.12 解析 Markdown 为 `Vec<TextBlock>`（Heading / Paragraph 两种块，Paragraph 内含 Plain / Bold / Code 三种 inline）；(2) [`load_system_font_data`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L215-L225) 从 macOS PingFang 或 Linux Noto Sans CJK 路径加载字体（`eprintln!("[uink-rms-bridge] Loaded font: {}", path)` 在 L218）；(3) [`render_markdown_to_image`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L475-L640) 遍历 blocks，用 ab_glyph 的 `PxScale` + imageproc 的 `draw_text_mut` 逐行绘制到 `ImageBuffer::<Rgb<u8>>`——标题缩放规则见 [L504 注释](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L504)："H1 = 2.0x base, decreasing by 0.2 per level"（H1=2.0x、H2=1.8x、H3=1.6x...）；(4) `wrap_line` 做 CJK + Latin 混排自动换行（CJK 字符可在任意位置断行，Latin 按词宽累加）。最终用 image crate 编码为 PNG 字节。
+这是本扩展最复杂的部分，约 400 行代码（L230-L640）。管线分四步：(1) [`parse_markdown`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L248-L376) 用 pulldown-cmark 0.12 解析 Markdown 为 `Vec<TextBlock>`（Heading / Paragraph 两种块，Paragraph 内含 Plain / Bold / Code 三种 inline）：
+
+```rust
+// lib.rs L248-L376 (trimmed: first 30 lines)
+/// Parse markdown into structured text blocks for rendering
+fn parse_markdown(md: &str) -> Vec<TextBlock> {
+    use pulldown_cmark::{Event, Options, Parser, Tag, TagEnd};
+
+    let mut opts = Options::empty();
+    opts.insert(Options::ENABLE_TABLES);
+    let parser = Parser::new_ext(md, opts);
+
+    let mut blocks: Vec<TextBlock> = Vec::new();
+    let mut in_heading: Option<u8> = None;
+    let mut heading_text = String::new();
+    let mut in_paragraph = false;
+    let mut paragraph_parts: Vec<TextPart> = Vec::new();
+    let mut in_strong = false;
+    let mut strong_text = String::new();
+    let mut in_code = false;
+    let mut code_text = String::new();
+    let mut in_list_item = false;
+    // ... (99 lines omitted: event loop handling Start/End/Text events for headings, paragraphs, bold, code, list items)
+}
+```
+
+[Source: lib.rs L248-L376](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L248-L376)(2) [`load_system_font_data`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L215-L225) 从 macOS PingFang 或 Linux Noto Sans CJK 路径加载字体（`eprintln!("[uink-rms-bridge] Loaded font: {}", path)` 在 L218）：
+
+```rust
+// lib.rs L215-L225
+/// Load a system font for text rendering. Returns font data bytes.
+fn load_system_font_data() -> Result<Vec<u8>> {
+    for path in FONT_PATHS {
+        if let Ok(data) = std::fs::read(path) {
+            eprintln!("[uink-rms-bridge] Loaded font: {}", path);
+            return Ok(data);
+        }
+    }
+    Err(ExtensionError::ExecutionFailed(
+        "No suitable system font found. Install CJK fonts (PingFang/Noto Sans CJK)".to_string(),
+    ))
+}
+```
+
+[Source: lib.rs L215-L225](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L215-L225)(3) [`render_markdown_to_image`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L475-L640) 遍历 blocks，用 ab_glyph 的 `PxScale` + imageproc 的 `draw_text_mut` 逐行绘制到 `ImageBuffer::<Rgb<u8>>`：
+
+```rust
+// lib.rs L475-L640 (trimmed: first 30 lines)
+fn render_markdown_to_image(
+    md: &str,
+    width: u32,
+    height: u32,
+    font_data: &[u8],
+) -> Result<Vec<u8>> {
+    let font = load_font(font_data)?;
+    let blocks = parse_markdown(md);
+
+    let margin_x = (width as f32 * 0.08).max(20.0) as u32;
+    let margin_y = (height as f32 * 0.06).max(16.0) as u32;
+    let text_width = width - margin_x * 2;
+    let base_font_size = (height as f32 / 20.0).min(48.0).max(16.0) * 0.75;
+
+    let mut img = ImageBuffer::<Rgb<u8>, Vec<u8>>::from_pixel(
+        width, height, Rgb([255, 255, 255]),
+    );
+
+    let text_color = Rgb([0, 0, 0]);
+    let _code_bg = Rgb([240, 240, 240]);
+    let mut y_pos = margin_y as f32;
+    // ... (136 lines omitted: block iteration, heading scale, paragraph wrapping, PNG encoding)
+}
+```
+
+[Source: lib.rs L475-L640](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L475-L640)
+
+标题缩放规则见——标题缩放规则见 [L504 注释](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L504)："H1 = 2.0x base, decreasing by 0.2 per level"（H1=2.0x、H2=1.8x、H3=1.6x...）；(4) `wrap_line` 做 CJK + Latin 混排自动换行（CJK 字符可在任意位置断行，Latin 按词宽累加）。最终用 image crate 编码为 PNG 字节。
 
 ### 3.4 图像推送（push_image_to_device）
 
-渲染完的 PNG/JPEG 字节通过 [`push_image_to_device`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L1445-L1523) 以 `multipart/form-data` POST 到 `POST /api/v1/devices/{id}/image`。若用户传了 `dither_algorithm` / `resize_mode` / `padding_color` 参数，走处理端点；否则走 raw 端点直接推原图。支持的抖动算法有 8 种（ordered / floyd-steinberg / atkinson / burkes / sierra / stucki / jarvis-judice-ninke / threshold），resize 模式有 fit / cover / fill 三种。图像大小限制 10MB。
+渲染完的 PNG/JPEG 字节通过 [`push_image_to_device`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L1445-L1523) 以 `multipart/form-data` POST 到 `POST /api/v1/devices/{id}/image`：
+
+```rust
+// lib.rs L1445-L1475 (trimmed: execute_command router, first 30 lines of L1445-L1523)
+async fn execute_command(&self, command: &str, args: &serde_json::Value) -> Result<serde_json::Value> {
+    match command {
+        "configure" => {
+            // Handle configure dispatched via execute_command (used during reload)
+            let mut cfg = self.config.write();
+            if let Some(v) = args.get("server_region").and_then(|v| v.as_str()) { cfg.server_region = v.to_string(); }
+            if let Some(v) = args.get("custom_server_url").and_then(|v| v.as_str()) { cfg.custom_server_url = v.trim_end_matches('/').to_string(); }
+            if let Some(v) = args.get("email").and_then(|v| v.as_str()) { cfg.email = v.to_string(); }
+            if let Some(v) = args.get("password").and_then(|v| v.as_str()) { cfg.password = v.to_string(); }
+            if let Some(v) = args.get("sync_interval_secs").and_then(|v| v.as_u64()) { cfg.sync_interval_secs = v; }
+            if let Some(v) = args.get("poll_interval_secs").and_then(|v| v.as_u64()) { cfg.poll_interval_secs = v; }
+            drop(cfg);
+            *self.access_token.write() = None;
+            *self.refresh_token.write() = None;
+            self.token_expiry.store(0, Ordering::SeqCst);
+            self.template_registered.store(0, Ordering::SeqCst);
+            self.last_sync_ts.store(0, Ordering::SeqCst);
+            // ... (48 lines omitted: sync_devices, list_devices, push_content, push_image, refresh_status, get_display_size, get_display, refresh_auth routing)
+        }
+    }
+}
+```
+
+[Source: lib.rs L1445-L1523](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L1445-L1523)若用户传了 `dither_algorithm` / `resize_mode` / `padding_color` 参数，走处理端点；否则走 raw 端点直接推原图。支持的抖动算法有 8 种（ordered / floyd-steinberg / atkinson / burkes / sierra / stucki / jarvis-judice-ninke / threshold），resize 模式有 fit / cover / fill 三种。图像大小限制 10MB。
 
 ### 3.5 设备注册与 ID 映射（uink_epaper device template）
 
@@ -131,7 +302,31 @@ Uink-RMS 采用账号级 JWT 鉴权（区别于 onvif-bridge 的设备级 WS-Sec
 
 ### 3.6 configure() 热更新
 
-[`configure`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L1523-L1540) 接受 JSON 配置，写入 `UinkConfig` 的 RwLock，然后**主动清空 access_token / refresh_token / token_expiry**——这强制下次操作重新登录，避免用旧 token 访问新区域端点。同时重置 `template_registered` 和 `last_sync_ts`，让 auto-sync 立即用新配置跑一次。
+[`configure`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L1523-L1540) 接受 JSON 配置，写入 `UinkConfig` 的 RwLock，然后**主动清空 access_token / refresh_token / token_expiry**——这强制下次操作重新登录，避免用旧 token 访问新区域端点。同时重置 `template_registered` 和 `last_sync_ts`，让 auto-sync 立即用新配置跑一次：
+
+```rust
+// lib.rs L1523-L1540
+async fn configure(&mut self, config: &serde_json::Value) -> Result<()> {
+    let mut cfg = self.config.write();
+    if let Some(v) = config.get("server_region").and_then(|v| v.as_str()) { cfg.server_region = v.to_string(); }
+    if let Some(v) = config.get("custom_server_url").and_then(|v| v.as_str()) { cfg.custom_server_url = v.trim_end_matches('/').to_string(); }
+    if let Some(v) = config.get("email").and_then(|v| v.as_str()) { cfg.email = v.to_string(); }
+    if let Some(v) = config.get("password").and_then(|v| v.as_str()) { cfg.password = v.to_string(); }
+    if let Some(v) = config.get("sync_interval_secs").and_then(|v| v.as_u64()) { cfg.sync_interval_secs = v; }
+    if let Some(v) = config.get("poll_interval_secs").and_then(|v| v.as_u64()) { cfg.poll_interval_secs = v; }
+    drop(cfg);
+    *self.access_token.write() = None;
+    *self.refresh_token.write() = None;
+    self.token_expiry.store(0, Ordering::SeqCst);
+    // Reset sync state so auto-sync runs immediately with new config
+    self.template_registered.store(0, Ordering::SeqCst);
+    self.last_sync_ts.store(0, Ordering::SeqCst);
+    eprintln!("[uink-rms-bridge] Configuration updated");
+    Ok(())
+}
+```
+
+[Source: lib.rs L1523-L1540](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L1523-L1540)
 
 ### 3.7 图像推送序列图
 
@@ -189,7 +384,22 @@ sequenceDiagram
 
 ### 决策 4：区域端点硬编码 China / Europe（而非完全自定义）
 
-**我们选硬编码两个区域 + Custom 兜底**（见 [L713-L720](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L713-L720)）；替代方案是只提供 `custom_server_url` 一个字段让用户完全自填。理由：(1) Uink-RMS 目前只有 cn / eu 两个区域，下拉框选比手填 URL 更友好，降低用户配置心智负担；(2) 硬编码端点可以避免用户填错 URL（少个 `/`、多了 `/api/v1` 等）；(3) 保留 `Custom` 选项和 `custom_server_url` 字段作为扩展点——如果 Uink 未来开新区域或客户自建 RMS 实例，用户仍可填完整 URL。代价是 Uink 新增区域时需要改代码发新版（但这种情况罕见）。
+**我们选硬编码两个区域 + Custom 兜底**（见 [L713-L720](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L713-L720)）；替代方案是只提供 `custom_server_url` 一个字段让用户完全自填：
+
+```rust
+// lib.rs L713-L720
+impl UinkConfig {
+    fn api_base_url(&self) -> String {
+        match self.server_region.as_str() {
+            "China" => "https://cn.rms.uink.com".to_string(),
+            "Europe" => "https://eu.rms.uink.com".to_string(),
+            _ => self.custom_server_url.trim_end_matches('/').to_string(),
+        }
+    }
+}
+```
+
+[Source: lib.rs L713-L720](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L713-L720)理由：(1) Uink-RMS 目前只有 cn / eu 两个区域，下拉框选比手填 URL 更友好，降低用户配置心智负担；(2) 硬编码端点可以避免用户填错 URL（少个 `/`、多了 `/api/v1` 等）；(3) 保留 `Custom` 选项和 `custom_server_url` 字段作为扩展点——如果 Uink 未来开新区域或客户自建 RMS 实例，用户仍可填完整 URL。代价是 Uink 新增区域时需要改代码发新版（但这种情况罕见）。
 
 ### 决策 5：`RwLock<HashMap>` 而非 DashMap / SQLite
 
@@ -205,11 +415,106 @@ sequenceDiagram
 
 uink-rms-bridge 通过四个层面与 NeoMind 主体集成：
 
-**命令系统**：扩展注册了 7 个命令（见 [`commands()` L1220-L1443](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L1220-L1443)），这些命令在 NeoMind 前端表现为 Agent 可调用的工具。用户可以对 Agent 说"把会议室的电子纸内容改成欢迎词"，Agent 会调用 `push_content` 命令。命令参数通过 `ParameterDefinition` 声明类型和约束（如 `content_type` 的 options 是 `["text", "markdown", "image"]`），前端据此自动渲染表单。
+**命令系统**：扩展注册了 7 个命令（见 [`commands()` L1220-L1443](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L1220-L1443)），这些命令在 NeoMind 前端表现为 Agent 可调用的工具：
 
-**设备类型集成**：扩展通过 `device_template_register` capability 注册 `uink_epaper` 设备模板（见 [`auto_sync` L1552-L1606](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L1552-L1606)），模板声明了 14 个指标（battery / temperature / signal_strength / refresh_count / online_status / last_sync / sn / model / activation_status / alarm_status / firmware_version / hardware_version / preview_url / preview_thumbnail_url）和 3 个设备级命令（push_content / push_image / refresh_status）。注册后，Uink 设备在 NeoMind 设备面板中与摄像头、传感器等统一管理。
+```rust
+// lib.rs L1220-L1443 (trimmed: first 30 lines)
+fn commands(&self) -> Vec<ExtensionCommand> {
+    vec![
+        ExtensionCommand {
+            name: "sync_devices".into(),
+            display_name: "Sync Devices".into(),
+            description: "Sync Uink devices from RMS to NeoMind (registers template + devices)".into(),
+            payload_template: String::new(),
+            parameters: vec![],
+            fixed_values: Default::default(),
+            samples: vec![json!({})],
+            parameter_groups: vec![],
+        },
+        ExtensionCommand {
+            name: "list_devices".into(),
+            display_name: "List Devices".into(),
+            description: "List all synced Uink e-paper devices with their IDs, names, model, and online status. Use device_id from the result as target for push_content/push_image commands.".into(),
+            payload_template: String::new(),
+            parameters: vec![],
+            fixed_values: Default::default(),
+            samples: vec![json!({})],
+            parameter_groups: vec![],
+        },
+        // ... (193 lines omitted: push_content, push_image, refresh_status, get_display_size, get_display, refresh_auth command definitions)
+    ]
+}
+```
 
-**指标产出**：[`produce_metrics`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L1477-L1521) 返回 4 个扩展级指标（sync_count / push_count / device_count / error_count），用 `AtomicI64` 累加。设备级遥测（battery 等）通过 `device_metrics_write` capability 直接写入 NeoMind 设备指标存储，不走 produce_metrics 路径——这样前端设备面板能实时看到每个 e-paper 的电量和信号。
+[Source: lib.rs L1220-L1443](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L1220-L1443)
+
+这些命令在 NeoMind 前端表现为 Agent 可调用的工具。用户可以对 Agent 说"把会议室的电子纸内容改成欢迎词"，Agent 会调用 `push_content` 命令。命令参数通过 `ParameterDefinition` 声明类型和约束（如 `content_type` 的 options 是 `["text", "markdown", "image"]`），前端据此自动渲染表单。
+
+**设备类型集成**：扩展通过 `device_template_register` capability 注册 `uink_epaper` 设备模板（见 [`auto_sync` L1552-L1606](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L1552-L1606)），模板声明了 14 个指标：
+
+```rust
+// lib.rs L1552-L1606 (trimmed: first 30 lines)
+fn auto_sync(&self) -> Result<()> {
+    let ctx = CapabilityContext::default();
+
+    // Register template once
+    if self.template_registered.load(Ordering::SeqCst) == 0 {
+        let template_json = json!({
+            "device_type": "uink_epaper",
+            "name": "Uink E-Paper Display",
+            "description": "Uink electronic paper display device",
+            "categories": ["display", "e-paper"],
+            "metrics": [
+                { "name": "battery", "display_name": "Battery Level", "data_type": "Integer", "unit": "%", "min": 0, "max": 100 },
+                { "name": "temperature", "display_name": "Temperature", "data_type": "Float", "unit": "°C" },
+                { "name": "signal_strength", "display_name": "Signal Strength", "data_type": "Integer", "unit": "dBm" },
+                { "name": "refresh_count", "display_name": "Refresh Count", "data_type": "Integer", "unit": "count" },
+                { "name": "online_status", "display_name": "Online Status", "data_type": "String" },
+                // ... (9 more metrics: last_sync, sn, model, activation_status, alarm_status, firmware_version, hardware_version, preview_url, preview_thumbnail_url)
+            ],
+            // ... (25 lines omitted: commands definitions + ctx.device_template_register)
+        });
+    }
+    // ... (device sync logic continues)
+}
+```
+
+[Source: lib.rs L1552-L1606](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L1552-L1606)
+
+模板声明了 14 个指标（battery / temperature / signal_strength / refresh_count / online_status / last_sync / sn / model / activation_status / alarm_status / firmware_version / hardware_version / preview_url / preview_thumbnail_url）和 3 个设备级命令（push_content / push_image / refresh_status）。注册后，Uink 设备在 NeoMind 设备面板中与摄像头、传感器等统一管理。
+
+**指标产出**：[`produce_metrics`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L1477-L1521) 返回 4 个扩展级指标（sync_count / push_count / device_count / error_count），用 `AtomicI64` 累加：
+
+```rust
+// lib.rs L1477-L1521 (trimmed: first 30 lines)
+fn produce_metrics(&self) -> Result<Vec<ExtensionMetricValue>> {
+    let now_ts = Utc::now().timestamp();
+    let config = self.config.read();
+    let configured = !config.api_base_url().is_empty() && !config.email.is_empty();
+    let sync_interval = config.sync_interval_secs as i64;
+    let poll_interval = config.poll_interval_secs as i64;
+    drop(config);
+
+    // Auto-sync: register template + sync devices periodically
+    if configured {
+        let should_sync = self.template_registered.load(Ordering::SeqCst) == 0
+            || (now_ts - self.last_sync_ts.load(Ordering::SeqCst)) >= sync_interval;
+
+        if should_sync {
+            if let Err(e) = self.auto_sync() {
+                eprintln!("[uink-rms-bridge] Auto-sync failed: {}", e);
+                *self.last_error.write() = Some(format!("Auto-sync: {}", e));
+                self.total_error_count.fetch_add(1, Ordering::SeqCst);
+            } else {
+                *self.last_error.write() = None;
+            }
+        }
+    }
+    // ... (15 lines omitted: telemetry polling + metric assembly)
+}
+```
+
+[Source: lib.rs L1477-L1521](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L1477-L1521)设备级遥测（battery 等）通过 `device_metrics_write` capability 直接写入 NeoMind 设备指标存储，不走 produce_metrics 路径——这样前端设备面板能实时看到每个 e-paper 的电量和信号。
 
 **前端组件 DisplayEditorCard**：这是 uink-rms-bridge 与 [案例 #4 onvif-bridge](./4-onvif-bridge.md)（无前端）的关键差异。`DisplayEditorCard` 是一个 380x420px 的交互卡片，内含 Canvas 编辑器（支持文字 / 图片 / 矩形元素拖拽排布）、Markdown 编辑模态框、实时预览。组件通过 Vite 构建为 `uink-rms-bridge-components.umd.cjs`，由 NeoMind Runtime 动态加载。组件绑定 device data source 后，用户编辑完点推送，组件调用 `push_content` 命令把 Canvas 导出的 base64 图像或 Markdown 文本发给扩展。commit [`261d8e6`](https://github.com/camthink-ai/NeoMind-Extensions/commit/261d8e6) 为这个组件加了翻转支持和数据源绑定。
 
@@ -222,6 +527,38 @@ uink-rms-bridge 通过四个层面与 NeoMind 主体集成：
 ### 单元测试（内联在 lib.rs L2107-L2250）
 
 扩展在 [`src/lib.rs` 测试模块](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L2107-L2250) 内联了 6 个单元测试：
+
+```rust
+// lib.rs L2107-L2250 (trimmed: first 30 lines)
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_extension_metadata() {
+        let ext = UinkRmsBridge::new();
+        assert_eq!(ext.metadata().id, "uink-rms-bridge");
+    }
+
+    #[test]
+    fn test_commands_count() {
+        let ext = UinkRmsBridge::new();
+        let commands = ext.commands();
+        assert_eq!(commands.len(), 7);
+        let names: Vec<&str> = commands.iter().map(|c| c.name.as_str()).collect();
+        assert!(names.contains(&"sync_devices"));
+        assert!(names.contains(&"list_devices"));
+        assert!(names.contains(&"push_content"));
+        assert!(names.contains(&"push_image"));
+        assert!(names.contains(&"get_display_size"));
+        assert!(names.contains(&"refresh_auth"));
+        assert!(names.contains(&"get_display"));
+    }
+    // ... (5 more tests: config_parameters, api_base_url, model_to_resolution, parse_markdown, default_config)
+}
+```
+
+[Source: lib.rs L2107-L2250](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L2107-L2250)
 
 | 测试名 | 验证内容 |
 |--------|----------|
