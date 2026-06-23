@@ -17,10 +17,10 @@ tags: [应用开发, NE503, AI 辅助开发, skill]
 
 | 条件 | 说明 |
 |:---|:---|
-| Claude Code | 已安装。 |
-| ne503 源码仓库 | 克隆到本地（随 NE503 SDK 一并提供）；`ne503-dev` skill 位于仓库的 `.claude/skills/ne503-dev/`。或[下载 skill zip](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/app-development/ai-assisted-dev/ne503-dev.zip) 解压至 `.claude/skills/`。 |
-| Docker | 本机已安装，用于构建应用镜像。 |
-| NE503 设备 | 就绪：设备 IP + admin 密码；平台已初始化（HALv2 已装、ai-runtime 健康、检测模型已 scan+load）。 |
+| Claude Code | 安装到本机。 |
+| ne503 源码仓库 | 克隆到本地（随 NE503 SDK 一并提供），`ne503-dev` skill 位于仓库的 `.claude/skills/ne503-dev/`；或[下载 skill zip](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/app-development/ai-assisted-dev/ne503-dev.zip) 解压至 `.claude/skills/`。 |
+| Docker | 安装到本机，用于构建应用镜像。 |
+| NE503 设备 | 准备一台就绪的设备：记下设备 IP 与 admin 密码，并确认平台已初始化（HALv2 已装、ai-runtime 健康、检测模型已 scan+load）。 |
 
 ## 2. 从一句话到一个新应用
 
@@ -32,7 +32,7 @@ tags: [应用开发, NE503, AI 辅助开发, skill]
 
 > 做一个应用：检测到人停留 10 秒就发告警。部署到 `<设备 IP>`。
 
-Claude 读取 skill 后自主启动规划，就少数细节与开发者确认后开工：
+Claude 读取 skill 后自主启动规划，与开发者确认少数细节后即开工：
 
 <video controls width="100%">
   <source src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/app-development/ai-assisted-dev/ai-assist-start_new.mp4" type="video/mp4"></source>
@@ -56,9 +56,9 @@ Claude 读取 skill 后自主启动规划，就少数细节与开发者确认后
 
 ### 2.3 Claude 部署并验收
 
-代码写完后，部署同样由 Claude 自主完成——调用 skill 内置脚本串联"构建→上传→安装→启动→验收"全自动一次跑通，应用进入 `running`。
+代码写完后，部署同样由 Claude 自主完成——调用 skill 内置脚本，将"构建→上传→安装→启动→验收"全自动一次跑通，应用随之进入 `running`。
 
-部署完成后，Claude 进一步验证三件事：推理确实上线（拉日志确认模型加载与首帧到达）、平台注入的权限与 `app.yaml` 声明一致、实际进入摄像头画面能触发完整一轮检测。Web 控制台视角的验收过程见下：
+部署完成后，Claude 进一步验证三件事：推理确实上线（拉日志确认模型加载与首帧到达）、平台注入的权限与 `app.yaml` 声明一致、人进入画面即可触发一次完整检测。Web 控制台视角的验收过程见下：
 
 <video controls width="100%">
   <source src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/app-development/ai-assisted-dev/verify-on-web_new.mp4" type="video/mp4"></source>
@@ -67,7 +67,7 @@ Claude 读取 skill 后自主启动规划，就少数细节与开发者确认后
 
 真机重复多轮，告警稳定落在 10.1 秒，累计 3 次独立告警，无误报、无漏报。
 
-一句需求进，一个在设备上实跑的停留告警应用出——中间无任何手动步骤。
+输入一句话需求，即可产出一个在设备上实跑的停留告警应用——全程无任何手动步骤。
 
 完整过程汇总视频（按需查看）：
 
