@@ -5,7 +5,7 @@ tags: [NeoMind, 案例, 组件]
 sidebar_label: "6. metric_card"
 ---
 
-# #6 metric_card：入门仪表板组件
+# 6 metric_card：入门仪表板组件
 
 ## 1 案例背景
 
@@ -425,7 +425,7 @@ sequenceDiagram
     MC->>RO: observe(containerRef)
     RO-->>MC: containerSize {w, h}
 
-    Note over MC: useEffect #1: dataSource 变化触发
+    Note over MC: useEffect 1: dataSource 变化触发
     MC->>FD: fetchData({timeRange: 24})
     FD->>DS: 解析 dataSource 配置
     DS-->>FD: {value: 84} 或 {series: [...]}
@@ -436,7 +436,7 @@ sequenceDiagram
     MC-->>RT: 渲染 DOM
 
     loop 每 30 秒
-        Note over MC: useEffect #2: setInterval
+        Note over MC: useEffect 2: setInterval
         MC->>FD: fetchData({timeRange: 24})
         FD-->>MC: 新 result
         MC->>MC: extractValue → 更新 values[]
@@ -635,8 +635,8 @@ metric_card 的 git 历史记录了 `extractValue` 函数从「只处理数字�
 
 - [工程标准附录](./appendix-standards.md) —— manifest schema、尺寸约束、STYLE_GUIDE 规则的集中参考。
 - [案例集总览](./0-overview.md) —— 7 个案例的版本对齐表和阅读路径。
-- [#1 weather-forecast-v2](./1-weather-forecast.md) —— 配对的扩展案例。weather-forecast 产出指标，metric_card 消费指标，两者构成完整的「扩展 → 组件」数据链路。
-- [#7 ne101_camera](./7-ne101-camera-component/index.md) —— 旗舰组件案例（下一级难度）。在 metric_card 的基础上增加设备绑定、图像画布、AI 处理流水线。
+- [1 weather-forecast-v2](./1-weather-forecast.md) —— 配对的扩展案例。weather-forecast 产出指标，metric_card 消费指标，两者构成完整的「扩展 → 组件」数据链路。
+- [7 ne101_camera](./7-ne101-camera-component/index.md) —— 旗舰组件案例（下一级难度）。在 metric_card 的基础上增加设备绑定、图像画布、AI 处理流水线。
 - [组件 API 通用参考](../8-dashboard-component-dev.md) —— Dashboard 组件 schema、数据源绑定、渲染管线的 API 文档。
 - [源码仓库](https://github.com/camthink-ai/NeoMind-Dashboard-Components/tree/main/components/metric_card) —— `bundle.js` + `manifest.json`。
 - [STYLE_GUIDE](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/STYLE_GUIDE.md) —— 颜色 token、排版、组件模式、暗色模式的完整规范。

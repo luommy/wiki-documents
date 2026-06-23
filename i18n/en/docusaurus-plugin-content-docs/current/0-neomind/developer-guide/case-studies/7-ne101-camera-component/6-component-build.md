@@ -71,7 +71,7 @@ This object has four keys, corresponding to two addressing modes of the platform
 
 Source: [`manifest.json` L38-L39](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L38-L39)
 
-**Why expose both `default` and `NE101CameraPanel` keys**: this is a forward-compatibility insurance. The new Dashboard loader reads `export_name` (named export); the old loader (v1.x era) reads `default`. Both keys point to the same function reference, costing only a pointer (a few bytes), but avoiding the breaking change of "upgrading manifest's `export_name` field causing a white screen on older platforms." metric_card ([#6 metric_card](../6-metric-card-component.md)) adopts the same dual-exposure strategy.
+**Why expose both `default` and `NE101CameraPanel` keys**: this is a forward-compatibility insurance. The new Dashboard loader reads `export_name` (named export); the old loader (v1.x era) reads `default`. Both keys point to the same function reference, costing only a pointer (a few bytes), but avoiding the breaking change of "upgrading manifest's `export_name` field causing a white screen on older platforms." metric_card ([6 metric_card](../6-metric-card-component.md)) adopts the same dual-exposure strategy.
 
 **Semantics of the `ConfigPanel` and `AdvancedPanel` exports**: these two keys map to two tabs of the platform's ComponentConfigDialog. The platform's configuration dialog convention: if the bundle object has a `ConfigPanel` key, render it in the "Display" tab; if it has an `AdvancedPanel` key, render it in the "Advanced" tab. The main component (`NE101CameraPanel`) renders in the grid and is a separate rendering context from the configuration dialog — this is why they must be independent export keys, not sub-components of the main component.
 
@@ -257,7 +257,7 @@ The dashed lines in the diagram represent "called by" direction: upper layers (s
 
 ---
 
-## 6.4 React-in-IIFE Pitfall #1: Hook Order
+## 6.4 React-in-IIFE Pitfall 1: Hook Order
 
 React's Rules of Hooks mandates: **hooks must be called at the top level of the component function, never inside conditionals, loops, or nested functions**. The essence of this rule is that React internally tracks each hook's state by "call order index" — if one render calls 3 hooks and the next calls 4, the indices shift, and React throws error #310 ("Rendered more hooks than during the previous render") or worse, silent state corruption.
 
@@ -294,7 +294,7 @@ The comment `// ROI hooks — MUST be called unconditionally, before any conditi
 
 ---
 
-## 6.5 React-in-IIFE Pitfall #2: Frozen Input
+## 6.5 React-in-IIFE Pitfall 2: Frozen Input
 
 The second hooks pitfall is more insidious than the first — it does not crash React, but makes **input fields appear frozen** (the user types but nothing shows in the box). The fix for this bug went through two iterations, involving two commits: [`44f1fa5`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/44f1fa5) (`fix(ne101_camera): input fields frozen — use local state instead of shared composingRef`) and [`b060a25`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/b060a25) (`fix(ne101_camera): React error #310 — use defaultValue instead of hooks in imeInput`).
 
@@ -530,7 +530,7 @@ The common theme across these 7 decisions: **choosing the simplest approach that
 
 ### Cross-references
 
-- Back to [2 Architecture](./2-architecture.md) — the five-layer module structure of this section complements 2.2's five-layer architecture overview: 2 focuses on "what," 6 focuses on "how to build." 2.5 decision #1 (IIFE + window.React) has a deeper build-perspective analysis in 6.1.
+- Back to [2 Architecture](./2-architecture.md) — the five-layer module structure of this section complements 2.2's five-layer architecture overview: 2 focuses on "what," 6 focuses on "how to build." 2.5 decision 1 (IIFE + window.React) has a deeper build-perspective analysis in 6.1.
 - Back to [5 Frontend Consumption](./5-frontend-consume.md) — 5's callback ref pattern (commit `d7836b8`) and 6.4's hooks order fix (commit `0601cd4`) are two sides of the same coin: both are pitfalls of writing React in an IIFE.
 - [7 Integration Test](./7-integration-test.md) — the hooks pitfalls, frozen input, and shadcn class desync issues mentioned here have corresponding verification cases in 7's test matrix.
 - [8 Deep Dive](./8-deep-dive.md) — the version evolution (133 commits), debug trace saga, and `_configHash` performance optimization of the 1972-line IIFE are fully recapped in 8.

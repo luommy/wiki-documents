@@ -9,7 +9,7 @@ sidebar_label: "ne101_camera Flagship"
 
 > **一句话定位**：把 CamThink NE101 感知摄像头接入 Dashboard 的旗舰组件——它是 NeoMind 组件市场里第一个「设备绑定 + 图像画布 + AI 处理流水线 + ROI 叠加」四合一的组件，把入门级 metric_card 的「数值展示」扩展到了「设备 → 推理 → 视觉叠加」全链路。
 
-本案例是 NeoMind 组件市场的「旗舰深度案例」——前面 6 个案例（[#6 metric_card](../6-metric-card-component.md) 是直接前置）教你「怎么写一个组件」，本案例 8 节内容回答「怎么写一个把硬件 + AI + 视觉效果全部串起来的复杂组件」。读完本案例，你会理解为什么 NeoMind 用「IIFE + `window.React` 注入」而非 ESM 打包能撑住 1972 行的手写代码，以及为什么 manifest 里 `has_data_source: false` + `has_device_binding: true` 这个组合是设备绑定组件的典型范式。
+本案例是 NeoMind 组件市场的「旗舰深度案例」——前面 6 个案例（[6 metric_card](../6-metric-card-component.md) 是直接前置）教你「怎么写一个组件」，本案例 8 节内容回答「怎么写一个把硬件 + AI + 视觉效果全部串起来的复杂组件」。读完本案例，你会理解为什么 NeoMind 用「IIFE + `window.React` 注入」而非 ESM 打包能撑住 1972 行的手写代码，以及为什么 manifest 里 `has_data_source: false` + `has_device_binding: true` 这个组合是设备绑定组件的典型范式。
 
 ---
 
@@ -40,9 +40,9 @@ sidebar_label: "ne101_camera Flagship"
 
 ---
 
-## 2 与 #6 metric_card 的关系：从入门到旗舰
+## 2 与 6 metric_card 的关系：从入门到旗舰
 
-本案例是 [#6 metric_card](../6-metric-card-component.md) 的直接延续，但**复杂度等级差了一个数量级**。下表是两个案例的对照，帮助你建立「从入门到旗舰」的认知阶梯。
+本案例是 [6 metric_card](../6-metric-card-component.md) 的直接延续，但**复杂度等级差了一个数量级**。下表是两个案例的对照，帮助你建立「从入门到旗舰」的认知阶梯。
 
 | 维度 | metric_card（入门） | ne101_camera（旗舰） |
 |------|---------------------|----------------------|
@@ -122,7 +122,7 @@ graph LR
 | `manifest.json` 行数 | 40 行 |
 | 源码仓库 | [camthink-ai/NeoMind-Dashboard-Components](https://github.com/camthink-ai/NeoMind-Dashboard-Components/tree/main/components/ne101_camera) |
 | Git 提交数（组件目录） | 25+ commits |
-| 前置案例 | [#6 metric_card](../6-metric-card-component.md)（入门组件案例） |
+| 前置案例 | [6 metric_card](../6-metric-card-component.md)（入门组件案例） |
 | 后续案例 | 暂无（本案例是当前组件市场最复杂的案例） |
 
 ---

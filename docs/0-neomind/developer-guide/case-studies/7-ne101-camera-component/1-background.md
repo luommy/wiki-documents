@@ -41,7 +41,7 @@ NE101 支持的设备命令（device commands）是组件命令按钮的来源�
 
 ## 1.2 为什么不能拿 metric_card 凑合
 
-读者第一反应可能是：「NE101 不就是上报电池、信号、温度几个数值吗？拿 [#6 metric_card](../6-metric-card-component.md) 绑个数据源不就行了？」答案是不行，原因有四：
+读者第一反应可能是：「NE101 不就是上报电池、信号、温度几个数值吗？拿 [6 metric_card](../6-metric-card-component.md) 绑个数据源不就行了？」答案是不行，原因有四：
 
 **第一，metric_card 不能渲染图像。** NE101 最核心的价值是「抓拍到的 JPEG 图像」，而 metric_card 的 `extractValue()` 只能输出标量（数字/字符串）。要显示图像，需要专门的 `<img>` + Canvas 画布，metric_card 的渲染层完全没有这个能力。
 
@@ -80,7 +80,7 @@ graph TB
     MARKET["NeoMind 组件市场<br/>(按 manifest.category 分类)"]
 
     subgraph display["display 显示型"]
-        MC["metric_card<br/>(案例 #6 入门)<br/>has_data_source: true"]
+        MC["metric_card<br/>(案例 6 入门)<br/>has_data_source: true"]
     end
 
     subgraph device["device 设备绑定型"]
@@ -92,7 +92,7 @@ graph TB
     end
 
     subgraph bridge["bridge 协议桥接型"]
-        ONVIF["onvif-bridge<br/>(案例 #4)<br/>uink-rms-bridge (案例 #5)"]
+        ONVIF["onvif-bridge<br/>(案例 4)<br/>uink-rms-bridge (案例 5)"]
     end
 
     MARKET --> display
@@ -153,7 +153,7 @@ ne101_camera 的 manifest 只有 40 行，但信息密度极高。除了 1.3 讲
 
 本节列出 4 个关键设计决策及其被否决的备选方案。这些决策塑造了 ne101_camera 现在的形态，理解它们有助于你在二次开发时避免走弯路。
 
-### 决策 #1：组件不自己跑 AI，通过 `processingExtensionId` 外包给扩展
+### 决策 1：组件不自己跑 AI，通过 `processingExtensionId` 外包给扩展
 
 **选择**：组件只负责「图像展示 + 命令触发 + ROI 配置」，AI 推理通过 `processingExtensionId` 字段委托给用户选择的扩展（`locate-anything-v2` 兼容系）。
 
@@ -161,7 +161,7 @@ ne101_camera 的 manifest 只有 40 行，但信息密度极高。除了 1.3 讲
 
 **代价**：组件必须依赖外部扩展才能真正发挥价值——如果用户没安装任何 `locate-anything-v2` 兼容扩展，`processingExtensionId` 下拉框是空的，组件就退化成一个「纯图像展示 + 命令触发」的面板。这个代价被认为可接受，因为 NeoMind 生态默认推荐安装至少一个 AI 扩展。
 
-### 决策 #2：用 `has_device_binding` + `device_type_filter`，不用 `has_data_source`
+### 决策 2：用 `has_device_binding` + `device_type_filter`，不用 `has_data_source`
 
 **选择**：走「设备绑定」路径，manifest 写 `has_device_binding: true` + `device_type_filter: ["ne101_camera"]`，明确不用数据源绑定。
 
@@ -169,7 +169,7 @@ ne101_camera 的 manifest 只有 40 行，但信息密度极高。除了 1.3 讲
 
 **代价**：组件代码必须显式处理设备对象（`device.id`、`device.type`、`device.metrics`），而不能依赖 DataSource 的统一 `fetchData()` 接口。这导致组件的 data layer 比 metric_card 复杂得多。
 
-### 决策 #3：`processingRoiOverlap` 用 IoU 阈值，不用中心点判定
+### 决策 3：`processingRoiOverlap` 用 IoU 阈值，不用中心点判定
 
 **选择**：ROI 命中判定用「检测框与 ROI 的 IoU ≥ 阈值」（默认 0.6），阈值用户可调。
 
@@ -179,7 +179,7 @@ ne101_camera 的 manifest 只有 40 行，但信息密度极高。除了 1.3 讲
 
 **代价**：IoU 计算比中心点判定贵一点（需要算交集和并集面积），但实测在单帧检测框 ≤ 50 个的场景下性能损耗可忽略。
 
-### 决策 #4：`processingRois` 数组字段与单矩形字段共存（向后兼容）
+### 决策 4：`processingRois` 数组字段与单矩形字段共存（向后兼容）
 
 **选择**：manifest 同时保留 `processingRoiX/Y/W/H`（单矩形，L32-L35）和 `processingRois`（数组，L36）。运行时优先读数组，数组为空时回退到单矩形。
 
@@ -238,7 +238,7 @@ sequenceDiagram
 
 **第二类：集成者——想把一个 AI 扩展接到摄像头设备上。** 如果你是 AI 扩展的开发者，想让你的扩展能被 ne101_camera（或其它设备绑定组件）消费，你应该重点读 1（本节）+ 3 扩展侧（v1.1）+ 4 数据契约（MVP），理解 `processingExtensionId` 契约的输入输出格式、`detections` 虚拟指标的 schema、Transform 生命周期的管理规则。
 
-两类读者都需要前置读完 [#6 metric_card](../6-metric-card-component.md) 案例的 1-3，因为 metric_card 教的「IIFE 注入 + manifest 契约 + fetchData 拉取」是本案例的底层骨架。
+两类读者都需要前置读完 [6 metric_card](../6-metric-card-component.md) 案例的 1-3，因为 metric_card 教的「IIFE 注入 + manifest 契约 + fetchData 拉取」是本案例的底层骨架。
 
 ---
 

@@ -5,7 +5,7 @@ tags: [NeoMind, case study, AI inference]
 sidebar_label: "2. yolo-device-inference"
 ---
 
-# #2 yolo-device-inference: AI Inference Extension
+# 2 yolo-device-inference: AI Inference Extension
 
 ## 1 Case Background
 
@@ -13,7 +13,7 @@ sidebar_label: "2. yolo-device-inference"
 
 **What problem does it solve?** Camera devices on the NeoMind dashboard (e.g., NE101) only produce raw image frames (base64 / JPEG). To let the frontend "see detection results" instead of "see raw video," a resident inference service is needed on the device side that can: (1) subscribe to device image update events, (2) spin up ONNX Runtime for a YOLO forward pass when an event fires, (3) write structured results (boxes, classes, confidence) back as virtual metrics, (4) simultaneously write the visualization (annotated JPEG) as another metric for direct `<img>` rendering. yolo-device-inference is the "middleware" of this data chain.
 
-**Difference from yolo-video-v2**: yolo-video-v2 receives user-pushed video streams (base64 frame sequences), suited for "manual trigger analysis" scenarios; yolo-device-inference subscribes to image update events of **bound devices** via the NeoMind capability system, operating in "always-on automatic" mode — once `bind_device` completes, the extension runs inference on every device image update without frontend polling. This is the canonical pattern for edge AI deployment. Case #3 in this series covers the streaming variant yolo-video-v2.
+**Difference from yolo-video-v2**: yolo-video-v2 receives user-pushed video streams (base64 frame sequences), suited for "manual trigger analysis" scenarios; yolo-device-inference subscribes to image update events of **bound devices** via the NeoMind capability system, operating in "always-on automatic" mode — once `bind_device` completes, the extension runs inference on every device image update without frontend polling. This is the canonical pattern for edge AI deployment. Case 3 in this series covers the streaming variant yolo-video-v2.
 
 **Target reader**: AI engineers preparing to deploy trained ONNX models to NeoMind edge nodes; platform developers wanting to understand how extensions access device data through the capability system. Requires intermediate Rust proficiency (async, traits, `cfg` conditional compilation) and basic familiarity with ONNX Runtime's dynamic library loading mechanism.
 
@@ -497,7 +497,7 @@ The CI pipeline must build natively on each target platform (no cross-compile), 
 
 - [Case Overview](./0-overview.md) — this case's position in the NeoMind extension ecosystem
 - [Extension Standards Appendix](./appendix-standards.md) — metadata.json field spec, capability declaration checklist
-- [#3 yolo-video-v2](./3-yolo-video-v2.md) — companion case: streaming video inference variant; compare "device-bound auto-inference" vs "frontend-pushed frame analysis" design differences
-- [#7 NE101 Camera Component](./7-ne101-camera-component/index.md) — flagship hardware case consuming this extension; shows the complete chain from device to AI inference to frontend display
+- [3 yolo-video-v2](./3-yolo-video-v2.md) — companion case: streaming video inference variant; compare "device-bound auto-inference" vs "frontend-pushed frame analysis" design differences
+- [7 NE101 Camera Component](./7-ne101-camera-component/index.md) — flagship hardware case consuming this extension; shows the complete chain from device to AI inference to frontend display
 - [Extension Development API](../7-extension-development.md) — full reference for `Extension` trait, `ExtensionMetadata`, `CapabilityContext`
 - [Source Repository](https://github.com/camthink-ai/NeoMind-Extensions/tree/main/extensions/yolo-device-inference) — `extensions/yolo-device-inference/src/lib.rs` (all deep links in this document point to this file)

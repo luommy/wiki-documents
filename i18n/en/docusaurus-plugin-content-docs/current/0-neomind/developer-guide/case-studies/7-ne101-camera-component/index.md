@@ -9,7 +9,7 @@ sidebar_label: "ne101_camera Flagship"
 
 > **One-sentence positioning**: the flagship component that brings the CamThink NE101 sensing camera into the Dashboard — it is the first component in the NeoMind marketplace to combine device binding + image canvas + AI processing pipeline + ROI overlay in a single bundle, extending the entry-level metric_card "show a number" story into a full "device → inference → visual overlay" chain.
 
-This is the "flagship deep-dive case" of the NeoMind component marketplace. The previous six cases (with [#6 metric_card](../6-metric-card-component.md) as the direct prerequisite) teach you "how to write a component"; this case's eight subpages answer "how to write a complex component that wires hardware + AI + visual effects together". After reading it you will understand why NeoMind's "IIFE + `window.React` injection" pattern (instead of ESM bundling) scales to 1972 lines of hand-written code, and why the manifest combination `has_data_source: false` + `has_device_binding: true` is the canonical signature of any device-bound component.
+This is the "flagship deep-dive case" of the NeoMind component marketplace. The previous six cases (with [6 metric_card](../6-metric-card-component.md) as the direct prerequisite) teach you "how to write a component"; this case's eight subpages answer "how to write a complex component that wires hardware + AI + visual effects together". After reading it you will understand why NeoMind's "IIFE + `window.React` injection" pattern (instead of ESM bundling) scales to 1972 lines of hand-written code, and why the manifest combination `has_data_source: false` + `has_device_binding: true` is the canonical signature of any device-bound component.
 
 ---
 
@@ -40,9 +40,9 @@ If you are short on time and only want to understand "how this component works",
 
 ---
 
-## 2 Relationship to #6 metric_card: From Starter to Flagship
+## 2 Relationship to 6 metric_card: From Starter to Flagship
 
-This case is a direct continuation of [#6 metric_card](../6-metric-card-component.md), but **an order of magnitude more complex**. The table below maps the two cases so you can build a "starter → flagship" cognitive ladder.
+This case is a direct continuation of [6 metric_card](../6-metric-card-component.md), but **an order of magnitude more complex**. The table below maps the two cases so you can build a "starter → flagship" cognitive ladder.
 
 | Dimension | metric_card (starter) | ne101_camera (flagship) |
 |-----------|-----------------------|-------------------------|
@@ -122,7 +122,7 @@ graph LR
 | `manifest.json` lines | 40 |
 | Source repo | [camthink-ai/NeoMind-Dashboard-Components](https://github.com/camthink-ai/NeoMind-Dashboard-Components/tree/main/components/ne101_camera) |
 | Git commits (component dir) | 25+ |
-| Prerequisite case | [#6 metric_card](../6-metric-card-component.md) (starter component case) |
+| Prerequisite case | [6 metric_card](../6-metric-card-component.md) (starter component case) |
 | Successor case | none (this is currently the most complex case in the marketplace) |
 
 ---

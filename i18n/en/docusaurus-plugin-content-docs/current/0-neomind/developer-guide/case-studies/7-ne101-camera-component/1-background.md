@@ -41,7 +41,7 @@ The existence of these four command types further reinforces the 1.2 argument: a
 
 ## 1.2 Why metric_card Cannot Fill In
 
-A natural first reaction is: "NE101 just reports battery, signal, and temperature numbers — can't I bind a data source to [#6 metric_card](../6-metric-card-component.md) and be done?" The answer is no, for four reasons:
+A natural first reaction is: "NE101 just reports battery, signal, and temperature numbers — can't I bind a data source to [6 metric_card](../6-metric-card-component.md) and be done?" The answer is no, for four reasons:
 
 **First, metric_card cannot render images.** The core value of NE101 is "the JPEG image that was captured", while metric_card's `extractValue()` only outputs scalars (numbers/strings). Showing an image needs a dedicated `<img>` + Canvas, and metric_card's render layer has no such capability.
 
@@ -80,7 +80,7 @@ graph TB
     MARKET["NeoMind Component Marketplace<br/>(classified by manifest.category)"]
 
     subgraph display["display type"]
-        MC["metric_card<br/>(Case #6 starter)<br/>has_data_source: true"]
+        MC["metric_card<br/>(Case 6 starter)<br/>has_data_source: true"]
     end
 
     subgraph device["device-bound type"]
@@ -92,7 +92,7 @@ graph TB
     end
 
     subgraph bridge["bridge type"]
-        ONVIF["onvif-bridge (Case #4)<br/>uink-rms-bridge (Case #5)"]
+        ONVIF["onvif-bridge (Case 4)<br/>uink-rms-bridge (Case 5)"]
     end
 
     MARKET --> display
@@ -114,7 +114,7 @@ The dashed arrow is the most important cross-category relationship in this case:
 
 ne101_camera's manifest is only 40 lines but extremely dense. Beyond the two binding fields covered in 1.3, three fields are the core innovations of this case and will be referenced repeatedly in later sections:
 
-**`processingExtensionId: ""` ([manifest.json L24](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L24)) — the configurable AI-extension consumer contract.** This is the most important design decision in this case (see 1.6 decision #1). The empty string means "AI processing is off by default"; in the config panel the user picks an installed AI extension (object_detection / ocr / describe, etc.) from a dropdown, and the component sends the captured image URL + config params to that extension. The extension runs inference, writes the detections back to the device's virtual metrics, and the component reads them back and overlays them. This contract means ne101_camera is not hard-wired to any specific AI capability — the same component does different tasks when paired with different extensions.
+**`processingExtensionId: ""` ([manifest.json L24](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L24)) — the configurable AI-extension consumer contract.** This is the most important design decision in this case (see 1.6 decision 1). The empty string means "AI processing is off by default"; in the config panel the user picks an installed AI extension (object_detection / ocr / describe, etc.) from a dropdown, and the component sends the captured image URL + config params to that extension. The extension runs inference, writes the detections back to the device's virtual metrics, and the component reads them back and overlays them. This contract means ne101_camera is not hard-wired to any specific AI capability — the same component does different tasks when paired with different extensions.
 
 **`processingRoiOverlap: 0.6` ([manifest.json L31](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L31)) — the IoU-based ROI hit threshold.** This field decides "whether a detection box counts as falling inside an ROI": a box counts as a hit when its Intersection over Union with the ROI is ≥ 0.6. The earlier implementation used "center point inside ROI" (before commit `2109c45`), but center-point was too lenient for large targets straddling the ROI edge. Commit `2109c45` (`feat(ne101_camera): overlap-based ROI detection instead of center point`) switched to IoU, and commit `636a8ae` (`feat(ne101_camera): make ROI overlap threshold configurable`) then exposed the threshold as a user-tunable field.
 
@@ -153,7 +153,7 @@ This contrast also explains why ne101_camera's `bundle.js` is 1972 lines while m
 
 This section lists 4 key design decisions and the alternatives that were rejected. These decisions shaped ne101_camera into its current form; understanding them helps you avoid detours when forking the component.
 
-### Decision #1: The component does not run AI itself; it outsources via `processingExtensionId`
+### Decision 1: The component does not run AI itself; it outsources via `processingExtensionId`
 
 **Chosen**: the component only handles "image display + command trigger + ROI config"; AI inference is delegated via the `processingExtensionId` field to a user-selected extension (the `locate-anything-v2`-compatible family).
 
@@ -161,7 +161,7 @@ This section lists 4 key design decisions and the alternatives that were rejecte
 
 **Cost**: the component depends on an external extension to deliver real value — if the user has not installed any `locate-anything-v2`-compatible extension, the `processingExtensionId` dropdown is empty and the component degrades to a "pure image display + command trigger" panel. This cost is considered acceptable because the NeoMind ecosystem recommends installing at least one AI extension by default.
 
-### Decision #2: Use `has_device_binding` + `device_type_filter`, not `has_data_source`
+### Decision 2: Use `has_device_binding` + `device_type_filter`, not `has_data_source`
 
 **Chosen**: take the "device binding" path — the manifest declares `has_device_binding: true` + `device_type_filter: ["ne101_camera"]` and explicitly opts out of data-source binding.
 
@@ -169,7 +169,7 @@ This section lists 4 key design decisions and the alternatives that were rejecte
 
 **Cost**: the component code must explicitly handle the device object (`device.id`, `device.type`, `device.metrics`) rather than relying on DataSource's uniform `fetchData()` interface. This makes the data layer noticeably more complex than metric_card's.
 
-### Decision #3: `processingRoiOverlap` uses an IoU threshold, not center-point detection
+### Decision 3: `processingRoiOverlap` uses an IoU threshold, not center-point detection
 
 **Chosen**: ROI hit detection uses "IoU of detection box vs ROI ≥ threshold" (default 0.6), with the threshold user-tunable.
 
@@ -179,7 +179,7 @@ This section lists 4 key design decisions and the alternatives that were rejecte
 
 **Cost**: IoU computation is slightly more expensive than center-point (it needs intersection and union areas), but the perf cost is negligible for the typical ≤ 50 detection boxes per frame.
 
-### Decision #4: `processingRois` array coexists with single-rectangle fields (backward compatibility)
+### Decision 4: `processingRois` array coexists with single-rectangle fields (backward compatibility)
 
 **Chosen**: the manifest keeps both `processingRoiX/Y/W/H` (single rectangle, L32-L35) and `processingRois` (array, L36). At runtime the array takes precedence when non-empty; otherwise the component falls back to the single rectangle.
 
@@ -238,7 +238,7 @@ This case targets two audiences:
 
 **Second: integrators who want to wire an AI extension to a camera device.** If you develop AI extensions and want your extension to be consumable by ne101_camera (or any other device-bound component), focus on 1 (this section) + 3 Extension Side (v1.1) + 4 Data Contract (MVP) to learn the input/output format of the `processingExtensionId` contract, the schema of the `detections` virtual metric, and the rules of the Transform lifecycle.
 
-Both audiences should first read 1-3 of the [#6 metric_card](../6-metric-card-component.md) case, because the "IIFE injection + manifest contract + fetchData pull" triple taught there is the underlying skeleton of this case.
+Both audiences should first read 1-3 of the [6 metric_card](../6-metric-card-component.md) case, because the "IIFE injection + manifest contract + fetchData pull" triple taught there is the underlying skeleton of this case.
 
 ---
 

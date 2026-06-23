@@ -1,17 +1,17 @@
 ---
-description: "NeoMind 生产验证的厂商专有协议桥接案例：Uink-RMS 电子纸云平台桥接、JWT 鉴权链、Markdown→Image 渲染（pulldown-cmark + ab_glyph + imageproc）、区域端点路由、DisplayEditorCard 前端联动的完整工程剖析——与 #4 onvif-bridge 形成「专有 vs 标准」对比"
+description: "NeoMind 生产验证的厂商专有协议桥接案例：Uink-RMS 电子纸云平台桥接、JWT 鉴权链、Markdown→Image 渲染（pulldown-cmark + ab_glyph + imageproc）、区域端点路由、DisplayEditorCard 前端联动的完整工程剖析——与 4 onvif-bridge 形成「专有 vs 标准」对比"
 keywords: [NeoMind, uink-rms-bridge, 厂商桥接, 电子纸, Markdown 渲染, JWT]
 tags: [NeoMind, 案例, 厂商桥接]
 sidebar_label: "5. uink-rms-bridge"
 ---
 
-# #5 uink-rms-bridge：生产验证的厂商专有桥接
+# 5 uink-rms-bridge：生产验证的厂商专有桥接
 
 ## 1 案例背景
 
 **uink-rms-bridge** 是 NeoMind 生态中**生产验证的厂商专有协议桥接**案例。Uink-RMS 是一个面向 e-paper（电子纸 / 电子墨水屏）显示设备的云管理平台：设备通过 LPWAN / 蜂窝网络连入厂商云，云端提供 REST API 供第三方集成。uink-rms-bridge 让 NeoMind 能够完成三件事：(1) 在 Uink-RMS 平台上注册 e-paper 设备模板（`device_type = "uink_epaper"`，由扩展侧通过 `device_template_register` capability 一次性写入）；(2) 周期性拉取设备遥测（电量百分比、信号强度 dBm、温度、刷新计数）；(3) 把用户编辑的 Markdown / 纯文本 / 图像转换为 JPEG 并推送到 e-paper 屏幕上刷新显示。当前版本 `2.7.6`，核心实现集中在单个 [`src/lib.rs`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs) 文件共 2250 行，外加 React + TypeScript 编写的 [`DisplayEditorCard`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/frontend/) 前端组件（entrypoint `uink-rms-bridge-components.umd.cjs`）。
 
-**与 [案例 #4 onvif-bridge](./4-onvif-bridge.md) 的对比（本案例核心叙事轴）**：onvif-bridge 是**标准协议桥接**（ONVIF 是开放规范，任何 Profile S 摄像头通用），uink-rms-bridge 是**厂商专有协议桥接**（Uink-RMS 云 API 是封闭的私有接口，仅 Uink 自家设备可用）。两者代表 NeoMind 生态中两种截然不同的集成策略：标准协议桥接走「局域网 UDP/HTTP 直连设备 + 设备级 WS-Security 鉴权」的路径，演进风险低（标准稳定），不依赖任何外部云；厂商专有桥接走「公网 HTTPS 经厂商云中转 + 账号级 JWT 鉴权」的路径，演进风险高（厂商 API v1.0.1 可能变），强依赖 Uink-RMS 云服务可用性。理解这种对比，是选择 NeoMind 集成策略的关键——本系列把 #4 / #5 称为「协议桥接双子星」。
+**与 [案例 4 onvif-bridge](./4-onvif-bridge.md) 的对比（本案例核心叙事轴）**：onvif-bridge 是**标准协议桥接**（ONVIF 是开放规范，任何 Profile S 摄像头通用），uink-rms-bridge 是**厂商专有协议桥接**（Uink-RMS 云 API 是封闭的私有接口，仅 Uink 自家设备可用）。两者代表 NeoMind 生态中两种截然不同的集成策略：标准协议桥接走「局域网 UDP/HTTP 直连设备 + 设备级 WS-Security 鉴权」的路径，演进风险低（标准稳定），不依赖任何外部云；厂商专有桥接走「公网 HTTPS 经厂商云中转 + 账号级 JWT 鉴权」的路径，演进风险高（厂商 API v1.0.1 可能变），强依赖 Uink-RMS 云服务可用性。理解这种对比，是选择 NeoMind 集成策略的关键——本系列把 4 / 5 称为「协议桥接双子星」。
 
 **三大痛点驱动了该扩展的设计**：(1) Uink-RMS API 是**云中转**的，e-paper 刷新一次需要数秒（通过 LPWAN / 蜂窝下行），不能像普通 IoT 设备那样实时控制，必须在 UI 层做好延迟预期管理；(2) **Markdown → image 渲染必须在扩展侧完成**——Uink-RMS 的 `POST /api/v1/devices/{id}/image` 只接受 JPEG/PNG 二进制，不接受文本格式，所以 pulldown-cmark 解析 + ab_glyph 字体渲染 + imageproc 绘制 + image crate 编码 JPEG 这条管线完全由 Rust 侧负责；(3) 厂商云存在**区域分割**——中国大陆用户必须走 `https://cn.rms.uink.com`，海外用户走 `https://eu.rms.uink.com`，两者账号不互通，扩展必须支持区域路由。
 
@@ -77,7 +77,7 @@ graph TB
 
 ### 模块职责拆分（注意：单文件大）
 
-注意 `src/` 目录下**只有 `lib.rs` 一个文件**（用 `ls src/` 验证：仅 `lib.rs`，无备份、无其他 `.rs`）。这与 [案例 #4 onvif-bridge](./4-onvif-bridge.md) 的 5 文件拆分形成鲜明对比。下表按 lib.rs 内的逻辑分区列出：
+注意 `src/` 目录下**只有 `lib.rs` 一个文件**（用 `ls src/` 验证：仅 `lib.rs`，无备份、无其他 `.rs`）。这与 [案例 4 onvif-bridge](./4-onvif-bridge.md) 的 5 文件拆分形成鲜明对比。下表按 lib.rs 内的逻辑分区列出：
 
 | 逻辑层 | 行范围 | 职责 |
 |--------|--------|------|
@@ -92,9 +92,9 @@ graph TB
 | 命令实现 + FFI 导出 | [L1545-L2101](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L1545-L2101) | cmd_sync_devices / cmd_push_content / cmd_push_image / neomind_export! |
 | 单元测试 | [L2107-L2250](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L2107-L2250) | metadata、commands、config、api_base_url、model_to_resolution、parse_markdown |
 
-### 与 #4 onvif-bridge 架构对比
+### 与 4 onvif-bridge 架构对比
 
-| 架构维度 | [#4 onvif-bridge](./4-onvif-bridge.md) | **#5 uink-rms-bridge** |
+| 架构维度 | [4 onvif-bridge](./4-onvif-bridge.md) | **5 uink-rms-bridge** |
 |----------|------------------------------------------|--------------------------|
 | 协议类型 | 标准（ONVIF 开放规范） | **厂商专有**（Uink-RMS 私有云 API v1.0.1） |
 | 集成路径 | 局域网 UDP/HTTP 直连设备 | **公网 HTTPS 经厂商云中转** |
@@ -372,7 +372,7 @@ sequenceDiagram
 
 ### 决策 1：ureq 同步 HTTP（而非 reqwest async）
 
-**我们选 ureq v2（同步）**；替代方案是 reqwest + tokio multi-thread runtime；理由见 [`Cargo.toml` L23 注释](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/Cargo.toml#L23)："Use sync HTTP client to avoid Tokio runtime issues in dynamic libraries"。cdylib 被 NeoMind 主进程 `dlopen` 加载时，如果扩展内部自建 tokio runtime，会与主进程已有的 runtime 冲突（panic "Cannot start a runtime from within a runtime"）。ureq 是纯同步的，在 `execute_command` 的 async 上下文里用 `block_on` 包裹也不会嵌套 runtime。Tokio 仍然出现在依赖里（[L26-L27](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/Cargo.toml#L26-L27)），但只启用 `rt + sync` feature——这是 SDK 的 FFI 宏为 `RwLock` wrapper 需要的，不用于异步 IO。这个决策与 [案例 #4 onvif-bridge](./4-onvif-bridge.md) 一致（跨案例呼应：所有 native cdylib 扩展都用同步 HTTP）。
+**我们选 ureq v2（同步）**；替代方案是 reqwest + tokio multi-thread runtime；理由见 [`Cargo.toml` L23 注释](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/Cargo.toml#L23)："Use sync HTTP client to avoid Tokio runtime issues in dynamic libraries"。cdylib 被 NeoMind 主进程 `dlopen` 加载时，如果扩展内部自建 tokio runtime，会与主进程已有的 runtime 冲突（panic "Cannot start a runtime from within a runtime"）。ureq 是纯同步的，在 `execute_command` 的 async 上下文里用 `block_on` 包裹也不会嵌套 runtime。Tokio 仍然出现在依赖里（[L26-L27](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/Cargo.toml#L26-L27)），但只启用 `rt + sync` feature——这是 SDK 的 FFI 宏为 `RwLock` wrapper 需要的，不用于异步 IO。这个决策与 [案例 4 onvif-bridge](./4-onvif-bridge.md) 一致（跨案例呼应：所有 native cdylib 扩展都用同步 HTTP）。
 
 ### 决策 2：Markdown 在扩展侧 Rust 渲染（而非前端 canvas / 而非云侧）
 
@@ -516,7 +516,7 @@ fn produce_metrics(&self) -> Result<Vec<ExtensionMetricValue>> {
 
 [Source: lib.rs L1477-L1521](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L1477-L1521)设备级遥测（battery 等）通过 `device_metrics_write` capability 直接写入 NeoMind 设备指标存储，不走 produce_metrics 路径——这样前端设备面板能实时看到每个 e-paper 的电量和信号。
 
-**前端组件 DisplayEditorCard**：这是 uink-rms-bridge 与 [案例 #4 onvif-bridge](./4-onvif-bridge.md)（无前端）的关键差异。`DisplayEditorCard` 是一个 380x420px 的交互卡片，内含 Canvas 编辑器（支持文字 / 图片 / 矩形元素拖拽排布）、Markdown 编辑模态框、实时预览。组件通过 Vite 构建为 `uink-rms-bridge-components.umd.cjs`，由 NeoMind Runtime 动态加载。组件绑定 device data source 后，用户编辑完点推送，组件调用 `push_content` 命令把 Canvas 导出的 base64 图像或 Markdown 文本发给扩展。commit [`261d8e6`](https://github.com/camthink-ai/NeoMind-Extensions/commit/261d8e6) 为这个组件加了翻转支持和数据源绑定。
+**前端组件 DisplayEditorCard**：这是 uink-rms-bridge 与 [案例 4 onvif-bridge](./4-onvif-bridge.md)（无前端）的关键差异。`DisplayEditorCard` 是一个 380x420px 的交互卡片，内含 Canvas 编辑器（支持文字 / 图片 / 矩形元素拖拽排布）、Markdown 编辑模态框、实时预览。组件通过 Vite 构建为 `uink-rms-bridge-components.umd.cjs`，由 NeoMind Runtime 动态加载。组件绑定 device data source 后，用户编辑完点推送，组件调用 `push_content` 命令把 Canvas 导出的 base64 图像或 Markdown 文本发给扩展。commit [`261d8e6`](https://github.com/camthink-ai/NeoMind-Extensions/commit/261d8e6) 为这个组件加了翻转支持和数据源绑定。
 
 **configure() 与配置面板联动**：扩展声明了 6 个配置参数（server_region / custom_server_url / email / password / sync_interval_secs / poll_interval_secs），NeoMind 配置面板根据 `ParameterDefinition` 自动渲染表单。用户修改配置后，Runtime 调用 `configure()`，扩展更新 RwLock 内的 config 并清空 token，下次 `produce_metrics` 周期触发 auto-sync 时自动用新配置登录。
 
@@ -610,7 +610,7 @@ Uink-RMS 服务中断 = 扩展完全不可用（无法登录、无法推送、�
 
 ### 源码卫生反例：单文件 2250 行
 
-uink-rms-bridge 的 `src/` 目录**只有 `lib.rs` 一个文件，共 2250 行**（用 `ls src/` 验证：仅 `lib.rs`，无 `discovery.rs` / `soap_client.rs` 等拆分，无 `.bak` 备份）。这是一个**单文件巨型扩展的反例**——2250 行单文件可读性差，新贡献者定位代码困难（找 `cmd_push_content` 要滚到 L1884）。对比 [案例 #4 onvif-bridge](./4-onvif-bridge.md) 把协议拆成 5 个文件（lib.rs 1646 行 + discovery.rs 211 行 + soap_client.rs 516 行 + ptz.rs 214 行 + types.rs 78 行），每个文件职责单一、行数可控。
+uink-rms-bridge 的 `src/` 目录**只有 `lib.rs` 一个文件，共 2250 行**（用 `ls src/` 验证：仅 `lib.rs`，无 `discovery.rs` / `soap_client.rs` 等拆分，无 `.bak` 备份）。这是一个**单文件巨型扩展的反例**——2250 行单文件可读性差，新贡献者定位代码困难（找 `cmd_push_content` 要滚到 L1884）。对比 [案例 4 onvif-bridge](./4-onvif-bridge.md) 把协议拆成 5 个文件（lib.rs 1646 行 + discovery.rs 211 行 + soap_client.rs 516 行 + ptz.rs 214 行 + types.rs 78 行），每个文件职责单一、行数可控。
 
 **何时该拆分？何时单文件可接受？** uink-rms-bridge 选择单文件的理由是：它的所有逻辑围绕**单一厂商云 API**展开（Uink-RMS v1.0.1），auth / device / image / display 都是这个 API 的不同 endpoint，逻辑高度内聚，拆开反而增加跨文件跳转成本。而 onvif-bridge 是**多个独立协议栈**（WS-Discovery 是 UDP 多播、SOAP 是 HTTP、PTZ 是命令封装），天然分离。经验法则：如果模块之间共享很少的状态和类型（如 WS-Discovery 和 SOAP），拆分；如果所有模块都围绕同一个外部 API 的不同 endpoint（如 uink 的 auth + device + image），单文件可接受，但建议用 `// ===` 注释分区（本扩展确实这样做了，见 [L40](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L40)、[L161](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L161)、[L231](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L231) 等）。
 
@@ -640,9 +640,9 @@ uink-rms-bridge 的 `src/` 目录**只有 `lib.rs` 一个文件，共 2250 行**
 | 2026-06-xx | [`422ba8d`](https://github.com/camthink-ai/NeoMind-Extensions/commit/422ba8d) | 安全加固（JWT 链强化） |
 | 2026-06-xx | [`1e9a1f1`](https://github.com/camthink-ai/NeoMind-Extensions/commit/1e9a1f1) | v2.7.6 当前版本 |
 
-### 与 #4 onvif-bridge 完整对比（协议桥接双子星）
+### 与 4 onvif-bridge 完整对比（协议桥接双子星）
 
-| 维度 | [#4 onvif-bridge](./4-onvif-bridge.md) | **#5 uink-rms-bridge** |
+| 维度 | [4 onvif-bridge](./4-onvif-bridge.md) | **5 uink-rms-bridge** |
 |------|------------------------------------------|--------------------------|
 | 协议性质 | 标准（ONVIF 开放规范） | 厂商专有（Uink-RMS 私有 API） |
 | 通信路径 | 局域网直连设备 | 公网经厂商云中转 |
@@ -661,7 +661,7 @@ uink-rms-bridge 的 `src/` 目录**只有 `lib.rs` 一个文件，共 2250 行**
 
 ### 推荐阅读顺序
 
-如果你刚进入 NeoMind 协议桥接主题，建议先读 [案例 #4 onvif-bridge](./4-onvif-bridge.md) 再读本案例。#4 展示了「标准协议桥接」的工程范式（SOAP / WS-Discovery / WS-Security），#5 展示了「厂商专有桥接」的工程范式（JWT / Markdown 渲染 / 区域路由）。读完两者，你会理解 NeoMind 生态中两种截然不同的集成策略及其取舍。然后可以继续阅读 [案例总览](./0-overview.md) 了解完整案例矩阵。
+如果你刚进入 NeoMind 协议桥接主题，建议先读 [案例 4 onvif-bridge](./4-onvif-bridge.md) 再读本案例。4 展示了「标准协议桥接」的工程范式（SOAP / WS-Discovery / WS-Security），5 展示了「厂商专有桥接」的工程范式（JWT / Markdown 渲染 / 区域路由）。读完两者，你会理解 NeoMind 生态中两种截然不同的集成策略及其取舍。然后可以继续阅读 [案例总览](./0-overview.md) 了解完整案例矩阵。
 
 ### 小结
 

@@ -5,7 +5,7 @@ tags: [NeoMind, case study, component]
 sidebar_label: "6. metric_card"
 ---
 
-# #6 metric_card: Introductory Dashboard Component
+# 6 metric_card: Introductory Dashboard Component
 
 ## 1 Case Background
 
@@ -15,7 +15,7 @@ sidebar_label: "6. metric_card"
 
 **Target reader**: Developers who just finished the [Component API reference](../8-dashboard-component-dev.md) and want to build their first component. Requires React basics (hooks, JSX) but zero bundler knowledge — NeoMind components deliberately avoid Webpack/Vite/Rollup so anyone can write and ship directly.
 
-**Where it fits**: metric_card is the canonical "display component." It does not bind to specific device types (`has_device_binding: false`), does not run AI inference, and does not render images/video. In later cases, #7 (ne101_camera) builds on metric_card's foundation with device binding, image canvas, and an AI processing pipeline. Master this case's 8 sections and you have the skeleton of every NeoMind component: IIFE injection, manifest contract, fetchData retrieval, OKLCH visual system.
+**Where it fits**: metric_card is the canonical "display component." It does not bind to specific device types (`has_device_binding: false`), does not run AI inference, and does not render images/video. In later cases, 7 (ne101_camera) builds on metric_card's foundation with device binding, image canvas, and an AI processing pipeline. Master this case's 8 sections and you have the skeleton of every NeoMind component: IIFE injection, manifest contract, fetchData retrieval, OKLCH visual system.
 
 **What you will learn**: Why NeoMind components use IIFE + `window.React` injection instead of ESM bundling; how `manifest.json`'s `size_constraints` / `has_data_source` / `config_schema` fields shape component behavior in the dashboard; how `extractValue()` normalizes across 5+ data formats; why OKLCH + CSS variables beat hardcoded hex colors; how `backdrop-filter` glass effects are implemented with inline style objects under a zero-build constraint.
 
@@ -82,7 +82,7 @@ components/metric_card/
 └── bundle.js        # 352 lines hand-written IIFE JavaScript (source, not compiled output)
 ```
 
-> **Key insight**: `bundle.js` is named "bundle" but is **not the output of a bundler**. The NeoMind component marketplace deliberately requires hand-written IIFE — the file IS the source code, readable like any normal JS. Case #7 (ne101_camera) is 1972 lines and is still hand-written IIFE.
+> **Key insight**: `bundle.js` is named "bundle" but is **not the output of a bundler**. The NeoMind component marketplace deliberately requires hand-written IIFE — the file IS the source code, readable like any normal JS. Case 7 (ne101_camera) is 1972 lines and is still hand-written IIFE.
 
 View full manifest: [`manifest.json`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/metric_card/manifest.json#L1-L49)
 
@@ -425,7 +425,7 @@ sequenceDiagram
     MC->>RO: observe(containerRef)
     RO-->>MC: containerSize {w, h}
 
-    Note over MC: useEffect #1: dataSource change triggers
+    Note over MC: useEffect 1: dataSource change triggers
     MC->>FD: fetchData({timeRange: 24})
     FD->>DS: resolve dataSource config
     DS-->>FD: {value: 84} or {series: [...]}
@@ -436,7 +436,7 @@ sequenceDiagram
     MC-->>RT: render DOM
 
     loop Every 30 seconds
-        Note over MC: useEffect #2: setInterval
+        Note over MC: useEffect 2: setInterval
         MC->>FD: fetchData({timeRange: 24})
         FD-->>MC: new result
         MC->>MC: extractValue → update values[]
@@ -450,9 +450,9 @@ sequenceDiagram
 
 **Key timing points:**
 
-- **`useEffect` #1 (L180-186)** watches `dataSource` changes. Uses `getStableDsKey()` to generate a stable identifier for the data source (`source|mode|id|field` concatenation), avoiding the overhead of deep equality checks.
-- **`useEffect` #2 (L188-196)** sets up 30-second polling. Before each poll, it resets `lastDsKeyRef` to force `doFetch` to run.
-- **`useEffect` #3 (L198-207)** binds a `ResizeObserver`; when the container size changes, it recalculates `getLayout()`'s column count. This lets metric_card adjust its layout in real time as the user drags to resize (from 1 column to 2 to 3).
+- **`useEffect` 1 (L180-186)** watches `dataSource` changes. Uses `getStableDsKey()` to generate a stable identifier for the data source (`source|mode|id|field` concatenation), avoiding the overhead of deep equality checks.
+- **`useEffect` 2 (L188-196)** sets up 30-second polling. Before each poll, it resets `lastDsKeyRef` to force `doFetch` to run.
+- **`useEffect` 3 (L198-207)** binds a `ResizeObserver`; when the container size changes, it recalculates `getLayout()`'s column count. This lets metric_card adjust its layout in real time as the user drags to resize (from 1 column to 2 to 3).
 
 ---
 
@@ -635,8 +635,8 @@ metric_card's git history records the evolution of `extractValue` from "numbers 
 
 - [Engineering Standards Appendix](./appendix-standards.md) — Central reference for manifest schema, size constraints, and STYLE_GUIDE rules.
 - [Case Study Overview](./0-overview.md) — Version alignment table and reading paths for all 7 cases.
-- [#1 weather-forecast-v2](./1-weather-forecast.md) — Paired extension case. weather-forecast produces metrics; metric_card consumes them; together they form a complete "extension → component" data pipeline.
-- [#7 ne101_camera](./7-ne101-camera-component/index.md) — Flagship component case (next difficulty level). Builds on metric_card's foundation with device binding, image canvas, and AI processing pipeline.
+- [1 weather-forecast-v2](./1-weather-forecast.md) — Paired extension case. weather-forecast produces metrics; metric_card consumes them; together they form a complete "extension → component" data pipeline.
+- [7 ne101_camera](./7-ne101-camera-component/index.md) — Flagship component case (next difficulty level). Builds on metric_card's foundation with device binding, image canvas, and AI processing pipeline.
 - [Component API Reference](../8-dashboard-component-dev.md) — API docs for dashboard component schema, data source binding, and render pipeline.
 - [Source Repository](https://github.com/camthink-ai/NeoMind-Dashboard-Components/tree/main/components/metric_card) — `bundle.js` + `manifest.json`.
 - [STYLE_GUIDE](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/STYLE_GUIDE.md) — Complete spec for color tokens, typography, component patterns, and dark mode.

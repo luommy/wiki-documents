@@ -25,10 +25,10 @@ This series is distinct from the [Extension API reference](../7-extension-develo
 
 Pick the shortest path for your role and goal:
 
-- **Path 1 (Newcomer)**: #1 → #6 → #7 — Build intuition with the simplest extension and component, then tackle the end-to-end flagship case.
-- **Path 2 (AI Engineer)**: #2 → #3 → #7 — From single-frame inference to video-stream processing, then full product integration.
-- **Path 3 (Industrial Integrator)**: #4 → #5 → #7 — Two protocol-bridge cases as foundation, then a camera-grade product integration.
-- **Path 4 (Component Developer)**: #6 → #7 → any extension case — Master the component paradigm first, then learn how to interop with extensions.
+- **Path 1 (Newcomer)**: 1 → 6 → 7 — Build intuition with the simplest extension and component, then tackle the end-to-end flagship case.
+- **Path 2 (AI Engineer)**: 2 → 3 → 7 — From single-frame inference to video-stream processing, then full product integration.
+- **Path 3 (Industrial Integrator)**: 4 → 5 → 7 — Two protocol-bridge cases as foundation, then a camera-grade product integration.
+- **Path 4 (Component Developer)**: 6 → 7 → any extension case — Master the component paradigm first, then learn how to interop with extensions.
 
 ## Version Alignment Table
 
@@ -36,13 +36,13 @@ Case code is aligned with the source repository's release; the audit locks to a 
 
 | Case | Source repo version | SDK version | Last audit |
 |------|---------------------|-------------|------------|
-| #1 weather-forecast | v2.7.6 | SDK 0.6 | 2026-06-22 |
-| #2 yolo-device-inference | v2.7.6 | SDK 0.6 | 2026-06-22 |
-| #3 yolo-video-v2 | v2.7.6 | SDK 0.6 | 2026-06-22 |
-| #4 onvif-bridge | v2.7.6 | SDK 0.6 | 2026-06-22 |
-| #5 uink-rms-bridge | v2.7.6 | SDK 0.6 | 2026-06-22 |
-| #6 metric_card | v1.7.0 | — | 2026-06-22 |
-| #7 ne101_camera | v2.14.9 | — | 2026-06-22 |
+| 1 weather-forecast | v2.7.6 | SDK 0.6 | 2026-06-22 |
+| 2 yolo-device-inference | v2.7.6 | SDK 0.6 | 2026-06-22 |
+| 3 yolo-video-v2 | v2.7.6 | SDK 0.6 | 2026-06-22 |
+| 4 onvif-bridge | v2.7.6 | SDK 0.6 | 2026-06-22 |
+| 5 uink-rms-bridge | v2.7.6 | SDK 0.6 | 2026-06-22 |
+| 6 metric_card | v1.7.0 | — | 2026-06-22 |
+| 7 ne101_camera | v2.14.9 | — | 2026-06-22 |
 
 A case audit is triggered when the source repository cuts a release (manual, not automated).
 
@@ -56,7 +56,7 @@ A case audit is triggered when the source repository cuts a release (manual, not
 > - Full comments and reasonable line breaks are preserved; readability is close to plain source code — you can read it directly without a source map.
 > - Current sizes: `metric_card` is 352 lines, `ne101_camera` is 1972 lines.
 >
-> Therefore the "key code walkthroughs" in cases #6 / #7 point directly at specific line numbers in `bundle.js` — readers can open the source file and follow along.
+> Therefore the "key code walkthroughs" in cases 6 / 7 point directly at specific line numbers in `bundle.js` — readers can open the source file and follow along.
 
 ## Further Reading
 

@@ -5,7 +5,7 @@ tags: [NeoMind, case study, data extension]
 sidebar_label: "1. weather-forecast-v2"
 ---
 
-# #1 weather-forecast-v2: Starter Data Extension
+# 1 weather-forecast-v2: Starter Data Extension
 
 ## 1 Case Background
 
@@ -15,7 +15,7 @@ sidebar_label: "1. weather-forecast-v2"
 
 **Target reader**: Developers who have just finished the [Extension API Reference](../7-extension-development.md) and want to build their first extension. No advanced Rust knowledge required, but you should understand traits, async/await, and the module system.
 
-**Position in the ecosystem**: weather-forecast-v2 is the reference template for "data-type extensions" — it has no hardware dependencies, no AI models, no industrial protocol stacks. Later cases build on this foundation: #2 (yolo-device-inference) adds model loading, #4 (onvif-bridge) adds protocol stack complexity. Master this case's 8 sections and you have the skeleton for all data-type extensions.
+**Position in the ecosystem**: weather-forecast-v2 is the reference template for "data-type extensions" — it has no hardware dependencies, no AI models, no industrial protocol stacks. Later cases build on this foundation: 2 (yolo-device-inference) adds model loading, 4 (onvif-bridge) adds protocol stack complexity. Master this case's 8 sections and you have the skeleton for all data-type extensions.
 
 **What you'll learn**: How to build extension metadata with the `ExtensionMetadata::new()` builder chain; how to produce periodic metrics with `ExtensionMetricValue`; why a sync HTTP client (`ureq`) is chosen over `reqwest` in the dynamic library context; how to expose a React component via a Vite UMD bundle for the NeoMind dashboard loader.
 
@@ -522,7 +522,7 @@ weather-forecast-v2 is pure Rust + HTTP with no C dependencies, so all 5 targets
 
 - [Appendix: Engineering Standards](./appendix-standards.md) — Complete reference for metadata schema, capabilities, version consistency, and build matrix
 - [Overview: All Case Studies](./0-overview.md) — Index of 7 case studies and 4 reading paths
-- [#6 metric_card Component Case](./6-metric-card-component.md) — Next starter case: dashboard component template
+- [6 metric_card Component Case](./6-metric-card-component.md) — Next starter case: dashboard component template
 - [Extension Development API](../7-extension-development.md) — API docs for `Extension` trait, macros, and capabilities
 - [Source Code](https://github.com/camthink-ai/NeoMind-Extensions/tree/main/extensions/weather-forecast-v2) — Full source on GitHub
 

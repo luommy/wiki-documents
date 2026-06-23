@@ -5,7 +5,7 @@ tags: [NeoMind, case study, streaming]
 sidebar_label: "3. yolo-video-v2"
 ---
 
-# #3 yolo-video-v2: Streaming Extension
+# 3 yolo-video-v2: Streaming Extension
 
 ## 1 Case Background
 
@@ -15,7 +15,7 @@ sidebar_label: "3. yolo-video-v2"
 
 **Key differences from yolo-device-inference** (this is the most important comparison for understanding this case):
 
-| Dimension | yolo-device-inference (#2) | yolo-video-v2 (#3) |
+| Dimension | yolo-device-inference (2) | yolo-video-v2 (3) |
 |-----------|----------------------------|---------------------|
 | Data source | Subscribes to a bound device's image metric (event-driven pull) | RTSP/camera/base64, one of three (started in init_session) |
 | Invocation | Resident after `configure + bind_device` | Explicit session lifecycle via `start_stream / stop_stream` |
@@ -101,7 +101,7 @@ let is_network_stream = source_url.starts_with("rtsp://")
 
 ### Comparison with yolo-device-inference architecture
 
-| Architecture dimension | #2 yolo-device-inference | #3 yolo-video-v2 |
+| Architecture dimension | 2 yolo-device-inference | 3 yolo-video-v2 |
 |------------------------|--------------------------|-------------------|
 | Entry abstraction | `Extension::execute_command("bind_device")` | `Extension::stream_capability()` + `init_session` |
 | Inference trigger | Device image-metric update event | Frame-loop OS thread drives proactively |
@@ -427,7 +427,7 @@ sequenceDiagram
 
 ### 3.7 YoloDetector lazy load
 
-`YoloDetector` wraps `usls::models::YOLO` and uses the same lazy-load pattern as #2: an `Option<YOLO>` + `load_attempted` pair encodes a four-state machine. See [`src/detector.rs` L1-L80](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/yolo-video-v2/src/detector.rs#L1-L80). `auto_device()` prefers CoreML (macOS) / CUDA (Linux) / CPU; `with_device_fallback` falls back to CPU when the GPU is unavailable. `setup_native_lib_paths` configures `DYLD_LIBRARY_PATH` / `LD_LIBRARY_PATH` / `PATH` before loading the model so the ONNX Runtime dylib can be located ([`src/detector.rs` L63-L80](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/yolo-video-v2/src/detector.rs#L63-L80)).
+`YoloDetector` wraps `usls::models::YOLO` and uses the same lazy-load pattern as 2: an `Option<YOLO>` + `load_attempted` pair encodes a four-state machine. See [`src/detector.rs` L1-L80](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/yolo-video-v2/src/detector.rs#L1-L80). `auto_device()` prefers CoreML (macOS) / CUDA (Linux) / CPU; `with_device_fallback` falls back to CPU when the GPU is unavailable. `setup_native_lib_paths` configures `DYLD_LIBRARY_PATH` / `LD_LIBRARY_PATH` / `PATH` before loading the model so the ONNX Runtime dylib can be located ([`src/detector.rs` L63-L80](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/yolo-video-v2/src/detector.rs#L63-L80)).
 
 ```rust
 // detector.rs L63-L80 (setup_native_lib_paths summary)
@@ -751,20 +751,20 @@ Commit `60e4e5b` upgraded ffmpeg-next from v7 to v8 (note: the current `Cargo.to
 
 ### Relationship to other cases
 
-- **#1 weather-forecast-v2**: The simplest synchronous extension (HTTP pull + metric output); the starting point for the NeoMind extension model.
-- **#2 yolo-device-inference**: AI inference + synchronous capability bridge (event-driven pull); the "low-frequency version" of #3.
-- **#3 yolo-video-v2 (this case)**: AI inference + Push streaming mode (high-frequency proactive push); the "streaming upgrade" of #2.
-- **#4 onvif-bridge / #5 uink-rms-bridge**: Protocol-bridge extensions focused on device onboarding rather than AI inference.
-- **#6 metric_card**: A pure front-end component extension with no back-end logic.
-- **#7 ne101_camera (flagship case)**: An end-to-end camera product case that combines #2 (device-bound inference) and #3 (RTSP streaming analysis).
+- **1 weather-forecast-v2**: The simplest synchronous extension (HTTP pull + metric output); the starting point for the NeoMind extension model.
+- **2 yolo-device-inference**: AI inference + synchronous capability bridge (event-driven pull); the "low-frequency version" of #3.
+- **3 yolo-video-v2 (this case)**: AI inference + Push streaming mode (high-frequency proactive push); the "streaming upgrade" of #2.
+- **4 onvif-bridge / 5 uink-rms-bridge**: Protocol-bridge extensions focused on device onboarding rather than AI inference.
+- **6 metric_card**: A pure front-end component extension with no back-end logic.
+- **7 ne101_camera (flagship case)**: An end-to-end camera product case that combines 2 (device-bound inference) and 3 (RTSP streaming analysis).
 
 ### Recommended reading order
 
-If this is your first encounter with NeoMind streaming extensions, read in this order: (1) start with the [Overview](./0-overview.md) to grasp the extension model; (2) read [Case #1](./1-weather-forecast.md) to learn the basics of synchronous extensions; (3) read [Case #2](./2-yolo-device-inference.md) to understand AI inference + the synchronous capability bridge; (4) finish with this case (#3) to contrast Push versus Pull. If you only care about the SDK's StreamCapability interface design, jump straight to 3.1.
+If this is your first encounter with NeoMind streaming extensions, read in this order: (1) start with the [Overview](./0-overview.md) to grasp the extension model; (2) read [Case #1](./1-weather-forecast.md) to learn the basics of synchronous extensions; (3) read [Case #2](./2-yolo-device-inference.md) to understand AI inference + the synchronous capability bridge; (4) finish with this case (3) to contrast Push versus Pull. If you only care about the SDK's StreamCapability interface design, jump straight to 3.1.
 
 ### Bridge to ne101_camera
 
-Case #7 ne101_camera (the flagship case, coming soon) shows how a real camera product simultaneously uses #2 (device-bound inference) and #3 (RTSP streaming analysis) — the ne101 device's image metrics flow through #2's event-driven path, while its RTSP live stream flows through #3's Push path. Understanding this case's `init_session` → `start_push` → frame loop → `send_push_output` chain is a prerequisite for reading #7.
+Case 7 ne101_camera (the flagship case, coming soon) shows how a real camera product simultaneously uses 2 (device-bound inference) and 3 (RTSP streaming analysis) — the ne101 device's image metrics flow through #2's event-driven path, while its RTSP live stream flows through #3's Push path. Understanding this case's `init_session` → `start_push` → frame loop → `send_push_output` chain is a prerequisite for reading #7.
 
 ### Summary
 

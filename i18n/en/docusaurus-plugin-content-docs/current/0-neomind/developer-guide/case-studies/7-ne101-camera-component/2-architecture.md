@@ -7,7 +7,7 @@ sidebar_label: "2. Architecture"
 
 # 2 Architecture Overview
 
-> This section cracks open [`bundle.js`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js) — the 1972-line hand-written IIFE — and lays it flat. After reading you should be able to: (1) draw the IIFE top-level structure and the `window.*` injection boundary; (2) explain the responsibilities of the five layers (helper / template / sub-component / main / export); (3) reproduce the component tree (root `NE101CameraPanel` plus the `ConfigPanel` / `AdvancedPanel` exported siblings) and the semantics of the core hooks; (4) describe the dual-channel "WebSocket-priority + REST-fallback" data flow; and (5) articulate, via the comparison with [#6 metric_card](../6-metric-card-component.md), the architectural gulf between a "device-bound component" and a "display component". All line numbers reference the `main` branch of the source repo; links carry `#L<start>-L<end>` anchors.
+> This section cracks open [`bundle.js`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js) — the 1972-line hand-written IIFE — and lays it flat. After reading you should be able to: (1) draw the IIFE top-level structure and the `window.*` injection boundary; (2) explain the responsibilities of the five layers (helper / template / sub-component / main / export); (3) reproduce the component tree (root `NE101CameraPanel` plus the `ConfigPanel` / `AdvancedPanel` exported siblings) and the semantics of the core hooks; (4) describe the dual-channel "WebSocket-priority + REST-fallback" data flow; and (5) articulate, via the comparison with [6 metric_card](../6-metric-card-component.md), the architectural gulf between a "device-bound component" and a "display component". All line numbers reference the `main` branch of the source repo; links carry `#L<start>-L<end>` anchors.
 
 ---
 
@@ -25,7 +25,7 @@ var NE101CameraPanel = (function () {
 
 Source: [`bundle.js` L1-L5](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1-L5)
 
-These three lines (`var React = window.React`, `var jsx = window.jsxRuntime.jsx`, `var jsxs = window.jsxRuntime.jsxs`) are the NeoMind component market's standard "injection triple", shared with metric_card ([#6 metric_card 3.2](../6-metric-card-component.md)). The implication is that **the bundle does not pack React** — it borrows a single instance already loaded by the host page, guaranteeing one React instance for the whole dashboard and preventing cross-instance hook failures (the classic `useContext` returns undefined / `useRef` throws symptoms).
+These three lines (`var React = window.React`, `var jsx = window.jsxRuntime.jsx`, `var jsxs = window.jsxRuntime.jsxs`) are the NeoMind component market's standard "injection triple", shared with metric_card ([6 metric_card 3.2](../6-metric-card-component.md)). The implication is that **the bundle does not pack React** — it borrows a single instance already loaded by the host page, guaranteeing one React instance for the whole dashboard and preventing cross-instance hook failures (the classic `useContext` returns undefined / `useRef` throws symptoms).
 
 Why use `var Name = (function(){ ... })()` (an IIFE) instead of UMD / CommonJS / ESM? The root cause is that **the Dashboard host injects the bundle via a `<script>` tag**. A `<script>` tag has no module scope, so an IIFE is the only zero-dependency mechanism that emulates private naming via function scope + closure: every `function classColor` / `var white` inside the function body stays out of `window`, and only the final `return { ... }` object is attached to `window.NE101CameraPanel`. UMD also works under `<script>` but adds a `define` / `module.exports` detection branch that is redundant for NeoMind's "no bundler" philosophy; CommonJS's `require` simply does not work in the browser.
 
@@ -46,7 +46,7 @@ Note that `manifest.json`'s [`export_name: "NE101CameraPanel"`](https://github.c
   "export_name": "NE101CameraPanel"
 ```
 
-Source: [manifest.json L39](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L39) (it reads the main component from `NE101CameraPanel.NE101CameraPanel`), not the default; but the default is also retained for backward compatibility with older Dashboard loaders that still write `bundle.default` (see 2.5 decision #2). This dual exposure is one detail that distinguishes ne101_camera from metric_card — metric_card also exposes `default + MetricCard` but only exports a single component, whereas ne101_camera must also carry `ConfigPanel` and `AdvancedPanel` out for the configuration dialog.
+Source: [manifest.json L39](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L39) (it reads the main component from `NE101CameraPanel.NE101CameraPanel`), not the default; but the default is also retained for backward compatibility with older Dashboard loaders that still write `bundle.default` (see 2.5 decision 2). This dual exposure is one detail that distinguishes ne101_camera from metric_card — metric_card also exposes `default + MetricCard` but only exports a single component, whereas ne101_camera must also carry `ConfigPanel` and `AdvancedPanel` out for the configuration dialog.
 
 The diagram below draws the main line from window injection to IIFE closure to five layers to return object.
 
@@ -563,7 +563,7 @@ This fix comes from commit [`e3a70be`](https://github.com/camthink-ai/NeoMind-Da
 
 This section lists five architectural decisions that shape ne101_camera's current form. Each decision uses a three-part "we chose X / alternative Y / rationale Z" framing, plus the cost paid.
 
-### Decision #1: IIFE + window.React instead of bundling React
+### Decision 1: IIFE + window.React instead of bundling React
 
 **Choice**: the IIFE form `var NE101CameraPanel = (function(){ var React = window.React; ... })()`, without packing React, borrowing the singleton from the host page.
 
@@ -573,7 +573,7 @@ This section lists five architectural decisions that shape ne101_camera's curren
 
 **Cost**: (1) No tree-shaking — the entire helper layer ships in the bundle even if some functions are unused; (2) no TypeScript type checking — the parameter types of `getFirst(vals, keys)` and similar functions live only in comments and convention; (3) no ESLint `rules-of-hooks` — hook-order bugs can only be caught at runtime (commit `0601cd4` is exactly such a bug). metric_card accepts this cost because it is 352 lines; ne101_camera accepts it at 1972 lines because `test_bundle.js` provides logic-test coverage as a safety net.
 
-### Decision #2: Named export + default dual exposure
+### Decision 2: Named export + default dual exposure
 
 **Choice**: [`bundle.js` L1971](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1971) return object contains both `default` and named exports (`NE101CameraPanel` / `ConfigPanel` / `AdvancedPanel`).
 
@@ -583,7 +583,7 @@ This section lists five architectural decisions that shape ne101_camera's curren
 
 **Cost**: the return object has one layer of redundancy (`default` and `NE101CameraPanel` point to the same function), but this is the standard cost of forward compatibility and is negligible.
 
-### Decision #3: WebSocket-priority + REST-fallback dual channel
+### Decision 3: WebSocket-priority + REST-fallback dual channel
 
 **Choice**: image data flows through two channels — Priority 1 is `props.deviceImageSrc` (WebSocket push), Priority 2 is `neomind.fetchDeviceValues(deviceId)` (REST pull).
 
@@ -601,7 +601,7 @@ This section lists five architectural decisions that shape ne101_camera's curren
 
 Source: [`bundle.js` L523-L524](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L523-L524)
 
-### Decision #4: Dynamically generating transform JS code
+### Decision 4: Dynamically generating transform JS code
 
 **Choice**: use `generateTransformJsCode(pipe)` ([L239](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L239-L456)) to serialize the pipeline config into a JavaScript code string, stuffed into the TransformAutomation entity's `js_code` field.
 
@@ -611,7 +611,7 @@ Source: [`bundle.js` L523-L524](https://github.com/camthink-ai/NeoMind-Dashboard
 
 **Cost**: (1) string-concatenated code has no syntax checking — typos only surface at runtime; (2) the controller must `eval` this code in a sandbox, introducing (controlled) security risk; (3) debugging is hard — stack frames point into the generated string, not the source. `test_bundle.js` contains snapshot tests specifically for `generateTransformJsCode` to mitigate this.
 
-### Decision #5: Golden-angle HSV for class coloring
+### Decision 5: Golden-angle HSV for class coloring
 
 **Choice**: `classColor(label)` ([L57-L72](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L55-L72)) uses string hashing + golden-angle 137.508° rotation to generate HSV hue.
 
@@ -623,11 +623,11 @@ Source: [`bundle.js` L523-L524](https://github.com/camthink-ai/NeoMind-Dashboard
 
 ---
 
-## 2.6 Architectural Comparison with #6 metric_card
+## 2.6 Architectural Comparison with 6 metric_card
 
-The table below compares ne101_camera and [#6 metric_card](../6-metric-card-component.md) across six dimensions, to help readers build a mental model of the architectural gulf between "display component" and "device-bound component". For metric_card's relevant fields, see its [3.1 manifest contract](../6-metric-card-component.md).
+The table below compares ne101_camera and [6 metric_card](../6-metric-card-component.md) across six dimensions, to help readers build a mental model of the architectural gulf between "display component" and "device-bound component". For metric_card's relevant fields, see its [3.1 manifest contract](../6-metric-card-component.md).
 
-| Dimension | #6 metric_card | #7 ne101_camera | Gap interpretation |
+| Dimension | 6 metric_card | 7 ne101_camera | Gap interpretation |
 |-----------|----------------|-----------------|---------------------|
 | **Code volume** | 352-line IIFE | 1972-line IIFE | The extra 1620 lines in ne101 mostly live in the sub-component layer (`AdvancedPanel` 522 lines) and the template engine layer (`generateTransformJsCode` 217 lines) — both are complexity unique to "device binding + AI processing pipeline". |
 | **Component count** | 1 exported component (`MetricCard`) | 3 exported components (`NE101CameraPanel` + `ConfigPanel` + `AdvancedPanel`) + 5 internal sub-components | metric_card's "single component" means it has no configuration-dialog tab structure; ne101's three-piece set is the platform's requirement for components with `has_device_binding` or complex `config_schema`. |

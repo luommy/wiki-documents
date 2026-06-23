@@ -7,7 +7,7 @@ sidebar_label: "2. Architecture"
 
 # 2 架构总览
 
-> 本节是把 [`bundle.js`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js) 1972 行手写 IIFE「拆开看」的章节。读完你应当能：(1) 画出 IIFE 顶层结构与 `window.*` 注入的依赖边界；(2) 解释 helper / template / sub-component / main / export 五层的职责切分；(3) 复述组件树（根节点 `NE101CameraPanel` 加上 `ConfigPanel` / `AdvancedPanel` 两个对外子组件）以及核心 hooks 的语义；(4) 描述「WebSocket 优先 + REST 回退」的双通道数据流；(5) 在与 [#6 metric_card](../6-metric-card-component.md) 的对比里说清「设备绑定组件」与「显示型组件」的架构代差。所有行号都基于源码仓库的 `main` 分支，链接带 `#L<start>-L<end>` 锚点。
+> 本节是把 [`bundle.js`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js) 1972 行手写 IIFE「拆开看」的章节。读完你应当能：(1) 画出 IIFE 顶层结构与 `window.*` 注入的依赖边界；(2) 解释 helper / template / sub-component / main / export 五层的职责切分；(3) 复述组件树（根节点 `NE101CameraPanel` 加上 `ConfigPanel` / `AdvancedPanel` 两个对外子组件）以及核心 hooks 的语义；(4) 描述「WebSocket 优先 + REST 回退」的双通道数据流；(5) 在与 [6 metric_card](../6-metric-card-component.md) 的对比里说清「设备绑定组件」与「显示型组件」的架构代差。所有行号都基于源码仓库的 `main` 分支，链接带 `#L<start>-L<end>` 锚点。
 
 ---
 
@@ -25,7 +25,7 @@ var NE101CameraPanel = (function () {
 
 Source: [`bundle.js` L1-L5](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1-L5)
 
-这三行 `var React = window.React` + `var jsx = window.jsxRuntime.jsx` + `var jsxs = window.jsxRuntime.jsxs` 是 NeoMind 组件市场的「注入三连」，也是与 metric_card（[#6 metric_card 3.2](../6-metric-card-component.md)）共享的底层约定。它意味着 **bundle 不打包 React**，而是从宿主页面已经加载好的单例里「借」一份 React，从而保证全仪表板只有一个 React 实例，hooks 不会跨实例失效（`useContext` 返回 undefined、`useRef` 报错这类经典症状）。
+这三行 `var React = window.React` + `var jsx = window.jsxRuntime.jsx` + `var jsxs = window.jsxRuntime.jsxs` 是 NeoMind 组件市场的「注入三连」，也是与 metric_card（[6 metric_card 3.2](../6-metric-card-component.md)）共享的底层约定。它意味着 **bundle 不打包 React**，而是从宿主页面已经加载好的单例里「借」一份 React，从而保证全仪表板只有一个 React 实例，hooks 不会跨实例失效（`useContext` 返回 undefined、`useRef` 报错这类经典症状）。
 
 为什么用 `var Name = (function(){ ... })()` 这种 IIFE 形式而不是 UMD / CommonJS / ESM？根本原因是 **Dashboard 宿主通过 `<script>` 标签注入 bundle**。`<script>` 标签没有模块作用域，IIFE 是唯一能用「函数作用域 + 闭包」模拟私有命名空间的零依赖手段：函数体内的 `function classColor` / `var white` 等等不会泄漏到 `window` 上，只有最后那一句 `return { ... }` 的对象挂到 `window.NE101CameraPanel`。UMD 虽然也能跑在 `<script>` 下，但它多了一层 `define` / `module.exports` 的探测分支，对「不跑打包器」的 NeoMind 范式是冗余的；CommonJS 的 `require` 在浏览器里根本不工作。
 
@@ -154,7 +154,7 @@ Source: [`bundle.js` L55-L72](https://github.com/camthink-ai/NeoMind-Dashboard-C
 
 Source: [`bundle.js` L86-L100](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L86-L100)
 
-- `pipeRois(pipe)`（[L204-L230](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L204-L230)）—— 从 pipeline 配置里把 ROI 数组抽出来，同时兼容新格式（`pipe.rois = [{points:[...]}`）和旧格式（`pipe.roiX/Y/W/H` 单矩形）。这是 1.6 决策 #4 那条「向后兼容字段演进」在代码层的落点。
+- `pipeRois(pipe)`（[L204-L230](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L204-L230)）—— 从 pipeline 配置里把 ROI 数组抽出来，同时兼容新格式（`pipe.rois = [{points:[...]}`）和旧格式（`pipe.roiX/Y/W/H` 单矩形）。这是 1.6 决策 4 那条「向后兼容字段演进」在代码层的落点。
 
 ```js
 // bundle.js L204-L230 — pipeRois
@@ -567,7 +567,7 @@ Source: [`bundle.js` L1613-L1628](https://github.com/camthink-ai/NeoMind-Dashboa
 
 本节列出 5 个塑造 ne101_camera 当前形态的架构决策。每个决策给出「我们选 X / 替代方案 Y / 理由 Z」三段式，以及付出的代价。
 
-### 决策 #1：IIFE + window.React 而非打包 React
+### 决策 1：IIFE + window.React 而非打包 React
 
 **选择**：用 `var NE101CameraPanel = (function(){ var React = window.React; ... })()` 的 IIFE 形式，不打包 React，从宿主页面借用单例。
 
@@ -577,7 +577,7 @@ Source: [`bundle.js` L1613-L1628](https://github.com/camthink-ai/NeoMind-Dashboa
 
 **代价**：(1) 没有 tree-shaking，整个 helper 层即使某些函数没被用到也会进 bundle；(2) 没有 TypeScript 类型检查，`getFirst(vals, keys)` 这类函数的参数类型全靠注释和约定；(3) 没有 ESLint 的 `rules-of-hooks`，hooks 顺序错误只能靠运行时发现（commit `0601cd4` 就是这类 bug）。metric_card 接受这个代价因为只有 352 行；ne101_camera 1972 行仍然接受，靠的是 `test_bundle.js` 做逻辑测试兜底。
 
-### 决策 #2：命名导出 + default 双暴露
+### 决策 2：命名导出 + default 双暴露
 
 **选择**：[`bundle.js` L1971](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1971) 的 return 对象同时包含 `default` 和命名导出（`NE101CameraPanel` / `ConfigPanel` / `AdvancedPanel`）。
 
@@ -587,7 +587,7 @@ Source: [`bundle.js` L1613-L1628](https://github.com/camthink-ai/NeoMind-Dashboa
 
 **代价**：return 对象多一层冗余（`default` 和 `NE101CameraPanel` 指向同一个函数），但这是「向前兼容」的标准代价，可忽略。
 
-### 决策 #3：WebSocket 优先 + REST 回退的双通道
+### 决策 3：WebSocket 优先 + REST 回退的双通道
 
 **选择**：图像数据走两条通道——Priority 1 是 `props.deviceImageSrc`（WebSocket 推送），Priority 2 是 `neomind.fetchDeviceValues(deviceId)`（REST 拉取）。
 
@@ -605,7 +605,7 @@ Source: [`bundle.js` L1613-L1628](https://github.com/camthink-ai/NeoMind-Dashboa
 
 Source: [`bundle.js` L523-L524](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L523-L524)
 
-### 决策 #4：动态生成 transform JS 代码
+### 决策 4：动态生成 transform JS 代码
 
 **选择**：用 `generateTransformJsCode(pipe)`（[L239](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L239-L456)）把 pipeline 配置序列化成一段 JavaScript 代码字符串，塞进 TransformAutomation 实体的 `js_code` 字段。
 
@@ -615,7 +615,7 @@ Source: [`bundle.js` L523-L524](https://github.com/camthink-ai/NeoMind-Dashboard
 
 **代价**：(1) 字符串拼接的代码没有语法检查，拼错了只能在运行时发现；(2) 主控需要在沙箱里 `eval` 这段代码，有（受控的）安全风险；(3) 调试困难——出错时栈帧指向生成的字符串，不指向源码。`test_bundle.js` 里有专门针对 `generateTransformJsCode` 的快照测试来缓解这个问题。
 
-### 决策 #5：黄金角 HSV 给类别上色
+### 决策 5：黄金角 HSV 给类别上色
 
 **选择**：`classColor(label)`（[L57-L72](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L55-L72)）用字符串哈希 + 黄金角 137.508° 旋转生成 HSV 色相。
 
@@ -627,11 +627,11 @@ Source: [`bundle.js` L523-L524](https://github.com/camthink-ai/NeoMind-Dashboard
 
 ---
 
-## 2.6 与 #6 metric_card 的架构对比
+## 2.6 与 6 metric_card 的架构对比
 
-下表把 ne101_camera 和 [#6 metric_card](../6-metric-card-component.md) 在 6 个维度上做对照，帮助读者建立「显示型组件 vs 设备绑定组件」的架构代差认知。metric_card 的相关字段可以参考它的 [3.1 manifest 契约](../6-metric-card-component.md)。
+下表把 ne101_camera 和 [6 metric_card](../6-metric-card-component.md) 在 6 个维度上做对照，帮助读者建立「显示型组件 vs 设备绑定组件」的架构代差认知。metric_card 的相关字段可以参考它的 [3.1 manifest 契约](../6-metric-card-component.md)。
 
-| 维度 | #6 metric_card | #7 ne101_camera | 代差解读 |
+| 维度 | 6 metric_card | 7 ne101_camera | 代差解读 |
 |------|----------------|-----------------|----------|
 | **代码量** | 352 行 IIFE | 1972 行 IIFE | ne101 多出来的 1620 行主要在 sub-component 层（`AdvancedPanel` 522 行）和 template 引擎层（`generateTransformJsCode` 217 行），这些都是「设备绑定 + AI 处理流水线」独有的复杂度。 |
 | **组件数** | 1 个对外组件（`MetricCard`） | 3 个对外组件（`NE101CameraPanel` + `ConfigPanel` + `AdvancedPanel`）+ 5 个内部 sub-component | metric_card 的「单组件」意味着它没有配置对话框的 tab 结构；ne101 的三件套是平台对「有 `has_device_binding` 或复杂 `config_schema` 的组件」的要求。 |

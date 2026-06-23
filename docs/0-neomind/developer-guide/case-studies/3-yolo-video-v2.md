@@ -5,7 +5,7 @@ tags: [NeoMind, 案例, 流式]
 sidebar_label: "3. yolo-video-v2"
 ---
 
-# #3 yolo-video-v2：流式扩展
+# 3 yolo-video-v2：流式扩展
 
 ## 1 案例背景
 
@@ -15,7 +15,7 @@ sidebar_label: "3. yolo-video-v2"
 
 **与 yolo-device-inference 的关键区别**（这是理解本案例最重要的对比维度）：
 
-| 维度 | yolo-device-inference (#2) | yolo-video-v2 (#3) |
+| 维度 | yolo-device-inference (2) | yolo-video-v2 (3) |
 |------|----------------------------|---------------------|
 | 数据来源 | 订阅已绑定设备的 image metric（event-driven pull） | RTSP/摄像头/base64 三选一（init_session 时启动） |
 | 调用模式 | `configure + bind_device` 后常驻 | `start_stream / stop_stream` 显式会话生命周期 |
@@ -101,7 +101,7 @@ let is_network_stream = source_url.starts_with("rtsp://")
 
 ### 与 yolo-device-inference 架构对比
 
-| 架构维度 | #2 yolo-device-inference | #3 yolo-video-v2 |
+| 架构维度 | 2 yolo-device-inference | 3 yolo-video-v2 |
 |----------|--------------------------|-------------------|
 | 入口抽象 | `Extension::execute_command("bind_device")` | `Extension::stream_capability()` + `init_session` |
 | 推理触发 | 设备 image metric 更新事件 | 帧循环 OS 线程主动驱动 |
@@ -427,7 +427,7 @@ sequenceDiagram
 
 ### 3.7 YoloDetector 懒加载
 
-`YoloDetector` 封装 usls::models::YOLO，采用与 #2 相同的懒加载模式：`Option<YOLO>` + `load_attempted` 双字段编码四态状态机。查看 detector 主体：[`src/detector.rs` L1-L80](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/yolo-video-v2/src/detector.rs#L1-L80)。`auto_device()` 优先 CoreML（macOS）/ CUDA（Linux）/ CPU，`with_device_fallback` 在 GPU 不可用时回退 CPU。`setup_native_lib_paths` 在加载模型前设置 `DYLD_LIBRARY_PATH` / `LD_LIBRARY_PATH` / `PATH`，确保 ONNX Runtime dylib 能被定位（[`src/detector.rs` L63-L80](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/yolo-video-v2/src/detector.rs#L63-L80)）。
+`YoloDetector` 封装 usls::models::YOLO，采用与 2 相同的懒加载模式：`Option<YOLO>` + `load_attempted` 双字段编码四态状态机。查看 detector 主体：[`src/detector.rs` L1-L80](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/yolo-video-v2/src/detector.rs#L1-L80)。`auto_device()` 优先 CoreML（macOS）/ CUDA（Linux）/ CPU，`with_device_fallback` 在 GPU 不可用时回退 CPU。`setup_native_lib_paths` 在加载模型前设置 `DYLD_LIBRARY_PATH` / `LD_LIBRARY_PATH` / `PATH`，确保 ONNX Runtime dylib 能被定位（[`src/detector.rs` L63-L80](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/yolo-video-v2/src/detector.rs#L63-L80)）。
 
 ```rust
 // detector.rs L63-L80 (setup_native_lib_paths summary)
@@ -593,7 +593,7 @@ fn produce_metrics(&self) -> Result<Vec<ExtensionMetricValue>> {
   "entrypoint": "yolo-video-v2-components.umd.cjs"
 }
 ```
-[Source: metadata.json L32-L37](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/yolo-video-v2/metadata.json#L32-L37)：(1) 接收 `image_jpeg` chunk 渲染到 `<img>` 或 canvas；(2) 解析 metadata JSON 中的 `detections` / `roi_stats` / `line_stats` / `capture_events` 绘制叠加层；(3) 发送 `start_stream` / `stop_stream` / `update_stream_config` 命令。前端契约是「JPEG 帧 + JSON metadata 并行推送」，这与 #2 的「虚拟指标 + data URI」截然不同。
+[Source: metadata.json L32-L37](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/yolo-video-v2/metadata.json#L32-L37)：(1) 接收 `image_jpeg` chunk 渲染到 `<img>` 或 canvas；(2) 解析 metadata JSON 中的 `detections` / `roi_stats` / `line_stats` / `capture_events` 绘制叠加层；(3) 发送 `start_stream` / `stop_stream` / `update_stream_config` 命令。前端契约是「JPEG 帧 + JSON metadata 并行推送」，这与 2 的「虚拟指标 + data URI」截然不同。
 
 ### 与 stream-player 扩展的协作
 
@@ -751,12 +751,12 @@ commit `60e4e5b` 把 ffmpeg-next 从 v7 升级到 v8（注意：当前 `Cargo.to
 
 ### 与其他案例的关系定位
 
-- **#1 weather-forecast-v2**：最简单的同步扩展（HTTP pull + 指标产出），是理解 NeoMind 扩展基础模型的起点。
-- **#2 yolo-device-inference**：AI 推理 + 同步能力桥（event-driven pull），是 #3 的「低频版本」。
-- **#3 yolo-video-v2（本案例）**：AI 推理 + Push 流模式（高频主动推送），是 #2 的「流式升级」。
-- **#4 onvif-bridge / #5 uink-rms-bridge**：协议桥接扩展，关注设备接入而非 AI 推理。
-- **#6 metric_card**：纯前端组件扩展，不涉及后端逻辑。
-- **#7 ne101_camera（旗舰案例）**：端到端摄像头产品案例，会综合用到 #2（设备推理）和 #3（流式分析）的能力。
+- **1 weather-forecast-v2**：最简单的同步扩展（HTTP pull + 指标产出），是理解 NeoMind 扩展基础模型的起点。
+- **2 yolo-device-inference**：AI 推理 + 同步能力桥（event-driven pull），是 3 的「低频版本」。
+- **3 yolo-video-v2（本案例）**：AI 推理 + Push 流模式（高频主动推送），是 2 的「流式升级」。
+- **4 onvif-bridge / 5 uink-rms-bridge**：协议桥接扩展，关注设备接入而非 AI 推理。
+- **6 metric_card**：纯前端组件扩展，不涉及后端逻辑。
+- **7 ne101_camera（旗舰案例）**：端到端摄像头产品案例，会综合用到 #2（设备推理）和 #3（流式分析）的能力。
 
 ### 推荐阅读顺序
 
@@ -764,7 +764,7 @@ commit `60e4e5b` 把 ffmpeg-next 从 v7 升级到 v8（注意：当前 `Cargo.to
 
 ### 延伸到 ne101_camera
 
-案例 #7 ne101_camera（旗舰案例，即将发布）会展示一个真实的摄像头产品如何同时使用 #2（设备绑定推理）和 #3（RTSP 流式分析）——ne101 设备的图像指标走 #2 的 event-driven 路径，而 ne101 的 RTSP 直播流走 #3 的 Push 路径。理解本案例的 `init_session` → `start_push` → 帧循环 → `send_push_output` 链路是阅读 #7 的前置条件。
+案例 7 ne101_camera（旗舰案例，即将发布）会展示一个真实的摄像头产品如何同时使用 #2（设备绑定推理）和 #3（RTSP 流式分析）——ne101 设备的图像指标走 2 的 event-driven 路径，而 ne101 的 RTSP 直播流走 3 的 Push 路径。理解本案例的 `init_session` → `start_push` → 帧循环 → `send_push_output` 链路是阅读 7 的前置条件。
 
 ### 小结
 

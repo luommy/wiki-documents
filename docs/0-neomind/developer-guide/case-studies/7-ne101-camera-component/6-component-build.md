@@ -71,7 +71,7 @@ return {
 
 Source: [`manifest.json` L38-L39](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L38-L39)
 
-**为什么同时暴露 `default` 和 `NE101CameraPanel` 两个键**：这是向前兼容的保险。新版 Dashboard 加载器读 `export_name`（命名导出），旧版加载器（v1.x 时代）读 `default`。两个键指向同一个函数引用，多占的只是一个指针（几字节），但避免了「升级 manifest 的 `export_name` 字段后旧版平台白屏」的破坏性变更。metric_card（[#6 metric_card](../6-metric-card-component.md)）也采用了同样的双暴露策略。
+**为什么同时暴露 `default` 和 `NE101CameraPanel` 两个键**：这是向前兼容的保险。新版 Dashboard 加载器读 `export_name`（命名导出），旧版加载器（v1.x 时代）读 `default`。两个键指向同一个函数引用，多占的只是一个指针（几字节），但避免了「升级 manifest 的 `export_name` 字段后旧版平台白屏」的破坏性变更。metric_card（[6 metric_card](../6-metric-card-component.md)）也采用了同样的双暴露策略。
 
 **`ConfigPanel` 和 `AdvancedPanel` 的导出语义**：这两个键映射到平台 ComponentConfigDialog 的两个 tab。平台的配置对话框约定：如果一个组件的 bundle 对象上存在 `ConfigPanel` 键，就把它渲染到「Display」tab；如果存在 `AdvancedPanel` 键，就渲染到「Advanced」tab。主组件（`NE101CameraPanel`）渲染在网格里，与配置对话框是分离的两个渲染上下文——这就是为什么它们必须是独立的导出键，而不能是主组件的子组件。
 
@@ -257,7 +257,7 @@ graph TB
 
 ---
 
-## 6.4 React Hooks 在 IIFE 中的陷阱 #1：Hooks 顺序
+## 6.4 React Hooks 在 IIFE 中的陷阱 1：Hooks 顺序
 
 React 的 Rules of Hooks 规定：**hooks 必须在组件函数的顶层调用，不能放在条件语句、循环、嵌套函数里**。这条规则的本质是 React 内部用「调用顺序索引」来追踪每个 hook 的状态——如果某次渲染调用了 3 个 hooks、下次渲染调用了 4 个，索引就会错位，React 报错 #310（"Rendered more hooks than during the previous render"）或更隐晦的 state 错乱。
 
@@ -294,7 +294,7 @@ var setEditingIdx = editingIdxState[1];
 
 ---
 
-## 6.5 React Hooks 在 IIFE 中的陷阱 #2：Frozen Input
+## 6.5 React Hooks 在 IIFE 中的陷阱 2：Frozen Input
 
 第二个 hooks 陷阱比第一个更隐蔽——它不会让 React 崩溃，而是让**输入框看起来冻结了**（用户打字但框里不显示）。这个 bug 的修复经历了两次迭代，涉及两个 commit：[`44f1fa5`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/44f1fa5)（`fix(ne101_camera): input fields frozen — use local state instead of shared composingRef`）和 [`b060a25`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/b060a25)（`fix(ne101_camera): React error #310 — use defaultValue instead of hooks in imeInput`）。
 

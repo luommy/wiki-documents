@@ -5,7 +5,7 @@ tags: [NeoMind, case-study, protocol-bridge]
 sidebar_label: "4. onvif-bridge"
 ---
 
-# #4 onvif-bridge: Standard Protocol Bridge
+# 4 onvif-bridge: Standard Protocol Bridge
 
 ## 1 Case Background
 
@@ -13,7 +13,7 @@ sidebar_label: "4. onvif-bridge"
 
 **What problem does it solve?** NeoMind's frontend needs unified management of heterogeneous IP cameras. If every vendor used its own SDK (Hikvision SDK, Dahua SDK, Tiandy SDK), the codebase would explode, maintenance costs would be prohibitive, and onboarding new vendors would take weeks. onvif-bridge wraps the ONVIF standard protocol into NeoMind's commands and metrics, so the frontend only needs to call unified commands like `discover` / `get_stream_uri` / `ptz_move` to operate any ONVIF-compliant camera. This is an **open-standard-driven integration strategy** — adapting to the protocol, not to the vendor.
 
-**Preview of comparison with #5 uink-rms-bridge**: [#5 uink-rms-bridge](./5-uink-rms-bridge.md) is a **vendor-proprietary protocol** bridge (closed SDK + private binary protocol), while onvif-bridge is a **standard protocol** bridge (open specification + SOAP/WS-Discovery). These two represent fundamentally different integration strategies in the NeoMind ecosystem — "standard protocol bridging" vs. "proprietary protocol bridging" — each with vastly different applicable scenarios, engineering complexity, and maintenance costs. Case #5 in this series will specifically compare these two strategies.
+**Preview of comparison with 5 uink-rms-bridge**: [5 uink-rms-bridge](./5-uink-rms-bridge.md) is a **vendor-proprietary protocol** bridge (closed SDK + private binary protocol), while onvif-bridge is a **standard protocol** bridge (open specification + SOAP/WS-Discovery). These two represent fundamentally different integration strategies in the NeoMind ecosystem — "standard protocol bridging" vs. "proprietary protocol bridging" — each with vastly different applicable scenarios, engineering complexity, and maintenance costs. Case 5 in this series will specifically compare these two strategies.
 
 **Relationship with NeoEyes camera product line**: NeoEyes NE101 / NE301 hardware devices partially support the ONVIF protocol stack, and onvif-bridge can serve as a universal integration path for these self-developed devices. When customers deploy a mix of NeoEyes cameras and third-party ONVIF cameras, onvif-bridge provides a unified management interface.
 
@@ -90,7 +90,7 @@ graph TB
 
 ### Architecture Comparison with AI Inference Extensions
 
-| Architecture Dimension | #2 yolo-device-inference | #3 yolo-video-v2 | **#4 onvif-bridge** |
+| Architecture Dimension | 2 yolo-device-inference | 3 yolo-video-v2 | **4 onvif-bridge** |
 |------------------------|--------------------------|-------------------|----------------------|
 | Core responsibility | Single-frame YOLO inference | Real-time video stream inference + detection | Standard protocol bridge (discovery + stream URL + PTZ) |
 | ONNX model | Yes | Yes | **No** |
@@ -446,7 +446,7 @@ sequenceDiagram
     NM-->>FE: PTZ command executed
 ```
 
-This sequence diagram reveals an important fact: onvif-bridge **never touches any video frames** throughout the entire chain. Its endpoint is returning an RTSP URL — all subsequent stream pulling, decoding, inference, and rendering are handled by other components (for example, [Case #3 yolo-video-v2](./3-yolo-video-v2.md) can consume this RTSP URL for real-time detection). This design ensures that protocol bridging and stream processing can evolve independently.
+This sequence diagram reveals an important fact: onvif-bridge **never touches any video frames** throughout the entire chain. Its endpoint is returning an RTSP URL — all subsequent stream pulling, decoding, inference, and rendering are handled by other components (for example, [Case 3 yolo-video-v2](./3-yolo-video-v2.md) can consume this RTSP URL for real-time detection). This design ensures that protocol bridging and stream processing can evolve independently.
 
 ---
 
@@ -490,7 +490,7 @@ This sequence diagram reveals an important fact: onvif-bridge **never touches an
 
 **Alternative**: Integrate `ffmpeg-next` inside the extension to directly pull RTSP streams and decode them into JPEG frames for frontend push.
 
-**Rationale**: (1) **Separation of concerns** — protocol bridging (SOAP/WS-Discovery) and video processing (RTSP pulling / H.264 decoding) are completely different engineering domains; mixing them in one extension would double the codebase and make independent testing difficult; (2) **Composability** — after the RTSP URL is returned to the frontend, it can be fed to [Case #3 yolo-video-v2](./3-yolo-video-v2.md) for real-time AI detection, played directly by a frontend `<video>` tag, or recorded by a third-party NVR — onvif-bridge should not constrain how the stream is consumed; (3) **Build artifact size** — not pulling in `ffmpeg-next` / `nokhwa` reduces the `.nep` package from approximately 15MB to 3MB, which is significant for edge deployment (bandwidth-constrained scenarios). The tradeoff is that users need to combine onvif-bridge + yolo-video-v2 themselves to achieve the "camera discovery + AI detection" end-to-end pipeline, but NeoMind's extension composition mechanism is designed exactly for this.
+**Rationale**: (1) **Separation of concerns** — protocol bridging (SOAP/WS-Discovery) and video processing (RTSP pulling / H.264 decoding) are completely different engineering domains; mixing them in one extension would double the codebase and make independent testing difficult; (2) **Composability** — after the RTSP URL is returned to the frontend, it can be fed to [Case 3 yolo-video-v2](./3-yolo-video-v2.md) for real-time AI detection, played directly by a frontend `<video>` tag, or recorded by a third-party NVR — onvif-bridge should not constrain how the stream is consumed; (3) **Build artifact size** — not pulling in `ffmpeg-next` / `nokhwa` reduces the `.nep` package from approximately 15MB to 3MB, which is significant for edge deployment (bandwidth-constrained scenarios). The tradeoff is that users need to combine onvif-bridge + yolo-video-v2 themselves to achieve the "camera discovery + AI detection" end-to-end pipeline, but NeoMind's extension composition mechanism is designed exactly for this.
 
 ---
 
@@ -571,7 +571,7 @@ fn produce_metrics(&self) -> Result<Vec<ExtensionMetricValue>> {
 
 ### End-to-End Collaboration with yolo-video-v2
 
-onvif-bridge and [Case #3 yolo-video-v2](./3-yolo-video-v2.md) form a classic end-to-end pipeline:
+onvif-bridge and [Case 3 yolo-video-v2](./3-yolo-video-v2.md) form a classic end-to-end pipeline:
 
 ```
 User: "Discover cameras and run YOLO detection on the video stream"
@@ -606,7 +606,7 @@ The [`metadata.json`](https://github.com/camthink-ai/NeoMind-Extensions/blob/mai
 }
 ```
 
-[Source: metadata.json L1-L12](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/metadata.json#L1-L12) The frontend renders device lists and PTZ control panels through the generic device-display component, without depending on any frontend code bundled with onvif-bridge. This contrasts sharply with [Case #3 yolo-video-v2](./3-yolo-video-v2.md) (which ships its own `YoloVideoDisplay` React component). The pure backend design reduces extension complexity, but at the cost of limited frontend UI customization.
+[Source: metadata.json L1-L12](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/metadata.json#L1-L12) The frontend renders device lists and PTZ control panels through the generic device-display component, without depending on any frontend code bundled with onvif-bridge. This contrasts sharply with [Case 3 yolo-video-v2](./3-yolo-video-v2.md) (which ships its own `YoloVideoDisplay` React component). The pure backend design reduces extension complexity, but at the cost of limited frontend UI customization.
 
 ---
 
@@ -825,7 +825,7 @@ src/
   types.rs        (78 lines)
 ```
 
-This contrasts sharply with [Case #2 yolo-device-inference](./2-yolo-device-inference.md) (`src/` contains 18 backup files) and [Case #3 yolo-video-v2](./3-yolo-video-v2.md) (`src/` contains multiple backup files). onvif-bridge likely remains clean because: (1) as a more recently developed extension (introduced together with BACnet/OPC-UA in commit `422ba8d`), it has not yet been polluted by multiple iterations; (2) protocol bridging code is more structured than AI inference code — each file has a single responsibility (SOAP / Discovery / PTZ / Types), making it less likely to produce temporary copies during refactoring. onvif-bridge serves as a **positive example** for source code governance — a clean `src/` directory ensures that `grep` / `rg` search results are not polluted by noise, making code reviews more focused.
+This contrasts sharply with [Case 2 yolo-device-inference](./2-yolo-device-inference.md) (`src/` contains 18 backup files) and [Case 3 yolo-video-v2](./3-yolo-video-v2.md) (`src/` contains multiple backup files). onvif-bridge likely remains clean because: (1) as a more recently developed extension (introduced together with BACnet/OPC-UA in commit `422ba8d`), it has not yet been polluted by multiple iterations; (2) protocol bridging code is more structured than AI inference code — each file has a single responsibility (SOAP / Discovery / PTZ / Types), making it less likely to produce temporary copies during refactoring. onvif-bridge serves as a **positive example** for source code governance — a clean `src/` directory ensures that `grep` / `rg` search results are not polluted by noise, making code reviews more focused.
 
 ### Troubleshooting Quick Reference
 
@@ -855,9 +855,9 @@ This contrasts sharply with [Case #2 yolo-device-inference](./2-yolo-device-infe
 
 ### Preview: Comparison with uink-rms-bridge
 
-The **standard protocol bridge** strategy represented by onvif-bridge and the **vendor-proprietary protocol bridge** strategy represented by [#5 uink-rms-bridge](./5-uink-rms-bridge.md) are two fundamentally different integration paths in the NeoMind ecosystem:
+The **standard protocol bridge** strategy represented by onvif-bridge and the **vendor-proprietary protocol bridge** strategy represented by [5 uink-rms-bridge](./5-uink-rms-bridge.md) are two fundamentally different integration paths in the NeoMind ecosystem:
 
-| Dimension | #4 onvif-bridge (Standard) | #5 uink-rms-bridge (Proprietary) |
+| Dimension | 4 onvif-bridge (Standard) | 5 uink-rms-bridge (Proprietary) |
 |-----------|----------------------------|----------------------------------|
 | Protocol source | ONVIF open specification | Vendor private SDK |
 | Compatibility | Any Profile S device | Specific vendor models only |
@@ -865,7 +865,7 @@ The **standard protocol bridge** strategy represented by onvif-bridge and the **
 | Maintenance cost | Stable protocol spec, low cost | SDK version lock-in, high cost |
 | Feature coverage | Discovery + streaming + PTZ (standard scope) | Vendor-extended features (potentially more) |
 
-A detailed comparison will be presented in [Case #5](./5-uink-rms-bridge.md). Recommended reading order: **read #4 (standard protocol) first, then #5 (proprietary protocol)** to form a complete understanding from "open" to "closed."
+A detailed comparison will be presented in [Case #5](./5-uink-rms-bridge.md). Recommended reading order: **read 4 (standard protocol) first, then 5 (proprietary protocol)** to form a complete understanding from "open" to "closed."
 
 ### ONVIF Specification References
 
@@ -881,7 +881,7 @@ onvif-bridge implements complete ONVIF Profile S core capabilities in approximat
 
 From a source code governance perspective, onvif-bridge's `src/` directory (5 files, zero backup files) is the cleanest case study in this series and can serve as a positive reference for code hygiene.
 
-Recommended reading order: [Overview](./0-overview.md) → [Case #2 yolo-device-inference](./2-yolo-device-inference.md) → [Case #3 yolo-video-v2](./3-yolo-video-v2.md) → **this article (#4 onvif-bridge)** → [Case #5 uink-rms-bridge](./5-uink-rms-bridge.md).
+Recommended reading order: [Overview](./0-overview.md) → [Case 2 yolo-device-inference](./2-yolo-device-inference.md) → [Case 3 yolo-video-v2](./3-yolo-video-v2.md) → **this article (4 onvif-bridge)** → [Case 5 uink-rms-bridge](./5-uink-rms-bridge.md).
 
 ---
 

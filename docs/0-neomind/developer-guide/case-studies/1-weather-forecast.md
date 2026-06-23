@@ -5,7 +5,7 @@ tags: [NeoMind, 案例, 数据型扩展]
 sidebar_label: "1. weather-forecast-v2"
 ---
 
-# #1 weather-forecast-v2：入门数据型扩展
+# 1 weather-forecast-v2：入门数据型扩展
 
 ## 1 案例背景
 
@@ -522,7 +522,7 @@ weather-forecast-v2 是纯 Rust + HTTP，没有 C 依赖，5 个 target 都能�
 
 - [共享工程标准附录](./appendix-standards.md) —— metadata schema、capability、版本一致性、构建矩阵的完整参考
 - [案例集总览](./0-overview.md) —— 7 个案例的索引和 4 条阅读路径
-- [#6 metric_card 组件案例](./6-metric-card-component.md) —— 下一个入门案例：仪表板组件范本
+- [6 metric_card 组件案例](./6-metric-card-component.md) —— 下一个入门案例：仪表板组件范本
 - [扩展 API 通用参考](../7-extension-development.md) —— `Extension` trait、宏、capability 的 API 文档
 - [源代码](https://github.com/camthink-ai/NeoMind-Extensions/tree/main/extensions/weather-forecast-v2) —— GitHub 仓库完整源码
 

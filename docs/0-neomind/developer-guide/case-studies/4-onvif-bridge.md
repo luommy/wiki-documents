@@ -5,7 +5,7 @@ tags: [NeoMind, 案例, 协议桥接]
 sidebar_label: "4. onvif-bridge"
 ---
 
-# #4 onvif-bridge：标准协议桥接
+# 4 onvif-bridge：标准协议桥接
 
 ## 1 案例背景
 
@@ -13,7 +13,7 @@ sidebar_label: "4. onvif-bridge"
 
 **它解决了什么问题？** NeoMind 的前端需要统一管理异构 IP 摄像头。如果每个厂商都用自己的 SDK（海康 SDK、大华 SDK、Tiandy SDK），代码量爆炸、维护成本高、新厂商接入周期长。onvif-bridge 把 ONVIF 标准协议封装为 NeoMind 的命令和指标，前端只需调用 `discover` / `get_stream_uri` / `ptz_move` 等统一命令，就能操作任何 ONVIF 兼容摄像头。这是**开放标准驱动的集成策略**——不是适配厂商，而是适配协议。
 
-**与 #5 uink-rms-bridge 的对比预告**：[#5 uink-rms-bridge](./5-uink-rms-bridge.md) 是**厂商专有协议**（封闭 SDK + 私有二进制协议），onvif-bridge 是**标准协议**（开放规范 + SOAP/WS-Discovery）。两者代表 NeoMind 生态中两种截然不同的集成策略——「标准协议桥接」vs「专有协议桥接」——各自的适用场景、工程复杂度、维护成本差异巨大。本系列 #5 会专门对比这两种策略。
+**与 5 uink-rms-bridge 的对比预告**：[5 uink-rms-bridge](./5-uink-rms-bridge.md) 是**厂商专有协议**（封闭 SDK + 私有二进制协议），onvif-bridge 是**标准协议**（开放规范 + SOAP/WS-Discovery）。两者代表 NeoMind 生态中两种截然不同的集成策略——「标准协议桥接」vs「专有协议桥接」——各自的适用场景、工程复杂度、维护成本差异巨大。本系列 5 会专门对比这两种策略。
 
 **与 NeoEyes 摄像头产品线的关系**：NeoEyes NE101 / NE301 等硬件设备部分支持 ONVIF 协议栈，onvif-bridge 也可以作为这些自研设备的通用接入路径。当客户混部 NeoEyes 摄像头和第三方 ONVIF 摄像头时，onvif-bridge 提供统一的管理面板。
 
@@ -90,7 +90,7 @@ graph TB
 
 ### 与 AI 推理扩展的架构对比
 
-| 架构维度 | #2 yolo-device-inference | #3 yolo-video-v2 | **#4 onvif-bridge** |
+| 架构维度 | 2 yolo-device-inference | 3 yolo-video-v2 | **4 onvif-bridge** |
 |----------|--------------------------|-------------------|----------------------|
 | 核心职责 | 单帧 YOLO 推理 | 实时视频流推理 + 检测 | 标准协议桥接（发现 + 取流 URL + PTZ） |
 | ONNX 模型 | 有 | 有 | **无** |
@@ -446,7 +446,7 @@ sequenceDiagram
     NM-->>FE: PTZ 命令已执行
 ```
 
-这个时序图揭示了一个重要事实：onvif-bridge 在整个链路中**不触碰任何视频帧**。它的终点是返回一个 RTSP URL——后续的拉流、解码、推理、渲染全部由其他组件完成（例如 [案例 #3 yolo-video-v2](./3-yolo-video-v2.md) 可以消费这个 RTSP URL 跑实时检测）。这种设计保证了协议桥接和流处理可以独立演进。
+这个时序图揭示了一个重要事实：onvif-bridge 在整个链路中**不触碰任何视频帧**。它的终点是返回一个 RTSP URL——后续的拉流、解码、推理、渲染全部由其他组件完成（例如 [案例 3 yolo-video-v2](./3-yolo-video-v2.md) 可以消费这个 RTSP URL 跑实时检测）。这种设计保证了协议桥接和流处理可以独立演进。
 
 ---
 
@@ -490,7 +490,7 @@ sequenceDiagram
 
 **替代方案**：在扩展内集成 `ffmpeg-next`，直接拉取 RTSP 流并解码为 JPEG 帧推送给前端。
 
-**理由**：(1) **职责分离**——协议桥接（SOAP/WS-Discovery）和视频处理（RTSP 拉流 / H.264 解码）是完全不同的工程领域，混在一个扩展里会导致代码量翻倍且难以独立测试；(2) **可组合性**——RTSP URL 返回给前端后，可以交给 [案例 #3 yolo-video-v2](./3-yolo-video-v2.md) 跑实时 AI 检测，也可以交给前端 `<video>` 标签直接播放，或者交给第三方 NVR 录像——onvif-bridge 不应该限制流的消费方式；(3) **编译产物体积**——不引入 `ffmpeg-next` / `nokhwa`，`.nep` 包从约 15MB 降到约 3MB，对边缘部署（带宽受限场景）意义重大。权衡的代价是用户需要自行组合 onvif-bridge + yolo-video-v2 才能实现「摄像头发现 + AI 检测」端到端链路，但 NeoMind 的扩展组合机制正是为此设计的。
+**理由**：(1) **职责分离**——协议桥接（SOAP/WS-Discovery）和视频处理（RTSP 拉流 / H.264 解码）是完全不同的工程领域，混在一个扩展里会导致代码量翻倍且难以独立测试；(2) **可组合性**——RTSP URL 返回给前端后，可以交给 [案例 3 yolo-video-v2](./3-yolo-video-v2.md) 跑实时 AI 检测，也可以交给前端 `<video>` 标签直接播放，或者交给第三方 NVR 录像——onvif-bridge 不应该限制流的消费方式；(3) **编译产物体积**——不引入 `ffmpeg-next` / `nokhwa`，`.nep` 包从约 15MB 降到约 3MB，对边缘部署（带宽受限场景）意义重大。权衡的代价是用户需要自行组合 onvif-bridge + yolo-video-v2 才能实现「摄像头发现 + AI 检测」端到端链路，但 NeoMind 的扩展组合机制正是为此设计的。
 
 ---
 
@@ -571,7 +571,7 @@ fn produce_metrics(&self) -> Result<Vec<ExtensionMetricValue>> {
 
 ### 与 yolo-video-v2 的端到端协作
 
-onvif-bridge 和 [案例 #3 yolo-video-v2](./3-yolo-video-v2.md) 构成了一条经典的端到端链路：
+onvif-bridge 和 [案例 3 yolo-video-v2](./3-yolo-video-v2.md) 构成了一条经典的端到端链路：
 
 ```
 用户: "发现摄像头并对视频流跑 YOLO 检测"
@@ -606,7 +606,7 @@ Agent 调用 yolo-video-v2.start_stream(source_url="rtsp://192.168.1.100:554/...
 }
 ```
 
-[Source: metadata.json L1-L12](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/metadata.json#L1-L12)前端通过通用的 device-display 组件渲染设备列表和 PTZ 控制面板，不依赖 onvif-bridge 自带的任何前端代码。这与 [案例 #3 yolo-video-v2](./3-yolo-video-v2.md)（自带 `YoloVideoDisplay` React 组件）形成鲜明对比。纯后端设计降低了扩展的复杂度，但代价是前端 UI 的定制性受限。
+[Source: metadata.json L1-L12](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/metadata.json#L1-L12)前端通过通用的 device-display 组件渲染设备列表和 PTZ 控制面板，不依赖 onvif-bridge 自带的任何前端代码。这与 [案例 3 yolo-video-v2](./3-yolo-video-v2.md)（自带 `YoloVideoDisplay` React 组件）形成鲜明对比。纯后端设计降低了扩展的复杂度，但代价是前端 UI 的定制性受限。
 
 ---
 
@@ -825,7 +825,7 @@ src/
   types.rs        (78 行)
 ```
 
-这与 [案例 #2 yolo-device-inference](./2-yolo-device-inference.md)（`src/` 含 18 个备份文件）和 [案例 #3 yolo-video-v2](./3-yolo-video-v2.md)（`src/` 含多个备份文件）形成了鲜明对比。onvif-bridge 之所以保持干净，可能是因为：(1) 作为较新开发的扩展（与 BACnet/OPC-UA 一同在 commit `422ba8d` 引入），尚未经历多轮迭代污染；(2) 协议桥接代码比 AI 推理代码更结构化——每个文件职责单一（SOAP / Discovery / PTZ / Types），重构时不容易产生临时副本。onvif-bridge 可以作为**源码治理的正例**——干净的 `src/` 目录让 `grep` / `rg` 的搜索结果不被噪音污染，让代码审查更聚焦。
+这与 [案例 2 yolo-device-inference](./2-yolo-device-inference.md)（`src/` 含 18 个备份文件）和 [案例 3 yolo-video-v2](./3-yolo-video-v2.md)（`src/` 含多个备份文件）形成了鲜明对比。onvif-bridge 之所以保持干净，可能是因为：(1) 作为较新开发的扩展（与 BACnet/OPC-UA 一同在 commit `422ba8d` 引入），尚未经历多轮迭代污染；(2) 协议桥接代码比 AI 推理代码更结构化——每个文件职责单一（SOAP / Discovery / PTZ / Types），重构时不容易产生临时副本。onvif-bridge 可以作为**源码治理的正例**——干净的 `src/` 目录让 `grep` / `rg` 的搜索结果不被噪音污染，让代码审查更聚焦。
 
 ### 排障速查表
 
@@ -855,9 +855,9 @@ src/
 
 ### 与 uink-rms-bridge 的对比预告
 
-onvif-bridge 代表的**标准协议桥接**策略与 [#5 uink-rms-bridge](./5-uink-rms-bridge.md) 代表的**厂商专有协议桥接**策略，是 NeoMind 生态中两种根本不同的集成路径：
+onvif-bridge 代表的**标准协议桥接**策略与 [5 uink-rms-bridge](./5-uink-rms-bridge.md) 代表的**厂商专有协议桥接**策略，是 NeoMind 生态中两种根本不同的集成路径：
 
-| 维度 | #4 onvif-bridge（标准） | #5 uink-rms-bridge（专有） |
+| 维度 | 4 onvif-bridge（标准） | 5 uink-rms-bridge（专有） |
 |------|--------------------------|------------------------------|
 | 协议来源 | ONVIF 开放规范 | 厂商私有 SDK |
 | 兼容性 | 任何 Profile S 设备 | 仅特定厂商型号 |
@@ -881,7 +881,7 @@ onvif-bridge 在约 2700 行 Rust 代码中实现了完整的 ONVIF Profile S �
 
 从源码治理角度看，onvif-bridge 的 `src/` 目录（5 个文件，零备份文件）是本系列中最干净的案例，可以作为代码卫生的正例参照。
 
-推荐阅读顺序：[总览](./0-overview.md) → [案例 #2 yolo-device-inference](./2-yolo-device-inference.md) → [案例 #3 yolo-video-v2](./3-yolo-video-v2.md) → **本文（#4 onvif-bridge）** → [案例 #5 uink-rms-bridge](./5-uink-rms-bridge.md)。
+推荐阅读顺序：[总览](./0-overview.md) → [案例 2 yolo-device-inference](./2-yolo-device-inference.md) → [案例 3 yolo-video-v2](./3-yolo-video-v2.md) → **本文（4 onvif-bridge）** → [案例 5 uink-rms-bridge](./5-uink-rms-bridge.md)。
 
 ---
 
