@@ -30,6 +30,14 @@ var NE101CameraPanel = (function () {
 
 IIFE 的最后一行是闭包的收尾和导出，位于 [`bundle.js` L1971-L1972](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1971-L1972)：`return { default: NE101CameraPanel, ... };` 紧跟 `})();`。`return` 的对象被赋值给 `var NE101CameraPanel`，再由平台的 `<script>` 加载器挂到 `window.NE101CameraPanel`。IIFE 内部所有 `function` / `var` 声明都被闭包作用域保护，不泄漏到 `window` 上——这是 IIFE 替代模块系统的核心价值：**零依赖的私有命名空间**。
 
+```js
+// bundle.js L1971-L1972
+return { default: NE101CameraPanel, NE101CameraPanel: NE101CameraPanel, ConfigPanel: ConfigPanel, AdvancedPanel: AdvancedPanel };
+})();
+```
+
+Source: [`bundle.js` L1971-L1972](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1971-L1972)
+
 **设计决策：IIFE + 全局注入 vs ESM bundle vs UMD**
 
 - **选择**：`var Name = (function(){ var React = window.React; ... })()` 的 IIFE + 全局注入范式。
@@ -54,6 +62,14 @@ return {
 ```
 
 这个对象有四个键，对应平台加载器的两种寻址方式。`manifest.json` 的 [`global_name`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L38-L38) 字段（`"NE101CameraPanel"`）告诉平台「这个 bundle 挂在 `window.NE101CameraPanel` 上」，而 [`export_name`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L39-L39) 字段（同为 `"NE101CameraPanel"`）告诉平台「从那个对象上取 `NE101CameraPanel` 键的值作为主组件」。平台的组件加载器伪代码如下：先按 `global_name` 从 `window` 取到 bundle 对象，再从对象上按 `export_name`（或 `default`，取决于加载器版本）取到组件函数。
+
+```js
+// manifest.json L38-L39
+"global_name": "NE101CameraPanel",
+"export_name": "NE101CameraPanel"
+```
+
+Source: [`manifest.json` L38-L39](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L38-L39)
 
 **为什么同时暴露 `default` 和 `NE101CameraPanel` 两个键**：这是向前兼容的保险。新版 Dashboard 加载器读 `export_name`（命名导出），旧版加载器（v1.x 时代）读 `default`。两个键指向同一个函数引用，多占的只是一个指针（几字节），但避免了「升级 manifest 的 `export_name` 字段后旧版平台白屏」的破坏性变更。metric_card（[#6 metric_card](../6-metric-card-component.md)）也采用了同样的双暴露策略。
 
@@ -103,6 +119,111 @@ graph LR
 3. **Main component 层**（[L472-L1319](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L472-L1319)）：`NE101CameraPanel(props)` —— 主组件，包含所有 hooks、effects、JSX 渲染逻辑。847 行，是五层中最重的一层。
 4. **Shared UI 层**（[L1321-L1348](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1321-L1348)）：shadcn CSS 类常量（`INPUT_CLS` / `LABEL_CLS` / `FIELD_CLS` / `DESC_CLS`）+ `SwitchControl` 按钮工厂。
 5. **Settings panels 层**（[L1353-L1969](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1353-L1969)）：`ConfigPanel`（Display tab，5 行空壳）、`AdvancedPanel`（Advanced tab，522 行重逻辑）、`ExtDropdown`（shadcn 风格下拉框）、`imeInput`（uncontrolled 输入工厂）。
+
+以下是每一层的代表性代码片段（因完整代码超过 1900 行，仅展示每层的开头几行）：
+
+```js
+// Layer 1: Helper 层 L7-L45（纯函数工具集）
+function batteryMeta(level) {
+  if (level == null) return { bar: 'rgba(128,128,128,0.3)' };
+  if (level > 60) return { bar: 'rgba(34,197,94,0.8)' };
+  if (level > 20) return { bar: 'rgba(234,179,8,0.8)' };
+  return { bar: 'rgba(239,68,68,0.8)' };
+}
+
+function formatValue(val, metric) {
+  if (val == null) return '--';
+  var dt = (metric && metric.data_type) || '';
+  if (dt === 'Integer') return typeof val === 'number' ? Math.round(val).toLocaleString() : String(val);
+  if (dt === 'Float') return typeof val === 'number' ? val.toFixed(1) : String(val);
+  return String(val);
+}
+// ... (178 lines omitted) ...
+```
+
+Source: [`bundle.js` L7-L230](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L7-L230)
+
+```js
+// Layer 2: Template 引擎层 L239-L267（generateTransformJsCode 开头）
+function generateTransformJsCode(pipe) {
+  var extensionId = pipe.extId;
+  if (extensionId.indexOf('virtual') === 0) {
+    extensionId = extensionId.replace(/^virtual[._-]/, '');
+  }
+  var templateName = pipe.template;
+  var mode = getExtMode(extensionId, templateName);
+  if (!mode) return '';
+
+  var extKey = extensionId.replace(/-/g, '_');
+  var pfx = extKey + '.';
+  var imageArg = mode.imageArg;
+  var hasCats = (mode.args || []).indexOf('categories') >= 0 && pipe.categories;
+  // ... (189 lines omitted) ...
+}
+```
+
+Source: [`bundle.js` L239-L456](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L239-L456)
+
+```js
+// Layer 3: Main component 层 L472-L495（NE101CameraPanel 开头）
+function NE101CameraPanel(props) {
+  var config = props.config || {};
+  var showCommands = config.showCommands !== false;
+  var location = props.title || config.displayTitle || config.location || '';
+
+  var deviceCtx = props.deviceContext;
+  var device = deviceCtx && deviceCtx.device;
+  var deviceType = deviceCtx && deviceCtx.deviceType;
+  var sendCmd = props.sendDeviceCommand;
+
+  var cmdState = React.useState({});
+  var cmdLoading = cmdState[0];
+  var setCmdLoading = cmdState[1];
+  // ... (824 lines omitted) ...
+}
+```
+
+Source: [`bundle.js` L472-L1319](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L472-L1319)
+
+```js
+// Layer 4: Shared UI 层 L1321-L1348（CSS 类常量 + SwitchControl）
+var INPUT_CLS = 'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50';
+var LABEL_CLS = 'text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70';
+var FIELD_CLS = 'flex flex-col gap-1.5';
+var DESC_CLS = 'text-sm text-muted-foreground';
+
+function SwitchControl(checked, onChangeFn) {
+  var state = checked ? 'checked' : 'unchecked';
+  return jsx('button', {
+    type: 'button', role: 'switch', 'data-state': state,
+    'aria-checked': String(checked), onClick: onChangeFn,
+    className: 'peer inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input',
+    children: jsx('span', { 'data-state': state, className: 'pointer-events-none block h-5 w-5 rounded-full bg-background shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0' })
+  });
+}
+```
+
+Source: [`bundle.js` L1321-L1348](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1321-L1348)
+
+```js
+// Layer 5: Settings panels 层 L1353-L1369（ConfigPanel + ROI_ACTIONS + ExtDropdown 开头）
+function ConfigPanel(props) {
+  return jsx('div', { className: 'space-y-3', children: null });
+}
+
+var ROI_ACTIONS = [
+  { id: 'count', label: 'Count Only', desc: 'Show all detections, count per ROI' },
+  { id: 'filter', label: 'Inside Only', desc: 'Only show detections inside ROI' },
+  { id: 'filter_outside', label: 'Outside Only', desc: 'Only show detections outside ROI' }
+];
+
+function ExtDropdown(props) {
+  var exts = props.extensions;
+  // ... (606 lines omitted) ...
+}
+```
+
+Source: [`bundle.js` L1353-L1969](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1353-L1969)
 
 **为什么这种分层能在没有构建步骤的情况下工作**：关键在于 JavaScript 的**函数提升（hoisting）**。IIFE 内部所有 `function foo() { ... }` 声明都会在 IIFE 求值时被提升到闭包顶部，因此第 5 层（L1353）的 `AdvancedPanel` 内部调用第 4 层（L1325）的 `INPUT_CLS` 常量、第 1 层（L57）的 `classColor` 函数时，不存在「先定义后使用」的顺序问题——它们都在同一个闭包作用域里。跨层调用就是普通的闭包内变量查找，不需要 ESM 的 `import` / `export` 解析，也不存在循环依赖（circular import）的风险，因为所有声明在 IIFE 求值时就已完成。
 
@@ -253,6 +374,45 @@ function ConfigPanel(props) {
 
 **AdvancedPanel：重逻辑的 Advanced tab**。查看源码起始：[`bundle.js` L1363-L1448](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1363-L1448)。`AdvancedPanel` 是整个 bundle 第二长的函数（522 行，仅次于主组件的 847 行），承载了 ne101_camera 的所有「配置复杂度」：AI 处理总开关（`SwitchControl`）、扩展选择（`ExtDropdown`）、模板/模式选择、类别过滤输入（`imeInput`）、短语输入、类别颜色过滤、ROI 开关 + 多边形编辑器（Canvas 画布上的拖拽点）、ROI 重叠阈值滑块（commit [`636a8ae`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/636a8ae)）、NMS IoU 阈值透传给 `locate-anything-v2`（commit [`8656148`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/8656148)）。
 
+```js
+// bundle.js L1363-L1448（AdvancedPanel 区域起始：ROI_ACTIONS + ExtDropdown）
+var ROI_ACTIONS = [
+  { id: 'count', label: 'Count Only', desc: 'Show all detections, count per ROI' },
+  { id: 'filter', label: 'Inside Only', desc: 'Only show detections inside ROI' },
+  { id: 'filter_outside', label: 'Outside Only', desc: 'Only show detections outside ROI' }
+];
+
+function ExtDropdown(props) {
+  var exts = props.extensions;
+  var value = props.value;
+  var onChangeFn = props.onChange;
+  var loading = props.loading;
+
+  var openSt = React.useState(false);
+  var open = openSt[0];
+  var setOpen = openSt[1];
+  var wrapRef = React.useRef(null);
+
+  React.useEffect(function () {
+    if (!open) return;
+    function handler(e) {
+      if (wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false);
+    }
+    document.addEventListener('mousedown', handler);
+    return function () { document.removeEventListener('mousedown', handler); }
+  }, [open]);
+  // ... (55 lines omitted) ...
+}
+
+function AdvancedPanel(props) {
+  var config = props.config || {};
+  var onChange = props.onChange;
+  // ... (519 lines omitted) ...
+}
+```
+
+Source: [`bundle.js` L1363-L1448](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1363-L1448)
+
 **ExtDropdown：shadcn 风格下拉框**。查看源码：[`bundle.js` L1371-L1446](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1371-L1446)。这是一个 76 行的自定义下拉框组件，替代原生 `<select>` 元素。用原生 `<select>` 会破坏 shadcn 设计系统的一致性（原生 select 的样式无法完全自定义，在 macOS 和 Windows 上表现不一）。`ExtDropdown` 用 `button` + 浮层 `div` 模拟下拉行为，所有 className 都匹配 shadcn Select 组件的 DOM 契约（`bg-popover` / `text-popover-foreground` / `shadow-md` / `rounded-md` / `border`）。它还支持 loading 态（显示 "Loading extensions..."）和外部点击关闭（`useEffect` + `document.addEventListener('mousedown', ...)`）。
 
 **设计决策：两个面板分工 vs 一个大表单**
@@ -285,7 +445,51 @@ var DESC_CLS = 'text-sm text-muted-foreground';
 
 **SwitchControl：用 `data-state` 触发 shadcn Switch 的 CSS 规则**。查看源码：[`L1334-L1348`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1334-L1348)。shadcn 的 Switch 组件用 `data-[state=checked]:bg-primary` 这个 Tailwind 变体来控制开关颜色——`data-state` 属性为 `checked` 时背景变为主题色，为 `unchecked` 时为输入框灰色。`SwitchControl` 手动构建了一个 `<button role="switch" data-state={checked ? 'checked' : 'unchecked'}>`，className 里包含 `data-[state=checked]:bg-primary data-[state=unchecked]:bg-input`，完全匹配 shadcn Switch 的 DOM 契约。Tailwind 编译器看到这些类名，生成的 CSS 规则与平台 Switch 组件完全一致。
 
+```js
+// bundle.js L1334-L1348
+function SwitchControl(checked, onChangeFn) {
+  var state = checked ? 'checked' : 'unchecked';
+  return jsx('button', {
+    type: 'button',
+    role: 'switch',
+    'data-state': state,
+    'aria-checked': String(checked),
+    onClick: onChangeFn,
+    className: 'peer inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input',
+    children: jsx('span', {
+      'data-state': state,
+      className: 'pointer-events-none block h-5 w-5 rounded-full bg-background shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0'
+    })
+  });
+}
+```
+
+Source: [`bundle.js` L1334-L1348](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1334-L1348)
+
 **ExtDropdown：同样的 `data-state` 驱动**。`ExtDropdown`（[L1371](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1371-L1446)）用相同的策略复刻 shadcn Select 的视觉——浮层的 `bg-popover` / `text-popover-foreground` / `shadow-md` 都是 shadcn Select 组件的标准类名。
+
+```js
+// bundle.js L1429-L1445（ExtDropdown 浮层渲染部分）
+return jsxs('div', { ref: wrapRef, className: 'relative', children: [
+  jsx('button', {
+    type: 'button',
+    className: INPUT_CLS + ' flex items-center justify-between cursor-pointer',
+    onClick: function () { setOpen(!open); },
+    children: jsxs('span', { className: 'flex items-center gap-2 w-full', children: [
+      jsx('span', { className: 'truncate flex-1 text-left', children: triggerLabel }),
+      // ... (1 line omitted: chevron svg) ...
+    ]})
+  }),
+  open && optItems.length > 0
+    ? jsx('div', {
+        className: 'absolute z-50 mt-1 w-full rounded-md border bg-popover text-popover-foreground shadow-md',
+        children: jsx('div', { className: 'p-1 max-h-48 overflow-y-auto', children: optItems })
+      })
+    : null
+]});
+```
+
+Source: [`bundle.js` L1371-L1446](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1371-L1446)
 
 **设计决策：CSS 类字符串复刻 vs 内联样式 vs 请求平台组件 API**
 

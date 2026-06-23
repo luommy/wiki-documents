@@ -30,6 +30,14 @@ The fundamental difference between this pattern and ESM-bundled components (Vite
 
 The last line of the IIFE is the closure's closing and export, at [`bundle.js` L1971-L1972](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1971-L1972): `return { default: NE101CameraPanel, ... };` followed by `})();`. The returned object is assigned to `var NE101CameraPanel`, which the platform's `<script>` loader then mounts onto `window.NE101CameraPanel`. All `function` and `var` declarations inside the IIFE are protected by the closure scope and do not leak to `window` — this is the core value of IIFE as a module substitute: **zero-dependency private namespace**.
 
+```js
+// bundle.js L1971-L1972
+return { default: NE101CameraPanel, NE101CameraPanel: NE101CameraPanel, ConfigPanel: ConfigPanel, AdvancedPanel: AdvancedPanel };
+})();
+```
+
+Source: [`bundle.js` L1971-L1972](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1971-L1972)
+
 **Design decision: IIFE + global injection vs ESM bundle vs UMD**
 
 - **Choice**: `var Name = (function(){ var React = window.React; ... })()` IIFE + global injection pattern.
@@ -54,6 +62,14 @@ return {
 ```
 
 This object has four keys, corresponding to two addressing modes of the platform loader. The [`global_name`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L38-L38) field in `manifest.json` (`"NE101CameraPanel"`) tells the platform "this bundle is mounted on `window.NE101CameraPanel`," while the [`export_name`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L39-L39) field (also `"NE101CameraPanel"`) tells the platform "from that object, read the `NE101CameraPanel` key's value as the main component." The platform component loader pseudocode: first fetch the bundle object from `window` by `global_name`, then read either `export_name` (named export) or `default` (depending on loader version) to get the component function.
+
+```js
+// manifest.json L38-L39
+"global_name": "NE101CameraPanel",
+"export_name": "NE101CameraPanel"
+```
+
+Source: [`manifest.json` L38-L39](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L38-L39)
 
 **Why expose both `default` and `NE101CameraPanel` keys**: this is a forward-compatibility insurance. The new Dashboard loader reads `export_name` (named export); the old loader (v1.x era) reads `default`. Both keys point to the same function reference, costing only a pointer (a few bytes), but avoiding the breaking change of "upgrading manifest's `export_name` field causing a white screen on older platforms." metric_card ([#6 metric_card](../6-metric-card-component.md)) adopts the same dual-exposure strategy.
 
@@ -103,6 +119,111 @@ The 1972-line IIFE is not a flat slab of code — it is organized into five laye
 3. **Main component layer** ([L472-L1319](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L472-L1319)): `NE101CameraPanel(props)` — the main component with all hooks, effects, and JSX rendering logic. 847 lines, the heaviest layer.
 4. **Shared UI layer** ([L1321-L1348](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1321-L1348)): shadcn CSS class constants (`INPUT_CLS` / `LABEL_CLS` / `FIELD_CLS` / `DESC_CLS`) + `SwitchControl` button factory.
 5. **Settings panels layer** ([L1353-L1969](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1353-L1969)): `ConfigPanel` (Display tab, 5-line stub), `AdvancedPanel` (Advanced tab, 522 lines of heavy logic), `ExtDropdown` (shadcn-style dropdown), `imeInput` (uncontrolled input factory).
+
+Below are representative code snippets for each layer (full code exceeds 1900 lines; only the opening lines of each layer are shown):
+
+```js
+// Layer 1: Helper layer L7-L45 (pure function toolset)
+function batteryMeta(level) {
+  if (level == null) return { bar: 'rgba(128,128,128,0.3)' };
+  if (level > 60) return { bar: 'rgba(34,197,94,0.8)' };
+  if (level > 20) return { bar: 'rgba(234,179,8,0.8)' };
+  return { bar: 'rgba(239,68,68,0.8)' };
+}
+
+function formatValue(val, metric) {
+  if (val == null) return '--';
+  var dt = (metric && metric.data_type) || '';
+  if (dt === 'Integer') return typeof val === 'number' ? Math.round(val).toLocaleString() : String(val);
+  if (dt === 'Float') return typeof val === 'number' ? val.toFixed(1) : String(val);
+  return String(val);
+}
+// ... (178 lines omitted) ...
+```
+
+Source: [`bundle.js` L7-L230](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L7-L230)
+
+```js
+// Layer 2: Template engine layer L239-L267 (generateTransformJsCode opening)
+function generateTransformJsCode(pipe) {
+  var extensionId = pipe.extId;
+  if (extensionId.indexOf('virtual') === 0) {
+    extensionId = extensionId.replace(/^virtual[._-]/, '');
+  }
+  var templateName = pipe.template;
+  var mode = getExtMode(extensionId, templateName);
+  if (!mode) return '';
+
+  var extKey = extensionId.replace(/-/g, '_');
+  var pfx = extKey + '.';
+  var imageArg = mode.imageArg;
+  var hasCats = (mode.args || []).indexOf('categories') >= 0 && pipe.categories;
+  // ... (189 lines omitted) ...
+}
+```
+
+Source: [`bundle.js` L239-L456](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L239-L456)
+
+```js
+// Layer 3: Main component layer L472-L495 (NE101CameraPanel opening)
+function NE101CameraPanel(props) {
+  var config = props.config || {};
+  var showCommands = config.showCommands !== false;
+  var location = props.title || config.displayTitle || config.location || '';
+
+  var deviceCtx = props.deviceContext;
+  var device = deviceCtx && deviceCtx.device;
+  var deviceType = deviceCtx && deviceCtx.deviceType;
+  var sendCmd = props.sendDeviceCommand;
+
+  var cmdState = React.useState({});
+  var cmdLoading = cmdState[0];
+  var setCmdLoading = cmdState[1];
+  // ... (824 lines omitted) ...
+}
+```
+
+Source: [`bundle.js` L472-L1319](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L472-L1319)
+
+```js
+// Layer 4: Shared UI layer L1321-L1348 (CSS class constants + SwitchControl)
+var INPUT_CLS = 'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50';
+var LABEL_CLS = 'text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70';
+var FIELD_CLS = 'flex flex-col gap-1.5';
+var DESC_CLS = 'text-sm text-muted-foreground';
+
+function SwitchControl(checked, onChangeFn) {
+  var state = checked ? 'checked' : 'unchecked';
+  return jsx('button', {
+    type: 'button', role: 'switch', 'data-state': state,
+    'aria-checked': String(checked), onClick: onChangeFn,
+    className: 'peer inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input',
+    children: jsx('span', { 'data-state': state, className: 'pointer-events-none block h-5 w-5 rounded-full bg-background shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0' })
+  });
+}
+```
+
+Source: [`bundle.js` L1321-L1348](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1321-L1348)
+
+```js
+// Layer 5: Settings panels layer L1353-L1369 (ConfigPanel + ROI_ACTIONS + ExtDropdown opening)
+function ConfigPanel(props) {
+  return jsx('div', { className: 'space-y-3', children: null });
+}
+
+var ROI_ACTIONS = [
+  { id: 'count', label: 'Count Only', desc: 'Show all detections, count per ROI' },
+  { id: 'filter', label: 'Inside Only', desc: 'Only show detections inside ROI' },
+  { id: 'filter_outside', label: 'Outside Only', desc: 'Only show detections outside ROI' }
+];
+
+function ExtDropdown(props) {
+  var exts = props.extensions;
+  // ... (606 lines omitted) ...
+}
+```
+
+Source: [`bundle.js` L1353-L1969](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1353-L1969)
 
 **Why this layering works without a build step**: the key is JavaScript's **function hoisting**. All `function foo() { ... }` declarations inside the IIFE are hoisted to the top of the closure when the IIFE is evaluated, so when layer 5 (L1353) `AdvancedPanel` internally calls layer 4 (L1325) `INPUT_CLS` constant or layer 1 (L57) `classColor` function, there is no "define before use" ordering issue — they are all in the same closure scope. Cross-layer calls are ordinary closure variable lookups, requiring no ESM `import` / `export` resolution, and there is no circular dependency risk because all declarations are completed at IIFE evaluation time.
 
@@ -253,6 +374,45 @@ This function is only 5 lines, returning an empty `<div>`. The reason is in the 
 
 **AdvancedPanel: the heavy-logic Advanced tab**. See source start: [`bundle.js` L1363-L1448](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1363-L1448). `AdvancedPanel` is the second-longest function in the entire bundle (522 lines, behind only the main component's 847), carrying all of ne101_camera's "configuration complexity": AI processing master switch (`SwitchControl`), extension selector (`ExtDropdown`), template/mode picker, category filter input (`imeInput`), phrase input, class color filter, ROI toggle + polygon editor (drag-and-drop points on a Canvas), ROI overlap threshold slider (commit [`636a8ae`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/636a8ae)), NMS IoU threshold passthrough to `locate-anything-v2` (commit [`8656148`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/8656148)).
 
+```js
+// bundle.js L1363-L1448 (AdvancedPanel region start: ROI_ACTIONS + ExtDropdown)
+var ROI_ACTIONS = [
+  { id: 'count', label: 'Count Only', desc: 'Show all detections, count per ROI' },
+  { id: 'filter', label: 'Inside Only', desc: 'Only show detections inside ROI' },
+  { id: 'filter_outside', label: 'Outside Only', desc: 'Only show detections outside ROI' }
+];
+
+function ExtDropdown(props) {
+  var exts = props.extensions;
+  var value = props.value;
+  var onChangeFn = props.onChange;
+  var loading = props.loading;
+
+  var openSt = React.useState(false);
+  var open = openSt[0];
+  var setOpen = openSt[1];
+  var wrapRef = React.useRef(null);
+
+  React.useEffect(function () {
+    if (!open) return;
+    function handler(e) {
+      if (wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false);
+    }
+    document.addEventListener('mousedown', handler);
+    return function () { document.removeEventListener('mousedown', handler); }
+  }, [open]);
+  // ... (55 lines omitted) ...
+}
+
+function AdvancedPanel(props) {
+  var config = props.config || {};
+  var onChange = props.onChange;
+  // ... (519 lines omitted) ...
+}
+```
+
+Source: [`bundle.js` L1363-L1448](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1363-L1448)
+
 **ExtDropdown: shadcn-style dropdown**. See source: [`bundle.js` L1371-L1446](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1371-L1446). This is a 76-line custom dropdown component replacing the native `<select>` element. Using native `<select>` would break the shadcn design system's visual consistency (native select styling cannot be fully customized and differs between macOS and Windows). `ExtDropdown` uses `button` + floating `div` to simulate dropdown behavior, with all classNames matching the shadcn Select component's DOM contract (`bg-popover` / `text-popover-foreground` / `shadow-md` / `rounded-md` / `border`). It also supports a loading state (displaying "Loading extensions...") and click-outside-to-close (`useEffect` + `document.addEventListener('mousedown', ...)`).
 
 **Design decision: two-panel division vs one big form**
@@ -285,7 +445,51 @@ var DESC_CLS = 'text-sm text-muted-foreground';
 
 **SwitchControl: using `data-state` to trigger shadcn Switch's CSS rules**. See source: [`L1334-L1348`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1334-L1348). shadcn's Switch component uses the Tailwind variant `data-[state=checked]:bg-primary` to control the switch color — when the `data-state` attribute is `checked`, the background becomes the theme primary color; when `unchecked`, it becomes the input gray. `SwitchControl` manually constructs a `<button role="switch" data-state={checked ? 'checked' : 'unchecked'}>`, with the className containing `data-[state=checked]:bg-primary data-[state=unchecked]:bg-input`, perfectly matching shadcn Switch's DOM contract. The Tailwind compiler sees these class names and generates CSS rules identical to the platform's Switch component.
 
+```js
+// bundle.js L1334-L1348
+function SwitchControl(checked, onChangeFn) {
+  var state = checked ? 'checked' : 'unchecked';
+  return jsx('button', {
+    type: 'button',
+    role: 'switch',
+    'data-state': state,
+    'aria-checked': String(checked),
+    onClick: onChangeFn,
+    className: 'peer inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input',
+    children: jsx('span', {
+      'data-state': state,
+      className: 'pointer-events-none block h-5 w-5 rounded-full bg-background shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0'
+    })
+  });
+}
+```
+
+Source: [`bundle.js` L1334-L1348](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1334-L1348)
+
 **ExtDropdown: same `data-state`-driven approach**. `ExtDropdown` ([L1371](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1371-L1446)) uses the same strategy to replicate shadcn Select's visual — the popover's `bg-popover` / `text-popover-foreground` / `shadow-md` are all standard shadcn Select class names.
+
+```js
+// bundle.js L1429-L1445 (ExtDropdown popover render section)
+return jsxs('div', { ref: wrapRef, className: 'relative', children: [
+  jsx('button', {
+    type: 'button',
+    className: INPUT_CLS + ' flex items-center justify-between cursor-pointer',
+    onClick: function () { setOpen(!open); },
+    children: jsxs('span', { className: 'flex items-center gap-2 w-full', children: [
+      jsx('span', { className: 'truncate flex-1 text-left', children: triggerLabel }),
+      // ... (1 line omitted: chevron svg) ...
+    ]})
+  }),
+  open && optItems.length > 0
+    ? jsx('div', {
+        className: 'absolute z-50 mt-1 w-full rounded-md border bg-popover text-popover-foreground shadow-md',
+        children: jsx('div', { className: 'p-1 max-h-48 overflow-y-auto', children: optItems })
+      })
+    : null
+]});
+```
+
+Source: [`bundle.js` L1371-L1446](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1371-L1446)
 
 **Design decision: CSS class string replica vs inline styles vs requesting a platform component API**
 
