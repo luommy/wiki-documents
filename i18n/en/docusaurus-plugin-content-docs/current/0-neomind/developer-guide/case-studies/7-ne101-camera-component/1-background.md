@@ -26,7 +26,16 @@ The device commands NE101 supports are the source of the component's command but
 
 The existence of these four command types further reinforces the 1.2 argument: a purely display-oriented component like metric_card cannot carry command-triggering capability at all; a dedicated device-bound component is required to render command buttons and call the device-command API.
 
-> **Source evidence**: the manifest's `description.en` literally says "displays latest capture, battery status, and trigger controls" — this trio mirrors the NE101 device capabilities. See [manifest.json L4-L7](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L4-L7).
+> **Source evidence**: the manifest's `description.en` literally says "displays latest capture, battery status, and trigger controls" — this trio mirrors the NE101 device capabilities. See [manifest.json L4-L7](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L4-L7):
+
+```json
+// manifest.json L4-L7
+"description": {
+  "en": "CamThink NE101 sensing camera — displays latest capture, battery status, and trigger controls",
+  "zh": "CamThink NE101 感知摄像头 — 显示最新抓拍、电量状态和触发控制"
+},
+```
+[Source: manifest.json L4-L7](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L4-L7)
 
 ---
 
@@ -53,7 +62,14 @@ The NeoMind component marketplace has four `category` values: `display` (e.g. me
 Whether a component is "device-bound" is decided by two manifest fields:
 
 - `has_data_source: false` ([manifest.json L13](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L13)) — explicitly **does not** use data-source binding. DataSource is an abstraction designed for "periodic metrics produced by extensions"; binding it makes the editor show a "data source picker" panel. ne101_camera disables that panel because it does not consume extension metrics — it consumes device telemetry.
-- `has_device_binding: true` + `device_type_filter: ["ne101_camera"]` ([manifest.json L14-L15](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L14-L15)) — enables the device-binding panel and **only allows binding devices whose `device_type === "ne101_camera"`**. This filter is a two-way guarantee: on the editor side, the device dropdown only lists NE101 devices; on the runtime side, the component code can safely assume `device.type === "ne101_camera"` without any type branching.
+- `has_device_binding: true` + `device_type_filter: ["ne101_camera"]` ([manifest.json L14-L15](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L14-L15)):
+
+```json
+// manifest.json L14-L15
+"has_device_binding": true,
+"device_type_filter": ["ne101_camera"],
+```
+[Source: manifest.json L14-L15](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L14-L15) — enables the device-binding panel and **only allows binding devices whose `device_type === "ne101_camera"`**. This filter is a two-way guarantee: on the editor side, the device dropdown only lists NE101 devices; on the runtime side, the component code can safely assume `device.type === "ne101_camera"` without any type branching.
 
 This combination of "disable data source, enable device binding + type filter" is the **canonical signature of any device-bound component**. If you later write a dedicated component for an ONVIF camera, a Modbus sensor, or a Zigbee actuator, you can copy this pattern verbatim.
 

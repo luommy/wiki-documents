@@ -26,7 +26,16 @@ NE101 支持的设备命令（device commands）是组件命令按钮的来源�
 
 这四类命令的存在进一步印证了 1.2 的论点：metric_card 这种纯展示型组件根本无法承载命令触发能力，必须有专门的设备绑定组件来渲染命令按钮 + 调用设备命令 API。
 
-> **源码佐证**：manifest 的 `description.zh` 就写明了「显示最新抓拍、电量状态和触发控制」——这三个能力组合正是 NE101 设备能力的镜像。详见 [manifest.json L4-L7](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L4-L7)。
+> **源码佐证**：manifest 的 `description.zh` 就写明了「显示最新抓拍、电量状态和触发控制」——这三个能力组合正是 NE101 设备能力的镜像。详见 [manifest.json L4-L7](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L4-L7):
+
+```json
+// manifest.json L4-L7
+"description": {
+  "en": "CamThink NE101 sensing camera — displays latest capture, battery status, and trigger controls",
+  "zh": "CamThink NE101 感知摄像头 — 显示最新抓拍、电量状态和触发控制"
+},
+```
+[Source: manifest.json L4-L7](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L4-L7)
 
 ---
 
@@ -53,7 +62,14 @@ NeoMind 组件市场按 `category` 字段分四大类：`display`（显示型，
 判断一个组件是不是「设备绑定型」，看 manifest 的两个关键字段：
 
 - `has_data_source: false`（[manifest.json L13](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L13)）——明确**不**使用数据源绑定。数据源（DataSource）是 NeoMind 为「扩展周期产出的指标」设计的抽象，绑定后组件会在编辑器里显示「数据源选择面板」。ne101_camera 关掉这个面板，因为它不消费扩展指标，而是消费设备遥测。
-- `has_device_binding: true` + `device_type_filter: ["ne101_camera"]`（[manifest.json L14-L15](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L14-L15)）——开启设备绑定面板，且**只允许绑定 `device_type === "ne101_camera"` 的设备**。这个 filter 是双向保险：编辑器侧，设备下拉框只显示 NE101 设备；运行时侧，组件代码可以放心假设 `device.type === "ne101_camera"`，不需要做类型分支。
+- `has_device_binding: true` + `device_type_filter: ["ne101_camera"]`（[manifest.json L14-L15](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L14-L15)）:
+
+```json
+// manifest.json L14-L15
+"has_device_binding": true,
+"device_type_filter": ["ne101_camera"],
+```
+[Source: manifest.json L14-L15](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L14-L15) ——开启设备绑定面板，且**只允许绑定 `device_type === "ne101_camera"` 的设备**。这个 filter 是双向保险：编辑器侧，设备下拉框只显示 NE101 设备；运行时侧，组件代码可以放心假设 `device.type === "ne101_camera"`，不需要做类型分支。
 
 这种「关掉数据源、打开设备绑定 + 类型过滤」的组合，是**任何设备绑定组件的典型签名**。如果你将来要为 ONVIF 摄像头、传感器、执行器写专用组件，照抄这个范式即可。
 

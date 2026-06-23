@@ -92,7 +92,34 @@ graph LR
 
 **Design decision: temporary debug logs vs permanent logging framework vs error-boundary telemetry**
 
-- **Choice**: temporary add → single-pass remove pattern (commits [`0731cf8`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/0731cf8) → [`00a59cc`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/00a59cc)). References [`L661-L720`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L661-L720) (Transform lifecycle effect region).
+- **Choice**: temporary add → single-pass remove pattern (commits [`0731cf8`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/0731cf8) → [`00a59cc`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/00a59cc)). References [`L661-L720`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L661-L720) (Transform lifecycle effect region):
+
+```js
+// bundle.js L661-L700 (trimmed)
+React.useEffect(function () {
+  if (_isPreview) return;
+  var neomind = window.neomind;
+  var onCfgChange = props.onConfigChange;
+  // --- Processing OFF: delete Transform ---
+  if (!processingEnabled || !processingExtId || !device) {
+    if (_storedTid && neomind && neomind.deleteTransform) {
+      neomind.deleteTransform(_storedTid).catch(function () {});
+    }
+    if (_storedTid) {
+      transformIdRef.current = null;
+      if (onCfgChange) onCfgChange(Object.assign({}, config, { _transformId: '', _transformHash: '' }));
+    }
+    setExtStatus('idle');
+    return;
+  }
+  // --- No API ---
+  if (!neomind || !neomind.createTransform) { setExtStatus('unavailable'); return; }
+  // --- Build payload ---
+  var mode = getExtMode(processingExtId, processingTemplate);
+  if (!mode) { setExtStatus('active'); return; }
+  // ... (L701-L720: pipe config + persist + resetGuard)
+```
+[Source: bundle.js L661-L720](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L661-L720)
 - **Alternative A**: permanent logging framework — define `var DEBUG = false; function log() { if (DEBUG) console.log(...); }` in the IIFE, with `DEBUG = false` in production. Rejected because the IIFE has no build step to strip debug code; the `if (DEBUG)` branch and function call still ship in the production bundle, exacting a per-render performance cost on every user (even when nothing is logged).
 - **Alternative B**: error-boundary telemetry — report Transform errors to the platform's telemetry channel. Rejected because telemetry only captures thrown exceptions; most Transform lifecycle bugs are "logic errors" (creating duplicate Transforms, updating fields that shouldn't be updated) that don't throw, and telemetry can't catch them.
 - **Rationale**: temporary add-then-remove is the only debugging approach under the IIFE pattern that leaves no production footprint. Its cost is "cleanup discipline" — the developer must remember to delete debug logs before the PR merges, otherwise main gets polluted. ne101_camera's `00a59cc` is a positive example of this discipline.
@@ -145,7 +172,33 @@ graph TB
 
 ## 8.4 The `_configHash` Performance Optimization
 
-`_configHash` ([`bundle.js` L655-L659`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L655-L659)) is the **Tier 1 fast-path predicate** for ne101_camera's Transform three-tier lifecycle — a string concatenation of all processing-related config fields, serving as a digest of "has the config changed". On every React render, the component recomputes the current `_configHash` and compares it against the stored `_storedHash` (`config._transformHash`, [L660](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L660-L660)). If equal, the Tier 1 fast-path fires ([L723-L742](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L723-L742)): the component skips all Transform create/update/delete API calls, only verifies that the ID still exists on the backend, and returns immediately. This fast-path short-circuits 99% of renders (window drag, ResizeObserver firing, shallow prop changes), avoiding multiple-per-second Transform API calls that would overwhelm the backend.
+`_configHash` ([`bundle.js` L655-L659`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L655-L659)) is the **Tier 1 fast-path predicate** for ne101_camera's Transform three-tier lifecycle — a string concatenation of all processing-related config fields, serving as a digest of "has the config changed". On every React render, the component recomputes the current `_configHash` and compares it against the stored `_storedHash` (`config._transformHash`, [L660](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L660-L660)). If equal, the Tier 1 fast-path fires ([L723-L742](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L723-L742)): the component skips all Transform create/update/delete API calls:
+
+```js
+// bundle.js L723-L742
+// --- Tier 1: ID + hash match — verify Transform still exists ---
+if (_storedTid && _storedHash === _configHash) {
+  transformIdRef.current = _storedTid;
+  setExtStatus('active');
+  // Verify the Transform still exists on the backend (may have been deleted externally)
+  if (neomind.listTransforms) {
+    neomind.listTransforms({ id: _storedTid }).then(function (list) {
+      if (cancelled) return;
+      var arr = Array.isArray(list) ? list : [];
+      var found = false;
+      for (var vi = 0; vi < arr.length; vi++) {
+        if (arr[vi].id === _storedTid) { found = true; break; }
+      }
+      if (!found) {
+        transformIdRef.current = null;
+        if (onCfgChange) onCfgChange(Object.assign({}, config, { _transformId: '', _transformHash: '' }));
+      }
+    }).catch(function () {});
+  }
+  return;
+}
+```
+[Source: bundle.js L723-L742](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L723-L742), only verifies that the ID still exists on the backend, and returns immediately. This fast-path short-circuits 99% of renders (window drag, ResizeObserver firing, shallow prop changes), avoiding multiple-per-second Transform API calls that would overwhelm the backend.
 
 ```javascript
 var _configHash = processingExtId + ':' + processingTemplate + ':' +
@@ -198,7 +251,20 @@ graph TB
 
 ## 8.5 The ROI Iteration History: Center Point to IoU Threshold
 
-The ROI (Region of Interest) detection algorithm is the submodule in ne101_camera that has undergone the **most generational replacements** — it evolved from the initial "center-point judgment" to the current "configurable threshold area-overlap judgment", each generation fixing a real user complaint. The current judgment logic lives in [`bundle.js` L365-L372`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L365-L372) (the generated code for the `detOverlapsRoi` function).
+The ROI (Region of Interest) detection algorithm is the submodule in ne101_camera that has undergone the **most generational replacements** — it evolved from the initial "center-point judgment" to the current "configurable threshold area-overlap judgment", each generation fixing a real user complaint. The current judgment logic lives in [`bundle.js` L365-L372`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L365-L372) (the generated code for the `detOverlapsRoi` function):
+
+```js
+// bundle.js L365-L372
+L.push('var detOverlapsRoi = function(d, poly) {');
+L.push('  var dx1 = d.bbox[0], dy1 = d.bbox[1], dx2 = d.bbox[2], dy2 = d.bbox[3];');
+L.push('  var detArea = (dx2 - dx1) * (dy2 - dy1);');
+L.push('  if (detArea <= 0) return false;');
+L.push('  var clipped = clipPolyRect(poly, dx1, dy1, dx2, dy2);');
+L.push('  if (clipped.length < 3) return false;');
+L.push('  return polyArea(clipped) / detArea >= OVERLAP_TH;');
+L.push('};');
+```
+[Source: bundle.js L365-L372](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L365-L372)
 
 **Generation 1: Center-point judgment**. The original ROI algorithm was "does the detection box's center point fall inside the ROI rectangle" — `if (centerX >= roiX1 && centerX <= roiX2 && centerY >= roiY1 && centerY <= roiY2)`. This implementation was simple and crude, but had an obvious precision problem: a 100x100 detection box with only its center point (1 pixel) inside the ROI would be judged "inside the ROI", causing massive false positives. User complaint: "I drew the ROI over the doorway, but people passing in the hallway are being detected too". This complaint exposed the fundamental flaw of center-point judgment: **it doesn't care about the actual overlap area between the detection box and the ROI**.
 
@@ -251,7 +317,25 @@ graph LR
 
 **First misdiagnosis** (iteration 0 → 1, commit `44f1fa5`): the developer identified "shared `composingRef`" as the root cause — multiple input fields share the same ref; when one input's `onCompositionStart` sets the ref to true, if that input is unmounted (conditional rendering disappears), `onCompositionEnd` doesn't fire, the ref stays true, and all inputs' `onChange` are skipped. The fix replaced the shared ref with per-input **local state** (`React.useState`). This resolved the freeze but introduced a new bug: `imeInput` is a **factory function** (returns JSX, not a React component), and calling `useState` inside a factory function violates the Rules of Hooks. When template switching causes some inputs to appear/disappear, the hook count changes, triggering React error #310.
 
-**Second diagnosis** (iteration 1 → 2, commit `b060a25`): the developer realized "using hooks in a factory function" was a dead end — no matter how state was organized, hook count varied with input count. The real solution was to **completely abandon hooks in `imeInput`**, switching to a fully uncontrolled input ([`bundle.js` L1459-L1468`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1459-L1468)). `defaultValue` + `onChange` one-way sync — the browser manages input natively, React doesn't intervene. The biggest advantage of this approach is "**simplicity**" — 10 lines of code, no hooks, no refs, no state, naturally free of hook-ordering issues or freeze issues.
+**Second diagnosis** (iteration 1 → 2, commit `b060a25`): the developer realized "using hooks in a factory function" was a dead end — no matter how state was organized, hook count varied with input count. The real solution was to **completely abandon hooks in `imeInput`**, switching to a fully uncontrolled input ([`bundle.js` L1459-L1468`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1459-L1468)):
+
+```js
+// bundle.js L1459-L1468
+// Uncontrolled input — uses defaultValue so it always responds to typing.
+// Syncs to config via onChange. No hooks needed, avoids hook-count mismatch
+// when fields appear/disappear based on mode.
+function imeInput(key, value, placeholder) {
+  return jsx('input', {
+    className: INPUT_CLS,
+    defaultValue: value,
+    placeholder: placeholder,
+    onChange: function (e) {
+      update(key, e.target.value);
+    }
+  });
+}
+```
+[Source: bundle.js L1459-L1468](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1459-L1468) `defaultValue` + `onChange` one-way sync — the browser manages input natively, React doesn't intervene. The biggest advantage of this approach is "**simplicity**" — 10 lines of code, no hooks, no refs, no state, naturally free of hook-ordering issues or freeze issues.
 
 **Engineering lesson**: under the IIFE pattern, **the simplest solution is usually the correct one**. In ESM + React projects, developers are accustomed to the "manage every interaction with hooks" pattern (controlled input + useState), because that pattern is safe under ESLint's `rules-of-hooks` protection. But the IIFE has no ESLint; hooks boundary conditions (no hooks in factory functions, no hooks in conditional blocks, hook count must be stable) rely entirely on developer discipline. In that context, **avoiding hooks** is safer than "using hooks correctly" — the uncontrolled input achieves with 10 lines of code what controlled input + IME-aware ref + composing state achieves with three layers of machinery, with no boundary conditions. This lesson was later applied to other ne101_camera subsystems: wherever the DOM's native capabilities can solve the problem (like `<input defaultValue>`, `<button onclick>`), don't introduce hooks.
 

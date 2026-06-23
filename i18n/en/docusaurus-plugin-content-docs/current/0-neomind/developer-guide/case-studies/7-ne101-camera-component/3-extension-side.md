@@ -2,16 +2,16 @@
 description: "ne101_camera extension-side contract: the processingExtensionId generic AI processing paradigm, the AI_EXT_IDS whitelist, the EXT_MODES mode catalog (imageArg/responseType/command triple), the __imageData injection mechanism, the locate-anything-v2 NMS threshold special-case, and the extension degradation fallback"
 keywords: [ne101_camera, processingExtensionId, extension contract, EXT_MODES, imageArg, responseType, locate-anything-v2]
 tags: [NeoMind, Case Study]
-sidebar_label: "§3 Extension Side"
+sidebar_label: "3. Extension Side"
 ---
 
-# §3 Extension Side: The processingExtensionId Generic AI Contract
+# 3 Extension Side: The processingExtensionId Generic AI Contract
 
 > This page is the **extension-side contract reference** for the ne101_camera case study and the canonical definition of the "component + pluggable extension" paradigm. After reading it you should be able to: (1) explain why ne101_camera — a component that appears to perform "AI detection" — contains zero lines of AI inference code in its own `bundle.js`, because all inference is outsourced to a user-selected extension referenced by the `processingExtensionId` config field, and why this split between "component orchestrates, extension infers" is the template for AI reuse across the NeoMind ecosystem; (2) recount the four members of the `AI_EXT_IDS` whitelist (locate-anything-v2 / image-analyzer-v2 / yolo-device-inference / ocr-device-inference) and why they are hardcoded into the component rather than discovered via metadata; (3) draw the structure of the `EXT_MODES` mode catalog, state how each mode's triple of `command` + `imageArg` + `responseType` dictates the shape of the generated Transform code, and how the `args` field (`['categories']` vs `['phrase']`) drives the input fields rendered in `AdvancedPanel`; (4) explain the `__imageData` injection mechanism — why the Transform does not fetch the image itself but instead waits for the platform to inject the base64-encoded capture at execution time; (5) recount the `locate-anything-v2` NMS IoU 0.5 threshold special-case (commit `8656148`) and the design motivation behind the lenient fallback that lets a new extension not yet registered in `EXT_MODES` proceed with a default `boxes_x1y1x2y2` response shape. All line-number anchors point at the `main` branch of [`bundle.js`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js) and [`manifest.json`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json) in the source repository.
 
 ---
 
-## §3.1 The processingExtensionId Generic Contract
+## 3.1 The processingExtensionId Generic Contract
 
 The most easily misunderstood fact about ne101_camera is this: although it looks like it is doing "AI object detection", a full read of the 1972-line `bundle.js` will find zero lines of YOLO inference, zero references to an ONNX runtime, zero model-weight loads. The component itself **does no AI whatsoever**. All inference is outsourced to whichever extension the user picks via the `processingExtensionId` config field. This field lives in the `default_config` block of [`manifest.json` L23-L24](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L23-L24):
 
@@ -22,7 +22,7 @@ The most easily misunderstood fact about ne101_camera is this: although it looks
 
 `processingEnabled` is the master switch (default false, so out of the box the component is a pure camera-view widget), and `processingExtensionId` is the extension-id slot (default empty string = no extension selected = no processing). When the user toggles the switch on in `AdvancedPanel` and picks an extension (say `locate-anything-v2`) from the dropdown, the component's `generateTransformJsCode` writes that extension id into the generated Transform's `extensions.invoke()` call, and the platform — when the Transform runs in the controller sandbox — routes the call to the extension's HTTP/RPC endpoint.
 
-This "component + pluggable extension" contract is the **template** for AI reuse across the NeoMind ecosystem: one component, N inference backends. The same ne101_camera component, paired with `locate-anything-v2`, becomes "open-vocabulary object detection"; paired with `ocr-device-inference`, it becomes "OCR text recognition"; paired with `yolo-device-inference`, it becomes "edge-device YOLOv8 inference". The component never needs to know how those extensions are implemented internally — only how to invoke them and how to normalize their responses (see [§4.3](./4-data-contract.md)).
+This "component + pluggable extension" contract is the **template** for AI reuse across the NeoMind ecosystem: one component, N inference backends. The same ne101_camera component, paired with `locate-anything-v2`, becomes "open-vocabulary object detection"; paired with `ocr-device-inference`, it becomes "OCR text recognition"; paired with `yolo-device-inference`, it becomes "edge-device YOLOv8 inference". The component never needs to know how those extensions are implemented internally — only how to invoke them and how to normalize their responses (see [4.3](./4-data-contract.md)).
 
 **Why "pluggable extension" beats "baked-in AI"**: if the component shipped its own YOLO model (say, embedding onnxruntime-web + yolov8n.weights into the bundle), three serious consequences would follow. First, bundle size would explode — a quantized YOLOv8n weight is ~12MB and onnxruntime-web's WASM adds ~12MB, taking the bundle from 80KB to over 25MB and pushing load time from milliseconds to seconds. Second, model choice would be locked — a user wanting OCR would need a different "OCR-baked" variant of the component, multiplying the component-market SKU count. Third, model updates would be tightly coupled to component updates — every YOLO iteration would require a new component release, whereas extensions are deployed independently (upgraded by the user or platform ops without touching the component). The pluggable-extension design dissolves all three problems: the component stays at 80KB, the user picks the model, and extensions can evolve on their own release cadence.
 
@@ -54,7 +54,7 @@ graph LR
 
 ---
 
-## §3.2 The AI_EXT_IDS Whitelist
+## 3.2 The AI_EXT_IDS Whitelist
 
 The platform hosts many extensions (weather, ONVIF bridge, various AI inference engines), but ne101_camera only cares about **AI extensions that can consume an image input and return detections**. The component filters with a hardcoded whitelist defined at [`bundle.js` L144](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L144-L144):
 
@@ -89,13 +89,36 @@ Only the filtered `filtered` array is handed to `ExtDropdown` to render as dropd
 - **Alternative A**: metadata-driven — extensions declare `"supports_image": true` in their manifest, and the component filters on that field. Rejected because: this requires all extension authors to follow a "declare capability" contract, and NeoMind's current extension manifest has no such field. Introducing it requires platform-level standardization that will not happen in the short term.
 - **Alternative B**: show all installed extensions. Rejected because: non-AI extensions (weather, ONVIF bridge) pollute the dropdown; selecting one causes a Transform invocation failure with a poor experience, and the error may only surface at Transform runtime (hard to debug).
 - **Rationale**: the hardcoded whitelist is the simplest option — the four extensions are the known, stable AI set, and adding a new AI extension only requires appending one string to the array. In the absence of an extension-metadata standard, this is the pragmatic choice.
-- **Cost**: adding a new AI extension requires editing component code (append to `AI_EXT_IDS` and add a mode entry to `EXT_MODES`). But the lenient fallback in §3.7 ensures that "new extension + old whitelist" still works (it falls through to the default `detect` command).
+- **Cost**: adding a new AI extension requires editing component code (append to `AI_EXT_IDS` and add a mode entry to `EXT_MODES`). But the lenient fallback in 3.7 ensures that "new extension + old whitelist" still works (it falls through to the default `detect` command).
 
 ---
 
-## §3.3 The EXT_MODES Mode Catalog
+## 3.3 The EXT_MODES Mode Catalog
 
 Each extension does not have just one invocation mode — `locate-anything-v2` can do category-based detection, phrase-based grounding, and OCR. The component uses a **mode catalog** `EXT_MODES` to describe "which modes this extension supports, and what each mode's parameters and response shape are". The catalog lives at [`bundle.js` L154-L171](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L154-L171). Its structure is an object keyed by extension id; each value is an array of modes supported by that extension. Each mode is an object with eight fields: `id` / `command` / `imageArg` / `responseType` / `label` / `desc` / `icon` / `args`.
+
+```js
+  var EXT_MODES = {
+    'locate-anything-v2': [
+      { id: 'object_detection', command: 'detect', imageArg: 'image_base64', responseType: 'boxes_x1y1x2y2', label: 'Object Detection', desc: 'Detect objects by category', icon: 'search', args: ['categories'] },
+      { id: 'grounding', command: 'ground', imageArg: 'image_base64', responseType: 'boxes_x1y1x2y2', label: 'Grounding', desc: 'Find objects by description', icon: 'target', args: ['phrase'] },
+      { id: 'text_detection', command: 'detect_text', imageArg: 'image_base64', responseType: 'boxes_x1y1x2y2', label: 'Text Detection', desc: 'Extract text from image', icon: 'text', args: [] },
+      { id: 'ground_gui', command: 'ground_gui', imageArg: 'image_base64', responseType: 'boxes_x1y1x2y2', label: 'UI Grounding', desc: 'Locate UI elements by description', icon: 'monitor', args: ['phrase'] },
+      { id: 'point', command: 'point', imageArg: 'image_base64', responseType: 'boxes_x1y1x2y2', label: 'Point', desc: 'Point to specific objects', icon: 'cursor', args: ['phrase'] }
+    ],
+    'image-analyzer-v2': [
+      { id: 'object_detection', command: 'analyze_image', imageArg: 'image', responseType: 'objects_bbox', label: 'Object Detection', desc: 'YOLOv8 object detection', icon: 'search', args: [] }
+    ],
+    'yolo-device-inference': [
+      { id: 'object_detection', command: 'analyze_image', imageArg: 'image', responseType: 'detections_bbox', label: 'Object Detection', desc: 'YOLOv8 device inference', icon: 'search', args: [] }
+    ],
+    'ocr-device-inference': [
+      { id: 'text_detection', command: 'recognize_image', imageArg: 'image', responseType: 'ocr_text_blocks', label: 'Text Detection', desc: 'OCR text recognition', icon: 'text', args: [] }
+    ]
+  };
+```
+
+*Source: [`bundle.js` L154-L171](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L154-L171)*
 
 The mode distribution across the four extensions is:
 
@@ -113,6 +136,15 @@ The mode distribution across the four extensions is:
 
 **Mode-picker UI behavior**: when the user picks `locate-anything-v2` in `ExtDropdown`, the mode-picker area below shows 5 mode cards (object_detection / grounding / text_detection / ground_gui / point); picking `image-analyzer-v2` shows only 1 card. This "expand modes per extension" behavior is driven by the `getExtModes(extId)` function at [`bundle.js` L196-L198](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L196-L198) — it returns the `EXT_MODES[extId]` array, and `AdvancedPanel` iterates it to render the cards.
 
+```js
+  /** Get available modes for an extension */
+  function getExtModes(extensionId) {
+    return EXT_MODES[extensionId] || [{ id: 'object_detection', command: 'detect', imageArg: 'image', responseType: 'boxes_x1y1x2y2', label: 'Object Detection', desc: 'Generic detection', icon: 'search' }];
+  }
+```
+
+*Source: [`bundle.js` L195-L198](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L195-L198)*
+
 **Design decision: per-extension mode catalog vs a single generic detect mode**
 
 - **Choice**: `EXT_MODES` lists all modes per extension ([L154-L171](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L154-L171)); `getExtModes(extId)` returns that extension's mode array for UI rendering ([L196-L198](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L196-L198)).
@@ -121,7 +153,7 @@ The mode distribution across the four extensions is:
 
 ---
 
-## §3.4 The imageArg + responseType Contract
+## 3.4 The imageArg + responseType Contract
 
 The two most critical fields in each mode object are `imageArg` and `responseType` — together they define the **interface contract** between component and extension. `imageArg` describes "what parameter name the component uses to pass the image to the extension"; `responseType` describes "what shape of data the extension returns". The meaning of both fields is clearly documented in source comments at [`bundle.js` L146-L153](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L146-L153):
 
@@ -148,7 +180,55 @@ var r = extensions.invoke('locate-anything-v2', 'detect', {
 });
 ```
 
-Here `'locate-anything-v2'` is the extension id, `'detect'` is the mode's `command` field, `image_base64` is the mode's `imageArg` field, and `__imageData` is the base64-encoded device capture JPEG that the platform injects at Transform execution time (see §3.6). After the extension is invoked it returns an object whose shape is described by `responseType` — the component dispatches to different normalization branches in the latter half of the generated code ([L288-L329](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L288-L329)) based on `responseType`, unifying the four heterogeneous response shapes into the internal `{bbox, label, confidence}` form (see [§4.3](./4-data-contract.md) for details).
+Here `'locate-anything-v2'` is the extension id, `'detect'` is the mode's `command` field, `image_base64` is the mode's `imageArg` field, and `__imageData` is the base64-encoded device capture JPEG that the platform injects at Transform execution time (see 3.6). After the extension is invoked it returns an object whose shape is described by `responseType` — the component dispatches to different normalization branches in the latter half of the generated code ([L288-L329](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L288-L329)) based on `responseType`, unifying the four heterogeneous response shapes into the internal `{bbox, label, confidence}` form (see [4.3](./4-data-contract.md) for details).
+
+```js
+    // Parse detections from extension response
+    if (mode.responseType === 'boxes_x1y1x2y2') {
+      L.push('var rawBoxes = r.boxes || [];');
+      L.push('var refTags = (r.answer || \'\').match(/<ref>(.*?)<\\/ref>/g) || [];');
+      L.push('var dets = rawBoxes.map(function(b, i) {');
+      L.push('  return {');
+      L.push('    bbox: [b.x1 / W, b.y1 / H, b.x2 / W, b.y2 / H],');
+      L.push('    label: (refTags[i] || \'\').replace(/<\\/?ref>/g, \'\'),');
+      L.push('    confidence: b.score || b.confidence || null');
+      L.push('  };');
+      L.push('});');
+    } else if (mode.responseType === 'objects_bbox') {
+      L.push('var dets = (r.objects || []).map(function(o) {');
+      L.push('  var b = o.bbox || {};');
+      L.push('  return {');
+      L.push('    bbox: [(b.x||0)/W, (b.y||0)/H, ((b.x||0)+(b.width||0))/W, ((b.y||0)+(b.height||0))/H],');
+      L.push('    label: o.label || \'\',');
+      L.push('    confidence: o.confidence || null');
+      L.push('  };');
+      L.push('});');
+    } else if (mode.responseType === 'detections_bbox') {
+      L.push('var dets = (r.detections || []).map(function(d) {');
+      L.push('  var b = d.bbox || {};');
+      L.push('  return {');
+      L.push('    bbox: [(b.x||0)/W, (b.y||0)/H, ((b.x||0)+(b.width||0))/W, ((b.y||0)+(b.height||0))/H],');
+      L.push('    label: d.label || \'\',');
+      L.push('    confidence: d.confidence || null');
+      L.push('  };');
+      L.push('});');
+    } else if (mode.responseType === 'ocr_text_blocks') {
+      L.push('var data = r.data || r;');
+      L.push('var blocks = data.text_blocks || [];');
+      L.push('var dets = blocks.map(function(b) {');
+      L.push('  var b2 = b.bbox || {};');
+      L.push('  return {');
+      L.push('    bbox: [b2.x, b2.y, (b2.x||0) + (b2.width||0), (b2.y||0) + (b2.height||0)],');
+      L.push('    polygon: b.polygon || null,');
+      L.push('    label: b.text || \'\',');
+      L.push('    confidence: b.confidence || null');
+      L.push('  };');
+      L.push('});');
+      L.push('var texts = blocks.map(function(b) { return b.text; }).filter(Boolean);');
+    }
+```
+
+*Source: [`bundle.js` L287-L329](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L287-L329)*
 
 The diagram below turns the contract chain "component → image input → extension → response output → component normalization" into a sequence, showing which segment `imageArg` and `responseType` each define.
 
@@ -186,7 +266,7 @@ graph LR
 
 ---
 
-## §3.5 The locate-anything-v2 NMS Threshold Special-Case
+## 3.5 The locate-anything-v2 NMS Threshold Special-Case
 
 Among all extensions, `locate-anything-v2` enjoys a special privilege: when generating the invocation code, the component appends an extra `nms_iou_threshold: 0.5` argument for it. This special-case was introduced by commit [`8656148`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/8656148) (`feat(ne101): pass NMS IoU threshold 0.5 to locate-anything-v2`) and lives at [`bundle.js` L281-L282](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L281-L282):
 
@@ -211,7 +291,7 @@ if (extensionId === 'locate-anything-v2') L.push(',  nms_iou_threshold: 0.5');
 
 ---
 
-## §3.6 The __imageData Injection Mechanism
+## 3.6 The __imageData Injection Mechanism
 
 When the generated Transform code runs in the controller sandbox, it needs the device's latest captured image as input for AI inference. How that image is obtained is the most subtle part of the entire extension-side contract — the component **does not fetch the image inside the Transform code itself**; instead it relies on the platform to **inject** a variable named `__imageData` at execution time. Look at the start of the generated Transform code, at [`bundle.js` L266-L272](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L266-L272):
 
@@ -225,11 +305,24 @@ var H = (imageMeta && imageMeta.height) || 1;
 
 **`__imageData` is not a variable defined inside the Transform code** — it is injected by the platform as a parameter when invoking the Transform's execution function. The platform knows which device this Transform is bound to (via the `rule: { device_id, device_type: 'ne101_camera' }` declared at [`fillTemplate` L453](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L453-L453)); before execution it fetches the image field from the device's latest telemetry, base64-encodes it, and passes it in as the `__imageData` argument to the Transform function. This mechanism completely decouples "image acquisition" (which requires MQTT subscription, device credentials, base64 encoding) from "image consumption" (AI inference + normalization) — the Transform code only consumes, and the platform handles acquisition.
 
+```js
+  function fillTemplate(pipe) {
+    var jsCode = generateTransformJsCode(pipe);
+    return {
+      js_code: jsCode,
+      output_prefix: 'virtual',
+      rule: { device_id: pipe.deviceId || '', device_type: 'ne101_camera' }
+    };
+  }
+```
+
+*Source: [`bundle.js` L448-L455](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L448-L455)*
+
 **The fallback chain**: if the platform version is old and does not support `__imageData` injection (the variable is undefined), the code falls back to `input_raw.values.image` — the standard field path for device telemetry in the Transform context. `input_raw` is the device-telemetry object the platform passes to the Transform; `values.image` is the image field (which may be a URL or base64). This fallback guarantees backward compatibility on older platforms.
 
 **The early-exit guard**: L267's `if (!imageData) return {};` is a critical safety net — if neither `__imageData` nor `input_raw.values.image` is present (say, the device just came online and has not captured yet, or the image field was mistakenly stored as null by the backend), the Transform returns an empty object immediately, skipping the subsequent extension invocation and metric generation. This avoids pointless "no image but still calling the AI extension" computation and prevents the extension from erroring on an empty `__imageData` string.
 
-**The role of `imageMeta`**: L271-L272's `imageMeta` (containing `width` / `height`) is also platform-injected, used for coordinate normalization. Detection boxes returned by extensions are typically in pixel values (e.g. `x1=320, y1=240`); they must be divided by image width/height to obtain 0-1 normalized coordinates (used for Canvas rendering with `objectFit: contain` non-linear scaling; see [§5](./5-frontend-consume.md)). If `imageMeta` is missing, width/height fall back to 1, and coordinates stay as raw pixels — a degraded mode where boxes are drawn in the wrong place but nothing crashes.
+**The role of `imageMeta`**: L271-L272's `imageMeta` (containing `width` / `height`) is also platform-injected, used for coordinate normalization. Detection boxes returned by extensions are typically in pixel values (e.g. `x1=320, y1=240`); they must be divided by image width/height to obtain 0-1 normalized coordinates (used for Canvas rendering with `objectFit: contain` non-linear scaling; see [5](./5-frontend-consume.md)). If `imageMeta` is missing, width/height fall back to 1, and coordinates stay as raw pixels — a degraded mode where boxes are drawn in the wrong place but nothing crashes.
 
 **Design decision: platform-injected __imageData vs Transform fetches image itself vs component passes image**
 
@@ -241,9 +334,9 @@ var H = (imageMeta && imageMeta.height) || 1;
 
 ---
 
-## §3.7 The Extension Degradation Fallback
+## 3.7 The Extension Degradation Fallback
 
-The NeoMind AI-extension ecosystem will keep growing — future additions may include a "segmentation extension", a "pose-estimation extension", or a "depth-estimation extension". ne101_camera's `EXT_MODES` catalog (§3.3) lists only the four extensions known today; what happens if the user installs a new extension that is not in `EXT_MODES`? The answer is: **lenient fallback**, not a rejection error. This fallback logic lives in the `getExtMode()` function at [`bundle.js` L181-L193](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L181-L193):
+The NeoMind AI-extension ecosystem will keep growing — future additions may include a "segmentation extension", a "pose-estimation extension", or a "depth-estimation extension". ne101_camera's `EXT_MODES` catalog (3.3) lists only the four extensions known today; what happens if the user installs a new extension that is not in `EXT_MODES`? The answer is: **lenient fallback**, not a rejection error. This fallback logic lives in the `getExtMode()` function at [`bundle.js` L181-L193](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L181-L193):
 
 ```javascript
 function getExtMode(extensionId, templateName) {
@@ -272,18 +365,18 @@ A similar fallback appears in `getExtModes(extensionId)` at [`bundle.js` L196-L1
 
 **The shape of the default mode**: the fallback returns a mode object with the triple `{command: 'detect', imageArg: 'image', responseType: 'boxes_x1y1x2y2'}`. This is a **guess-based default** — most YOLO-style detection extensions accept the `image` parameter name, use a `detect` command, and return some form of detection-box array. If the new extension happens to follow this convention (many will), it works out of the box. `boxes_x1y1x2y2` is the most "raw" response shape (just four coordinate values) with the simplest normalization logic, making it a reasonable default guess.
 
-**Risk and cost**: if the unknown extension's response shape is not `boxes_x1y1x2y2` (say it returns `ocr_text_blocks` or some novel `segments` format), the normalizer will not find the expected field (`r.boxes` is undefined) and the detections array will be empty. This is a **silent failure** — the Transform does not error, but no detection boxes render. The user sees a degraded "image shows but no detections" experience. This risk is deemed acceptable because: (1) it is not a crash (the component remains usable, only detection is degraded); (2) the debug log (mentioned in [§5](./5-frontend-consume.md) as `console.warn('empty detections')`) helps developers locate the problem; (3) once the component updates `EXT_MODES` to include the new extension, the correct response shape takes over.
+**Risk and cost**: if the unknown extension's response shape is not `boxes_x1y1x2y2` (say it returns `ocr_text_blocks` or some novel `segments` format), the normalizer will not find the expected field (`r.boxes` is undefined) and the detections array will be empty. This is a **silent failure** — the Transform does not error, but no detection boxes render. The user sees a degraded "image shows but no detections" experience. This risk is deemed acceptable because: (1) it is not a crash (the component remains usable, only detection is degraded); (2) the debug log (mentioned in [5](./5-frontend-consume.md) as `console.warn('empty detections')`) helps developers locate the problem; (3) once the component updates `EXT_MODES` to include the new extension, the correct response shape takes over.
 
 **Design decision: lenient fallback vs strict rejection**
 
 - **Choice**: unknown extensions fall through to the default `object_detection` + `boxes_x1y1x2y2`, allowing Transform creation to proceed ([L181-L193](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L181-L193) + [L196-L198](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L196-L198)).
 - **Alternative**: strict mode — extensions not in `EXT_MODES` trigger an `AdvancedPanel` error "this extension is not supported by ne101_camera", blocking Transform creation. Rejected because: this makes the "new extension + old component" combination entirely unusable — the user installs a new AI extension but cannot use it because ne101_camera has not yet updated `EXT_MODES`. This version coupling is a hindrance to ecosystem growth.
 - **Rationale**: forward-compatibility takes priority over strictness. New extensions most likely follow common detection-API conventions (`detect` command + `image` parameter + box response), and the lenient fallback lets them "mostly work" before the component catches up. Occasional shape mismatches cause silent failure (no boxes), not crashes — users can wait for a component update or hand-edit the Transform code.
-- **Cost**: silent failure is harder to debug than an explicit error. The mitigations are the §5 debug log and this very documentation — making sure developers know "unknown extensions fall through to boxes_x1y1x2y2", so empty detections quickly point to a response-shape mismatch.
+- **Cost**: silent failure is harder to debug than an explicit error. The mitigations are the 5 debug log and this very documentation — making sure developers know "unknown extensions fall through to boxes_x1y1x2y2", so empty detections quickly point to a response-shape mismatch.
 
 ---
 
-## §3.8 Design Decisions Summary
+## 3.8 Design Decisions Summary
 
 The six design decisions on this page are consolidated below, each with the choice / alternative / rationale triple. They share a common theme: **in the fuzzy zones of the "component ↔ extension" contract, choose leniency and adaptation over strictness and coercion** — the component does not demand that extensions follow a unified API, but instead adapts to each extension's existing conventions via the mode catalog (`EXT_MODES`) and parameter normalization (`imageArg`); unknown extensions get a default fallback rather than a rejection; expert parameters (NMS threshold) get a hardcoded safe default rather than UI exposure.
 
@@ -300,18 +393,18 @@ The six design decisions on this page are consolidated below, each with the choi
 
 | Commit | Type | One-line summary | Section |
 |--------|------|------------|----------|
-| [`8656148`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/8656148) | feat | pass NMS IoU threshold 0.5 to locate-anything-v2 | §3.5 |
-| [`c276c23`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/c276c23) | feat | per-class detection colors via golden-angle HSV rotation | §3.4 (rendering-side consumption after response normalization) |
-| [`e3a70be`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/e3a70be) | fix | parse JSON string detections from backend virtual metrics | §3.4 (storage round-trip after responseType normalization) |
-| [`403c0f1`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/403c0f1) | fix | handle `{x,y}` object format for OCR polygon detection boxes | §3.4 (polygon compatibility in ocr_text_blocks responses) |
-| [`b746c02`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/b746c02) | feat | render OCR detection boxes as polygons with rect fallback | §3.4 (rendering-side polygon support for ocr_text_blocks) |
-| [`a8c1212`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/a8c1212) | revert | remove auto hash bump, preserve user transform edits | §3.6 (customizability contract on generated code) |
+| [`8656148`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/8656148) | feat | pass NMS IoU threshold 0.5 to locate-anything-v2 | 3.5 |
+| [`c276c23`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/c276c23) | feat | per-class detection colors via golden-angle HSV rotation | 3.4 (rendering-side consumption after response normalization) |
+| [`e3a70be`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/e3a70be) | fix | parse JSON string detections from backend virtual metrics | 3.4 (storage round-trip after responseType normalization) |
+| [`403c0f1`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/403c0f1) | fix | handle `{x,y}` object format for OCR polygon detection boxes | 3.4 (polygon compatibility in ocr_text_blocks responses) |
+| [`b746c02`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/b746c02) | feat | render OCR detection boxes as polygons with rect fallback | 3.4 (rendering-side polygon support for ocr_text_blocks) |
+| [`a8c1212`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/a8c1212) | revert | remove auto hash bump, preserve user transform edits | 3.6 (customizability contract on generated code) |
 
 ### Cross-chapter bridges
 
-- [§4 Data Contract](./4-data-contract.md) — the four `responseType` values defined here (`boxes_x1y1x2y2` / `objects_bbox` / `detections_bbox` / `ocr_text_blocks`) get a detailed normalization-code analysis in §4.3, including each responseType's field structure, coordinate conversion, and polygon-preservation strategy.
-- Back to [§2 Architecture](./2-architecture.md) — the "component + pluggable extension" contract defined here is the expansion of the "AI inference outsourcing" design decision in §2.1.
-- [§6 Component Build](./6-component-build.md) — the `AdvancedPanel` mode-picker UI and the `ExtDropdown` component get a build-perspective analysis in §6.6 (shadcn CSS-class replication, dual-panel division of labor).
+- [4 Data Contract](./4-data-contract.md) — the four `responseType` values defined here (`boxes_x1y1x2y2` / `objects_bbox` / `detections_bbox` / `ocr_text_blocks`) get a detailed normalization-code analysis in 4.3, including each responseType's field structure, coordinate conversion, and polygon-preservation strategy.
+- Back to [2 Architecture](./2-architecture.md) — the "component + pluggable extension" contract defined here is the expansion of the "AI inference outsourcing" design decision in 2.1.
+- [6 Component Build](./6-component-build.md) — the `AdvancedPanel` mode-picker UI and the `ExtDropdown` component get a build-perspective analysis in 6.6 (shadcn CSS-class replication, dual-panel division of labor).
 
 ---
 

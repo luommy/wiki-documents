@@ -92,7 +92,34 @@ graph LR
 
 **设计决策：临时调试 log vs 永久 logging 框架 vs error-boundary telemetry**
 
-- **选择**：临时 add → 一次性 remove 模式（commits [`0731cf8`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/0731cf8) → [`00a59cc`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/00a59cc)）。引用 [`L661-L720`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L661-L720)（Transform lifecycle effect 区域）。
+- **选择**：临时 add → 一次性 remove 模式（commits [`0731cf8`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/0731cf8) → [`00a59cc`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/00a59cc)）。引用 [`L661-L720`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L661-L720)（Transform lifecycle effect 区域）:
+
+```js
+// bundle.js L661-L700 (trimmed)
+React.useEffect(function () {
+  if (_isPreview) return;
+  var neomind = window.neomind;
+  var onCfgChange = props.onConfigChange;
+  // --- Processing OFF: delete Transform ---
+  if (!processingEnabled || !processingExtId || !device) {
+    if (_storedTid && neomind && neomind.deleteTransform) {
+      neomind.deleteTransform(_storedTid).catch(function () {});
+    }
+    if (_storedTid) {
+      transformIdRef.current = null;
+      if (onCfgChange) onCfgChange(Object.assign({}, config, { _transformId: '', _transformHash: '' }));
+    }
+    setExtStatus('idle');
+    return;
+  }
+  // --- No API ---
+  if (!neomind || !neomind.createTransform) { setExtStatus('unavailable'); return; }
+  // --- Build payload ---
+  var mode = getExtMode(processingExtId, processingTemplate);
+  if (!mode) { setExtStatus('active'); return; }
+  // ... (L701-L720: pipe config + persist + resetGuard)
+```
+[Source: bundle.js L661-L720](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L661-L720)
 - **备选方案 A**：永久 logging 框架——在 IIFE 里定义 `var DEBUG = false; function log() { if (DEBUG) console.log(...); }`，发布时 `DEBUG = false`。否决理由：IIFE 没有构建步骤剥离 debug 代码，`if (DEBUG)` 的分支判断和函数调用仍然会进生产 bundle，每个用户每次渲染都付出性能代价（即使 log 不输出）。
 - **备选方案 B**：error-boundary telemetry——把 Transform 错误上报到平台的 telemetry 通道。否决理由：telemetry 只能捕获抛出的异常，但 Transform lifecycle 的 bug 多数是「逻辑错误」（创建了重复的 Transform、更新了不该更新的字段），不抛异常，telemetry 抓不到。
 - **理由**：临时 add-then-remove 是 IIFE 范式下唯一不留下生产副作用的调试手段。它的代价是「清理纪律」——开发者必须记得在 PR 合并前删除 debug log，否则会污染 main 分支。ne101_camera 的 `00a59cc` 是这种纪律的正面案例。
@@ -145,7 +172,33 @@ graph TB
 
 ## 8.4 `_configHash` 性能优化
 
-`_configHash`（[`bundle.js` L655-L659`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L655-L659)）是 ne101_camera Transform 三层生命周期的 **Tier 1 fast-path 判据**——它是一个把所有 processing 相关 config 字段拼接成的字符串，作为「配置是否变化」的摘要。每次 React 渲染时，组件重新计算当前的 `_configHash`，与存储在 config 里的 `_storedHash`（`config._transformHash`，[L660](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L660-L660)）比对。如果两者相等，Tier 1 fast-path 触发（[L723-L742](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L723-L742)）：组件跳过 Transform 的 create/update/delete API 调用，只验证 ID 仍然存在于后端，然后立即返回。这个 fast-path 把 99% 的渲染（用户拖动窗口、ResizeObserver 触发、props 浅变化）都短路掉了，避免每秒多次的 Transform API 调用拖垮后端。
+`_configHash`（[`bundle.js` L655-L659`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L655-L659)）是 ne101_camera Transform 三层生命周期的 **Tier 1 fast-path 判据**——它是一个把所有 processing 相关 config 字段拼接成的字符串，作为「配置是否变化」的摘要。每次 React 渲染时，组件重新计算当前的 `_configHash`，与存储在 config 里的 `_storedHash`（`config._transformHash`，[L660](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L660-L660)）比对。如果两者相等，Tier 1 fast-path 触发（[L723-L742](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L723-L742)）：组件跳过 Transform 的 create/update/delete API 调用:
+
+```js
+// bundle.js L723-L742
+// --- Tier 1: ID + hash match — verify Transform still exists ---
+if (_storedTid && _storedHash === _configHash) {
+  transformIdRef.current = _storedTid;
+  setExtStatus('active');
+  // Verify the Transform still exists on the backend (may have been deleted externally)
+  if (neomind.listTransforms) {
+    neomind.listTransforms({ id: _storedTid }).then(function (list) {
+      if (cancelled) return;
+      var arr = Array.isArray(list) ? list : [];
+      var found = false;
+      for (var vi = 0; vi < arr.length; vi++) {
+        if (arr[vi].id === _storedTid) { found = true; break; }
+      }
+      if (!found) {
+        transformIdRef.current = null;
+        if (onCfgChange) onCfgChange(Object.assign({}, config, { _transformId: '', _transformHash: '' }));
+      }
+    }).catch(function () {});
+  }
+  return;
+}
+```
+[Source: bundle.js L723-L742](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L723-L742)，只验证 ID 仍然存在于后端，然后立即返回。这个 fast-path 把 99% 的渲染（用户拖动窗口、ResizeObserver 触发、props 浅变化）都短路掉了，避免每秒多次的 Transform API 调用拖垮后端。
 
 ```javascript
 var _configHash = processingExtId + ':' + processingTemplate + ':' +
@@ -198,7 +251,20 @@ graph TB
 
 ## 8.5 ROI 迭代史：从中心点到 IoU 阈值
 
-ROI（Region of Interest）检测算法是 ne101_camera 经历**最多代际更替**的子模块——它从最初的「中心点判定」演化到当前的「基于面积重叠的可配置阈值判定」，每一代都修了一个真实的用户投诉。当前版本的判定逻辑在 [`bundle.js` L365-L372`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L365-L372)（`detOverlapsRoi` 函数的生成代码）。
+ROI（Region of Interest）检测算法是 ne101_camera 经历**最多代际更替**的子模块——它从最初的「中心点判定」演化到当前的「基于面积重叠的可配置阈值判定」，每一代都修了一个真实的用户投诉。当前版本的判定逻辑在 [`bundle.js` L365-L372`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L365-L372)（`detOverlapsRoi` 函数的生成代码）:
+
+```js
+// bundle.js L365-L372
+L.push('var detOverlapsRoi = function(d, poly) {');
+L.push('  var dx1 = d.bbox[0], dy1 = d.bbox[1], dx2 = d.bbox[2], dy2 = d.bbox[3];');
+L.push('  var detArea = (dx2 - dx1) * (dy2 - dy1);');
+L.push('  if (detArea <= 0) return false;');
+L.push('  var clipped = clipPolyRect(poly, dx1, dy1, dx2, dy2);');
+L.push('  if (clipped.length < 3) return false;');
+L.push('  return polyArea(clipped) / detArea >= OVERLAP_TH;');
+L.push('};');
+```
+[Source: bundle.js L365-L372](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L365-L372)
 
 **第一代：中心点判定**。最初的 ROI 算法是「检测框中心点是否落在 ROI 矩形内」——`if (centerX >= roiX1 && centerX <= roiX2 && centerY >= roiY1 && centerY <= roiY2)`。这个实现简单粗暴，但有明显的精度问题：一个 100x100 的检测框只有中心点（1 个像素）落在 ROI 内，整个检测会被判定为「在 ROI 内」，导致大量误报。用户投诉：「我把 ROI 划在门口，但走廊上路过的人也被检测了」。这个投诉暴露了中心点判定的根本缺陷：**它不关心检测框与 ROI 的实际重叠面积**。
 
@@ -251,7 +317,25 @@ graph LR
 
 **第一次误诊**（迭代 0 → 1，commit `44f1fa5`）：开发者定位到「共享 `composingRef`」是 bug 根源——多个输入框共享同一个 ref，一个输入框的 `onCompositionStart` 把 ref 设为 true 后，如果该输入框被卸载（条件渲染消失），`onCompositionEnd` 不会触发，ref 卡在 true，所有输入框的 `onChange` 都被跳过。修复方案是把共享 ref 换成每个输入框的**局部 state**（`React.useState`）。这个修复解决了冻结问题，但引入了新 bug：`imeInput` 是一个**工厂函数**（返回 JSX，不是 React 组件），在工厂函数里调用 `useState` 违反 Rules of Hooks。当模板切换导致某些输入框出现/消失时，hook 数量变化，触发 React error #310。
 
-**第二次诊断**（迭代 1 → 2，commit `b060a25`）：开发者意识到「在工厂函数里用 hooks」是死路一条——无论怎么组织 state，hooks 数量都会随输入框数量变化。真正的解决方案是**彻底放弃在 `imeInput` 里用 hooks**，改用完全 uncontrolled 的输入（[`bundle.js` L1459-L1468`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1459-L1468)）。`defaultValue` + `onChange` 单向同步——浏览器原生管理输入，React 不干预。这个方案最大的优点是「**简单**」——10 行代码，没有 hooks、没有 ref、没有 state，自然不会有 hooks 顺序问题或冻结问题。
+**第二次诊断**（迭代 1 → 2，commit `b060a25`）：开发者意识到「在工厂函数里用 hooks」是死路一条——无论怎么组织 state，hooks 数量都会随输入框数量变化。真正的解决方案是**彻底放弃在 `imeInput` 里用 hooks**，改用完全 uncontrolled 的输入（[`bundle.js` L1459-L1468`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1459-L1468)）:
+
+```js
+// bundle.js L1459-L1468
+// Uncontrolled input — uses defaultValue so it always responds to typing.
+// Syncs to config via onChange. No hooks needed, avoids hook-count mismatch
+// when fields appear/disappear based on mode.
+function imeInput(key, value, placeholder) {
+  return jsx('input', {
+    className: INPUT_CLS,
+    defaultValue: value,
+    placeholder: placeholder,
+    onChange: function (e) {
+      update(key, e.target.value);
+    }
+  });
+}
+```
+[Source: bundle.js L1459-L1468](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1459-L1468)`defaultValue` + `onChange` 单向同步——浏览器原生管理输入，React 不干预。这个方案最大的优点是「**简单**」——10 行代码，没有 hooks、没有 ref、没有 state，自然不会有 hooks 顺序问题或冻结问题。
 
 **工程教训**：在 IIFE 范式下，**最简单的方案往往是正确的方案**。ESM + React 项目里，开发者习惯了「每个交互都用 hooks 管理」的范式（controlled input + useState），因为这个范式在 ESLint 的 `rules-of-hooks` 保护下是安全的。但 IIFE 没有 ESLint，hooks 的边界条件（不能在工厂函数里用、不能在条件块里用、数量必须稳定）全靠开发者自觉。在这种情况下，**回避 hooks** 比「正确使用 hooks」更安全——uncontrolled input 用 10 行代码达到了 controlled input + IME-aware ref + composing state 三层机制的效果，且没有任何边界条件。这个教训后来被应用到 ne101_camera 的其它子模块：凡是能用 DOM 原生能力解决的（如 `<input defaultValue>`、`<button onclick>`），就不要引入 hooks。
 

@@ -42,11 +42,52 @@ graph TB
 
 **Why this pipeline is effect-driven**: ne101_camera is a "React-in-IIFE" component on the NeoMind platform (see [2.1](./2-architecture.md)). It has no external state management (Redux / Zustand); all cross-frame state is managed with `React.useState` + `React.useRef`. React's core mental model is "UI = f(state)" — whenever state changes, the render function re-runs. The component wires WS pushes, REST backfill, image `onLoad`, and ResizeObserver callbacks all into `setState`, so every external event drives a full re-render through state mutation. The cost of this pattern is the absence of virtual-DOM diffing optimizations (every render recomputes `ovTf` and the detections mapping from scratch), but since a single component's DOM node count stays under 50 (one `<svg>` + N `<g>` elements), the full-rerender overhead is negligible. What is genuinely expensive are async API calls like `neomind.createTransform`; these are strictly confined to effects and guarded by a `cancelled` flag (see [`bundle.js` L709](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L709-L709)).
 
+```js
+// bundle.js L704-L714
+var payload = Object.assign({}, tplCfg, {
+  name: transformName,
+  scope: device.id,
+  description: 'ne101:' + device.id + ':' + processingExtId + ':' + processingTemplate
+});
+var cancelled = false;
+
+var persist = function (id) {
+  transformIdRef.current = id;
+  if (onCfgChange) onCfgChange(Object.assign({}, config, { _transformId: id, _transformHash: _configHash }));
+};
+```
+
+Source: [`bundle.js` L704-L714](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L704-L714)
+
 ---
 
 ## 5.2 Per-Class Coloring: Golden-Angle HSV
 
-Detection-box color is not fixed; it is determined by the class label (`det.label`). Commit [`c276c23`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/c276c23) (`feat(ne101): per-class detection colors via golden-angle HSV rotation`) introduced the `classColor(label)` function at [`bundle.js` L55-L72](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L55-L72). The function does three things:
+Detection-box color is not fixed; it is determined by the class label (`det.label`). Commit [`c276c23`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/c276c23) (`feat(ne101): per-class detection colors via golden-angle HSV rotation`) introduced the `classColor(label)` function at [`bundle.js` L55-L72](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L55-L72):
+
+```js
+// bundle.js L55-L72
+// Per-class color via golden-angle HSV rotation — maximally distinct hues for any class count.
+// Same label always yields the same color; 100+ classes still get good separation.
+function classColor(label) {
+  var h = 0;
+  for (var i = 0; i < label.length; i++) { h = ((h << 5) - h + label.charCodeAt(i)) | 0; }
+  var hue = (Math.abs(h) * 137.508) % 360;  // golden angle
+  var s = 0.78, v = 0.95;
+  var c = v * s, hp = hue / 60, x = c * (1 - Math.abs(hp % 2 - 1)), r = 0, g = 0, b = 0;
+  if (hp < 1) { r = c; g = x; }
+  else if (hp < 2) { r = x; g = c; }
+  else if (hp < 3) { g = c; b = x; }
+  else if (hp < 4) { g = x; b = c; }
+  else if (hp < 5) { r = x; b = c; }
+  else { r = c; b = x; }
+  var m = v - c, R = Math.round((r + m) * 255), G = Math.round((g + m) * 255), B = Math.round((b + m) * 255);
+  var rgb = R + ',' + G + ',' + B;
+  return { stroke: 'rgba(' + rgb + ',0.85)', fill: 'rgba(' + rgb + ',0.08)', text: 'rgba(' + rgb + ',0.95)' };
+}
+```
+
+The function does three things:
 
 1. **String hash (L58-L59)**: applies the classic `h = ((h << 5) - h + charCodeAt(i)) | 0` accumulator to hash the label string. This is a 32-bit integer hash where the shift-and-subtract is equivalent to multiplying by 31 (`((h << 5) - h) = h * 31`), the same algorithm used by Java's `String.hashCode()`. The `| 0` truncates the result to a 32-bit signed integer.
 2. **Golden-angle rotation (L60)**: `hue = (Math.abs(h) * 137.508) % 360`. 137.508° is the golden angle — the shorter arc obtained when the circumference is divided according to the golden ratio. Multiplying the hash by the golden angle and taking mod 360 is equivalent to sampling hues on the color wheel at golden-ratio intervals — mathematically the optimal strategy for maximizing the minimum pairwise distance among any number of points on a circle. The same label always hashes to the same hue (pure function, no side effects), while two labels whose hash values differ by only 1 will have hues 137.508° apart, making visual collision practically impossible.
@@ -66,6 +107,50 @@ Before `c276c23`, detection-box color went through two iterations. The earliest 
 ## 5.3 SVG Overlay: Polygon + Rect Fallback
 
 Detection boxes are not drawn on a Canvas but overlaid on the `<img>` via an SVG layer. The rendering logic for this SVG layer lives at [`bundle.js` L1210-L1272](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1210-L1272); its core is a `detections.map(...)` call that produces one `<g>` element per detection, containing a shape (polygon or rect) plus a label text node.
+
+```js
+// bundle.js L1210-L1272 (trimmed)
+(processingEnabled && detections.length > 0 && ovTf)
+  ? jsx('svg', {
+      key: 'det-svg',
+      className: 'absolute inset-0 w-full h-full',
+      style: { pointerEvents: 'none' },
+      viewBox: '0 0 100 100',
+      preserveAspectRatio: 'none',
+      children: detections.map(function (det, i) {
+        var detLabel = det.label || '';
+        var detConf = typeof det.confidence === 'number' ? Math.round(det.confidence * 100) : '';
+        var clr = classColor(detLabel || ('det' + i));
+        var children = [];
+
+        if (det.polygon && det.polygon.length >= 3) {
+          // Polygon mode (OCR scenarios): precise contour
+          var pts = det.polygon.map(function(p) {
+            var px = Array.isArray(p) ? p[0] : p.x;
+            var py = Array.isArray(p) ? p[1] : p.y;
+            var tx = ovTf ? ((px * ovTf.sx + ovTf.ox) * 100) : (px * 100);
+            var ty = ovTf ? ((py * ovTf.sy + ovTf.oy) * 100) : (py * 100);
+            return tx.toFixed(2) + ',' + ty.toFixed(2);
+          }).join(' ');
+          children.push(jsx('polygon', {
+            key: 'poly', points: pts,
+            fill: clr.fill, stroke: clr.stroke,
+            strokeWidth: '0.4'
+          }));
+        } else if (det.bbox && det.bbox.length >= 4) {
+          // Rect fallback (object detection scenarios)
+          // ... (25 lines omitted: rect coords + label text node)
+        }
+
+        // ... (14 lines omitted: label text rendering)
+
+        return children.length > 0 ? jsxs('g', { key: 'dbox-' + i, children: children }) : null;
+      })
+    })
+  : null,
+```
+
+Source: [`bundle.js` L1210-L1272](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1210-L1272)
 
 **Polygon mode (L1224-L1237)**: when `det.polygon` exists and has ≥ 3 vertices, an `<polygon>` is rendered. This is the precise contour for OCR scenarios (`ocr_text_blocks` responseType) — OCR text boxes are often not axis-aligned rectangles (tilted text, curved text lines), and a polygon hugs the boundary far better than a bbox. Vertices are iterated at L1226-L1231; each vertex is first passed through the `ovTf` transform (see 5.4) and then concatenated into the SVG `points` string.
 
@@ -88,7 +173,29 @@ Commit [`b746c02`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/c
 
 ## 5.4 The object-cover Coordinate Transform
 
-Detection-box coordinates are **normalized to image space** (0-1 means the ratio relative to the original image width/height), but the image is rendered in the DOM with `object-cover` — the image is scaled to completely cover the container, with excess cropped. This means only a subset of the original image is visible in the container, and detection-box coordinates must pass through a transform to overlay correctly on the visible region. This transform is `ovTf`, computed at [`bundle.js` L879-L899](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L879-L899).
+Detection-box coordinates are **normalized to image space** (0-1 means the ratio relative to the original image width/height), but the image is rendered in the DOM with `object-cover` — the image is scaled to completely cover the container, with excess cropped. This means only a subset of the original image is visible in the container, and detection-box coordinates must pass through a transform to overlay correctly on the visible region. This transform is `ovTf`, computed at [`bundle.js` L879-L899](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L879-L899):
+
+```js
+// bundle.js L879-L899
+// Object-cover transform: map normalized image coords (0-1) to container coords (0-1)
+// object-cover scales image to cover container, cropping excess.
+// In image space, only a portion is visible. We map image coords → container coords.
+var imgNat = imgNatState[0];
+var ctrSize = ctrSizeState[0];
+var ovTf = null;
+if (imgNat.w > 0 && imgNat.h > 0 && ctrSize.w > 0 && ctrSize.h > 0) {
+  var imgAsp = imgNat.w / imgNat.h;
+  var cAsp = ctrSize.w / ctrSize.h;
+  if (imgAsp > cAsp) {
+    // Image wider than container → sides cropped, image fills container height
+    var scX = (ctrSize.h / imgNat.h * imgNat.w) / ctrSize.w;
+    ovTf = { sx: scX, sy: 1, ox: (1 - scX) / 2, oy: 0 };
+  } else {
+    // Image taller than container → top/bottom cropped, image fills container width
+    var scY = (ctrSize.w / imgNat.w * imgNat.h) / ctrSize.h;
+    ovTf = { sx: 1, sy: scY, ox: 0, oy: (1 - scY) / 2 };
+  }
+```
 
 `ovTf` is a `{sx, sy, ox, oy}` 4-tuple representing the affine transform that maps normalized image coordinates `(px, py)` to normalized container coordinates `(tx, ty)`: `tx = px * sx + ox`, `ty = py * sy + oy`. Two branches:
 
@@ -97,7 +204,40 @@ Detection-box coordinates are **normalized to image space** (0-1 means the ratio
 
 At render time this transform is applied to every coordinate of every detection box: polygon vertices at [L1185-L1187](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1185-L1187) (ROI polygons) and [L1229-L1230](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1229-L1230) (detection polygons), bbox corners at [L1241-L1244](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1241-L1244), and label positions at [L1259-L1260](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1259-L1260). The transform formula is uniformly `tx = (px * ovTf.sx + ovTf.ox) * 100` (the multiply by 100 is because the SVG viewBox is 100x100).
 
+```js
+// ROI polygon vertices (L1185-L1187):
+var tx = ovTf ? ((p.x * ovTf.sx + ovTf.ox) * 100) : (p.x * 100);
+var ty = ovTf ? ((p.y * ovTf.sy + ovTf.oy) * 100) : (p.y * 100);
+
+// detection polygon vertices (L1229-L1230):
+var dtx = ovTf ? ((px * ovTf.sx + ovTf.ox) * 100) : (px * 100);
+var dty = ovTf ? ((py * ovTf.sy + ovTf.oy) * 100) : (py * 100);
+
+// bbox corners (L1241-L1244):
+var rx1 = ovTf ? (bx1 * ovTf.sx + ovTf.ox) * 100 : bx1 * 100;
+var ry1 = ovTf ? (by1 * ovTf.sy + ovTf.oy) * 100 : by1 * 100;
+var rx2 = ovTf ? (bx2 * ovTf.sx + ovTf.ox) * 100 : bx2 * 100;
+var ry2 = ovTf ? (by2 * ovTf.sy + ovTf.oy) * 100 : by2 * 100;
+
+// label position (L1259-L1260):
+var lx = ovTf ? ((lpx * ovTf.sx + ovTf.ox) * 100) : (lpx * 100);
+var ly = (ovTf ? ((lpy * ovTf.sy + ovTf.oy) * 100) : (lpy * 100)) - 1.5;
+```
+
+Source: [`bundle.js` L1185-L1260](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1185-L1260)
+
 The image's own `object-cover` is set at [`bundle.js` L1162](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1162-L1162): `className: 'w-full h-full object-cover'`.
+
+```js
+                jsx('img', {
+                  src: imageSrc,
+                  alt: 'Latest capture',
+                  className: 'w-full h-full object-cover',
+                  loading: 'lazy',
+                  style: { imageRendering: 'auto' },
+```
+
+Source: [`bundle.js` L1159-L1164](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1159-L1164)
 
 ```mermaid
 graph LR
@@ -125,7 +265,32 @@ graph LR
 
 ## 5.5 The ResizeObserver Callback-Ref Pattern
 
-The `ovTf` computation depends on two pieces of state: the image's natural dimensions (`imgNatState`) and the container dimensions (`ctrSizeState`). The image dimensions are written via the `<img onLoad>` callback ([L1165-L1168](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1165-L1168)); the container dimensions are written via a ResizeObserver listening to the media `<div>`'s size changes. But there is a classic React trap here: **the media `<div>` is conditionally rendered** — it only mounts when `hasImage` is true ([L1153-L1156](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1153-L1156)), and the image arrives asynchronously (WS push or REST backfill). This means on the component's first render the media `<div>` does not yet exist, and a naive `useEffect(() => { new ResizeObserver(mediaRef.current) }, [])` would find `mediaRef.current === null`, so the ResizeObserver would never be attached.
+The `ovTf` computation depends on two pieces of state: the image's natural dimensions (`imgNatState`) and the container dimensions (`ctrSizeState`). The image dimensions are written via the `<img onLoad>` callback ([L1165-L1168](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1165-L1168)):
+
+```js
+// bundle.js L1153-L1168
+hasImage
+  ? jsxs('div', {
+      key: 'media',
+      ref: cbRef.current,
+      className: 'relative w-full h-full',
+      children: [
+        jsx('img', {
+          src: imageSrc,
+          alt: 'Latest capture',
+          className: 'w-full h-full object-cover',
+          loading: 'lazy',
+          style: { imageRendering: 'auto' },
+          onLoad: function (e) {
+            var img = e.target;
+            if (img && img.naturalWidth) setImgNat({ w: img.naturalWidth, h: img.naturalHeight });
+          }
+        }),
+```
+
+Source: [`bundle.js` L1153-L1168](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1153-L1168)
+
+The container dimensions are written via a ResizeObserver listening to the media `<div>`'s size changes. But there is a classic React trap here: **the media `<div>` is conditionally rendered** — it only mounts when `hasImage` is true ([L1153-L1156](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1153-L1156)), and the image arrives asynchronously (WS push or REST backfill). This means on the component's first render the media `<div>` does not yet exist, and a naive `useEffect(() => { new ResizeObserver(mediaRef.current) }, [])` would find `mediaRef.current === null`, so the ResizeObserver would never be attached.
 
 Commit [`d7836b8`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/d7836b8) (`fix(ne101_camera): ResizeObserver never set up when image loads async`) fixes exactly this. The solution is the **callback ref pattern**, at [`bundle.js` L534-L548](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L534-L548):
 
@@ -150,6 +315,16 @@ The key insight is that `cbRef.current` is a **function** (not a ref object), pa
 
 The callback logic has three steps: (1) L538 disconnects the previous ResizeObserver if one exists, preventing memory leaks; (2) L539 stores the element in `mediaRef` for use by other logic; (3) L541-L545 creates a new ResizeObserver whose callback invokes `setCtrSize` to update the container-dimension state. The initial value of `ctrSizeState` is `{w: 0, h: 0}` ([L530](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L530-L530)); when it transitions from 0 to the actual size, a re-render is triggered, `ovTf` goes from `null` to a valid value, and detection boxes transition from "not rendered" (the `&& ovTf` guard at L1211) to "rendered."
 
+```js
+    var imgNatState = React.useState({ w: 0, h: 0 });
+    var setImgNat = imgNatState[1];
+    var mediaRef = React.useRef(null);
+    var ctrSizeState = React.useState({ w: 0, h: 0 });
+    var setCtrSize = ctrSizeState[1];
+```
+
+Source: [`bundle.js` L527-L530](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L527-L530)
+
 Commit [`7c92a19`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/7c92a19) (`fix(ne101): fix ROI canvas coordinate mapping for objectFit contain`) is a related earlier fix that handled coordinate-mapping issues from the `objectFit: contain` era; after the switch to `object-cover`, `d7836b8`'s callback ref completed the async-mount scenario.
 
 **Design decision: callback ref vs useEffect+ref vs ResizeObserver on window**
@@ -165,6 +340,40 @@ Commit [`7c92a19`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/c
 ## 5.6 Detection Summary Badges
 
 The bottom overlay bar ([`bundle.js` L1067-L1145](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1067-L1145)) renders a set of detection summary badges that let users quickly grasp "what was detected in this frame" without inspecting detection-box details. The design principle for these badges is **metric-driven** — the data source is the virtual metrics already computed by the Transform, not re-aggregated inside the component from the detections array.
+
+```js
+// bundle.js L1067-L1095 (trimmed)
+var vTotalCount = getFirst(vals, [pfx + 'total_count', 'values.' + pfx + 'total_count']);
+var vRoiCount = getFirst(vals, [pfx + 'roi_count', 'values.' + pfx + 'roi_count']);
+var vCountByClass = getFirst(vals, [pfx + 'count_by_class', 'values.' + pfx + 'count_by_class']);
+var vTexts = getFirst(vals, [pfx + 'texts', 'values.' + pfx + 'texts']);
+var maxInfTime = getFirst(vals, [pfx + 'inference_time_ms', 'values.' + pfx + 'inference_time_ms']);
+
+var displayCount = vTotalCount != null ? vTotalCount : detections.length;
+var detLabels = detections.slice(0, 4).map(function (d) { return d.label || '?'; });
+
+var detSummaryChildren = [];
+detSummaryChildren.push(
+  jsx('span', {
+    key: 'count',
+    style: Object.assign({}, white, bgMetricStyle, textShadow, { fontSize: '9px', fontWeight: '600', padding: '2px 6px', borderRadius: '4px' }),
+    children: displayCount + ' detected'
+  })
+);
+
+// ROI count badge
+if (vRoiCount != null) {
+  detSummaryChildren.push(
+    jsxs('span', {
+      key: 'roi-count',
+      style: Object.assign({}, white80, { fontSize: '8px', fontWeight: '600', padding: '2px 5px', borderRadius: '3px', background: 'rgba(255,200,50,0.25)', border: '1px solid rgba(255,200,50,0.4)' }),
+      children: ['ROI: ', jsx('span', { key: 'n', style: { fontFamily: 'monospace' }, children: vRoiCount })]
+    })
+  );
+}
+```
+
+Source: [`bundle.js` L1067-L1145](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1067-L1145)
 
 The rendering condition is `hasAnySummary` (L1063), meaning at least `total_count` exists among the virtual metrics. When satisfied, five badges are rendered in order:
 
@@ -186,6 +395,53 @@ The rendering condition is `hasAnySummary` (L1063), meaning at least `total_coun
 ## 5.7 Transform Tiered Lifecycle
 
 The Transform's create/update/delete logic lives at [`bundle.js` L661-L824](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L661-L824) inside a `React.useEffect` whose dependency array is `[device.id, processingEnabled, _configHash, _storedTid, _storedHash]` (L824). Inside the effect, dispatching follows three tiers:
+
+```js
+// bundle.js L661-L679, L722-L742 (trimmed)
+React.useEffect(function () {
+  if (_isPreview) return;
+  var neomind = window.neomind;
+  var onCfgChange = props.onConfigChange;
+
+  // --- Processing OFF: delete Transform ---
+  if (!processingEnabled || !processingExtId || !device) {
+    if (_storedTid && neomind && neomind.deleteTransform) {
+      neomind.deleteTransform(_storedTid).catch(function () {});
+    }
+    if (_storedTid) {
+      transformIdRef.current = null;
+      if (onCfgChange) onCfgChange(Object.assign({}, config, { _transformId: '', _transformHash: '' }));
+    }
+    setExtStatus('idle');
+    return;
+  }
+  // ... (42 lines omitted: payload build) ...
+
+  // --- Tier 1: ID + hash match — verify Transform still exists ---
+  if (_storedTid && _storedHash === _configHash) {
+    transformIdRef.current = _storedTid;
+    setExtStatus('active');
+    if (neomind.listTransforms) {
+      neomind.listTransforms({ id: _storedTid }).then(function (list) {
+        if (cancelled) return;
+        var arr = Array.isArray(list) ? list : [];
+        var found = false;
+        for (var vi = 0; vi < arr.length; vi++) {
+          if (arr[vi].id === _storedTid) { found = true; break; }
+        }
+        if (!found) {
+          transformIdRef.current = null;
+          if (onCfgChange) onCfgChange(Object.assign({}, config, { _transformId: '', _transformHash: '' }));
+        }
+      }).catch(function () {});
+    }
+    return;
+  }
+  // ... (82 lines omitted: Tier 2 update + Tier 3 create) ...
+}, [device ? device.id : null, processingEnabled, _configHash, _storedTid, _storedHash]);
+```
+
+Source: [`bundle.js` L661-L824](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L661-L824)
 
 **Config hash (L655-L659)**: before the effect, `_configHash` is computed by concatenating all processing-config fields (extId / template / categories / phrase / classFilter / roiEnabled / roiAction / roiOverlap / roiX/Y/W/H / rois) into a single string. If `_configHash === _storedHash` (the hash persisted last time), the configuration is unchanged and Tier 1's fast path is taken.
 

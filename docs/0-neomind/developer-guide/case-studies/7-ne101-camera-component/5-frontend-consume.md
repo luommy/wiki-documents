@@ -42,11 +42,50 @@ graph TB
 
 **为什么这条管线是 effect-driven 的**：ne101_camera 是 NeoMind 平台的「React-in-IIFE」组件（见 [2.1](./2-architecture.md)），它没有 Redux / Zustand 这类外部状态管理，所有跨帧状态都用 `React.useState` + `React.useRef` 管理。React 的核心心智模型就是「UI = f(state)」——只要 state 变了，渲染函数就会重跑。组件把 WS 推送、REST 回填、图像 `onLoad`、ResizeObserver 回调都接到了 `setState` 上，每一次外部事件都通过 state 变更驱动一次完整的重渲染。这种模式的代价是：没有虚拟 DOM diffing 的优化空间（每次都全量重算 `ovTf` 和 detections 映射），但因为单组件的 DOM 节点数在 50 以内（一个 `<svg>` + N 个 `<g>`），全量重渲染的开销可以忽略。真正昂贵的是 `neomind.createTransform` 这类异步 API 调用，它们被严格限制在 effect 里、用 `cancelled` 标志位做取消保护（见 [`bundle.js` L709](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L709-L709)）。
 
+```js
+      var payload = Object.assign({}, tplCfg, {
+        name: transformName,
+        scope: device.id,
+        description: 'ne101:' + device.id + ':' + processingExtId + ':' + processingTemplate
+      });
+      var cancelled = false;
+
+      var persist = function (id) {
+        transformIdRef.current = id;
+        if (onCfgChange) onCfgChange(Object.assign({}, config, { _transformId: id, _transformHash: _configHash }));
+      };
+```
+
+Source: [`bundle.js` L704-L714](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L704-L714)
+
 ---
 
 ## 5.2 按类别上色：Golden-Angle HSV
 
 检测框的颜色不是固定的，而是由类别标签（`det.label`）决定的。commit [`c276c23`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/c276c23)（`feat(ne101): per-class detection colors via golden-angle HSV rotation`）引入了 `classColor(label)` 函数，位于 [`bundle.js` L55-L72](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L55-L72)。这个函数做了三件事：
+
+```js
+  // Per-class color via golden-angle HSV rotation — maximally distinct hues for any class count.
+  // Same label always yields the same color; 100+ classes still get good separation.
+  function classColor(label) {
+    var h = 0;
+    for (var i = 0; i < label.length; i++) { h = ((h << 5) - h + label.charCodeAt(i)) | 0; }
+    var hue = (Math.abs(h) * 137.508) % 360;  // golden angle
+    var s = 0.78, v = 0.95;
+    var c = v * s, hp = hue / 60, x = c * (1 - Math.abs(hp % 2 - 1)), r = 0, g = 0, b = 0;
+    if (hp < 1) { r = c; g = x; }
+    else if (hp < 2) { r = x; g = c; }
+    else if (hp < 3) { g = c; b = x; }
+    else if (hp < 4) { g = x; b = c; }
+    else if (hp < 5) { r = x; b = c; }
+    else { r = c; b = x; }
+    var m = v - c, R = Math.round((r + m) * 255), G = Math.round((g + m) * 255), B = Math.round((b + m) * 255);
+    var rgb = R + ',' + G + ',' + B;
+    return { stroke: 'rgba(' + rgb + ',0.85)', fill: 'rgba(' + rgb + ',0.08)', text: 'rgba(' + rgb + ',0.95)' };
+  }
+```
+
+Source: [`bundle.js` L55-L72](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L55-L72)
 
 1. **字符串哈希（L58-L59）**：用经典的 `h = ((h << 5) - h + charCodeAt(i)) | 0` 累加器对 label 字符串做哈希。这是一个 32 位整数哈希，位移 5 + 减自身等价于乘以 31（`((h << 5) - h) = h * 31`），是 Java `String.hashCode()` 的同款算法。`| 0` 把结果截断成 32 位有符号整数。
 2. **黄金角旋转（L60）**：`hue = (Math.abs(h) * 137.508) % 360`。137.508° 是黄金角（golden angle），即圆周角按黄金比例分割后的较短弧。把哈希值乘以黄金角再 mod 360，等价于在色相环上按黄金比例步进取色——这是数学上让任意数量点在圆周上「最大化最小间距」的最优策略。同一个 label 永远哈希到同一个色相（纯函数，无副作用），而不同 label 即使哈希值只差 1，色相也会差 137.508°，视觉上几乎不可能撞色。
@@ -66,6 +105,50 @@ graph TB
 ## 5.3 SVG 叠加渲染：Polygon + Rect Fallback
 
 检测框的渲染不是画在 Canvas 上，而是用一层 SVG 叠加在 `<img>` 之上。这层 SVG 的渲染逻辑在 [`bundle.js` L1210-L1272](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1210-L1272)，核心是一个 `detections.map(...)` 调用，每个 detection 生成一个 `<g>` 元素，内含形状（polygon 或 rect）+ 标签文字。
+
+```js
+                // Detection boxes overlay — SVG (polygon when available, rect fallback) adjusted for object-cover image scaling
+                (processingEnabled && detections.length > 0 && ovTf)
+                  ? jsx('svg', {
+                      key: 'det-svg',
+                      className: 'absolute inset-0 w-full h-full',
+                      style: { pointerEvents: 'none' },
+                      viewBox: '0 0 100 100',
+                      preserveAspectRatio: 'none',
+                      children: detections.map(function (det, i) {
+                        var detLabel = det.label || '';
+                        var detConf = typeof det.confidence === 'number' ? Math.round(det.confidence * 100) : '';
+                        var clr = classColor(detLabel || ('det' + i));
+                        var children = [];
+
+                        if (det.polygon && det.polygon.length >= 3) {
+                          // Polygon mode (OCR scenarios): precise contour
+                          var pts = det.polygon.map(function(p) {
+                            var px = Array.isArray(p) ? p[0] : p.x;
+                            var py = Array.isArray(p) ? p[1] : p.y;
+                            var tx = ovTf ? ((px * ovTf.sx + ovTf.ox) * 100) : (px * 100);
+                            var ty = ovTf ? ((py * ovTf.sy + ovTf.oy) * 100) : (py * 100);
+                            return tx.toFixed(2) + ',' + ty.toFixed(2);
+                          }).join(' ');
+                          children.push(jsx('polygon', {
+                            key: 'poly', points: pts,
+                            fill: clr.fill, stroke: clr.stroke,
+                            strokeWidth: '0.4'
+                          }));
+                        } else if (det.bbox && det.bbox.length >= 4) {
+                          // Rect fallback (object detection scenarios)
+                          // ... (25 lines omitted: rect coords + label text node)
+                        }
+
+                        // ... (14 lines omitted: label text rendering)
+
+                        return children.length > 0 ? jsxs('g', { key: 'dbox-' + i, children: children }) : null;
+                      })
+                    })
+                  : null,
+```
+
+Source: [`bundle.js` L1210-L1272](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1210-L1272)
 
 **Polygon 模式（L1224-L1237）**：当 `det.polygon` 存在且顶点数 ≥ 3 时，渲染 `<polygon>`。这是 OCR 场景（`ocr_text_blocks` responseType）的精确轮廓——OCR 文本框通常不是轴对齐矩形（倾斜文本、弯曲文本行），多边形比 bbox 更贴合。顶点坐标在 L1226-L1231 遍历，每个顶点先经过 `ovTf` 变换（见 5.4），再拼接成 SVG `points` 字符串。
 
@@ -90,6 +173,29 @@ commit [`b746c02`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/c
 
 检测框的坐标是**归一化到图像空间的**（0-1 表示相对于原始图像宽高的比例），但图像在 DOM 里是用 `object-cover` 渲染的——图像会被缩放以完全覆盖容器，多余的部分被裁剪。这意味着图像的可见区域只是原始图像的一个子集，检测框坐标必须经过一个变换才能正确叠加在可见区域上。这个变换就是 `ovTf`，计算逻辑在 [`bundle.js` L879-L899](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L879-L899)。
 
+```js
+    // Object-cover transform: map normalized image coords (0-1) to container coords (0-1)
+    // object-cover scales image to cover container, cropping excess.
+    // In image space, only a portion is visible. We map image coords → container coords.
+    var imgNat = imgNatState[0];
+    var ctrSize = ctrSizeState[0];
+    var ovTf = null;
+    if (imgNat.w > 0 && imgNat.h > 0 && ctrSize.w > 0 && ctrSize.h > 0) {
+      var imgAsp = imgNat.w / imgNat.h;
+      var cAsp = ctrSize.w / ctrSize.h;
+      if (imgAsp > cAsp) {
+        // Image wider than container → sides cropped, image fills container height
+        var scX = (ctrSize.h / imgNat.h * imgNat.w) / ctrSize.w;
+        ovTf = { sx: scX, sy: 1, ox: (1 - scX) / 2, oy: 0 };
+      } else {
+        // Image taller than container → top/bottom cropped, image fills container width
+        var scY = (ctrSize.w / imgNat.w * imgNat.h) / ctrSize.h;
+        ovTf = { sx: 1, sy: scY, ox: 0, oy: (1 - scY) / 2 };
+      }
+```
+
+Source: [`bundle.js` L879-L899](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L879-L899)
+
 `ovTf` 是一个 `{sx, sy, ox, oy}` 四元组，含义是：把归一化图像坐标 `(px, py)` 映射到归一化容器坐标 `(tx, ty)` 的仿射变换——`tx = px * sx + ox`，`ty = py * sy + oy`。两个分支：
 
 - **图像宽高比 > 容器宽高比（L888-L894）**：图像比容器「更宽」，缩放后图像的两侧被裁剪，容器只显示图像中间的一段宽度。此时 `sy = 1`（纵向不缩放），`sx = (cH / iH * iW) / cW`（横向缩放，因为图像被压缩到了更窄的容器宽度上），`ox = (1 - sx) / 2`（横向偏移，让裁剪居中），`oy = 0`。
@@ -97,7 +203,40 @@ commit [`b746c02`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/c
 
 这个变换在渲染时被应用到每一个检测框的每一个坐标上：polygon 顶点在 [L1185-L1187](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1185-L1187)（ROI 多边形）和 [L1229-L1230](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1229-L1230)（检测框 polygon），bbox 四角在 [L1241-L1244](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1241-L1244)，标签位置在 [L1259-L1260](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1259-L1260)。变换公式统一是 `tx = (px * ovTf.sx + ovTf.ox) * 100`（乘以 100 是因为 SVG viewBox 是 100x100）。
 
+```js
+// ROI polygon 顶点 (L1185-L1187):
+var tx = ovTf ? ((p.x * ovTf.sx + ovTf.ox) * 100) : (p.x * 100);
+var ty = ovTf ? ((p.y * ovTf.sy + ovTf.oy) * 100) : (p.y * 100);
+
+// detection polygon 顶点 (L1229-L1230):
+var dtx = ovTf ? ((px * ovTf.sx + ovTf.ox) * 100) : (px * 100);
+var dty = ovTf ? ((py * ovTf.sy + ovTf.oy) * 100) : (py * 100);
+
+// bbox 四角 (L1241-L1244):
+var rx1 = ovTf ? (bx1 * ovTf.sx + ovTf.ox) * 100 : bx1 * 100;
+var ry1 = ovTf ? (by1 * ovTf.sy + ovTf.oy) * 100 : by1 * 100;
+var rx2 = ovTf ? (bx2 * ovTf.sx + ovTf.ox) * 100 : bx2 * 100;
+var ry2 = ovTf ? (by2 * ovTf.sy + ovTf.oy) * 100 : by2 * 100;
+
+// 标签位置 (L1259-L1260):
+var lx = ovTf ? ((lpx * ovTf.sx + ovTf.ox) * 100) : (lpx * 100);
+var ly = (ovTf ? ((lpy * ovTf.sy + ovTf.oy) * 100) : (lpy * 100)) - 1.5;
+```
+
+Source: [`bundle.js` L1185-L1260](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1185-L1260)
+
 图像本身的 `object-cover` 是在 [`bundle.js` L1162](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1162-L1162) 设置的：`className: 'w-full h-full object-cover'`。
+
+```js
+                jsx('img', {
+                  src: imageSrc,
+                  alt: 'Latest capture',
+                  className: 'w-full h-full object-cover',
+                  loading: 'lazy',
+                  style: { imageRendering: 'auto' },
+```
+
+Source: [`bundle.js` L1159-L1164](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1159-L1164)
 
 ```mermaid
 graph LR
@@ -125,7 +264,32 @@ graph LR
 
 ## 5.5 ResizeObserver 回调 Ref 模式
 
-`ovTf` 的计算依赖两个状态：图像原始尺寸（`imgNatState`）和容器尺寸（`ctrSizeState`）。图像尺寸通过 `<img onLoad>` 回调写入（[L1165-L1168](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1165-L1168)），容器尺寸通过 ResizeObserver 监听媒体 `<div>` 的尺寸变化写入。但这里有一个 React 的经典陷阱：**媒体 `<div>` 是条件渲染的**——只有当 `hasImage` 为 true 时才挂载（[L1153-L1156](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1153-L1156)），而图像是异步到达的（WS 推送或 REST 回填）。这意味着组件首次渲染时媒体 `<div>` 还不存在，一个普通的 `useEffect(() => { new ResizeObserver(mediaRef.current) }, [])` 会拿到 `mediaRef.current === null`，ResizeObserver 永远不会被挂载。
+`ovTf` 的计算依赖两个状态：图像原始尺寸（`imgNatState`）和容器尺寸（`ctrSizeState`）。图像尺寸通过 `<img onLoad>` 回调写入（[L1165-L1168](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1165-L1168)）：
+
+```js
+// bundle.js L1153-L1168
+hasImage
+  ? jsxs('div', {
+      key: 'media',
+      ref: cbRef.current,
+      className: 'relative w-full h-full',
+      children: [
+        jsx('img', {
+          src: imageSrc,
+          alt: 'Latest capture',
+          className: 'w-full h-full object-cover',
+          loading: 'lazy',
+          style: { imageRendering: 'auto' },
+          onLoad: function (e) {
+            var img = e.target;
+            if (img && img.naturalWidth) setImgNat({ w: img.naturalWidth, h: img.naturalHeight });
+          }
+        }),
+```
+
+Source: [`bundle.js` L1153-L1168](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1153-L1168)
+
+容器尺寸通过 ResizeObserver 监听媒体 `<div>` 的尺寸变化写入。但这里有一个 React 的经典陷阱：**媒体 `<div>` 是条件渲染的**——只有当 `hasImage` 为 true 时才挂载（[L1153-L1156](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1153-L1156)），而图像是异步到达的（WS 推送或 REST 回填）。这意味着组件首次渲染时媒体 `<div>` 还不存在，一个普通的 `useEffect(() => { new ResizeObserver(mediaRef.current) }, [])` 会拿到 `mediaRef.current === null`，ResizeObserver 永远不会被挂载。
 
 commit [`d7836b8`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/d7836b8)（`fix(ne101_camera): ResizeObserver never set up when image loads async`）就是修这个问题的。修复方案是 **callback ref 模式**，位于 [`bundle.js` L534-L548](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L534-L548)：
 
@@ -150,6 +314,16 @@ if (!cbRef.current) {
 
 callback 内部的逻辑三步走：(1) L538 断开旧的 ResizeObserver（如果存在），防止内存泄漏；(2) L539 把元素存入 `mediaRef`，供其他逻辑使用；(3) L541-L545 创建新的 ResizeObserver，回调里调用 `setCtrSize` 更新容器尺寸状态。`ctrSizeState` 的初始值是 `{w: 0, h: 0}`（[L530](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L530-L530)），当它从 0 变成实际尺寸时，会触发重渲染，`ovTf` 从 `null` 变成有效值，检测框从「不渲染」（L1211 的 `&& ovTf` 守卫）变成「渲染」。
 
+```js
+    var imgNatState = React.useState({ w: 0, h: 0 });
+    var setImgNat = imgNatState[1];
+    var mediaRef = React.useRef(null);
+    var ctrSizeState = React.useState({ w: 0, h: 0 });
+    var setCtrSize = ctrSizeState[1];
+```
+
+Source: [`bundle.js` L527-L530](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L527-L530)
+
 commit [`7c92a19`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/7c92a19)（`fix(ne101): fix ROI canvas coordinate mapping for objectFit contain`）是相关的早期修复，处理的是 `objectFit: contain` 时代的坐标映射问题，后来切换到 `object-cover` 后由 `d7836b8` 的 callback ref 补全了异步挂载场景。
 
 **设计决策：callback ref vs useEffect+ref vs ResizeObserver on window**
@@ -165,6 +339,40 @@ commit [`7c92a19`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/c
 ## 5.6 检测摘要徽章
 
 图像底部的叠加栏（[`bundle.js` L1067-L1145](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1067-L1145)）渲染一组检测摘要徽章，让用户在不看检测框细节的情况下也能快速掌握「这一帧检测到了什么」。这组徽章的设计原则是 **metric-driven**——数据来源是 Transform 已经计算好的 virtual 指标，而不是在组件里重新从 detections 数组聚合。
+
+```js
+// bundle.js L1067-L1095 (trimmed)
+var vTotalCount = getFirst(vals, [pfx + 'total_count', 'values.' + pfx + 'total_count']);
+var vRoiCount = getFirst(vals, [pfx + 'roi_count', 'values.' + pfx + 'roi_count']);
+var vCountByClass = getFirst(vals, [pfx + 'count_by_class', 'values.' + pfx + 'count_by_class']);
+var vTexts = getFirst(vals, [pfx + 'texts', 'values.' + pfx + 'texts']);
+var maxInfTime = getFirst(vals, [pfx + 'inference_time_ms', 'values.' + pfx + 'inference_time_ms']);
+
+var displayCount = vTotalCount != null ? vTotalCount : detections.length;
+var detLabels = detections.slice(0, 4).map(function (d) { return d.label || '?'; });
+
+var detSummaryChildren = [];
+detSummaryChildren.push(
+  jsx('span', {
+    key: 'count',
+    style: Object.assign({}, white, bgMetricStyle, textShadow, { fontSize: '9px', fontWeight: '600', padding: '2px 6px', borderRadius: '4px' }),
+    children: displayCount + ' detected'
+  })
+);
+
+// ROI count badge
+if (vRoiCount != null) {
+  detSummaryChildren.push(
+    jsxs('span', {
+      key: 'roi-count',
+      style: Object.assign({}, white80, { fontSize: '8px', fontWeight: '600', padding: '2px 5px', borderRadius: '3px', background: 'rgba(255,200,50,0.25)', border: '1px solid rgba(255,200,50,0.4)' }),
+      children: ['ROI: ', jsx('span', { key: 'n', style: { fontFamily: 'monospace' }, children: vRoiCount })]
+    })
+  );
+}
+```
+
+Source: [`bundle.js` L1067-L1145](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1067-L1145)
 
 徽章的渲染条件是 `hasAnySummary`（L1063），即 virtual 指标里至少存在 `total_count`。满足后按顺序渲染五个徽章：
 
@@ -186,6 +394,53 @@ commit [`7c92a19`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/c
 ## 5.7 Transform 三级生命周期
 
 Transform 的 create/update/delete 逻辑在 [`bundle.js` L661-L824](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L661-L824)，是一个 `React.useEffect`，依赖数组是 `[device.id, processingEnabled, _configHash, _storedTid, _storedHash]`（L824）。这个 effect 内部按三级分发：
+
+```js
+// bundle.js L661-L679, L722-L742 (trimmed)
+React.useEffect(function () {
+  if (_isPreview) return;
+  var neomind = window.neomind;
+  var onCfgChange = props.onConfigChange;
+
+  // --- Processing OFF: delete Transform ---
+  if (!processingEnabled || !processingExtId || !device) {
+    if (_storedTid && neomind && neomind.deleteTransform) {
+      neomind.deleteTransform(_storedTid).catch(function () {});
+    }
+    if (_storedTid) {
+      transformIdRef.current = null;
+      if (onCfgChange) onCfgChange(Object.assign({}, config, { _transformId: '', _transformHash: '' }));
+    }
+    setExtStatus('idle');
+    return;
+  }
+  // ... (42 lines omitted: payload build) ...
+
+  // --- Tier 1: ID + hash match — verify Transform still exists ---
+  if (_storedTid && _storedHash === _configHash) {
+    transformIdRef.current = _storedTid;
+    setExtStatus('active');
+    if (neomind.listTransforms) {
+      neomind.listTransforms({ id: _storedTid }).then(function (list) {
+        if (cancelled) return;
+        var arr = Array.isArray(list) ? list : [];
+        var found = false;
+        for (var vi = 0; vi < arr.length; vi++) {
+          if (arr[vi].id === _storedTid) { found = true; break; }
+        }
+        if (!found) {
+          transformIdRef.current = null;
+          if (onCfgChange) onCfgChange(Object.assign({}, config, { _transformId: '', _transformHash: '' }));
+        }
+      }).catch(function () {});
+    }
+    return;
+  }
+  // ... (82 lines omitted: Tier 2 update + Tier 3 create) ...
+}, [device ? device.id : null, processingEnabled, _configHash, _storedTid, _storedHash]);
+```
+
+Source: [`bundle.js` L661-L824](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L661-L824)
 
 **配置哈希（L655-L659）**：在 effect 之前，先计算 `_configHash`——把所有处理配置字段（extId / template / categories / phrase / classFilter / roiEnabled / roiAction / roiOverlap / roiX/Y/W/H / rois）拼成一个字符串。如果 `_configHash === _storedHash`（上次持久化的哈希），说明配置没变，走 Tier 1 快速路径。
 
