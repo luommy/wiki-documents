@@ -2,34 +2,51 @@
 description: "ne101_camera 组件架构剖析：1972 行 IIFE 的 5 层拆解（helper / hook / sub-component / export）、3 个对外组件（NE101CameraPanel / ConfigPanel / AdvancedPanel）、数据流（WebSocket 优先 + REST 回退）、ROI 叠加管线、与 metric_card 的架构对比"
 keywords: [NeoMind, ne101_camera, IIFE 架构, React-in-IIFE, 设备绑定组件]
 tags: [NeoMind, 案例, 架构]
-sidebar_label: "2. 架构总览"
+sidebar_label: "2. Architecture"
 ---
 
-# §2 架构总览
+# 2 架构总览
 
 > 本节是把 [`bundle.js`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js) 1972 行手写 IIFE「拆开看」的章节。读完你应当能：(1) 画出 IIFE 顶层结构与 `window.*` 注入的依赖边界；(2) 解释 helper / template / sub-component / main / export 五层的职责切分；(3) 复述组件树（根节点 `NE101CameraPanel` 加上 `ConfigPanel` / `AdvancedPanel` 两个对外子组件）以及核心 hooks 的语义；(4) 描述「WebSocket 优先 + REST 回退」的双通道数据流；(5) 在与 [#6 metric_card](../6-metric-card-component.md) 的对比里说清「设备绑定组件」与「显示型组件」的架构代差。所有行号都基于源码仓库的 `main` 分支，链接带 `#L<start>-L<end>` 锚点。
 
 ---
 
-## §2.1 IIFE 顶层结构
+## 2.1 IIFE 顶层结构
 
-ne101_camera 的 `bundle.js` 第一行不是 import，而是一句对 `window` 的契约声明。查看源码：[`bundle.js` L1-L5](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1-L5)。
+ne101_camera 的 `bundle.js` 第一行不是 import，而是一句对 `window` 的契约声明。查看源码：
 
-```javascript
+```js
+// bundle.js L1-L5
 var NE101CameraPanel = (function () {
   var React = window.React;
   var jsx = window.jsxRuntime.jsx;
   var jsxs = window.jsxRuntime.jsxs;
-  // ... 1965 行组件逻辑 ...
-  return { default: NE101CameraPanel, NE101CameraPanel: NE101CameraPanel, ConfigPanel: ConfigPanel, AdvancedPanel: AdvancedPanel };
-})();
 ```
 
-这三行 `var React = window.React` + `var jsx = window.jsxRuntime.jsx` + `var jsxs = window.jsxRuntime.jsxs` 是 NeoMind 组件市场的「注入三连」，也是与 metric_card（[#6 metric_card §3.2](../6-metric-card-component.md)）共享的底层约定。它意味着 **bundle 不打包 React**，而是从宿主页面已经加载好的单例里「借」一份 React，从而保证全仪表板只有一个 React 实例，hooks 不会跨实例失效（`useContext` 返回 undefined、`useRef` 报错这类经典症状）。
+Source: [`bundle.js` L1-L5](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1-L5)
+
+这三行 `var React = window.React` + `var jsx = window.jsxRuntime.jsx` + `var jsxs = window.jsxRuntime.jsxs` 是 NeoMind 组件市场的「注入三连」，也是与 metric_card（[#6 metric_card 3.2](../6-metric-card-component.md)）共享的底层约定。它意味着 **bundle 不打包 React**，而是从宿主页面已经加载好的单例里「借」一份 React，从而保证全仪表板只有一个 React 实例，hooks 不会跨实例失效（`useContext` 返回 undefined、`useRef` 报错这类经典症状）。
 
 为什么用 `var Name = (function(){ ... })()` 这种 IIFE 形式而不是 UMD / CommonJS / ESM？根本原因是 **Dashboard 宿主通过 `<script>` 标签注入 bundle**。`<script>` 标签没有模块作用域，IIFE 是唯一能用「函数作用域 + 闭包」模拟私有命名空间的零依赖手段：函数体内的 `function classColor` / `var white` 等等不会泄漏到 `window` 上，只有最后那一句 `return { ... }` 的对象挂到 `window.NE101CameraPanel`。UMD 虽然也能跑在 `<script>` 下，但它多了一层 `define` / `module.exports` 的探测分支，对「不跑打包器」的 NeoMind 范式是冗余的；CommonJS 的 `require` 在浏览器里根本不工作。
 
-最后一行 [`bundle.js` L1971](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1971) 是**命名导出 + default 双暴露**：`return { default: NE101CameraPanel, NE101CameraPanel: ..., ConfigPanel: ..., AdvancedPanel: ... }`。注意 `manifest.json` 的 [`export_name: "NE101CameraPanel"`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L39) 选了命名导出（从 `NE101CameraPanel.NE101CameraPanel` 取主组件），而不是 default；但 default 同时被保留，是为了兼容那些仍写 `bundle.default` 的旧版 Dashboard 加载器（见 §2.5 决策 #2）。这种「双暴露」是 ne101_camera 区别于 metric_card 的一个细节——metric_card 也写了 `default + MetricCard`，但只导出一个组件，而 ne101_camera 要把 `ConfigPanel` / `AdvancedPanel` 一起带出去给配置对话框使用。
+最后一行 [`bundle.js` L1971](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1971) 是**命名导出 + default 双暴露**：
+
+```js
+// bundle.js L1971
+  return { default: NE101CameraPanel, NE101CameraPanel: NE101CameraPanel, ConfigPanel: ConfigPanel, AdvancedPanel: AdvancedPanel };
+```
+
+Source: [`bundle.js` L1971](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1971)
+
+注意 `manifest.json` 的 [`export_name: "NE101CameraPanel"`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L39) 选了命名导出：
+
+```js
+// manifest.json L38-L39
+  "global_name": "NE101CameraPanel",
+  "export_name": "NE101CameraPanel"
+```
+
+Source: [manifest.json L39](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L39)（从 `NE101CameraPanel.NE101CameraPanel` 取主组件），而不是 default；但 default 同时被保留，是为了兼容那些仍写 `bundle.default` 的旧版 Dashboard 加载器（见 2.5 决策 #2）。这种「双暴露」是 ne101_camera 区别于 metric_card 的一个细节——metric_card 也写了 `default + MetricCard`，但只导出一个组件，而 ne101_camera 要把 `ConfigPanel` / `AdvancedPanel` 一起带出去给配置对话框使用。
 
 下图把 IIFE 的「window 注入 → IIFE 闭包 → 五层 → return 对象」这条主线画清楚。
 
@@ -65,13 +82,25 @@ graph TB
 
 ---
 
-## §2.2 五层架构拆解
+## 2.2 五层架构拆解
 
 ne101_camera 的 1972 行 IIFE 按职责可以切成五层。这一节给每层一个 2-3 句的职责说明，并标出关键行号深链，方便后续章节交叉引用。
 
 ### 第 1 层：Helper 层（L7-L230）
 
-Helper 层是无状态的工具函数集，**只做纯计算、不触碰 React**。这一层的设计原则是「可以单独抽出来跑在 Node.js 里」，因为它们没有任何副作用。查看源码：[`bundle.js` L7-L230](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L7-L230)。
+Helper 层是无状态的工具函数集，**只做纯计算、不触碰 React**。这一层的设计原则是「可以单独抽出来跑在 Node.js 里」，因为它们没有任何副作用。查看源码：
+
+```js
+// bundle.js L7-L12 — batteryMeta
+  function batteryMeta(level) {
+    if (level == null) return { bar: 'rgba(128,128,128,0.3)' };
+    if (level > 60) return { bar: 'rgba(34,197,94,0.8)' };
+    if (level > 20) return { bar: 'rgba(234,179,8,0.8)' };
+    return { bar: 'rgba(239,68,68,0.8)' };
+  }
+```
+
+Source: [`bundle.js` L7-L12](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L7-L12)
 
 核心 helper：
 
@@ -79,32 +108,258 @@ Helper 层是无状态的工具函数集，**只做纯计算、不触碰 React**
 - `formatValue(val, metric)` / `unitStr(metric)` / `timeAgo(iso)` —— 数值格式化与相对时间，metric_card 也有同类函数。
 - `getVal(obj, key)` / `getFirst(obj, keys)` —— 支持点号路径的取值器，是处理 `values.xxx.yyy` 这类嵌套遥测字段的通用工具。
 - `classColor(label)`（[L57](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L55-L72)）—— **黄金角 HSV 上色**：对类别字符串做字符串哈希，再把哈希值乘以黄金角 137.508° 得到色相，保证任意类别数都有视觉可分的颜色。这条规则是 commit [`c276c23`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/c276c23)（`feat(ne101): per-class detection colors via golden-angle HSV rotation`）引入的。
+
+```js
+// bundle.js L55-L72 — classColor (golden-angle HSV)
+  // Per-class color via golden-angle HSV rotation — maximally distinct hues for any class count.
+  // Same label always yields the same color; 100+ classes still get good separation.
+  function classColor(label) {
+    var h = 0;
+    for (var i = 0; i < label.length; i++) { h = ((h << 5) - h + label.charCodeAt(i)) | 0; }
+    var hue = (Math.abs(h) * 137.508) % 360;  // golden angle
+    var s = 0.78, v = 0.95;
+    var c = v * s, hp = hue / 60, x = c * (1 - Math.abs(hp % 2 - 1)), r = 0, g = 0, b = 0;
+    if (hp < 1) { r = c; g = x; }
+    else if (hp < 2) { r = x; g = c; }
+    else if (hp < 3) { g = c; b = x; }
+    else if (hp < 4) { g = x; b = c; }
+    else if (hp < 5) { r = x; b = c; }
+    else { r = c; b = x; }
+    var m = v - c, R = Math.round((r + m) * 255), G = Math.round((g + m) * 255), B = Math.round((b + m) * 255);
+    var rgb = R + ',' + G + ',' + B;
+    return { stroke: 'rgba(' + rgb + ',0.85)', fill: 'rgba(' + rgb + ',0.08)', text: 'rgba(' + rgb + ',0.95)' };
+  }
+```
+
+Source: [`bundle.js` L55-L72](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L55-L72)
 - `PinIcon` / `ModeIcon`（[L86-L100](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L86-L100)）—— 内联 SVG 图标组件，无外部依赖。
-- `pipeRois(pipe)`（[L204-L230](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L204-L230)）—— 从 pipeline 配置里把 ROI 数组抽出来，同时兼容新格式（`pipe.rois = [{points:[...]}`）和旧格式（`pipe.roiX/Y/W/H` 单矩形）。这是 §1.6 决策 #4 那条「向后兼容字段演进」在代码层的落点。
+
+```js
+// bundle.js L86-L100 — PinIcon + ModeIcon entry
+  function PinIcon() {
+    return jsx('svg', {
+      width: '12', height: '12', viewBox: '0 0 24 24',
+      fill: 'none', stroke: 'currentColor', strokeWidth: '2', strokeLinecap: 'round', strokeLinejoin: 'round',
+      style: { flexShrink: '0' },
+      children: jsx('path', { d: 'M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z' })
+    });
+  }
+
+  // SVG icons for AI mode cards (Lucide-style)
+  var _iconBase = { fill: 'none', stroke: 'currentColor', strokeWidth: '2', strokeLinecap: 'round', strokeLinejoin: 'round' };
+  function ModeIcon(type) {
+    switch (type) {
+      case 'search':
+```
+
+Source: [`bundle.js` L86-L100](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L86-L100)
+
+- `pipeRois(pipe)`（[L204-L230](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L204-L230)）—— 从 pipeline 配置里把 ROI 数组抽出来，同时兼容新格式（`pipe.rois = [{points:[...]}`）和旧格式（`pipe.roiX/Y/W/H` 单矩形）。这是 1.6 决策 #4 那条「向后兼容字段演进」在代码层的落点。
+
+```js
+// bundle.js L204-L230 — pipeRois
+  function pipeRois(pipe) {
+    if (!pipe.roiEnabled) return [];
+    if (pipe.rois && Array.isArray(pipe.rois) && pipe.rois.length > 0) {
+      var result = [];
+      for (var i = 0; i < pipe.rois.length; i++) {
+        var r = pipe.rois[i];
+        var pts = r.points;
+        if (pts && pts.length >= 3) {
+          result.push({ name: (r.name || 'ROI ' + (i + 1)).replace(/[^a-zA-Z0-9_\u4e00-\u9fff]/g, '_'), points: pts });
+        }
+      }
+      if (result.length > 0) return result;
+    }
+    if (pipe.roiX == null || pipe.roiY == null) return [];
+    var x = Number(pipe.roiX) || 0;
+    var y = Number(pipe.roiY) || 0;
+    var w = Number(pipe.roiW) || 0.8;
+    var h = Number(pipe.roiH) || 0.8;
+    if (w <= 0) w = 0.8;
+    if (h <= 0) h = 0.8;
+    return [{ name: 'default', points: [
+      { x: x, y: y },
+      { x: x + w, y: y },
+      { x: x + w, y: y + h },
+      { x: x, y: y + h }
+    ]}];
+  }
+```
+
+Source: [`bundle.js` L204-L230](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L204-L230)
 
 Helper 层之所以单独成层，是因为它们在 main component 和 sub-component 里都会被反复调用；如果散落在各处，会出现「改一个函数要 grep 全文」的维护噩梦。
 
 ### 第 2 层：Template 引擎层（L239-L456）
 
-这是 ne101_camera 区别于所有其它 NeoMind 组件的「独门武器」：**动态生成 transform 的 js_code 字符串**。查看源码：[`bundle.js` L239-L456](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L239-L456)。
+这是 ne101_camera 区别于所有其它 NeoMind 组件的「独门武器」：**动态生成 transform 的 js_code 字符串**。查看源码：
+
+```js
+// bundle.js L239-L264 — generateTransformJsCode entry
+  function generateTransformJsCode(pipe) {
+    var extensionId = pipe.extId;
+    // Remove any 'virtual' prefix in various formats (defensive)
+    if (extensionId.indexOf('virtual') === 0) {
+      extensionId = extensionId.replace(/^virtual[._-]/, '');
+    }
+    var templateName = pipe.template;
+    var mode = getExtMode(extensionId, templateName);
+    if (!mode) return '';
+
+    var extKey = extensionId.replace(/-/g, '_');
+    var pfx = extKey + '.';
+    var imageArg = mode.imageArg;
+    var hasCats = (mode.args || []).indexOf('categories') >= 0 && pipe.categories;
+    var hasPhrase = (mode.args || []).indexOf('phrase') >= 0 && pipe.phrase;
+    var rois = pipeRois(pipe);
+    var roiAction = pipe.roiAction || 'count';
+    var classFilter = pipe.classFilter;
+
+    var L = [];
+    L.push('// NE101 Camera Transform');
+    L.push('// Extension: ' + extensionId + ' | Mode: ' + mode.label);
+    L.push('// Generated by component config — safe to customize');
+    L.push('');
+    // ... (190 lines omitted: input parsing, extension invoke, per-template post-processing) ...
+```
+
+Source: [`bundle.js` L239-L456](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L239-L456)
 
 `generateTransformJsCode(pipe)`（[L239](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L239-L264)）接收一个 pipeline 配置对象（包含 `extId` / `template` / `categories` / `phrase` / `classFilter` / `roiEnabled` / `roiAction` / `roiX/Y/W/H`），返回一段字符串形式的 JavaScript 代码。这段代码会被塞进 NeoMind 主控的 TransformAutomation 实体里，由主控在每次抓拍后调度执行，调用扩展的 `extensions.invoke()` 并把结果写回虚拟指标。
 
-为什么用代码生成而不是硬编码条件分支？因为不同 `processingTemplate`（`object_detection` / `ocr` / `describe` / `barcode`）需要完全不同的后处理（OCR 要拼多边形、describe 要拼描述文本、object_detection 要按类别聚合），如果用 `if (template === 'ocr') { ... } else if ...` 的写法，主组件的渲染函数会膨胀到不可读。把后处理逻辑生成成独立字符串、让主控在沙箱里 `eval` 执行，等于把「可变的后处理」从组件代码里物理剥离出去。这个决策的权衡见 §2.5 #4。
+为什么用代码生成而不是硬编码条件分支？因为不同 `processingTemplate`（`object_detection` / `ocr` / `describe` / `barcode`）需要完全不同的后处理（OCR 要拼多边形、describe 要拼描述文本、object_detection 要按类别聚合），如果用 `if (template === 'ocr') { ... } else if ...` 的写法，主组件的渲染函数会膨胀到不可读。把后处理逻辑生成成独立字符串、让主控在沙箱里 `eval` 执行，等于把「可变的后处理」从组件代码里物理剥离出去。这个决策的权衡见 2.5 #4。
 
 ### 第 3 层：Sub-component 层（L458-L1970）
 
 这一层包含所有「被 main component 渲染或被 Dashboard 配置对话框渲染」的 React 函数组件。和 metric_card 只导出一个 `MetricCard` 不同，ne101_camera 的 sub-component 层有 **5 个公开/私有组件**，这也是它 1972 行代码量的主要来源：
 
 - `NoDevice`（[L458](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L458-L469)）—— 设备未绑定时显示的占位卡片，告诉用户「请在配置面板里绑定设备」。
+
+```js
+// bundle.js L458-L469 — NoDevice
+  function NoDevice() {
+    return jsxs('div', {
+      className: 'flex flex-col items-center justify-center h-full w-full p-4 text-center border border-border rounded-lg',
+      children: [
+        jsx('div', { key: 'icon', className: 'w-10 h-10 rounded-lg flex items-center justify-center mb-3', style: { background: 'rgba(161,161,170,0.15)' }, children:
+          jsx('span', { style: Object.assign({}, mutedFg, { fontSize: '14px', fontWeight: '700' }), children: 'CAM' })
+        }),
+        jsx('p', { key: 'title', style: Object.assign({}, mutedFg, { fontSize: '14px', fontWeight: '500' }), children: 'NE101 Camera' }),
+        jsx('p', { key: 'hint', style: Object.assign({}, mutedFgSub, { fontSize: '10px', marginTop: '4px' }), children: 'Bind a device in config panel' })
+      ]
+    });
+  }
+```
+
+Source: [`bundle.js` L458-L469](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L458-L469)
 - `SwitchControl(checked, onChangeFn)`（[L1334-L1348](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1334-L1348)）—— shadcn Switch 的手写复刻，用 `data-state` 触发宿主页面的 CSS 规则，避免引入额外依赖。
+
+```js
+// bundle.js L1334-L1348 — SwitchControl
+  function SwitchControl(checked, onChangeFn) {
+    var state = checked ? 'checked' : 'unchecked';
+    return jsx('button', {
+      type: 'button',
+      role: 'switch',
+      'data-state': state,
+      'aria-checked': String(checked),
+      onClick: onChangeFn,
+      className: 'peer inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input',
+      children: jsx('span', {
+        'data-state': state,
+        className: 'pointer-events-none block h-5 w-5 rounded-full bg-background shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0'
+      })
+    });
+  }
+```
+
+Source: [`bundle.js` L1334-L1348](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1334-L1348)
+
 - `ConfigPanel(props)`（[L1353-L1357](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1353-L1357)）—— Display tab 的内容，目前是空壳（平台负责 title 字段），但保留导出给配置对话框的 tab 结构。
+
+```js
+// bundle.js L1353-L1357 — ConfigPanel
+  function ConfigPanel(props) {
+    // Title field is provided by the platform (ComponentConfigDialog → titleSection)
+    // No custom fields needed — this keeps Display tab clean with just the platform title
+    return jsx('div', { className: 'space-y-3', children: null });
+  }
+```
+
+Source: [`bundle.js` L1353-L1357](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1353-L1357)
+
 - `ExtDropdown(props)`（[L1371-L1446](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1371-L1446)）—— shadcn 风格的扩展选择下拉框，替代原生 `<select>`，支持 loading 态和外部点击关闭。
+
+```js
+// bundle.js L1371-L1390 — ExtDropdown (head; 56 lines omitted)
+  function ExtDropdown(props) {
+    var exts = props.extensions;
+    var value = props.value;
+    var onChangeFn = props.onChange;
+    var loading = props.loading;
+
+    var openSt = React.useState(false);
+    var open = openSt[0];
+    var setOpen = openSt[1];
+    var wrapRef = React.useRef(null);
+
+    React.useEffect(function () {
+      if (!open) return;
+      function handler(e) {
+        if (wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false);
+      }
+      document.addEventListener('mousedown', handler);
+      return function () { document.removeEventListener('mousedown', handler); }
+    }, [open]);
+    // ... (56 lines omitted: option list rendering, trigger button, popover) ...
+```
+
+Source: [`bundle.js` L1371-L1446](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1371-L1446)
 - `AdvancedPanel(props)`（[L1448-L1970](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1448-L1970)）—— **高级配置面板**：AI 处理开关、扩展选择、模板选择、ROI 编辑器、ROI 重叠阈值滑块、NMS 阈值透传。这一个组件就有 522 行，是整个 bundle 最长的一段。
+
+```js
+// bundle.js L1448-L1457 — AdvancedPanel (entry; 513 lines omitted)
+  function AdvancedPanel(props) {
+    var config = props.config || {};
+    var onChange = props.onChange;
+
+    function update(key, value) {
+      if (onChange) onChange(key, value);
+    }
+
+    // Uncontrolled input — uses defaultValue so it always responds to typing.
+    // Syncs to config via onChange. No hooks needed, avoids hook-count mismatch
+    // ... (513 lines omitted: AI toggle, ExtDropdown, template picker, ROI editor, sliders) ...
+```
+
+Source: [`bundle.js` L1448-L1970](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1448-L1970)
 
 ### 第 4 层：Main component 层（L470-L1333）
 
-`NE101CameraPanel(props)`（[L472](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L470-L1333)）是运行时挂到网格里的主组件。它消费平台注入的 props（`config` / `deviceContext` / `deviceImageSrc` / `virtualMetrics` / `sendDeviceCommand`），内部用一组 hooks 管理命令加载状态、扩展状态、transform 生命周期、检测缓存、图像 layout 等。核心 hooks 见 §2.3。
+`NE101CameraPanel(props)`（[L472](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L470-L1333)）是运行时挂到网格里的主组件。它消费平台注入的 props（`config` / `deviceContext` / `deviceImageSrc` / `virtualMetrics` / `sendDeviceCommand`），内部用一组 hooks 管理命令加载状态、扩展状态、transform 生命周期、检测缓存、图像 layout 等。
+
+```js
+// bundle.js L470-L486 — NE101CameraPanel entry
+  function NE101CameraPanel(props) {
+    var config = props.config || {};
+    var showCommands = config.showCommands !== false;
+    var location = props.title || config.displayTitle || config.location || '';
+
+    var deviceCtx = props.deviceContext;
+    var device = deviceCtx && deviceCtx.device;
+    var deviceType = deviceCtx && deviceCtx.deviceType;
+    var sendCmd = props.sendDeviceCommand;
+
+    var cmdState = React.useState({});
+    var cmdLoading = cmdState[0];
+    var setCmdLoading = cmdState[1];
+    // ... (847 lines omitted: processing config, effects, render) ...
+```
+
+Source: [`bundle.js` L470-L1333](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L470-L1333)
+
+核心 hooks 见 2.3。
 
 ### 第 5 层：Export 层（L1971）
 
@@ -112,7 +367,7 @@ Helper 层之所以单独成层，是因为它们在 main component 和 sub-comp
 
 ---
 
-## §2.3 组件树（NE101CameraPanel / ConfigPanel / AdvancedPanel）
+## 2.3 组件树（NE101CameraPanel / ConfigPanel / AdvancedPanel）
 
 NeoMind Dashboard 对一个「设备绑定组件」的对外契约是：**主组件 + 可选的 Display tab 配置面板 + 可选的 Advanced tab 配置面板**。ne101_camera 把这三个角色都填满了，构成了一个三对外组件的组件树。
 
@@ -147,6 +402,37 @@ graph TB
 
 `NE101CameraPanel` 主组件的核心 hooks（位于 [`bundle.js` L484-L513](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L484-L513)）构成了它的状态机骨架：
 
+```js
+// bundle.js L484-L524 — core hooks block
+    var cmdState = React.useState({});
+    var cmdLoading = cmdState[0];
+    var setCmdLoading = cmdState[1];
+    // ... (18 lines omitted: processing config destructure) ...
+    var extStatusState = React.useState('idle');
+    var extStatus = extStatusState[0];
+    var setExtStatus = extStatusState[1];
+
+    // Track transform ID for cleanup
+    var transformIdRef = React.useRef(null);
+
+    // Cache last known detections + their source timestamp
+    var lastDetsRef = React.useRef([]);
+    var lastDetsTsRef = React.useRef(null);
+
+    // WS-triggered fetch: platform WS delivers small metrics (battery, ts) in real-time,
+    // but large base64 images may exceed WS message size limits.
+    // Strategy: when WS updates device.currentValues (detected by ts change),
+    // trigger a single Rest fetch to get the full data including the image.
+    var imageState = React.useState(null);
+    var imageData = imageState[0];
+    var setImageData = imageState[1];
+
+    var lastFetchTsRef = React.useRef(null);
+    var fetchingRef = React.useRef(false);
+```
+
+Source: [`bundle.js` L484-L524](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L484-L524)
+
 | Hook | 行号 | 作用 |
 |------|------|------|
 | `cmdState = React.useState({})` | [L484](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L484-L486) | 设备命令的 loading 状态字典，key 是命令名 |
@@ -161,7 +447,7 @@ graph TB
 
 ---
 
-## §2.4 数据流：WebSocket 优先 + REST 回退
+## 2.4 数据流：WebSocket 优先 + REST 回退
 
 ne101_camera 的数据流是它和 metric_card 差异最大的地方。metric_card 用 `fetchData` prop 做轮询拉取，而 ne101_camera 走的是 **WebSocket 推送（增量）+ REST 拉取（全量回退）** 的双通道。
 
@@ -199,15 +485,51 @@ sequenceDiagram
 
 这条数据流的核心约定写在 [`bundle.js` L1601-L1602](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1601-L1602) 的注释里：
 
-```javascript
-// Fetch preview image from bound device
-// Priority: 1. deviceImageSrc prop (from platform store, populated by WebSocket)
-//           2. REST fetch via fetchDeviceValues (fallback)
+```js
+// bundle.js L1600-L1602 — data-flow priority comment
+    // Fetch preview image from bound device
+    // Priority: 1. deviceImageSrc prop (from platform store, populated by WebSocket)
+    //           2. REST fetch via fetchDeviceValues (fallback)
 ```
+
+Source: [`bundle.js` L1601-L1602](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1601-L1602)
 
 **Priority 1：`deviceImageSrc` prop**。这个 prop 来自平台的 device store，由 WebSocket 推送填充。平台订阅 `devices/{device_id}/telemetry` 主题，每收到一条消息就更新 store，再通过 React props 把 `deviceImageSrc` 注入组件。这是**实时通道**——延迟低（毫秒级），但可靠性受限于 WebSocket 连接状态（重连中会丢消息），且大体积的 base64 图像可能超出 WS 消息大小限制（见 [`bundle.js` L515-L517](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L515-L517) 的注释）。
 
-**Priority 2：REST 回退**。当 `deviceImageSrc` 为空时（首次挂载、WS 重连中、或图像体积超限），组件用 `window.neomind.fetchDeviceValues(deviceId)` 拉取全量 `currentValues`（见 [`bundle.js` L1613-L1628](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1613-L1628) 的 `fetchPreview` 函数）。这是**可靠通道**——一定有响应，但延迟高（HTTP 往返）。
+```js
+// bundle.js L515-L517 — WS-triggered fetch comment
+    // WS-triggered fetch: platform WS delivers small metrics (battery, ts) in real-time,
+    // but large base64 images may exceed WS message size limits.
+    // Strategy: when WS updates device.currentValues (detected by ts change),
+```
+
+Source: [`bundle.js` L515-L517](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L515-L517)
+
+**Priority 2：REST 回退**。当 `deviceImageSrc` 为空时（首次挂载、WS 重连中、或图像体积超限），组件用 `window.neomind.fetchDeviceValues(deviceId)` 拉取全量 `currentValues`（见 [`bundle.js` L1613-L1628](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1613-L1628) 的 `fetchPreview` 函数）：
+
+```js
+// bundle.js L1613-L1628 — fetchPreview
+    function fetchPreview() {
+      if (previewSrc) return; // already have image from prop
+      if (!deviceId) { previewImgState[1](''); return; }
+      var neomind = window.neomind;
+      if (!neomind || typeof neomind.fetchDeviceValues !== 'function') return;
+      previewLoadingState[1](true);
+      neomind.fetchDeviceValues(deviceId).then(function (v) {
+        if (!v) { previewLoadingState[1](false); return; }
+        var img = getFirst(v, ['values.imageUrl', 'values.image', 'values.photo', 'imageUrl', 'image', 'photo', 'values.picture', 'picture']);
+        if (img && typeof img === 'string') {
+          var src = img.indexOf('data:') === 0 ? img : 'data:image/jpeg;base64,' + img;
+          previewImgState[1](src);
+        }
+        previewLoadingState[1](false);
+      }).catch(function () { previewLoadingState[1](false); });
+    }
+```
+
+Source: [`bundle.js` L1613-L1628](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1613-L1628)
+
+这是**可靠通道**——一定有响应，但延迟高（HTTP 往返）。
 
 这条双通道策略的引入节点是两个关键 commit：
 
@@ -216,16 +538,32 @@ sequenceDiagram
 
 检测数据的解析有一个容易踩的坑：后端把 `detections` 虚拟指标存成 **JSON 字符串**而不是数组。[`bundle.js` L857](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L853-L867) 用 try/catch 做了防御性解析：
 
-```javascript
-var vDet = getFirst(vals, [pfx + 'detections', 'values.' + pfx + 'detections']);
-if (typeof vDet === 'string') { try { vDet = JSON.parse(vDet); } catch(e) { vDet = null; } }
+```js
+// bundle.js L853-L867 — detections parse + source_ts alignment
+    if (processingEnabled && processingExtId) {
+      var pfx = 'virtual.' + processingExtId.replace(/-/g, '_') + '.';
+      var vDet = getFirst(vals, [pfx + 'detections', 'values.' + pfx + 'detections']);
+      // Backend may store detections as a JSON string — parse it
+      if (typeof vDet === 'string') { try { vDet = JSON.parse(vDet); } catch(e) { vDet = null; } }
+      var vSourceTs = getFirst(vals, [pfx + 'source_ts', 'values.' + pfx + 'source_ts']);
+      // Match: detections' source_ts must align with the current image timestamp
+      var imgTsVal = imgTs;
+      var tsMatch = !vSourceTs || !imgTsVal || String(vSourceTs) === String(imgTsVal);
+      if (Array.isArray(vDet) && vDet.length > 0 && tsMatch) {
+        detections = vDet;
+        lastDetsRef.current = vDet;
+        lastDetsTsRef.current = imgTsVal;
+      } else if (Array.isArray(vDet) && vDet.length > 0) {
+        // Detections exist but from a different image — cache but don't display
+        lastDetsRef.current = vDet;
+        lastDetsTsRef.current = vSourceTs;
 ```
 
-这个修复来自 commit [`e3a70be`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/e3a70be)（`fix(ne101): parse JSON string detections from backend virtual metrics`）。在此之前，组件假设 `vDet` 一定是数组，遇到字符串就崩溃。这是「设备绑定组件」常见的契约模糊地带——后端的序列化策略和前端的反序列化假设不一致，§4 数据契约会专门讨论。
+这个修复来自 commit [`e3a70be`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/e3a70be)（`fix(ne101): parse JSON string detections from backend virtual metrics`）。在此之前，组件假设 `vDet` 一定是数组，遇到字符串就崩溃。这是「设备绑定组件」常见的契约模糊地带——后端的序列化策略和前端的反序列化假设不一致，4 数据契约会专门讨论。
 
 ---
 
-## §2.5 关键设计决策（≥4，含权衡与替代方案）
+## 2.5 关键设计决策（≥4，含权衡与替代方案）
 
 本节列出 5 个塑造 ne101_camera 当前形态的架构决策。每个决策给出「我们选 X / 替代方案 Y / 理由 Z」三段式，以及付出的代价。
 
@@ -259,6 +597,14 @@ if (typeof vDet === 'string') { try { vDet = JSON.parse(vDet); } catch(e) { vDet
 
 **代价**：(1) 组件要维护两条数据路径，代码复杂度翻倍；(2) WS 推送和 REST 拉取可能产生「数据竞态」（REST 返回旧数据覆盖了 WS 推送的新数据），需要用 `lastFetchTsRef` 和 `fetchingRef`（[`bundle.js` L523-L524](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L523-L524)）做去重。commit [`0eedd27`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/0eedd27) 修过一次这个竞态。
 
+```js
+// bundle.js L523-L524 — race-condition dedup refs
+    var lastFetchTsRef = React.useRef(null);
+    var fetchingRef = React.useRef(false);
+```
+
+Source: [`bundle.js` L523-L524](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L523-L524)
+
 ### 决策 #4：动态生成 transform JS 代码
 
 **选择**：用 `generateTransformJsCode(pipe)`（[L239](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L239-L456)）把 pipeline 配置序列化成一段 JavaScript 代码字符串，塞进 TransformAutomation 实体的 `js_code` 字段。
@@ -281,9 +627,9 @@ if (typeof vDet === 'string') { try { vDet = JSON.parse(vDet); } catch(e) { vDet
 
 ---
 
-## §2.6 与 #6 metric_card 的架构对比
+## 2.6 与 #6 metric_card 的架构对比
 
-下表把 ne101_camera 和 [#6 metric_card](../6-metric-card-component.md) 在 6 个维度上做对照，帮助读者建立「显示型组件 vs 设备绑定组件」的架构代差认知。metric_card 的相关字段可以参考它的 [§3.1 manifest 契约](../6-metric-card-component.md)。
+下表把 ne101_camera 和 [#6 metric_card](../6-metric-card-component.md) 在 6 个维度上做对照，帮助读者建立「显示型组件 vs 设备绑定组件」的架构代差认知。metric_card 的相关字段可以参考它的 [3.1 manifest 契约](../6-metric-card-component.md)。
 
 | 维度 | #6 metric_card | #7 ne101_camera | 代差解读 |
 |------|----------------|-----------------|----------|
@@ -291,6 +637,32 @@ if (typeof vDet === 'string') { try { vDet = JSON.parse(vDet); } catch(e) { vDet
 | **组件数** | 1 个对外组件（`MetricCard`） | 3 个对外组件（`NE101CameraPanel` + `ConfigPanel` + `AdvancedPanel`）+ 5 个内部 sub-component | metric_card 的「单组件」意味着它没有配置对话框的 tab 结构；ne101 的三件套是平台对「有 `has_device_binding` 或复杂 `config_schema` 的组件」的要求。 |
 | **数据接入** | `has_data_source: true` + `fetchData` prop（通用） | `has_device_binding: true` + `device_type_filter: ["ne101_camera"]`（专用） | metric_card 消费任何 DataSource（设备遥测 / 扩展指标 / 系统指标），ne101 只消费 `device.type === "ne101_camera"` 的设备。这是「通用 vs 专用」的根本分野。 |
 | **配置复杂度** | 简单 display config（`label` / `unit` / `decimalPlaces`） | 18 字段 `default_config`（[manifest.json L18-L37](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L18-L37)）：processing pipeline + ROI + NMS + categories + phrase | ne101 的配置字段数是 metric_card 的 3 倍以上，且每个字段都有默认值和兼容性回退逻辑（`processingRois` 数组 vs 单矩形）。 |
+
+```js
+// manifest.json L18-L37 — default_config (18 fields)
+  "default_config": {
+    "showMetrics": true,
+    "showCommands": true,
+    "location": "",
+    "displayTitle": "",
+    "processingEnabled": false,
+    "processingExtensionId": "",
+    "processingTemplate": "object_detection",
+    "processingCategories": "person,car",
+    "processingPhrase": "",
+    "processingClassFilter": "",
+    "processingRoiEnabled": false,
+    "processingRoiAction": "count",
+    "processingRoiOverlap": 0.6,
+    "processingRoiX": 0.1,
+    "processingRoiY": 0.1,
+    "processingRoiW": 0.8,
+    "processingRoiH": 0.8,
+    "processingRois": []
+  }
+```
+
+Source: [manifest.json L18-L37](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L18-L37)
 | **导出方式** | `default + MetricCard` 双暴露（但只用 default） | `default + NE101CameraPanel + ConfigPanel + AdvancedPanel` 四字段暴露 | metric_card 的 default 双暴露是「向前兼容的保险」；ne101 的命名导出是「配置对话框必须用的契约」。 |
 | **适用场景** | 任何标量指标（温度、电池、延迟、计数） | 仅 `ne101_camera` 设备类型 | metric_card 是「万能数值卡」，ne101 是「专用摄像头面板」。如果 NE101 设备被淘汰，ne101 组件也会随之废弃；metric_card 永远不会因为某个设备类型消失而失效。 |
 
@@ -298,7 +670,7 @@ if (typeof vDet === 'string') { try { vDet = JSON.parse(vDet); } catch(e) { vDet
 
 ---
 
-## §2.7 小结
+## 2.7 小结
 
 本节拆解了 ne101_camera 的五层 IIFE 架构、三对外组件的组件树、WebSocket 优先 + REST 回退的双通道数据流，以及 5 个关键设计决策。核心结论三条：
 
@@ -321,11 +693,11 @@ if (typeof vDet === 'string') { try { vDet = JSON.parse(vDet); } catch(e) { vDet
 
 ### 后续章节桥接
 
-- [§3 扩展侧](./3-extension-side.md)（v1.1）—— 深入 `processingExtensionId` 契约，讲解扩展如何消费图像、如何回写检测结果，以及 `generateTransformJsCode` 生成的代码在主控沙箱里的执行细节。
-- [§4 数据契约](./4-data-contract.md)（MVP）—— MQTT 主题命名、WebSocket 增量消息格式、`detections` 字段 schema、ROI 多边形 vs 单矩形的 JSON 结构。本节提到的 JSON string 解析坑（commit `e3a70be`）会在那里展开成完整的 schema 讨论。
-- [§5 前端消费](./5-frontend-consume.md)（MVP）—— 组件如何拉取 detections、解析 JSON string、按类别上色（`classColor` 的黄金角 HSV）、画检测框和 ROI 多边形。
-- [§6 组件构建](./6-component-build.md)（MVP）—— `NE101CameraPanel` 命名导出的写法、React hooks 在 IIFE 中的陷阱（commit `0601cd4`）、`AdvancedPanel` 的分层设计。
-- 回到 [§1 业务背景](./1-background.md) —— 如果你还没读过，先读 §1 再回来读本节，叙事会更连贯。
+- [3 扩展侧](./3-extension-side.md)（v1.1）—— 深入 `processingExtensionId` 契约，讲解扩展如何消费图像、如何回写检测结果，以及 `generateTransformJsCode` 生成的代码在主控沙箱里的执行细节。
+- [4 数据契约](./4-data-contract.md)（MVP）—— MQTT 主题命名、WebSocket 增量消息格式、`detections` 字段 schema、ROI 多边形 vs 单矩形的 JSON 结构。本节提到的 JSON string 解析坑（commit `e3a70be`）会在那里展开成完整的 schema 讨论。
+- [5 前端消费](./5-frontend-consume.md)（MVP）—— 组件如何拉取 detections、解析 JSON string、按类别上色（`classColor` 的黄金角 HSV）、画检测框和 ROI 多边形。
+- [6 组件构建](./6-component-build.md)（MVP）—— `NE101CameraPanel` 命名导出的写法、React hooks 在 IIFE 中的陷阱（commit `0601cd4`）、`AdvancedPanel` 的分层设计。
+- 回到 [1 业务背景](./1-background.md) —— 如果你还没读过，先读 1 再回来读本节，叙事会更连贯。
 
 ---
 
