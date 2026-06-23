@@ -17,10 +17,10 @@ The demo app is a **loitering alert** (Loitering Detection): when a person stays
 
 | Prerequisite | Description |
 |:---|:---|
-| Claude Code | Installed locally. |
+| Claude Code | Install it on your local machine. |
 | ne503 source repo | Clone locally (bundled with the NE503 SDK); the `ne503-dev` skill resides at `.claude/skills/ne503-dev/`. Alternatively, [download the skill zip](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/app-development/ai-assisted-dev/ne503-dev.zip) and extract it into `.claude/skills/`. |
-| Docker | On the local machine, for building app images. |
-| NE503 device | Ready: IP + admin password known; platform initialized (HALv2 installed, ai-runtime healthy, detection model scanned + loaded). |
+| Docker | Install it on your local machine, for building app images. |
+| NE503 device | Prepare a ready device: note its IP + admin password, and confirm the platform is initialized (HALv2 installed, ai-runtime healthy, detection model scanned + loaded). |
 
 ## 2. From One Sentence to a New App
 
@@ -58,7 +58,7 @@ The full development process (template selection → placeholder fixing → stat
 
 With the code written, deployment is likewise handled by Claude — the skill's bundled script chains "build → upload → install → start → verify" into one fully-automatic pass, and the app enters `running`.
 
-After deployment, Claude verifies three things: inference is actually live (logs confirm the model is loaded and the first frame has arrived); the platform-injected permissions match `app.yaml`; and actually stepping into the camera frame triggers a complete detection cycle. The verification from the Web Console's perspective is below:
+After deployment, Claude verifies three things: inference is actually live (logs confirm the model is loaded and the first frame has arrived); the platform-injected permissions match `app.yaml`; and a person entering the frame triggers a complete detection cycle. The verification from the Web Console's perspective is below:
 
 <video controls width="100%">
   <source src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/app-development/ai-assisted-dev/verify-on-web_new.mp4" type="video/mp4"></source>
@@ -67,7 +67,7 @@ After deployment, Claude verifies three things: inference is actually live (logs
 
 The cycle repeated many times on-device; every alert landed at 10.1 s, totaling 3 independent alerts — no false alarms, no missed ones.
 
-One requirement in, a live loitering-detection app on the device out — with no manual step in between.
+A single sentence of input produces a live loitering-alert app on the device — with no manual step in between.
 
 Full end-to-end process (watch on demand):
 
