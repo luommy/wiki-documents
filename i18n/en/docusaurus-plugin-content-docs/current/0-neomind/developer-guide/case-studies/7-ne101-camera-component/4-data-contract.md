@@ -121,7 +121,7 @@ The AI extension's response format is decided by the extension author; ne101_cam
 
 | responseType | Data path | Field format |
 |---|---|---|
-| `boxes_x1y1x2y2` | `r.boxes` | `` `{x1,y1,x2,y2}` `` normalized coords |
+| `boxes_x1y1x2y2` | `r.boxes` | `` `{x1,y1,x2,y2}` `` pixel coords (normalized to 0-1 in code) |
 | `objects_bbox` | `r.objects[].bbox` | `` `{x,y,w,h}` `` pixel coords |
 | `detections_bbox` | `r.detections[].bbox` | `` `{x,y,w,h}` `` pixel coords |
 | `ocr_text_blocks` | `r.text_blocks` | See code block below (has polygon) |
@@ -453,9 +453,9 @@ graph TB
 **The 0.6 threshold tradeoff** — this is a **design decision**:
 
 - **Choice**: Default `OVERLAP_TH = 0.6`, adjustable by the user in the `[0, 1]` range.
-- **Alternative A**: 0.5 (majority vote). Rejected because 0.5 means "if half the detection box is inside the ROI, it counts," which is still too permissive for large targets hugging the ROI boundary. In testing on a "pedestrian walkway" scenario, 0.5 counted "a person with half their body outside the frame" as in-ROI, inflating the count by about 15-20%.
-- **Alternative B**: 1.0 (full containment). Rejected because 1.0 requires the detection box to be fully inside the ROI, but in practice targets frequently hug the ROI edge (people walking near the walkway entrance); 1.0 misses these edge cases, undercounting by about 30%.
-- **Reason**: 0.6 is an empirical value — on CamThink's internal labeled data across three test scenarios (pedestrian walkway, parking lot entrance, warehouse shelves), 0.6 had the highest F1-score. Users can adjust via the config panel slider: walkway/corridor scenarios recommend 0.6-0.7, open-area scenarios recommend 0.4-0.5.
+- **Alternative A**: 0.5 (majority vote). Rejected because 0.5 means "if half the detection box is inside the ROI, it counts," which is still too permissive for large targets hugging the ROI boundary, inflating counts.
+- **Alternative B**: 1.0 (full containment). Rejected because 1.0 requires the detection box to be fully inside the ROI, but in practice targets frequently hug the ROI edge; 1.0 misses these edge cases, undercounting.
+- **Reason**: Empirically, 0.6 balances precision and recall for most edge-detection scenarios — too low (e.g., 0.5) inflates counts, too high (e.g., 1.0) misses valid detections. Users can adjust via the config panel slider.
 
 ---
 
@@ -509,7 +509,7 @@ The 5 design decisions covered on this page are summarized below, each with the 
 |----------|--------|-------------|--------|
 | **Permissive extension fallback** | Unlisted extensions default to `boxes_x1y1x2y2` response format ([L181-L193](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L181-L193)) | Strict whitelist: unlisted extensions error out | Decouples component version from extension version; "new extension + old component" still runs |
 | **Silent JSON catch** | `JSON.parse` failure sets null, no throw ([L857](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L857-L857), commit `e3a70be`) | Throw / `console.error` but keep original value | Avoids component white-screen; degrades to "image without boxes" experience |
-| **0.6 ROI overlap threshold** | Sutherland-Hodgman clipping + area ratio >= 0.6 ([L341](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L341-L341), commit `636a8ae`) | 0.5 (too permissive) / 1.0 (too strict) | 0.6 has highest F1-score on three labeled scenarios; user-adjustable |
+| **0.6 ROI overlap threshold** | Sutherland-Hodgman clipping + area ratio >= 0.6 ([L341](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L341-L341), commit `636a8ae`) | 0.5 (too permissive) / 1.0 (too strict) | 0.6 balances precision and recall for most edge-detection scenarios; user-adjustable |
 | **Dual-channel WS+REST** | WS priority + REST backfill ([L1601-L1602](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1601-L1602), commits `b0be12b` + `0eedd27`) | WS-only / REST-only polling | WS provides real-time; REST provides reliability floor; complementary |
 | **Optimistic base64 judgment** | Anything not `http(s)://` is treated as base64 ([L637](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L637-L637)) | Strict: must start with `data:image` to count as base64 | Better to try a weird string as base64 once (`<img>` fails silently) than to request a base64 string as a URL |
 

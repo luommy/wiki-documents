@@ -35,7 +35,7 @@ graph TB
     end
 
     subgraph "metric_card bundle.js（IIFE）"
-        IIFE["var NeoMind_MetricCard = (function(){<br/>var React = window.React;<br/>var jsx = window.jsxRuntime.jsx;<br/>... return {MetricCard};<br/>})()"]
+        IIFE["var NeoMind_MetricCard = (function(){<br/>var React = window.React;<br/>var jsx = window.jsxRuntime.jsx;<br/>... return {default, MetricCard};<br/>})()"]
         MC[MetricCard 组件]
         EXTRACT[extractValue<br/>多格式归一化]
         GLASS[glassContainer<br/>OKLCH 毛玻璃样式]

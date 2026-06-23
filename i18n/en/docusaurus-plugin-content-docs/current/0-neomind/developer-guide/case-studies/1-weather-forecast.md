@@ -427,7 +427,7 @@ Even if multi-city parallel fetches were supported in the future, only a handful
 | HTTP client | `ureq 2.x` + `json` feature | Sync, lightweight, no runtime dependency. Alternative `reqwest` pulls in the entire Tokio stack (see 4.1) |
 | Async trait | `async-trait 0.1` | SDK's `Extension` trait uses async fns; Rust pre-1.75 requires this crate. Can be removed once native async traits stabilize |
 | Datetime | `chrono 0.4` | `Utc::now().timestamp_millis()` for metric timestamps. Alternative `time` crate has a more modern API but poorer ecosystem compatibility |
-| Tokio | `1` + `rt` + `sync` features | Used only for the SDK's FFI macro RwLock wrapper, does not start a runtime. Alternative `parking_lot` exists, but SDK internally depends on `tokio::sync::RwLock` |
+| Tokio | No direct dependency (SDK may pull it transitively, but this extension uses std::sync, not tokio::sync) | Alternative `parking_lot` exists, but SDK internally depends on `tokio::sync::RwLock` |
 | Frontend framework | React 18 + TypeScript 5 | NeoMind dashboard standard stack. peerDependencies declare React ≥18, Host provides the runtime |
 | Frontend bundler | Vite 5 (UMD mode) | Fast builds + UMD format compatible with NeoMind loader. Alternative webpack has 3× the configuration complexity |
 

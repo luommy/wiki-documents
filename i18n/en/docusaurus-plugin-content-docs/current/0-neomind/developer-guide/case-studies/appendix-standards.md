@@ -24,7 +24,7 @@ The two schemas overlap heavily, but **extensions uniquely have `builds` / `fron
 
 | Field | Type | Required | Description | Example |
 |-------|------|----------|-------------|---------|
-| `id` | string | yes | Unique artifact identifier, globally unique, kebab-case | `weather-forecast-v2` / `ne101_camera` |
+| `id` | string | yes | Unique artifact identifier, globally unique, lowercase with underscores (snake_case), e.g. ne101_camera, metric_card | `weather-forecast-v2` / `ne101_camera` |
 | `name` | string \| object | yes | Display name. Components support `{ "en": "...", "zh": "..." }` i18n object | `"weather forecast"` / `{ "en": "NE101 Camera Panel", "zh": "NE101 感知摄像头面板" }` |
 | `version` | string (semver) | yes | Three-segment semantic version. Extensions read automatically from `Cargo.toml`; components hand-written | `"2.7.6"` / `"2.14.9"` |
 | `description` | string \| object | yes | One-line description; components support i18n | `"Real-time weather forecast..."` |
@@ -83,6 +83,7 @@ Extensions with React frontend must declare the `frontend` object:
 | `default_config` | object | yes | Default config object used when user has not customized | see code block below |
 | `global_name` | string | yes | Global variable name that `bundle.js` mounts onto `window` | `"NE101CameraPanel"` |
 | `export_name` | string | yes | IIFE default export name, usually same as `global_name` | `"NE101CameraPanel"` |
+| `max_data_sources` | integer | Optional | Limits the number of bindable data sources when has_data_source is true | 12 |
 
 `default_config` example (excerpted from `ne101_camera`):
 

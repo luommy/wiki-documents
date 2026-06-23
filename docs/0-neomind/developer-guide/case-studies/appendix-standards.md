@@ -24,7 +24,7 @@ NeoMind 生态有两类可发布工件——**扩展**（Rust cdylib + 可选 Re
 
 | 字段 | 类型 | 必填 | 说明 | 示例 |
 |------|------|------|------|------|
-| `id` | string | 是 | 工件唯一标识，全生态唯一，kebab-case | `weather-forecast-v2` / `ne101_camera` |
+| `id` | string | 是 | 工件唯一标识，全生态唯一，小写字母 + 下划线（snake_case），如 ne101_camera、metric_card | `weather-forecast-v2` / `ne101_camera` |
 | `name` | string \| object | 是 | 展示名。组件支持 `{ "en": "...", "zh": "..." }` 多语言对象 | `"weather forecast"` / `{ "en": "NE101 Camera Panel", "zh": "NE101 感知摄像头面板" }` |
 | `version` | string (semver) | 是 | 三段语义化版本。扩展从 `Cargo.toml` 自动读取；组件手写 | `"2.7.6"` / `"2.14.9"` |
 | `description` | string \| object | 是 | 一句话描述，组件支持多语言 | `"Real-time weather forecast..."` |
@@ -83,6 +83,7 @@ NeoMind 生态有两类可发布工件——**扩展**（Rust cdylib + 可选 Re
 | `default_config` | object | 是 | 默认配置对象，用户未自定义时使用 | 见下方代码块 |
 | `global_name` | string | 是 | `bundle.js` 挂载到 `window` 的全局变量名 | `"NE101CameraPanel"` |
 | `export_name` | string | 是 | IIFE 默认导出名，与 `global_name` 通常一致 | `"NE101CameraPanel"` |
+| `max_data_sources` | integer | 可选 | 当 has_data_source 为 true 时生效，限制可绑定数据源数量上限 | 12 |
 
 `default_config` 示例（节选自 `ne101_camera`）：
 

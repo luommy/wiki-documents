@@ -583,6 +583,8 @@ mod tests {
 
 Markdown → Image 渲染是扩展最易出 bug 的部分（字体覆盖、CJK 换行、标题缩放）。建议补充的回归用例：(1) 纯中文长文本换行（验证 CJK anywhere-break）；(2) 中英文混排（验证 Latin 词不拆、CJK 可拆）；(3) H1-H6 六级标题缩放比例（2.0x / 1.8x / 1.6x / 1.4x / 1.2x / 1.0x）；(4) 加粗文本的 double-strike 渲染效果；(5) emoji 字符（当前字体可能不覆盖，需验证降级行为）；(6) 空 Markdown / 超长 Markdown 边界。`test_parse_markdown` 只验证 AST 结构，未验证渲染像素——像素级回归需要固定字体 + golden image 比对。
 
+> 注：源码 `2.0f32.max(...)` 中的 `.max` 导致 H2+ 被 clamp 到 2.0x，实际渲染中所有标题级别字号相同。这是源码 bug（应为 `.min`），当前缩放表描述的是注释中的设计意图而非运行时行为。
+
 ### "生产验证"的具体含义
 
 该扩展的"生产验证"不是一次性完成的，而是跨 6 个版本（v2.7.0 → v2.7.6）的迭代验证：(1) **跨版本回归**——每次版本 bump（[`24b47d2`](https://github.com/camthink-ai/NeoMind-Extensions/commit/24b47d2) v2.7.0、[`ff762aa`](https://github.com/camthink-ai/NeoMind-Extensions/commit/ff762aa) v2.7.1、[`cd075d5`](https://github.com/camthink-ai/NeoMind-Extensions/commit/cd075d5) v2.7.2、[`8e81400`](https://github.com/camthink-ai/NeoMind-Extensions/commit/8e81400) v2.7.4、[`d2db401`](https://github.com/camthink-ai/NeoMind-Extensions/commit/d2db401) v2.7.5、[`1e9a1f1`](https://github.com/camthink-ai/NeoMind-Extensions/commit/1e9a1f1) v2.7.6）都跑全套单测 + 手动 E2E；(2) **多区域实测**——cn.rms.uink.com 和 eu.rms.uink.com 两个端点都验证过 JWT 登录 + 设备列表 + 图像推送全链路；(3) **真实设备刷新测试**——在 UINK 7.5（800x480）和 UINK 2.13（250x122）两种分辨率设备上推送 Markdown，确认 e-paper 实际刷新显示正确。

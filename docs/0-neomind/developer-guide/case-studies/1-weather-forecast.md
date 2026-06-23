@@ -427,7 +427,7 @@ sequenceDiagram
 | HTTP 客户端 | `ureq 2.x` + `json` feature | 同步、轻量、无 runtime 依赖。替代品 `reqwest` 会拉入整个 Tokio（见 4.1） |
 | async trait | `async-trait 0.1` | SDK 的 `Extension` trait 用了 async fn，Rust 1.75 前需要此 crate。未来 Rust 原生 async trait 稳定后可移除 |
 | 时间处理 | `chrono 0.4` | `Utc::now().timestamp_millis()` 生成指标时间戳。替代品 `time` crate API 更现代但生态兼容性不如 chrono |
-| Tokio | `1` + `rt` + `sync` features | 仅用于 SDK FFI 宏的 RwLock wrapper，不启动 runtime。替代品是 `parking_lot`，但 SDK 内部依赖 tokio::sync::RwLock |
+| Tokio | 不直接依赖（SDK 可能间接引入，但本扩展代码用 std::sync 而非 tokio::sync） | 替代品是 `parking_lot`，但 SDK 内部依赖 tokio::sync::RwLock |
 | 前端框架 | React 18 + TypeScript 5 | NeoMind 仪表板标准技术栈。peerDependencies 声明 React ≥18，Host 提供运行时 |
 | 前端构建 | Vite 5（UMD 模式） | 快速构建 + UMD 格式兼容 NeoMind 加载器。替代品 webpack 配置复杂度高 3 倍 |
 

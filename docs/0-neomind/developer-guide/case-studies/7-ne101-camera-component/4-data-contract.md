@@ -123,7 +123,7 @@ AI 扩展的响应格式由扩展作者决定，ne101_camera 不能控制。为�
 
 | responseType | 数据路径 | 字段格式 |
 |---|---|---|
-| `boxes_x1y1x2y2` | `r.boxes` | `` `{x1,y1,x2,y2}` `` 归一化坐标 |
+| `boxes_x1y1x2y2` | `r.boxes` | `` `{x1,y1,x2,y2}` `` 像素坐标（代码归一化后 0-1） |
 | `objects_bbox` | `r.objects[].bbox` | `` `{x,y,w,h}` `` 像素坐标 |
 | `detections_bbox` | `r.detections[].bbox` | `` `{x,y,w,h}` `` 像素坐标 |
 | `ocr_text_blocks` | `r.text_blocks` | 见下方代码块（有 polygon） |
@@ -457,9 +457,9 @@ graph TB
 **阈值 0.6 的权衡**——这是一个**设计决策**：
 
 - **选择**：默认 `OVERLAP_TH = 0.6`，用户可在 `[0, 1]` 范围内调整。
-- **备选方案 A**：0.5（多数投票）。否决理由：0.5 意味着「检测框有一半在 ROI 内就算命中」，对贴着 ROI 边界的大目标仍然过于宽松。实测在「人行通道」场景下，0.5 会让「半个身子在画面外的人」也被计入，计数偏高约 15-20%。
-- **备选方案 B**：1.0（完全包含）。否决理由：1.0 要求检测框完全在 ROI 内才命中，但实际部署中目标经常贴着 ROI 边缘（人走到通道口边缘），1.0 会漏掉这些边缘情况，计数偏低约 30%。
-- **理由**：0.6 是经验值——在 CamThink 内部三个测试场景（人行通道、停车场出入口、仓库货架）的标注数据上，0.6 的 F1-score 最高。用户可以通过配置面板的滑块调整：监控通道类场景建议 0.6-0.7，监控开放区域类场景建议 0.4-0.5。
+- **备选方案 A**：0.5（多数投票）。否决理由：0.5 意味着「检测框有一半在 ROI 内就算命中」，对贴着 ROI 边界的大目标仍然过于宽松，计数偏高。
+- **备选方案 B**：1.0（完全包含）。否决理由：1.0 要求检测框完全在 ROI 内才命中，但实际部署中目标经常贴着 ROI 边缘，1.0 会漏掉这些边缘情况，计数偏低。
+- **理由**：经实测，0.6 在多数边缘检测场景下平衡了精度和召回——过低（如 0.5）会导致计数偏高，过高（如 1.0）会漏掉部分有效检测。用户可以通过配置面板的滑块调整。
 
 ---
 
@@ -513,7 +513,7 @@ var _vals = Object.assign({}, wsValues, imageData || {}, virtualDataState[0] || 
 |------|------|----------|------|
 | **宽容扩展回退** | 未列出的扩展走默认 `boxes_x1y1x2y2` 响应格式（[L181-L193](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L181-L193)） | 严格白名单：未列出扩展直接报错 | 解耦组件版本与扩展版本，让「新扩展 + 旧组件」能跑起来 |
 | **JSON 解析静默 catch** | `JSON.parse` 失败时置 null，不抛异常（[L857](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L857-L857)，commit `e3a70be`） | 抛异常 / `console.error` 但保持原值 | 避免组件白屏，降级为「有图无框」体验 |
-| **ROI 重叠阈值 0.6** | Sutherland-Hodgman 裁剪 + 面积比 ≥ 0.6（[L341](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L341-L341)，commit `636a8ae`） | 0.5（过宽松）/ 1.0（过严格） | 0.6 在三个标注场景上 F1-score 最高，用户可调 |
+| **ROI 重叠阈值 0.6** | Sutherland-Hodgman 裁剪 + 面积比 ≥ 0.6（[L341](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L341-L341)，commit `636a8ae`） | 0.5（过宽松）/ 1.0（过严格） | 0.6 在多数边缘检测场景下平衡了精度和召回，用户可调 |
 | **双通道 WS+REST** | WS 优先 + REST 回填（[L1601-L1602](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1601-L1602)，commit `b0be12b` + `0eedd27`） | WS-only / REST-only 轮询 | WS 提供实时性，REST 提供可靠性底线，互补 |
 | **base64 乐观判定** | 不是 `http(s)://` 开头就按 base64 处理（[L637](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L637-L637)） | 严格判定：必须 `data:image` 开头才算 base64 | 宁可把异常字符串当 base64 试一次（`<img>` 静默失败），也不要把 base64 当 URL 去请求 |
 

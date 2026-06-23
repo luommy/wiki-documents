@@ -314,7 +314,7 @@ callback 内部的逻辑三步走：(1) L538 断开旧的 ResizeObserver（如�
 
 Source: [`bundle.js` L527-L530](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L527-L530)
 
-commit [`7c92a19`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/7c92a19)（`fix(ne101): fix ROI canvas coordinate mapping for objectFit contain`）是相关的早期修复，处理的是 `objectFit: contain` 时代的坐标映射问题，后来切换到 `object-cover` 后由 `d7836b8` 的 callback ref 补全了异步挂载场景。
+commit [`7c92a19`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/7c92a19)（`fix(ne101): fix ROI canvas coordinate mapping for objectFit contain`）是相关的早期修复，处理的是 `objectFit: contain` 时代的坐标映射问题，后来切换到 `object-cover` 后由 `d7836b8` 的 callback ref 补全了异步挂载场景。注：主图像渲染已切换到 object-cover，但 ROI Canvas 编辑器仍使用 contain 坐标变换（bundle.js 的 containTransform 函数）。
 
 **设计决策：callback ref vs useEffect+ref vs ResizeObserver on window**
 

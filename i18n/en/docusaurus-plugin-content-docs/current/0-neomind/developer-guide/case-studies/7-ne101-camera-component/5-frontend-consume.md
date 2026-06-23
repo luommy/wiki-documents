@@ -319,7 +319,7 @@ The callback logic has three steps: (1) L538 disconnects the previous ResizeObse
 
 Source: [`bundle.js` L527-L530](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L527-L530)
 
-Commit [`7c92a19`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/7c92a19) (`fix(ne101): fix ROI canvas coordinate mapping for objectFit contain`) is a related earlier fix that handled coordinate-mapping issues from the `objectFit: contain` era; after the switch to `object-cover`, `d7836b8`'s callback ref completed the async-mount scenario.
+Commit [`7c92a19`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/7c92a19) (`fix(ne101): fix ROI canvas coordinate mapping for objectFit contain`) is a related earlier fix that handled coordinate-mapping issues from the `objectFit: contain` era; after the switch to `object-cover`, `d7836b8`'s callback ref completed the async-mount scenario. Note: main image rendering switched to object-cover, but the ROI Canvas editor still uses contain coordinate transforms (bundle.js containTransform function).
 
 **Design decision: callback ref vs useEffect+ref vs ResizeObserver on window**
 

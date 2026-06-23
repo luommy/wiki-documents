@@ -35,7 +35,7 @@ graph TB
     end
 
     subgraph "metric_card bundle.js (IIFE)"
-        IIFE["var NeoMind_MetricCard = (function(){<br/>var React = window.React;<br/>var jsx = window.jsxRuntime.jsx;<br/>... return {MetricCard};<br/>})()"]
+        IIFE["var NeoMind_MetricCard = (function(){<br/>var React = window.React;<br/>var jsx = window.jsxRuntime.jsx;<br/>... return {default, MetricCard};<br/>})()"]
         MC[MetricCard component]
         EXTRACT[extractValue<br/>multi-format normalization]
         GLASS[glassContainer<br/>OKLCH glass style]
