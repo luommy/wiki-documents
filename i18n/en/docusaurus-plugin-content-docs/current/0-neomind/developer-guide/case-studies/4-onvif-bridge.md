@@ -120,6 +120,33 @@ const MULTICAST_PORT: u16 = 3702;
 
 **The Probe message** ([`src/discovery.rs` L10-L31](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/discovery.rs#L10-L31)) is a SOAP envelope that tells ONVIF devices on the network "I am looking for NetworkVideoTransmitter-type devices." Each probe generates a random UUID as the MessageID to ensure no confusion with historical probes.
 
+```rust
+fn build_probe_message() -> String {
+    let message_id = uuid::Uuid::new_v4();
+    format!(
+        r#"<?xml version="1.0" encoding="UTF-8"?>
+<s:Envelope xmlns:s="http://www.w3.org/2003/05/soap-envelope"
+            xmlns:a="http://www.w3.org/2005/08/addressing">
+  <s:Header>
+    <a:Action s:mustUnderstand="1">http://schemas.xmlsoap.org/ws/2005/04/discovery/Probe</a:Action>
+    <a:MessageID>urn:uuid:{message_id}</a:MessageID>
+    <a:ReplyTo><a:Address>http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</a:Address></a:ReplyTo>
+    <a:To s:mustUnderstand="1">urn:schemas-xmlsoap-org:ws:2005:04:discovery</a:To>
+  </s:Header>
+  <s:Body>
+    <Probe xmlns="http://schemas.xmlsoap.org/ws/2005/04/discovery">
+      <d:Types xmlns:d="http://schemas.xmlsoap.org/ws/2005/04/discovery"
+               xmlns:dp0="http://www.onvif.org/ver10/network/wsdl">dp0:NetworkVideoTransmitter</d:Types>
+    </Probe>
+  </s:Body>
+</s:Envelope>"#,
+        message_id = message_id,
+    )
+}
+```
+
+*Source: [`src/discovery.rs` L10-L31](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/discovery.rs#L10-L31)*
+
 **The discover_devices main loop** ([`src/discovery.rs` L134-L211](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/discovery.rs#L134-L211)) follows these core steps:
 
 1. Call `find_local_ipv4()` to detect the machine's real IP (cannot bind to `0.0.0.0` — fails on macOS)
@@ -130,7 +157,52 @@ const MULTICAST_PORT: u16 = 3702;
 6. In a deadline loop, `recv_from` to collect ProbeMatch responses
 7. Deduplicate by endpoint and return
 
+```rust
+pub fn discover_devices(timeout_ms: u64) -> Result<Vec<DiscoveryMatch>, String> {
+    let timeout_ms = timeout_ms.clamp(500, 30_000);
+    let bind_addr = match find_local_ipv4() {
+        Some(ip) => {
+            eprintln!("[onvif-bridge] Binding multicast socket to {}", ip);
+            SocketAddrV4::new(ip, 0)
+        }
+        None => {
+            eprintln!("[onvif-bridge] Could not detect local IP, binding to 0.0.0.0");
+            SocketAddrV4::new(Ipv4Addr::UNSPECIFIED, 0)
+        }
+    };
+    let socket = UdpSocket::bind(bind_addr)
+        .map_err(|e| format!("Failed to bind UDP socket: {}", e))?;
+    socket.set_broadcast(true).map_err(|e| format!("Failed to enable broadcast: {}", e))?;
+    socket.set_multicast_ttl_v4(1).map_err(|e| format!("Failed to set multicast TTL: {}", e))?;
+    socket.set_read_timeout(Some(Duration::from_millis(timeout_ms)))
+        .map_err(|e| format!("Failed to set read timeout: {}", e))?;
+    // ... (30 lines omitted: join multicast group, send probe, deadline recv loop)
+    let mut seen = std::collections::HashSet::new();
+    discovered.retain(|m| seen.insert(m.endpoint.clone()));
+    Ok(discovered)
+}
+```
+
+*Source: [`src/discovery.rs` L134-L211](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/discovery.rs#L134-L211)*
+
 **Necessity of find_local_ipv4** ([`src/discovery.rs` L119-L131](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/discovery.rs#L119-L131)): On macOS, when a multicast socket is bound to `0.0.0.0` (INADDR_ANY), the kernel cannot determine which network interface to use for sending multicast packets, resulting in `No route to host`. The solution is to create a temporary UDP socket connected to `8.8.8.8:80` (which doesn't actually send packets — it just triggers the kernel's route lookup), then read the socket's `local_addr()` to get the machine's real IP. This fix was introduced in commit `59d3490`.
+
+```rust
+fn find_local_ipv4() -> Option<Ipv4Addr> {
+    // On macOS, multicast from 0.0.0.0 can fail with "No route to host"
+    // Binding to a specific interface address fixes this
+    let socket = UdpSocket::bind("0.0.0.0:0").ok()?;
+    // Try connecting to a public address (doesn't actually send packets)
+    socket.connect("8.8.8.8:80").ok()?;
+    let local = socket.local_addr().ok()?;
+    match local {
+        std::net::SocketAddr::V4(v4) => Some(*v4.ip()),
+        _ => None,
+    }
+}
+```
+
+*Source: [`src/discovery.rs` L119-L131](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/discovery.rs#L119-L131)*
 
 ### 3.2 SOAP Client and WS-Security (soap_client.rs)
 
@@ -169,6 +241,39 @@ The algorithm formula: `Digest = Base64(SHA-1(Nonce + Created + Password))`. Thi
 
 **soap_request_raw** ([`src/soap_client.rs` L68-L124](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/soap_client.rs#L68-L124)) constructs the complete SOAP envelope, including the WS-Security header (if credentials are provided) and SOAP Body, then sends it synchronously via `ureq::post(url)`. Key security measures include a 10MB response size limit (to prevent memory exhaustion) and automatic SOAP Fault detection with formatted error messages.
 
+```rust
+pub fn soap_request_raw(url: &str, action: &str, body: &str,
+    username: Option<&str>, password: Option<&str>) -> Result<String, String> {
+    let security_header = match (username, password) {
+        (Some(user), Some(pass)) if !user.is_empty() && !pass.is_empty() => {
+            Some(build_security_header(user, pass))
+        }
+        _ => None,
+    };
+    let header_content = match &security_header {
+        Some(sec) => format!("  <s:Header>\n    {}\n  </s:Header>", sec),
+        None => "  <s:Header/>".to_string(),
+    };
+    let envelope = format!(
+        r#"<?xml version="1.0" encoding="UTF-8"?>
+<s:Envelope xmlns:s="http://www.w3.org/2003/05/soap-envelope" ...>
+{header}  <s:Body>    {body}  </s:Body>
+</s:Envelope>"#, header = header_content, body = body);
+    let content_type = format!("application/soap+xml; charset=utf-8; action=\"{}\"", action);
+    let response = ureq::post(url).set("Content-Type", &content_type)
+        .send_string(&envelope).map_err(|e| format!("SOAP request failed: {}", e))?;
+    let response_text = response.into_string()
+        .map_err(|e| format!("Failed to read response: {}", e))?;
+    if response_text.len() > 10 * 1024 * 1024 {
+        return Err("SOAP response too large (exceeds 10MB)".to_string());
+    }
+    if let Some(fault) = extract_soap_fault(&response_text) { return Err(fault); }
+    Ok(response_text)
+}
+```
+
+*Source: [`src/soap_client.rs` L68-L124](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/soap_client.rs#L68-L124)*
+
 ### 3.3 Device Capability Negotiation
 
 onvif-bridge implements the core negotiation functions from the ONVIF Core and Media specifications:
@@ -183,6 +288,43 @@ onvif-bridge implements the core negotiation functions from the ONVIF Core and M
 
 **resolve_service_url** ([`src/soap_client.rs` L390-L407](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/soap_client.rs#L390-L407)) is an easily overlooked but critical function — different ONVIF services (device/media/ptz) have different URL paths (`/onvif/device_service`, `/onvif/media_service`, `/onvif/ptz_service`). The device URL returned by WS-Discovery typically already ends with `/onvif/device_service`, so when calling the media service, the path suffix must be replaced rather than appended.
 
+```rust
+pub fn get_device_info(device: &OnvifDevice) -> Result<serde_json::Value, String> {
+    let service_url = resolve_service_url(&device.device_url, "device");
+    let body = r#"<tds:GetDeviceInformation/>"#;
+    let response = soap_request_raw(&service_url,
+        "http://www.onvif.org/ver10/device/wsdl/GetDeviceInformation", body,
+        device.username.as_deref(), device.password.as_deref())?;
+    Ok(serde_json::json!({
+        "manufacturer": extract_tag(&response, "tt:Manufacturer").unwrap_or_default(),
+        "model": extract_tag(&response, "tt:Model").unwrap_or_default(),
+        "firmware_version": extract_tag(&response, "tt:FirmwareVersion").unwrap_or_default(),
+        "serial_number": extract_tag(&response, "tt:SerialNumber").unwrap_or_default(),
+        "hardware_id": extract_tag(&response, "tt:HardwareId").unwrap_or_default(),
+    }))
+}
+```
+
+*Source: [`src/soap_client.rs` L214-L233](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/soap_client.rs#L214-L233)*
+
+```rust
+pub fn resolve_service_url(device_url: &str, service: &str) -> String {
+    let base = device_url.trim_end_matches('/');
+    let suffix = match service {
+        "device" => "/onvif/device_service",
+        "media" => "/onvif/media_service",
+        "ptz" => "/onvif/ptz_service",
+        _ => "/onvif/device_service",
+    };
+    if let Some(slash_pos) = base.find("/onvif/") {
+        return format!("{}{}", &base[..slash_pos], suffix);
+    }
+    format!("{}{}", base, suffix)
+}
+```
+
+*Source: [`src/soap_client.rs` L390-L407](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/soap_client.rs#L390-L407)*
+
 ### 3.4 PTZ Control (ptz.rs)
 
 [`src/ptz.rs`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/ptz.rs#L1-L214) wraps six PTZ commands, all built on `soap_client::soap_request_raw` to construct SOAP bodies:
@@ -195,6 +337,34 @@ onvif-bridge implements the core negotiation functions from the ONVIF Core and M
 - **goto_preset** ([L186-L210](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/ptz.rs#L186-L210)): Move to a specified preset
 
 Each command determines the service URL via `resolve_ptz_url`, then embeds the corresponding ONVIF PTZ WSDL operation name and parameters (PanTilt space, Zoom space, Speed vector, etc.) into the SOAP body.
+
+```rust
+pub fn ptz_relative_move(device: &OnvifDevice, profile_token: &str,
+    pan: f64, tilt: f64, zoom: f64, speed: f64) -> Result<(), String> {
+    let service_url = resolve_ptz_url(&device.device_url);
+    let body = format!(
+        r#"<tptz:RelativeMove>
+      <tptz:ProfileToken>{profile_token}</tptz:ProfileToken>
+      <tptz:Translation>
+        <tt:PanTilt x="{pan}" y="{tilt}" space="http://www.onvif.org/ver10/tptz/PanTiltSpaces/TranslationGenericSpace"/>
+        <tt:Zoom x="{zoom}" space="http://www.onvif.org/ver10/tptz/ZoomSpaces/TranslationGenericSpace"/>
+      </tptz:Translation>
+      <tptz:Speed>
+        <tt:PanTilt x="{speed}" y="{speed}" space="http://www.onvif.org/ver10/tptz/PanTiltSpaces/GenericSpeedSpace"/>
+        <tt:Zoom x="{speed}" space="http://www.onvif.org/ver10/tptz/ZoomSpaces/ZoomGenericSpeedSpace"/>
+      </tptz:Speed>
+    </tptz:RelativeMove>"#,
+        profile_token = xml_escape(profile_token),
+        pan = pan, tilt = tilt, zoom = zoom, speed = speed,
+    );
+    crate::soap_client::soap_request_raw(&service_url,
+        "http://www.onvif.org/ver20/ptz/wsdl/RelativeMove", &body,
+        device.username.as_deref(), device.password.as_deref())?;
+    Ok(())
+}
+```
+
+*Source: [`src/ptz.rs` L5-L42](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/ptz.rs#L5-L42)*
 
 ### 3.5 Command Dispatch (lib.rs execute_command)
 
@@ -338,6 +508,29 @@ Each command's `samples` field provides usage examples that the Agent's LLM can 
 
 The extension declares two global metrics via the `metrics()` method ([`src/lib.rs` L122-L143](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/lib.rs#L122-L143)): `total_commands` (command invocation counter) and `connected_devices` (number of connected devices). Additionally, the `produce_metrics()` method ([L719-L790](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/lib.rs#L719-L790)) generates **virtual metrics** for each registered device:
 
+```rust
+fn metrics(&self) -> Vec<MetricDescriptor> {
+    vec![
+        MetricDescriptor {
+            name: "total_commands".to_string(),
+            display_name: "Total Commands".to_string(),
+            data_type: MetricDataType::Integer,
+            unit: String::new(),
+            min: None, max: None, required: false,
+        },
+        MetricDescriptor {
+            name: "connected_devices".to_string(),
+            display_name: "Connected Devices".to_string(),
+            data_type: MetricDataType::Integer,
+            unit: String::new(),
+            min: None, max: None, required: false,
+        },
+    ]
+}
+```
+
+*Source: [`src/lib.rs` L122-L143](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/lib.rs#L122-L143)*
+
 | Metric Name | Type | Meaning |
 |-------------|------|---------|
 | `onvif.{device_id}.connected` | Integer (0/1) | Whether the device is online |
@@ -346,6 +539,35 @@ The extension declares two global metrics via the `metrics()` method ([`src/lib.
 | `onvif.{device_id}.last_seen_ms` | Integer | Last discovery timestamp |
 
 These virtual metrics are written to the NeoMind host via `CapabilityContext::device_metrics_write`, and the frontend can render device health panels based on these metrics.
+
+```rust
+fn produce_metrics(&self) -> Result<Vec<ExtensionMetricValue>> {
+    let now = chrono::Utc::now().timestamp_millis();
+    let mut metrics = Vec::new();
+    self.register_template();
+    metrics.push(ExtensionMetricValue {
+        name: "total_commands".to_string(),
+        value: ParamMetricValue::Integer(self.total_commands.load(Ordering::SeqCst)),
+        timestamp: now,
+    });
+    let device_snapshot: Vec<_> = {
+        let devices = self.devices.read();
+        devices.iter().map(|(k, v)| (k.clone(), v.clone())).collect::<Vec<_>>()
+    };
+    for (id, device) in &device_snapshot {
+        metrics.push(ExtensionMetricValue {
+            name: format!("onvif.{}.connected", id),
+            value: ParamMetricValue::Integer(if device.connected { 1 } else { 0 }),
+            timestamp: now,
+        });
+        // ... (55 lines omitted: profile_count, ptz_supported, last_seen_ms,
+        //      and device_metrics_write capability calls per device)
+    }
+    Ok(metrics)
+}
+```
+
+*Source: [`src/lib.rs` L719-L790](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/lib.rs#L719-L790)*
 
 ### End-to-End Collaboration with yolo-video-v2
 
@@ -378,6 +600,32 @@ onvif-bridge's testing strategy is divided into three layers: SOAP client unit t
 
 [`src/soap_client.rs` L409-L516](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/soap_client.rs#L409-L516) contains 8 unit tests covering core security logic:
 
+```rust
+#[test]
+fn test_password_digest_produces_valid_output() {
+    let (nonce_b64, created, digest_b64) = compute_password_digest("mypassword");
+    assert_eq!(nonce_b64.len(), 24);
+    assert!(created.starts_with("20"));
+    assert!(created.contains("T"));
+    assert!(created.ends_with("Z"));
+    assert_eq!(digest_b64.len(), 28);
+    let (_, _created2, digest2_b64) = compute_password_digest("mypassword");
+    assert_eq!(digest2_b64.len(), 28);
+}
+
+#[test]
+fn test_security_header_contains_digest_type() {
+    let header = build_security_header("admin", "secret123");
+    assert!(header.contains("#PasswordDigest"));
+    assert!(header.contains("<wsse:Username>admin</wsse:Username>"));
+    assert!(header.contains("<wsse:Nonce"));
+    assert!(header.contains("<wsu:Created>"));
+}
+// ... (6 more tests: extract_soap_fault, extract_tag, resolve_service_url)
+```
+
+*Source: [`src/soap_client.rs` L409-L516](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/soap_client.rs#L409-L516)*
+
 | Test Name | Location | Verified Content |
 |-----------|----------|------------------|
 | `test_password_digest_produces_valid_output` | [L414-L428](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/soap_client.rs#L414-L428) | nonce is 24-char base64, created is ISO 8601, digest is 28-char base64 (SHA-1 20 bytes) |
@@ -394,6 +642,36 @@ The key value of these tests is **locking down the PasswordDigest algorithm's ou
 ### Extension Logic Unit Tests
 
 [`src/lib.rs` L1499-L1645](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/lib.rs#L1499-L1645) contains 6 unit tests covering device registry CRUD operations and command dispatch logic. These tests bypass network calls by directly manipulating the internal `RwLock<HashMap>` to insert device data, ensuring tests run offline. Key test cases include `test_add_and_list_device` (the complete lifecycle of add → list → get → remove) and `test_unknown_command` (verifying that unknown commands return a `CommandNotFound` error).
+
+```rust
+#[test]
+fn test_unknown_command() {
+    let ext = OnvifBridgeExtension::new();
+    let rt = tokio::runtime::Runtime::new().unwrap();
+    let result = rt.block_on(ext.execute_command("nonexistent", &json!({})));
+    assert!(result.is_err());
+}
+
+#[test]
+fn test_add_and_list_device() {
+    let ext = OnvifBridgeExtension::new();
+    {
+        let mut devices = ext.devices.write();
+        devices.insert("cam-001".to_string(), OnvifDevice {
+            device_id: "cam-001".to_string(),
+            name: "Test Camera".to_string(),
+            device_url: "http://192.168.1.100:80/onvif/device_service".to_string(),
+            // ... (8 fields omitted)
+            ..Default::default()
+        });
+    }
+    let rt = tokio::runtime::Runtime::new().unwrap();
+    let result = rt.block_on(ext.execute_command("list_devices", &json!({}))).unwrap();
+    assert_eq!(result["count"], 1);
+}
+```
+
+*Source: [`src/lib.rs` L1499-L1645](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/lib.rs#L1499-L1645)*
 
 ### Cross-Platform WS-Discovery Verification
 
@@ -456,8 +734,65 @@ Commit `59d3490` (`fix(onvif): improve WS-Discovery multicast reliability`) fixe
 The ONVIF specification defines a standard SOAP envelope format, but vendor implementations vary. onvif-bridge handles multiple lenient parsing strategies:
 
 - **Namespace prefix diversity** ([`src/discovery.rs` L34-L58](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/discovery.rs#L34-L58)): `find_body_start()` tries six namespace prefixes: `s:` / `SOAP-ENV:` / `soap:` / `soapenv:` / `env:` / no prefix, ensuring ProbeMatch responses from different vendors can be parsed. `extract_tagged_content()` similarly iterates through multiple prefixes.
+
+```rust
+fn find_body_start(response: &str) -> Option<usize> {
+    for prefix in &["s:", "SOAP-ENV:", "soap:", "soapenv:", "env:", ""] {
+        let tag = format!("<{}Body>", prefix);
+        if let Some(pos) = response.find(&tag) {
+            return Some(pos);
+        }
+    }
+    None
+}
+
+fn extract_tagged_content<'a>(xml: &'a str, local_name: &str) -> Option<&'a str> {
+    for prefix in &["d:", "SOAP-ENV:", "soap:", "soapenv:", "env:", "s:", ""] {
+        let open_tag = format!("<{}{}>", prefix, local_name);
+        if let Some(pos) = xml.find(&open_tag) {
+            let content_start = pos + open_tag.len();
+            let close_tag = format!("</{}{}>", prefix, local_name);
+            if let Some(end_pos) = xml[content_start..].find(&close_tag) {
+                return Some(&xml[content_start..content_start + end_pos]);
+            }
+        }
+    }
+    None
+}
+```
+
+*Source: [`src/discovery.rs` L34-L58](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/discovery.rs#L34-L58)*
 - **Profile token extraction** ([`src/soap_client.rs` L257-L271](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/soap_client.rs#L257-L271)): Some vendors put the token in the `<trt:Profiles token="xxx">` attribute, others in a child element. onvif-bridge first tries `extract_tag`, then falls back to attribute extraction.
+
+```rust
+let token = extract_tag(profile_section, "token")
+    .or_else(|| {
+        if let Some(attr_start) = profile_section.find("token=\"") {
+            let rest = &profile_section[attr_start + 7..];
+            if let Some(attr_end) = rest.find("\"") {
+                Some(rest[..attr_end].to_string())
+            } else { None }
+        } else { None }
+    })
+    .unwrap_or_else(|| format!("profile-{}", profiles.len()));
+```
+
+*Source: [`src/soap_client.rs` L257-L271](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/soap_client.rs#L257-L271)*
 - **Missing field defaults** ([`src/types.rs` L11-L19](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/types.rs#L11-L19)): All fields in `OnvifConfig` have `Default` implementations, returning empty strings instead of errors when device information is missing.
+
+```rust
+impl Default for OnvifConfig {
+    fn default() -> Self {
+        Self {
+            discovery_timeout_ms: 5000,
+            default_username: None,
+            default_password: None,
+        }
+    }
+}
+```
+
+*Source: [`src/types.rs` L11-L19](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/types.rs#L11-L19)*
 
 ### Source Code Hygiene Positive Example
 

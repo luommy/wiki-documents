@@ -120,6 +120,33 @@ const MULTICAST_PORT: u16 = 3702;
 
 **Probe 消息**（[`src/discovery.rs` L10-L31](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/discovery.rs#L10-L31)）是一个 SOAP envelope，告知网络中的 ONVIF 设备「我在找 NetworkVideoTransmitter 类型的设备」。每次探测会生成一个随机 UUID 作为 MessageID，确保不会与历史探测混淆。
 
+```rust
+fn build_probe_message() -> String {
+    let message_id = uuid::Uuid::new_v4();
+    format!(
+        r#"<?xml version="1.0" encoding="UTF-8"?>
+<s:Envelope xmlns:s="http://www.w3.org/2003/05/soap-envelope"
+            xmlns:a="http://www.w3.org/2005/08/addressing">
+  <s:Header>
+    <a:Action s:mustUnderstand="1">http://schemas.xmlsoap.org/ws/2005/04/discovery/Probe</a:Action>
+    <a:MessageID>urn:uuid:{message_id}</a:MessageID>
+    <a:ReplyTo><a:Address>http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous</a:Address></a:ReplyTo>
+    <a:To s:mustUnderstand="1">urn:schemas-xmlsoap-org:ws:2005:04:discovery</a:To>
+  </s:Header>
+  <s:Body>
+    <Probe xmlns="http://schemas.xmlsoap.org/ws/2005/04/discovery">
+      <d:Types xmlns:d="http://schemas.xmlsoap.org/ws/2005/04/discovery"
+               xmlns:dp0="http://www.onvif.org/ver10/network/wsdl">dp0:NetworkVideoTransmitter</d:Types>
+    </Probe>
+  </s:Body>
+</s:Envelope>"#,
+        message_id = message_id,
+    )
+}
+```
+
+*Source: [`src/discovery.rs` L10-L31](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/discovery.rs#L10-L31)*
+
 **discover_devices 主循环**（[`src/discovery.rs` L134-L211](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/discovery.rs#L134-L211)）的核心步骤：
 
 1. 调用 `find_local_ipv4()` 检测本机真实 IP（不能绑 `0.0.0.0`，macOS 会失败）
@@ -130,7 +157,52 @@ const MULTICAST_PORT: u16 = 3702;
 6. 在 deadline 循环内 `recv_from` 收集 ProbeMatch 响应
 7. 按 endpoint 去重后返回
 
+```rust
+pub fn discover_devices(timeout_ms: u64) -> Result<Vec<DiscoveryMatch>, String> {
+    let timeout_ms = timeout_ms.clamp(500, 30_000);
+    let bind_addr = match find_local_ipv4() {
+        Some(ip) => {
+            eprintln!("[onvif-bridge] Binding multicast socket to {}", ip);
+            SocketAddrV4::new(ip, 0)
+        }
+        None => {
+            eprintln!("[onvif-bridge] Could not detect local IP, binding to 0.0.0.0");
+            SocketAddrV4::new(Ipv4Addr::UNSPECIFIED, 0)
+        }
+    };
+    let socket = UdpSocket::bind(bind_addr)
+        .map_err(|e| format!("Failed to bind UDP socket: {}", e))?;
+    socket.set_broadcast(true).map_err(|e| format!("Failed to enable broadcast: {}", e))?;
+    socket.set_multicast_ttl_v4(1).map_err(|e| format!("Failed to set multicast TTL: {}", e))?;
+    socket.set_read_timeout(Some(Duration::from_millis(timeout_ms)))
+        .map_err(|e| format!("Failed to set read timeout: {}", e))?;
+    // ... (30 lines omitted: join multicast group, send probe, deadline recv loop)
+    let mut seen = std::collections::HashSet::new();
+    discovered.retain(|m| seen.insert(m.endpoint.clone()));
+    Ok(discovered)
+}
+```
+
+*Source: [`src/discovery.rs` L134-L211](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/discovery.rs#L134-L211)*
+
 **find_local_ipv4 的必要性**（[`src/discovery.rs` L119-L131](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/discovery.rs#L119-L131)）：macOS 的网络栈在多播绑定时，如果绑定到 `0.0.0.0`（INADDR_ANY），内核不知道用哪个网卡接口发送多播包，会报 `No route to host`。解决方案是先创建一个临时 UDP socket 连接到 `8.8.8.8:80`（不实际发包，只是让内核选择默认路由的网卡），然后读取该 socket 的 `local_addr()` 获取本机真实 IP。这个修复在 commit `59d3490` 中引入。
+
+```rust
+fn find_local_ipv4() -> Option<Ipv4Addr> {
+    // On macOS, multicast from 0.0.0.0 can fail with "No route to host"
+    // Binding to a specific interface address fixes this
+    let socket = UdpSocket::bind("0.0.0.0:0").ok()?;
+    // Try connecting to a public address (doesn't actually send packets)
+    socket.connect("8.8.8.8:80").ok()?;
+    let local = socket.local_addr().ok()?;
+    match local {
+        std::net::SocketAddr::V4(v4) => Some(*v4.ip()),
+        _ => None,
+    }
+}
+```
+
+*Source: [`src/discovery.rs` L119-L131](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/discovery.rs#L119-L131)*
 
 ### 3.2 SOAP 客户端与 WS-Security（soap_client.rs）
 
@@ -169,6 +241,39 @@ fn compute_password_digest(password: &str) -> (String, String, String) {
 
 **soap_request_raw**（[`src/soap_client.rs` L68-L124](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/soap_client.rs#L68-L124)）构建完整的 SOAP envelope，包含 WS-Security header（如果提供了凭据）和 SOAP Body，然后通过 `ureq::post(url)` 同步发送。关键安全措施包括：响应体大小限制 10MB（防内存耗尽）、SOAP Fault 自动检测和格式化错误消息。
 
+```rust
+pub fn soap_request_raw(url: &str, action: &str, body: &str,
+    username: Option<&str>, password: Option<&str>) -> Result<String, String> {
+    let security_header = match (username, password) {
+        (Some(user), Some(pass)) if !user.is_empty() && !pass.is_empty() => {
+            Some(build_security_header(user, pass))
+        }
+        _ => None,
+    };
+    let header_content = match &security_header {
+        Some(sec) => format!("  <s:Header>\n    {}\n  </s:Header>", sec),
+        None => "  <s:Header/>".to_string(),
+    };
+    let envelope = format!(
+        r#"<?xml version="1.0" encoding="UTF-8"?>
+<s:Envelope xmlns:s="http://www.w3.org/2003/05/soap-envelope" ...>
+{header}  <s:Body>    {body}  </s:Body>
+</s:Envelope>"#, header = header_content, body = body);
+    let content_type = format!("application/soap+xml; charset=utf-8; action=\"{}\"", action);
+    let response = ureq::post(url).set("Content-Type", &content_type)
+        .send_string(&envelope).map_err(|e| format!("SOAP request failed: {}", e))?;
+    let response_text = response.into_string()
+        .map_err(|e| format!("Failed to read response: {}", e))?;
+    if response_text.len() > 10 * 1024 * 1024 {
+        return Err("SOAP response too large (exceeds 10MB)".to_string());
+    }
+    if let Some(fault) = extract_soap_fault(&response_text) { return Err(fault); }
+    Ok(response_text)
+}
+```
+
+*Source: [`src/soap_client.rs` L68-L124](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/soap_client.rs#L68-L124)*
+
 ### 3.3 设备能力协商
 
 onvif-bridge 实现了 ONVIF Core 和 Media 规范中的核心协商函数：
@@ -183,6 +288,43 @@ onvif-bridge 实现了 ONVIF Core 和 Media 规范中的核心协商函数：
 
 **resolve_service_url**（[`src/soap_client.rs` L390-L407](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/soap_client.rs#L390-L407)）是一个容易被忽略但很关键的函数——ONVIF 设备的不同服务（device/media/ptz）有不同的 URL 路径（`/onvif/device_service`、`/onvif/media_service`、`/onvif/ptz_service`）。WS-Discovery 返回的 device URL 通常已经是 `/onvif/device_service` 结尾，调用 media 服务时需要替换路径后缀而非追加。
 
+```rust
+pub fn get_device_info(device: &OnvifDevice) -> Result<serde_json::Value, String> {
+    let service_url = resolve_service_url(&device.device_url, "device");
+    let body = r#"<tds:GetDeviceInformation/>"#;
+    let response = soap_request_raw(&service_url,
+        "http://www.onvif.org/ver10/device/wsdl/GetDeviceInformation", body,
+        device.username.as_deref(), device.password.as_deref())?;
+    Ok(serde_json::json!({
+        "manufacturer": extract_tag(&response, "tt:Manufacturer").unwrap_or_default(),
+        "model": extract_tag(&response, "tt:Model").unwrap_or_default(),
+        "firmware_version": extract_tag(&response, "tt:FirmwareVersion").unwrap_or_default(),
+        "serial_number": extract_tag(&response, "tt:SerialNumber").unwrap_or_default(),
+        "hardware_id": extract_tag(&response, "tt:HardwareId").unwrap_or_default(),
+    }))
+}
+```
+
+*Source: [`src/soap_client.rs` L214-L233](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/soap_client.rs#L214-L233)*
+
+```rust
+pub fn resolve_service_url(device_url: &str, service: &str) -> String {
+    let base = device_url.trim_end_matches('/');
+    let suffix = match service {
+        "device" => "/onvif/device_service",
+        "media" => "/onvif/media_service",
+        "ptz" => "/onvif/ptz_service",
+        _ => "/onvif/device_service",
+    };
+    if let Some(slash_pos) = base.find("/onvif/") {
+        return format!("{}{}", &base[..slash_pos], suffix);
+    }
+    format!("{}{}", base, suffix)
+}
+```
+
+*Source: [`src/soap_client.rs` L390-L407](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/soap_client.rs#L390-L407)*
+
 ### 3.4 PTZ 控制（ptz.rs）
 
 [`src/ptz.rs`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/ptz.rs#L1-L214) 封装了六个 PTZ 命令，全部基于 `soap_client::soap_request_raw` 构建 SOAP body：
@@ -195,6 +337,34 @@ onvif-bridge 实现了 ONVIF Core 和 Media 规范中的核心协商函数：
 - **goto_preset**（[L186-L210](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/ptz.rs#L186-L210)）：移动到指定预设位
 
 每个命令都通过 `resolve_ptz_url` 确定服务的 URL，然后在 SOAP body 中嵌入对应的 ONVIF PTZ WSDL 操作名和参数（PanTilt 空间、Zoom 空间、Speed 向量等）。
+
+```rust
+pub fn ptz_relative_move(device: &OnvifDevice, profile_token: &str,
+    pan: f64, tilt: f64, zoom: f64, speed: f64) -> Result<(), String> {
+    let service_url = resolve_ptz_url(&device.device_url);
+    let body = format!(
+        r#"<tptz:RelativeMove>
+      <tptz:ProfileToken>{profile_token}</tptz:ProfileToken>
+      <tptz:Translation>
+        <tt:PanTilt x="{pan}" y="{tilt}" space="http://www.onvif.org/ver10/tptz/PanTiltSpaces/TranslationGenericSpace"/>
+        <tt:Zoom x="{zoom}" space="http://www.onvif.org/ver10/tptz/ZoomSpaces/TranslationGenericSpace"/>
+      </tptz:Translation>
+      <tptz:Speed>
+        <tt:PanTilt x="{speed}" y="{speed}" space="http://www.onvif.org/ver10/tptz/PanTiltSpaces/GenericSpeedSpace"/>
+        <tt:Zoom x="{speed}" space="http://www.onvif.org/ver10/tptz/ZoomSpaces/ZoomGenericSpeedSpace"/>
+      </tptz:Speed>
+    </tptz:RelativeMove>"#,
+        profile_token = xml_escape(profile_token),
+        pan = pan, tilt = tilt, zoom = zoom, speed = speed,
+    );
+    crate::soap_client::soap_request_raw(&service_url,
+        "http://www.onvif.org/ver20/ptz/wsdl/RelativeMove", &body,
+        device.username.as_deref(), device.password.as_deref())?;
+    Ok(())
+}
+```
+
+*Source: [`src/ptz.rs` L5-L42](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/ptz.rs#L5-L42)*
 
 ### 3.5 命令分发（lib.rs execute_command）
 
@@ -338,6 +508,29 @@ onvif-bridge 通过 NeoMind Extension SDK 的标准接口与主体集成，不�
 
 扩展通过 `metrics()` 方法（[`src/lib.rs` L122-L143](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/lib.rs#L122-L143)）声明两个全局指标：`total_commands`（命令调用计数器）和 `connected_devices`（已连接设备数）。此外，`produce_metrics()` 方法（[L719-L790](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/lib.rs#L719-L790)）为每个已注册设备生成**虚拟指标**：
 
+```rust
+fn metrics(&self) -> Vec<MetricDescriptor> {
+    vec![
+        MetricDescriptor {
+            name: "total_commands".to_string(),
+            display_name: "Total Commands".to_string(),
+            data_type: MetricDataType::Integer,
+            unit: String::new(),
+            min: None, max: None, required: false,
+        },
+        MetricDescriptor {
+            name: "connected_devices".to_string(),
+            display_name: "Connected Devices".to_string(),
+            data_type: MetricDataType::Integer,
+            unit: String::new(),
+            min: None, max: None, required: false,
+        },
+    ]
+}
+```
+
+*Source: [`src/lib.rs` L122-L143](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/lib.rs#L122-L143)*
+
 | 指标名 | 类型 | 含义 |
 |--------|------|------|
 | `onvif.{device_id}.connected` | Integer (0/1) | 设备是否在线 |
@@ -346,6 +539,35 @@ onvif-bridge 通过 NeoMind Extension SDK 的标准接口与主体集成，不�
 | `onvif.{device_id}.last_seen_ms` | Integer | 最后一次发现时间戳 |
 
 这些虚拟指标通过 `CapabilityContext::device_metrics_write` 写入 NeoMind 主体，前端可以基于这些指标渲染设备健康度面板。
+
+```rust
+fn produce_metrics(&self) -> Result<Vec<ExtensionMetricValue>> {
+    let now = chrono::Utc::now().timestamp_millis();
+    let mut metrics = Vec::new();
+    self.register_template();
+    metrics.push(ExtensionMetricValue {
+        name: "total_commands".to_string(),
+        value: ParamMetricValue::Integer(self.total_commands.load(Ordering::SeqCst)),
+        timestamp: now,
+    });
+    let device_snapshot: Vec<_> = {
+        let devices = self.devices.read();
+        devices.iter().map(|(k, v)| (k.clone(), v.clone())).collect::<Vec<_>>()
+    };
+    for (id, device) in &device_snapshot {
+        metrics.push(ExtensionMetricValue {
+            name: format!("onvif.{}.connected", id),
+            value: ParamMetricValue::Integer(if device.connected { 1 } else { 0 }),
+            timestamp: now,
+        });
+        // ... (55 lines omitted: profile_count, ptz_supported, last_seen_ms,
+        //      and device_metrics_write capability calls per device)
+    }
+    Ok(metrics)
+}
+```
+
+*Source: [`src/lib.rs` L719-L790](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/lib.rs#L719-L790)*
 
 ### 与 yolo-video-v2 的端到端协作
 
@@ -378,6 +600,32 @@ onvif-bridge 的测试分为三层：SOAP 客户端单元测试、扩展逻辑�
 
 [`src/soap_client.rs` L409-L516](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/soap_client.rs#L409-L516) 包含 8 个单元测试，覆盖核心安全逻辑：
 
+```rust
+#[test]
+fn test_password_digest_produces_valid_output() {
+    let (nonce_b64, created, digest_b64) = compute_password_digest("mypassword");
+    assert_eq!(nonce_b64.len(), 24);
+    assert!(created.starts_with("20"));
+    assert!(created.contains("T"));
+    assert!(created.ends_with("Z"));
+    assert_eq!(digest_b64.len(), 28);
+    let (_, _created2, digest2_b64) = compute_password_digest("mypassword");
+    assert_eq!(digest2_b64.len(), 28);
+}
+
+#[test]
+fn test_security_header_contains_digest_type() {
+    let header = build_security_header("admin", "secret123");
+    assert!(header.contains("#PasswordDigest"));
+    assert!(header.contains("<wsse:Username>admin</wsse:Username>"));
+    assert!(header.contains("<wsse:Nonce"));
+    assert!(header.contains("<wsu:Created>"));
+}
+// ... (6 more tests: extract_soap_fault, extract_tag, resolve_service_url)
+```
+
+*Source: [`src/soap_client.rs` L409-L516](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/soap_client.rs#L409-L516)*
+
 | 测试名 | 位置 | 验证内容 |
 |--------|------|----------|
 | `test_password_digest_produces_valid_output` | [L414-L428](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/soap_client.rs#L414-L428) | nonce 是 24 字符 base64、created 是 ISO 8601、digest 是 28 字符 base64（SHA-1 20 字节） |
@@ -394,6 +642,36 @@ onvif-bridge 的测试分为三层：SOAP 客户端单元测试、扩展逻辑�
 ### 扩展逻辑单元测试
 
 [`src/lib.rs` L1499-L1645](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/lib.rs#L1499-L1645) 包含 6 个单元测试，覆盖设备注册表的 CRUD 操作和命令分发逻辑。这些测试通过直接操作内部 `RwLock<HashMap>` 插入设备数据，绕过网络调用，确保测试可以离线运行。关键的测试用例包括 `test_add_and_list_device`（添加 → 列表 → 获取 → 移除的完整生命周期）和 `test_unknown_command`（验证未知命令返回 `CommandNotFound` 错误）。
+
+```rust
+#[test]
+fn test_unknown_command() {
+    let ext = OnvifBridgeExtension::new();
+    let rt = tokio::runtime::Runtime::new().unwrap();
+    let result = rt.block_on(ext.execute_command("nonexistent", &json!({})));
+    assert!(result.is_err());
+}
+
+#[test]
+fn test_add_and_list_device() {
+    let ext = OnvifBridgeExtension::new();
+    {
+        let mut devices = ext.devices.write();
+        devices.insert("cam-001".to_string(), OnvifDevice {
+            device_id: "cam-001".to_string(),
+            name: "Test Camera".to_string(),
+            device_url: "http://192.168.1.100:80/onvif/device_service".to_string(),
+            // ... (8 fields omitted)
+            ..Default::default()
+        });
+    }
+    let rt = tokio::runtime::Runtime::new().unwrap();
+    let result = rt.block_on(ext.execute_command("list_devices", &json!({}))).unwrap();
+    assert_eq!(result["count"], 1);
+}
+```
+
+*Source: [`src/lib.rs` L1499-L1645](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/lib.rs#L1499-L1645)*
 
 ### 跨平台 WS-Discovery 验证
 
@@ -456,8 +734,65 @@ commit `59d3490`（`fix(onvif): improve WS-Discovery multicast reliability`）�
 ONVIF 规范定义了标准 SOAP envelope 格式，但厂商实现存在差异。onvif-bridge 在解析层面做了多项宽容处理：
 
 - **命名空间前缀多样性**（[`src/discovery.rs` L34-L58](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/discovery.rs#L34-L58)）：`find_body_start()` 尝试 `s:` / `SOAP-ENV:` / `soap:` / `soapenv:` / `env:` / 无前缀 六种命名空间前缀，确保能解析不同厂商的 ProbeMatch 响应。`extract_tagged_content()` 同样遍历多种前缀。
+
+```rust
+fn find_body_start(response: &str) -> Option<usize> {
+    for prefix in &["s:", "SOAP-ENV:", "soap:", "soapenv:", "env:", ""] {
+        let tag = format!("<{}Body>", prefix);
+        if let Some(pos) = response.find(&tag) {
+            return Some(pos);
+        }
+    }
+    None
+}
+
+fn extract_tagged_content<'a>(xml: &'a str, local_name: &str) -> Option<&'a str> {
+    for prefix in &["d:", "SOAP-ENV:", "soap:", "soapenv:", "env:", "s:", ""] {
+        let open_tag = format!("<{}{}>", prefix, local_name);
+        if let Some(pos) = xml.find(&open_tag) {
+            let content_start = pos + open_tag.len();
+            let close_tag = format!("</{}{}>", prefix, local_name);
+            if let Some(end_pos) = xml[content_start..].find(&close_tag) {
+                return Some(&xml[content_start..content_start + end_pos]);
+            }
+        }
+    }
+    None
+}
+```
+
+*Source: [`src/discovery.rs` L34-L58](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/discovery.rs#L34-L58)*
 - **Profile token 提取**（[`src/soap_client.rs` L257-L271](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/soap_client.rs#L257-L271)）：某些厂商把 token 放在 `<trt:Profiles token="xxx">` 的属性里，某些放在子元素中，onvif-bridge 先尝试 `extract_tag`，失败后从属性中提取。
+
+```rust
+let token = extract_tag(profile_section, "token")
+    .or_else(|| {
+        if let Some(attr_start) = profile_section.find("token=\"") {
+            let rest = &profile_section[attr_start + 7..];
+            if let Some(attr_end) = rest.find("\"") {
+                Some(rest[..attr_end].to_string())
+            } else { None }
+        } else { None }
+    })
+    .unwrap_or_else(|| format!("profile-{}", profiles.len()));
+```
+
+*Source: [`src/soap_client.rs` L257-L271](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/soap_client.rs#L257-L271)*
 - **缺失字段默认值**（[`src/types.rs` L11-L19](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/types.rs#L11-L19)）：`OnvifConfig` 的所有字段都有 `Default` 实现，设备信息缺失时返回空字符串而非报错。
+
+```rust
+impl Default for OnvifConfig {
+    fn default() -> Self {
+        Self {
+            discovery_timeout_ms: 5000,
+            default_username: None,
+            default_password: None,
+        }
+    }
+}
+```
+
+*Source: [`src/types.rs` L11-L19](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/types.rs#L11-L19)*
 
 ### 源码卫生正例
 
