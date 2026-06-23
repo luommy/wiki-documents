@@ -450,7 +450,7 @@ stateDiagram-v2
     CheckConfig --> Deleted: processingEnabled = false
     CheckConfig --> Tier1: ID exists + hash match
     CheckConfig --> Tier2: ID exists + hash differs
-    CheckContext --> Tier3: no ID anywhere
+    CheckConfig --> Tier3: no ID anywhere
 
     Tier1 --> VerifyExists: listTransforms(id)
     VerifyExists --> Active: found

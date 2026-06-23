@@ -112,11 +112,11 @@ graph LR
 
 ## 6.3 五层模块结构
 
-1972 行的 IIFE 不是一坨平铺代码，而是按职责分成了五层。这一节的分层与 [2.2](./2-architecture.md) 的五层架构概述一致，但这里聚焦**构建视角**——为什么这种分层能在没有打包器的情况下工作，以及每一层的构建特征。五层的行号边界如下：
+1972 行的 IIFE 不是一坨平铺代码，而是按职责分成了五层。这一节的分层与 [2.2](./2-architecture.md) 的五层架构概述互补（视角不同：2 聚焦架构分层，6 聚焦构建操作），但这里聚焦**构建视角**——为什么这种分层能在没有打包器的情况下工作，以及每一层的构建特征。五层的行号边界如下：
 
 1. **Helper 层**（[L7-L230](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L7-L230)）：纯函数工具集——`batteryMeta`、`formatValue`、`unitStr`、`timeAgo`、`getVal`、`getFirst`、`classColor`、`pipeRois`、`PinIcon`、`ModeIcon`。无 React 依赖、无状态、无副作用，可以单独抽出来跑在 Node.js 里做单元测试。
 2. **Template 引擎层**（[L239-L456](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L239-L456)）：`generateTransformJsCode(pipe)` + `fillTemplate` —— 从 pipeline 配置生成 Transform 的 JS 代码字符串。纯字符串拼接，无 React。
-3. **Main component 层**（[L472-L1319](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L472-L1319)）：`NE101CameraPanel(props)` —— 主组件，包含所有 hooks、effects、JSX 渲染逻辑。847 行，是五层中最重的一层。
+3. **Main component 层**（[L472-L1332](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L472-L1332)）：`NE101CameraPanel(props)` —— 主组件，包含所有 hooks、effects、JSX 渲染逻辑。861 行，是五层中最重的一层。
 4. **Shared UI 层**（[L1321-L1348](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1321-L1348)）：shadcn CSS 类常量（`INPUT_CLS` / `LABEL_CLS` / `FIELD_CLS` / `DESC_CLS`）+ `SwitchControl` 按钮工厂。
 5. **Settings panels 层**（[L1353-L1969](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1353-L1969)）：`ConfigPanel`（Display tab，5 行空壳）、`AdvancedPanel`（Advanced tab，522 行重逻辑）、`ExtDropdown`（shadcn 风格下拉框）、`imeInput`（uncontrolled 输入工厂）。
 
@@ -183,7 +183,7 @@ function NE101CameraPanel(props) {
 }
 ```
 
-Source: [`bundle.js` L472-L1319](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L472-L1319)
+Source: [`bundle.js` L472-L1332](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L472-L1332)
 
 ```js
 // Layer 4: Shared UI 层 L1321-L1348（CSS 类常量 + SwitchControl）
@@ -232,7 +232,7 @@ graph TB
     subgraph IIFE["IIFE 闭包作用域（1972 行）"]
         L1["① Helper 层 L7-L230<br/>batteryMeta / formatValue / classColor<br/>getVal / getFirst / pipeRois / PinIcon"]
         L2["② Template 引擎层 L239-L456<br/>generateTransformJsCode<br/>fillTemplate"]
-        L3["③ Main component 层 L472-L1319<br/>NE101CameraPanel(props)<br/>hooks / effects / JSX"]
+        L3["③ Main component 层 L472-L1332<br/>NE101CameraPanel(props)<br/>hooks / effects / JSX"]
         L4["④ Shared UI 层 L1321-L1348<br/>INPUT_CLS / LABEL_CLS<br/>SwitchControl"]
         L5["⑤ Settings panels 层 L1353-L1969<br/>ConfigPanel / AdvancedPanel<br/>ExtDropdown / imeInput"]
         EXPORT["return { default, ... }<br/>L1971-L1972"]
@@ -372,7 +372,7 @@ function ConfigPanel(props) {
 
 这个函数只有 5 行，返回一个空 `<div>`。原因写在注释里：**标题字段由平台提供**。ComponentConfigDialog 内置了一个 `titleSection`，用户可以在那里设置组件的显示标题（如「前门摄像头」），不需要组件自己再提供一个标题输入框。`ConfigPanel` 选择把 Display tab 完全让给平台的标题字段，保持视觉简洁。这种「不重复造轮子」的态度是 ne101_camera 配置设计的第一原则。
 
-**AdvancedPanel：重逻辑的 Advanced tab**。查看源码起始：[`bundle.js` L1363-L1448](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1363-L1448)。`AdvancedPanel` 是整个 bundle 第二长的函数（522 行，仅次于主组件的 847 行），承载了 ne101_camera 的所有「配置复杂度」：AI 处理总开关（`SwitchControl`）、扩展选择（`ExtDropdown`）、模板/模式选择、类别过滤输入（`imeInput`）、短语输入、类别颜色过滤、ROI 开关 + 多边形编辑器（Canvas 画布上的拖拽点）、ROI 重叠阈值滑块（commit [`636a8ae`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/636a8ae)）、NMS IoU 阈值透传给 `locate-anything-v2`（commit [`8656148`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/8656148)）。
+**AdvancedPanel：重逻辑的 Advanced tab**。查看源码起始：[`bundle.js` L1363-L1448](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1363-L1448)。`AdvancedPanel` 是整个 bundle 第二长的函数（523 行，仅次于主组件的 861 行），承载了 ne101_camera 的所有「配置复杂度」：AI 处理总开关（`SwitchControl`）、扩展选择（`ExtDropdown`）、模板/模式选择、类别过滤输入（`imeInput`）、短语输入、类别颜色过滤、ROI 开关 + 多边形编辑器（Canvas 画布上的拖拽点）、ROI 重叠阈值滑块（commit [`636a8ae`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/636a8ae)）、NMS IoU 阈值透传给 `locate-anything-v2`（commit [`8656148`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/8656148)）。
 
 ```js
 // bundle.js L1363-L1448（AdvancedPanel 区域起始：ROI_ACTIONS + ExtDropdown）
@@ -509,7 +509,7 @@ Source: [`bundle.js` L1371-L1446](https://github.com/camthink-ai/NeoMind-Dashboa
 |------|------|----------|------|
 | **IIFE 注入范式** | `var React = window.React` + IIFE 闭包（[L1-L5](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1-L5)） | ESM bundle / UMD | 平台保证单 React 实例，IIFE 从机制上杜绝多实例；零构建，`<script>` 标签直接加载 |
 | **多键导出对象** | `return { default, NE101CameraPanel, ConfigPanel, AdvancedPanel }`（[L1971](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1971-L1971)） | 单个 default 函数 | 平台需独立寻址配置面板；`default` + 命名导出双暴露兼容新旧加载器 |
-| **单 IIFE 五层结构** | 按行号分五层（helper / template / main / shared UI / panels），函数提升解决跨层调用（[L7](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L7-L230) / [L239](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L239-L456) / [L472](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L472-L1319) / [L1321](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1321-L1348) / [L1353](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1353-L1969)） | 拆成 ESM 模块 / class 组织 | 零构建 + 闭包作用域 = 无需打包器的模块化；函数提升消除顺序依赖 |
+| **单 IIFE 五层结构** | 按行号分五层（helper / template / main / shared UI / panels），函数提升解决跨层调用（[L7](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L7-L230) / [L239](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L239-L456) / [L472](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L472-L1332) / [L1321](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1321-L1348) / [L1353](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1353-L1969)） | 拆成 ESM 模块 / class 组织 | 零构建 + 闭包作用域 = 无需打包器的模块化；函数提升消除顺序依赖 |
 | **无条件顶层 hooks** | 所有 hooks 在函数顶部无条件调用，条件逻辑放 JSX 里（[L1522-L1534](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1522-L1534)，commit [`0601cd4`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/0601cd4)） | 条件 hooks + 守卫 | React Rules of Hooks 硬性约束，hook 调用顺序不一致直接导致 #310 崩溃 |
 | **uncontrolled input** | `defaultValue` + `onChange` 单向同步（[L1459-L1468](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1459-L1468)，commit [`b060a25`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/b060a25)） | controlled `value`+state / hooks-in-factory | IME 安全、无 hooks、永远响应输入；工厂函数里不能用 hooks |
 | **Display + Advanced 双面板** | `ConfigPanel`（空壳，[L1353-L1357](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1353-L1357)）+ `AdvancedPanel`（重逻辑，[L1363-L1969](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1363-L1969)） | 单个大表单 | 匹配平台 Display/Advanced 双 tab 用户心理模型；普通用户不被高级字段吓到 |

@@ -2,7 +2,7 @@
 description: Shared engineering standards — centralized reference for metadata/capability/version/build/test/release/security, referenced by all case studies
 keywords: [NeoMind, engineering standards, metadata, capability, build]
 tags: [NeoMind, developer-guide, standards]
-sidebar_label: Engineering Standards Appendix
+sidebar_label: Engineering Standards
 ---
 
 # Shared Engineering Standards Appendix

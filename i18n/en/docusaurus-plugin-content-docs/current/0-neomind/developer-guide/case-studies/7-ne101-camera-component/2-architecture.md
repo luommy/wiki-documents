@@ -62,8 +62,8 @@ graph TB
         ENTRY["L1: var NE101CameraPanel = (function () {<br/>L2-L4: var React = window.React<br/>var jsx/jsxs = window.jsxRuntime.*"]
         L1["Layer 1 Helper L7-L230<br/>batteryMeta / formatValue<br/>classColor / pipeRois"]
         L2["Layer 2 Template engine L239-L456<br/>generateTransformJsCode<br/>fillTemplate"]
-        L3["Layer 3 Sub-component L458-L1970<br/>NoDevice / ConfigPanel<br/>AdvancedPanel / SwitchControl"]
-        L4["Layer 4 Main component L470-L1333<br/>NE101CameraPanel body<br/>hooks / events / render"]
+        L3["Layer 3 Sub-components<br/>L458-L469<br/>L1334-L1970"]
+        L4["Layer 4 Main component<br/>L472-L1332<br/>NE101CameraPanel body<br/>hooks / events / render"]
         L5["Layer 5 Export L1971<br/>return default + named exports"]
         ENTRY --> L1
         L1 --> L2
@@ -316,7 +316,7 @@ Source: [`bundle.js` L1353-L1357](https://github.com/camthink-ai/NeoMind-Dashboa
 ```
 
 Source: [`bundle.js` L1371-L1446](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1371-L1446)
-- `AdvancedPanel(props)` ([L1448-L1970](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1448-L1970)) — **the advanced configuration panel**: AI processing toggle, extension picker, template picker, ROI editor, ROI overlap threshold slider, NMS threshold pass-through. This single component is 522 lines — the longest span in the bundle.
+- `AdvancedPanel(props)` ([L1448-L1970](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1448-L1970)) — **the advanced configuration panel**: AI processing toggle, extension picker, template picker, ROI editor, ROI overlap threshold slider, NMS threshold pass-through. This single component is 523 lines — the longest span in the bundle.
 
 ```js
 // bundle.js L1448-L1457 — AdvancedPanel (entry; 513 lines omitted)
@@ -335,9 +335,9 @@ Source: [`bundle.js` L1371-L1446](https://github.com/camthink-ai/NeoMind-Dashboa
 
 Source: [`bundle.js` L1448-L1970](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1448-L1970)
 
-### Layer 4: Main Component (L470-L1333)
+### Layer 4: Main Component (L472-L1332)
 
-`NE101CameraPanel(props)` ([L472](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L470-L1333)) is the main component mounted into the grid at runtime. It consumes platform-injected props (`config` / `deviceContext` / `deviceImageSrc` / `virtualMetrics` / `sendDeviceCommand`) and manages command-loading state, extension state, transform lifecycle, detection cache, and image layout via a group of hooks.
+`NE101CameraPanel(props)` ([L472](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L472-L1332)) is the main component mounted into the grid at runtime. It consumes platform-injected props (`config` / `deviceContext` / `deviceImageSrc` / `virtualMetrics` / `sendDeviceCommand`) and manages command-loading state, extension state, transform lifecycle, detection cache, and image layout via a group of hooks.
 
 ```js
 // bundle.js L470-L486 — NE101CameraPanel entry
@@ -357,7 +357,7 @@ Source: [`bundle.js` L1448-L1970](https://github.com/camthink-ai/NeoMind-Dashboa
     // ... (847 lines omitted: processing config, effects, render) ...
 ```
 
-Source: [`bundle.js` L470-L1333](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L470-L1333)
+Source: [`bundle.js` L472-L1332](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L472-L1332)
 
 ### Layer 5: Export (L1971)
 
@@ -372,7 +372,7 @@ The NeoMind Dashboard contract for a "device-bound component" is: **main compone
 ```mermaid
 graph TB
     subgraph RUNTIME["Runtime (rendered in the grid)"]
-        MAIN["NE101CameraPanel<br/>(main component, L470-L1333)"]
+        MAIN["NE101CameraPanel<br/>(main component, L472-L1332)"]
         NODEVICE["NoDevice<br/>(placeholder, L458)"]
         INNER["Internal jsx render branches<br/>image + metrics + command buttons<br/>+ ROI / detection-box Canvas"]
         MAIN -->|"deviceContext == null"| NODEVICE
@@ -629,8 +629,8 @@ The table below compares ne101_camera and [6 metric_card](../6-metric-card-compo
 
 | Dimension | 6 metric_card | 7 ne101_camera | Gap interpretation |
 |-----------|----------------|-----------------|---------------------|
-| **Code volume** | 352-line IIFE | 1972-line IIFE | The extra 1620 lines in ne101 mostly live in the sub-component layer (`AdvancedPanel` 522 lines) and the template engine layer (`generateTransformJsCode` 217 lines) — both are complexity unique to "device binding + AI processing pipeline". |
-| **Component count** | 1 exported component (`MetricCard`) | 3 exported components (`NE101CameraPanel` + `ConfigPanel` + `AdvancedPanel`) + 5 internal sub-components | metric_card's "single component" means it has no configuration-dialog tab structure; ne101's three-piece set is the platform's requirement for components with `has_device_binding` or complex `config_schema`. |
+| **Code volume** | 352-line IIFE | 1972-line IIFE | The extra 1620 lines in ne101 mostly live in the sub-component layer (`AdvancedPanel` 523 lines) and the template engine layer (`generateTransformJsCode` 218 lines) — both are complexity unique to "device binding + AI processing pipeline". |
+| **Component count** | 1 exported component (`MetricCard`) | 3 exported components (`NE101CameraPanel` + `ConfigPanel` + `AdvancedPanel`) + 4 internal sub-components | metric_card's "single component" means it has no configuration-dialog tab structure; ne101's three-piece set is the platform's requirement for components with `has_device_binding` or complex `config_schema`. |
 | **Data access** | `has_data_source: true` + `fetchData` prop (generic) | `has_device_binding: true` + `device_type_filter: ["ne101_camera"]` (specific) | metric_card consumes any DataSource (device telemetry / extension metrics / system metrics); ne101 only consumes devices where `device.type === "ne101_camera"`. This is the fundamental "generic vs specific" divide. |
 | **Configuration complexity** | Simple display config (`label` / `unit` / `decimalPlaces`) | 18-field `default_config` ([manifest.json L18-L37](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L18-L37)): processing pipeline + ROI + NMS + categories + phrase | ne101 has 3x the config fields of metric_card, each with defaults and compatibility fallback (`processingRois` array vs single rectangle). |
 | **Export style** | `default + MetricCard` dual exposure (but only default is used) | `default + NE101CameraPanel + ConfigPanel + AdvancedPanel` four-field exposure | metric_card's default dual exposure is "forward-compatible insurance"; ne101's named exports are "a contract the configuration dialog must use". |

@@ -378,13 +378,14 @@ function getExtMode(extensionId, templateName) {
 
 ## 3.8 设计决策汇总
 
-本页涉及的 6 个设计决策汇总如下，每个都包含「选择 / 备选 / 理由」三段式。这些决策有一个共同主题：**在「组件 ↔ 扩展」契约的模糊地带选择宽容和适配，而不是严格和强制**——组件不要求扩展遵循统一 API，而是通过模式目录（`EXT_MODES`）和参数归一化（`imageArg`）去适配每个扩展的既有约定；面对未知扩展选择默认回退而非报错拒绝；面对专家级参数（NMS 阈值）选择硬编码安全默认而非暴露给用户。
+本页涉及的 7 个设计决策汇总如下，每个都包含「选择 / 备选 / 理由」三段式。这些决策有一个共同主题：**在「组件 ↔ 扩展」契约的模糊地带选择宽容和适配，而不是严格和强制**——组件不要求扩展遵循统一 API，而是通过模式目录（`EXT_MODES`）和参数归一化（`imageArg`）去适配每个扩展的既有约定；面对未知扩展选择默认回退而非报错拒绝；面对专家级参数（NMS 阈值）选择硬编码安全默认而非暴露给用户。
 
 | 决策 | 选择 | 备选方案 | 理由 |
 |------|------|----------|------|
 | **可插拔扩展 vs 内置 AI** | 组件零 AI，推理外包给 `processingExtensionId` 指定的扩展（[manifest.json L24](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L24-L24)） | 组件打包 YOLO 模型 / 打包多个模型 | bundle 保持 80KB；用户按场景选模型；扩展可独立升级 |
 | **硬编码 AI_EXT_IDS 白名单** | 在 `bundle.js` 硬编码四元素数组（[L144](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L144-L144)），`indexOf` 过滤（[L1488-L1491](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1488-L1491)） | 元数据驱动（`supports_image: true`）/ 显示全部 | 扩展 manifest 无能力声明字段；硬编码是最简单的过滤手段 |
 | **每扩展模式目录** | `EXT_MODES` 按扩展列出所有模式（[L154-L171](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L154-L171)），`getExtModes` 返回该扩展模式数组（[L196-L198](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L196-L198)） | 所有扩展共用一个通用 `detect` 模式 | 扩展能力差异巨大（Grounding DINO 5 模式 vs YOLO 1 模式），模式目录是能力的显式声明 |
+| **按模式定义 imageArg** | 每种 EXT_MODES 模式自带 imageArg 字段 | 全局统一参数名 | 不同扩展接收的图像参数格式不同（base64 / URL / bytes），按模式定义更灵活 |
 | **硬编码 NMS 阈值 0.5** | 仅 `locate-anything-v2` 透传 `nms_iou_threshold: 0.5`（[L281-L282](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L281-L282)，commit [`8656148`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/8656148)） | 用户可配滑块 / 扩展默认值 | NMS 是专家概念，0.5 是公认安全默认；UI 简洁优先 |
 | **平台注入 __imageData** | 平台在执行 Transform 时注入 `__imageData`（base64）+ `imageMeta`（宽高）（[L266-L272](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L266-L272)，规则由 [L453](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L453-L453) 声明） | Transform 自己 fetch / 组件预写 URL | 平台拥有设备凭证 + MQTT 连接 + 执行上下文，是唯一能正确获取图像的角色 |
 | **宽容扩展回退** | 未知扩展走默认 `object_detection` + `boxes_x1y1x2y2`（[L181-L193](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L181-L193) + [L196-L198](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L196-L198)） | 严格拒绝未列出扩展 | 前向兼容：新扩展 + 旧组件能跑起来；静默失败（无检测框）优于硬报错（不可用） |

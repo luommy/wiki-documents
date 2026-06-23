@@ -134,7 +134,7 @@ AI 扩展的响应格式由扩展作者决定，ne101_camera 不能控制。为�
 
 **`objects_bbox`（image-analyzer-v2）** —— 归一化时把 `{x, y, width, height}` 转成 `[x1, y1, x2, y2]`（`x2 = x + width`），再除以 `W/H`。
 
-**`detections_bbox`（yolo-device-inference）** —— 字段结构与 `objects_bbox` 几乎一样，只是顶层 key 从 `objects` 变成了 `detections`。之所以单独列为一种 responseType 而不是复用 `objects_bbox`，是因为这两个扩展的调用命令不同（`analyze_image` vs `detect`），且未来 yolo-device-inference 可能在响应里增加设备端独有的字段（如推理耗时、模型版本）。
+**`detections_bbox`（yolo-device-inference）** —— 字段结构与 `objects_bbox` 几乎一样，只是顶层 key 从 `objects` 变成了 `detections`。之所以单独列为一种 responseType 而不是复用 `objects_bbox`，是因为 image-analyzer-v2 专用，与 yolo 共用 analyze_image 命令但响应路径不同，且未来 yolo-device-inference 可能在响应里增加设备端独有的字段（如推理耗时、模型版本）。
 
 **`ocr_text_blocks`（ocr-device-inference）** —— 见 [`bundle.js` L316-L328](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L316-L328)。响应结构是 `r.data.text_blocks[]`，每个 block 有 `text`、`confidence`、`bbox: {x, y, width, height}` 和可选的 `polygon`（多边形顶点数组）。归一化时 **保留 `polygon` 字段**（`polygon: b.polygon || null`），因为 OCR 文本框通常不是轴对齐矩形（倾斜文本），多边形比 bbox 更贴合。坐标已经是 0-1 归一化的，不再除以 `W/H`。commit `403c0f1`（`fix(ne101): handle {x,y} object format for OCR polygon detection boxes`）修复了 polygon 顶点可能是 `{x, y}` 对象格式也可能是 `[x, y]` 数组格式的兼容问题：
 

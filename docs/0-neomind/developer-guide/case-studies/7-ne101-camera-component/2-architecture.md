@@ -62,8 +62,8 @@ graph TB
         ENTRY["L1: var NE101CameraPanel = (function () {<br/>L2-L4: var React = window.React<br/>var jsx/jsxs = window.jsxRuntime.*"]
         L1["① Helper 层 L7-L230<br/>batteryMeta / formatValue<br/>classColor / pipeRois"]
         L2["② Template 引擎层 L239-L456<br/>generateTransformJsCode<br/>fillTemplate"]
-        L3["③ Sub-component 层 L458-L1970<br/>NoDevice / ConfigPanel<br/>AdvancedPanel / SwitchControl"]
-        L4["④ Main component 层 L470-L1333<br/>NE101CameraPanel 主体<br/>hooks / 事件 / 渲染"]
+        L3["③ Sub-components<br/>L458-L469<br/>L1334-L1970"]
+        L4["④ Main component<br/>L472-L1332<br/>NE101CameraPanel 主体<br/>hooks / 事件 / 渲染"]
         L5["⑤ Export 层 L1971<br/>return default + 命名导出"]
         ENTRY --> L1
         L1 --> L2
@@ -316,7 +316,7 @@ Source: [`bundle.js` L1353-L1357](https://github.com/camthink-ai/NeoMind-Dashboa
 ```
 
 Source: [`bundle.js` L1371-L1446](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1371-L1446)
-- `AdvancedPanel(props)`（[L1448-L1970](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1448-L1970)）—— **高级配置面板**：AI 处理开关、扩展选择、模板选择、ROI 编辑器、ROI 重叠阈值滑块、NMS 阈值透传。这一个组件就有 522 行，是整个 bundle 最长的一段。
+- `AdvancedPanel(props)`（[L1448-L1970](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1448-L1970)）—— **高级配置面板**：AI 处理开关、扩展选择、模板选择、ROI 编辑器、ROI 重叠阈值滑块、NMS 阈值透传。这一个组件就有 523 行，是整个 bundle 最长的一段。
 
 ```js
 // bundle.js L1448-L1457 — AdvancedPanel (entry; 513 lines omitted)
@@ -335,9 +335,9 @@ Source: [`bundle.js` L1371-L1446](https://github.com/camthink-ai/NeoMind-Dashboa
 
 Source: [`bundle.js` L1448-L1970](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1448-L1970)
 
-### 第 4 层：Main component 层（L470-L1333）
+### 第 4 层：Main component 层（L472-L1332）
 
-`NE101CameraPanel(props)`（[L472](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L470-L1333)）是运行时挂到网格里的主组件。它消费平台注入的 props（`config` / `deviceContext` / `deviceImageSrc` / `virtualMetrics` / `sendDeviceCommand`），内部用一组 hooks 管理命令加载状态、扩展状态、transform 生命周期、检测缓存、图像 layout 等。
+`NE101CameraPanel(props)`（[L472](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L472-L1332)）是运行时挂到网格里的主组件。它消费平台注入的 props（`config` / `deviceContext` / `deviceImageSrc` / `virtualMetrics` / `sendDeviceCommand`），内部用一组 hooks 管理命令加载状态、扩展状态、transform 生命周期、检测缓存、图像 layout 等。
 
 ```js
 // bundle.js L470-L486 — NE101CameraPanel entry
@@ -357,7 +357,7 @@ Source: [`bundle.js` L1448-L1970](https://github.com/camthink-ai/NeoMind-Dashboa
     // ... (847 lines omitted: processing config, effects, render) ...
 ```
 
-Source: [`bundle.js` L470-L1333](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L470-L1333)
+Source: [`bundle.js` L472-L1332](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L472-L1332)
 
 核心 hooks 见 2.3。
 
@@ -374,7 +374,7 @@ NeoMind Dashboard 对一个「设备绑定组件」的对外契约是：**主组
 ```mermaid
 graph TB
     subgraph RUNTIME["运行时（网格里渲染）"]
-        MAIN["NE101CameraPanel<br/>(主组件, L470-L1333)"]
+        MAIN["NE101CameraPanel<br/>(主组件, L472-L1332)"]
         NODEVICE["NoDevice<br/>(占位, L458)"]
         INNER["内部 jsx 渲染分支<br/>图像 + 指标 + 命令按钮<br/>+ ROI / 检测框 Canvas"]
         MAIN -->|"deviceContext == null"| NODEVICE
@@ -633,8 +633,8 @@ Source: [`bundle.js` L523-L524](https://github.com/camthink-ai/NeoMind-Dashboard
 
 | 维度 | 6 metric_card | 7 ne101_camera | 代差解读 |
 |------|----------------|-----------------|----------|
-| **代码量** | 352 行 IIFE | 1972 行 IIFE | ne101 多出来的 1620 行主要在 sub-component 层（`AdvancedPanel` 522 行）和 template 引擎层（`generateTransformJsCode` 217 行），这些都是「设备绑定 + AI 处理流水线」独有的复杂度。 |
-| **组件数** | 1 个对外组件（`MetricCard`） | 3 个对外组件（`NE101CameraPanel` + `ConfigPanel` + `AdvancedPanel`）+ 5 个内部 sub-component | metric_card 的「单组件」意味着它没有配置对话框的 tab 结构；ne101 的三件套是平台对「有 `has_device_binding` 或复杂 `config_schema` 的组件」的要求。 |
+| **代码量** | 352 行 IIFE | 1972 行 IIFE | ne101 多出来的 1620 行主要在 sub-component 层（`AdvancedPanel` 523 行）和 template 引擎层（`generateTransformJsCode` 218 行），这些都是「设备绑定 + AI 处理流水线」独有的复杂度。 |
+| **组件数** | 1 个对外组件（`MetricCard`） | 3 个对外组件（`NE101CameraPanel` + `ConfigPanel` + `AdvancedPanel`）+ 4 个内部 sub-component | metric_card 的「单组件」意味着它没有配置对话框的 tab 结构；ne101 的三件套是平台对「有 `has_device_binding` 或复杂 `config_schema` 的组件」的要求。 |
 | **数据接入** | `has_data_source: true` + `fetchData` prop（通用） | `has_device_binding: true` + `device_type_filter: ["ne101_camera"]`（专用） | metric_card 消费任何 DataSource（设备遥测 / 扩展指标 / 系统指标），ne101 只消费 `device.type === "ne101_camera"` 的设备。这是「通用 vs 专用」的根本分野。 |
 | **配置复杂度** | 简单 display config（`label` / `unit` / `decimalPlaces`） | 18 字段 `default_config`（[manifest.json L18-L37](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L18-L37)）：processing pipeline + ROI + NMS + categories + phrase | ne101 的配置字段数是 metric_card 的 3 倍以上，且每个字段都有默认值和兼容性回退逻辑（`processingRois` 数组 vs 单矩形）。 |
 | **导出方式** | `default + MetricCard` 双暴露（但只用 default） | `default + NE101CameraPanel + ConfigPanel + AdvancedPanel` 四字段暴露 | metric_card 的 default 双暴露是「向前兼容的保险」；ne101 的命名导出是「配置对话框必须用的契约」。 |
