@@ -515,3 +515,5 @@ CI 流水线必须在每个目标平台上原生构建（不能用 cross-compile
 - [7 NE101 摄像头组件](./7-ne101-camera-component/index.md)——消费本扩展的旗舰硬件案例，展示从设备到 AI 推理到前端展示的完整链路
 - [扩展开发 API](../7-extension-development.md)——`Extension` trait、`ExtensionMetadata`、`CapabilityContext` 的完整参考
 - [源码仓库](https://github.com/camthink-ai/NeoMind-Extensions/tree/main/extensions/yolo-device-inference)——`extensions/yolo-device-inference/src/lib.rs`（本文所有深链指向此文件）
+
+*最后更新: 2026-06-24*

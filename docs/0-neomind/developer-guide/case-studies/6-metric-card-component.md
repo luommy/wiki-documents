@@ -477,9 +477,9 @@ metric_card 的 manifest 完整遵循附录 1 的 schema。关键字段对照：
 | `id` | `"metric_card"` | 附录 1.1 |
 | `name` | `{ "en": "Metric Card", "zh": "指标卡片" }` | 附录 1.1（组件多语言对象） |
 | `version` | `"1.7.0"` | 附录 1.1（semver） |
-| `size_constraints` | `{ min_w: 2, ... max_w: 6 }` | 附录 1.4（组件独有） |
+| `size_constraints` | `{ min_w: 2, ... max_w: 6 }` | 附录 1.5（组件独有） |
 | `has_data_source` | `true` | 附录 1.5 |
-| `config_schema` | JSON Schema 对象 | 附录 1.6 |
+| `config_schema` | JSON Schema 对象 | 附录 1.5（组件独有） |
 
 ### 尺寸约束如何塑造网格
 

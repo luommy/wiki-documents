@@ -1,5 +1,5 @@
 ---
-description: "ne101_camera component architecture deep-dive: 5-layer decomposition of the 1972-line IIFE (helper / hook / sub-component / export), 3 exported components (NE101CameraPanel / ConfigPanel / AdvancedPanel), the WebSocket-priority + REST-fallback data flow, the ROI overlay pipeline, and an architectural comparison with metric_card"
+description: "ne101_camera component architecture deep-dive: 5-layer decomposition of the 1972-line IIFE (helper / template / sub-component / main / export), 3 exported components (NE101CameraPanel / ConfigPanel / AdvancedPanel), the WebSocket-priority + REST-fallback data flow, the ROI overlay pipeline, and an architectural comparison with metric_card"
 keywords: [NeoMind, ne101_camera, IIFE architecture, React-in-IIFE, device-bound component]
 tags: [NeoMind, case study, architecture]
 sidebar_label: "2. Architecture"

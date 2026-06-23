@@ -18,7 +18,7 @@ sidebar_label: "ne101_camera Flagship"
 旗舰案例共 8 个子页面，按依赖关系组织。建议按以下顺序阅读，标注 ★ 的是 MVP 核心（v1 发布必读），其余是 v1.1 增量。
 
 ```
-1 业务背景 → 2 架构总览 → 3 扩展侧 → 4 数据契约 ★ → 5 前端消费 ★ → 6 组件构建 ★ → 7 ROI 叠加 → 8 运维与扩展
+1 业务背景 → 2 架构总览 → 3 扩展侧 → 4 数据契约 ★ → 5 前端消费 ★ → 6 组件构建 ★ → 7 集成测试 → 8 深度复盘
 ```
 
 如果你时间有限只想读懂「这个组件怎么工作」，读 1 + 2 + 4 + 5 + 6 即可。如果你要二次开发或迁移到其它摄像头设备，把 3（扩展侧契约）和 7（ROI 渲染）也读完。
@@ -36,7 +36,7 @@ sidebar_label: "ne101_camera Flagship"
 | 5 | 5-frontend-consume.md ★ | 组件如何拉取 detections、解析 JSON string、按类别上色 | MVP |
 | 6 | 6-component-build.md ★ | `NE101CameraPanel` 命名导出、IIFE 注入、React hooks 在 IIFE 中的注意事项 | MVP |
 | 7 | 7-integration-test.md（v1.1） | 端到端集成测试、ROI 叠加验证、多扩展切换测试矩阵 | v1.1 |
-| 8 | 8-deep-dive.md（v1.1） | 版本演进（25 commits）、调试 Trace、性能优化、源码卫生复盘 | v1.1 |
+| 8 | 8-deep-dive.md（v1.1） | 版本演进（133 commits）、调试 Trace、性能优化、源码卫生复盘 | v1.1 |
 
 ---
 
@@ -64,11 +64,11 @@ sidebar_label: "ne101_camera Flagship"
 
 1. **设备绑定 vs 数据源的本质区别**——为什么 NE101 用 `has_device_binding: true` + `device_type_filter: ["ne101_camera"]` 而不是 `has_data_source: true`。这关系到组件在仪表板编辑器里能否显示「绑定设备」面板、能否调用 `trigger_capture` 这种设备命令。详见 [1 业务背景](./1-background.md)。
 
-2. **1972 行 IIFE 如何保持可维护**——`bundle.js` 没有任何打包步骤，全是手写 IIFE。我们会拆解它的模块分层（helpers / data layer / canvas layer / React layer / settings panel layer），并解释为什么 NeoMind 选择这种范式而非 ESM。详见 [6 组件构建](./6-component-build.md)（v1.1）。
+2. **1972 行 IIFE 如何保持可维护**——`bundle.js` 没有任何打包步骤，全是手写 IIFE。我们会拆解它的模块分层（helper / template / sub-component / main / export），并解释为什么 NeoMind 选择这种范式而非 ESM。详见 [6 组件构建](./6-component-build.md)（v1.1）。
 
 3. **`processingExtensionId` 通用 AI 处理契约**——这是本案例最核心的设计创新：组件不自己跑 AI，而是通过 `processingExtensionId: ""` 字段把图像「外包」给用户选择的扩展（object_detection / ocr / describe / 任意 `locate-anything-v2` 兼容扩展）。这种「组件 + 可插拔扩展」的契约是 NeoMind 生态复用 AI 能力的范本。详见 [3 扩展侧](./3-extension-side.md)（v1.1）。
 
-4. **ROI 叠加渲染的工程细节**——从单矩形 ROI（`processingRoiX/Y/W/H`，归一化 0-1）到多 ROI 数组（`processingRois: []`），从中心点判定（已被废弃）到 `processingRoiOverlap: 0.6` 的 IoU 阈值判定。这块涉及 Canvas 坐标映射、`objectFit: contain` 的非线性缩放、ResizeObserver 异步建立等坑点。详见 [5 前端消费](./5-frontend-consume.md) + [7 集成测试](./7-integration-test.md)。
+4. **ROI 叠加渲染的工程细节**——从单矩形 ROI（`processingRoiX/Y/W/H`，归一化 0-1）到多 ROI 数组（`processingRois: []`），从中心点判定（已被废弃）到 `processingRoiOverlap: 0.6` 的 IoU 阈值判定。这块涉及 Canvas 坐标映射、`object-cover` 的非线性缩放、ResizeObserver 异步建立等坑点。详见 [5 前端消费](./5-frontend-consume.md) + [7 集成测试](./7-integration-test.md)。
 
 5. **React-in-IIFE 的工程范式与陷阱**——在 1972 行的 IIFE 里写 React hooks 会有意外陷阱：例如 `b060a25` 修复了 React error #310（useEffect 里用了 hooks 依赖了未初始化的 state）、`0601cd4` 把条件 useState 移到顶层避免 hooks 顺序问题。这些坑在打包 React 项目里不会遇到，但在 IIFE 范式下必须显式处理。详见 [6 组件构建](./6-component-build.md)（v1.1）。
 
@@ -86,8 +86,8 @@ graph LR
     DATA["4 数据契约 ★<br/>MVP"]
     FE["5 前端消费 ★<br/>MVP"]
     BUILD["6 组件构建 ★<br/>MVP"]
-    ROI["7 ROI 叠加<br/>v1.1"]
-    OPS["8 运维与扩展<br/>v1.1"]
+    ROI["7 集成测试<br/>v1.1"]
+    OPS["8 深度复盘<br/>v1.1"]
 
     BG --> ARCH
     BG --> DATA
@@ -121,7 +121,7 @@ graph LR
 | `bundle.js` 行数 | 1972 行（手写 IIFE，非打包产物） |
 | `manifest.json` 行数 | 40 行 |
 | 源码仓库 | [camthink-ai/NeoMind-Dashboard-Components](https://github.com/camthink-ai/NeoMind-Dashboard-Components/tree/main/components/ne101_camera) |
-| Git 提交数（组件目录） | 25+ commits |
+| Git 提交数（组件目录） | 133 commits |
 | 前置案例 | [6 metric_card](../6-metric-card-component.md)（入门组件案例） |
 | 后续案例 | 暂无（本案例是当前组件市场最复杂的案例） |
 

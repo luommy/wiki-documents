@@ -47,7 +47,7 @@ A natural first reaction is: "NE101 just reports battery, signal, and temperatur
 
 **First, metric_card cannot render images.** The core value of NE101 is "the JPEG image that was captured", while metric_card's `extractValue()` only outputs scalars (numbers/strings). Showing an image needs a dedicated `<img>` + Canvas, and metric_card's render layer has no such capability.
 
-**Second, metric_card cannot draw ROI overlays.** A typical NE101 use case is "draw a box around the walkway and count pedestrians passing through" — this requires drawing semi-transparent rectangles (ROIs) over the image, drawing detection boxes over detected targets, and coloring them per class. This overlay logic (Canvas coordinate system, non-linear mapping of `objectFit: contain`, async setup of ResizeObserver) simply does not fit metric_card's "single card" layout.
+**Second, metric_card cannot draw ROI overlays.** A typical NE101 use case is "draw a box around the walkway and count pedestrians passing through" — this requires drawing semi-transparent rectangles (ROIs) over the image, drawing detection boxes over detected targets, and coloring them per class. This overlay logic (Canvas coordinate system, non-linear mapping of `object-cover`, async setup of ResizeObserver) simply does not fit metric_card's "single card" layout.
 
 **Third, metric_card cannot trigger device commands.** NE101 has device-level commands like `trigger_capture` (capture now) and `set_schedule` (set timer), which require rendering buttons in the component and calling `fetchData({type: 'device_command', ...})`. metric_card's manifest is `has_actions: false` and has no command-panel entry at all.
 
@@ -253,8 +253,8 @@ Both audiences should first read 1-3 of the [6 metric_card](../6-metric-card-com
 - **4 Data Contract ★ (MVP)**: MQTT topic naming, WebSocket delta message format, the `detections` field schema, and the JSON structure of single-rectangle ROI vs multi-ROI array.
 - **5 Frontend Consume ★ (MVP)**: how the component fetches detections, parses the JSON string, colors per class (commit `c276c23`'s golden-angle HSV rotation), and draws detection boxes.
 - **6 Component Build ★ (MVP)**: the `NE101CameraPanel` named export pattern, React-hooks-in-IIFE pitfalls (commits `b060a25` / `0601cd4`), and the layered design of the config panel.
-- **7 ROI Overlay (v1.1)**: rendering differences between single rectangle and multi-ROI array, normalized-to-pixel coordinate mapping, and handling the non-linear scaling of `objectFit: contain`.
-- **8 Ops & Extensions (v1.1)**: version evolution (key nodes across 25+ commits), debug-trace techniques, and performance tuning (avoiding duplicate Transform creation, throttling Canvas redraws).
+- **7 ROI Overlay (v1.1)**: rendering differences between single rectangle and multi-ROI array, normalized-to-pixel coordinate mapping, and handling the non-linear scaling of `object-cover`.
+- **8 Ops & Extensions (v1.1)**: version evolution (key nodes across 133 commits), debug-trace techniques, and performance tuning (avoiding duplicate Transform creation, throttling Canvas redraws).
 
 ---
 

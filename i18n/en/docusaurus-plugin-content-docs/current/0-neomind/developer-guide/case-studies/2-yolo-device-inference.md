@@ -515,3 +515,5 @@ The CI pipeline must build natively on each target platform (no cross-compile), 
 - [7 NE101 Camera Component](./7-ne101-camera-component/index.md) — flagship hardware case consuming this extension; shows the complete chain from device to AI inference to frontend display
 - [Extension Development API](../7-extension-development.md) — full reference for `Extension` trait, `ExtensionMetadata`, `CapabilityContext`
 - [Source Repository](https://github.com/camthink-ai/NeoMind-Extensions/tree/main/extensions/yolo-device-inference) — `extensions/yolo-device-inference/src/lib.rs` (all deep links in this document point to this file)
+
+*Last updated: 2026-06-24*

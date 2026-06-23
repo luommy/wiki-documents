@@ -477,9 +477,9 @@ metric_card's manifest fully follows the schema in Appendix 1. Key field mapping
 | `id` | `"metric_card"` | Appendix 1.1 |
 | `name` | `{ "en": "Metric Card", "zh": "指标卡片" }` | Appendix 1.1 (component multilingual object) |
 | `version` | `"1.7.0"` | Appendix 1.1 (semver) |
-| `size_constraints` | `{ min_w: 2, ... max_w: 6 }` | Appendix 1.4 (component-specific) |
+| `size_constraints` | `{ min_w: 2, ... max_w: 6 }` | Appendix 1.5 (component-specific) |
 | `has_data_source` | `true` | Appendix 1.5 |
-| `config_schema` | JSON Schema object | Appendix 1.6 |
+| `config_schema` | JSON Schema object | Appendix 1.5 (component-specific) |
 
 ### How Size Constraints Shape the Grid
 

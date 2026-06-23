@@ -18,7 +18,7 @@ This is the "flagship deep-dive case" of the NeoMind component marketplace. The 
 The flagship case has eight subpages organized by dependency. Read them in the order below; pages marked ★ are MVP core (required reading for the v1 release), the rest are v1.1 increments.
 
 ```
-1 Background → 2 Architecture → 3 Extension Side → 4 Data Contract ★ → 5 Frontend Consume ★ → 6 Component Build ★ → 7 ROI Overlay → 8 Ops & Extensions
+1 Background → 2 Architecture → 3 Extension Side → 4 Data Contract ★ → 5 Frontend Consume ★ → 6 Component Build ★ → 7 Integration Test → 8 Deep Dive
 ```
 
 If you are short on time and only want to understand "how this component works", read 1 + 2 + 4 + 5 + 6. If you plan to fork the component or retarget it to another camera device, also read 3 (the extension-side contract) and 7 (ROI rendering).
@@ -36,7 +36,7 @@ If you are short on time and only want to understand "how this component works",
 | 5 | 5-frontend-consume.md ★ | How the component fetches detections, parses JSON strings, colors per class | MVP |
 | 6 | 6-component-build.md ★ | The `NE101CameraPanel` named export, IIFE injection, React-hooks-in-IIFE pitfalls | MVP |
 | 7 | 7-integration-test.md (v1.1) | End-to-end integration tests, ROI overlay verification, multi-extension switching matrix | v1.1 |
-| 8 | 8-deep-dive.md (v1.1) | Version evolution (25+ commits), debug traces, performance tuning, source hygiene recap | v1.1 |
+| 8 | 8-deep-dive.md (v1.1) | Version evolution (133 commits), debug traces, performance tuning, source hygiene recap | v1.1 |
 
 ---
 
@@ -64,11 +64,11 @@ Reading all eight sections will give you five key capabilities:
 
 1. **The essential difference between device binding and data source** — why NE101 uses `has_device_binding: true` + `device_type_filter: ["ne101_camera"]` instead of `has_data_source: true`. This determines whether the dashboard editor shows a "bind device" panel and whether the component can invoke device commands like `trigger_capture`. See [1 Business Background](./1-background.md).
 
-2. **How a 1972-line IIFE stays maintainable** — `bundle.js` has no build step at all; it is entirely hand-written IIFE. We break down its module layers (helpers / data layer / canvas layer / React layer / settings panel layer) and explain why NeoMind chose this pattern over ESM. See [6 Component Build](./6-component-build.md) (v1.1).
+2. **How a 1972-line IIFE stays maintainable** — `bundle.js` has no build step at all; it is entirely hand-written IIFE. We break down its module layers (helper / template / sub-component / main / export) and explain why NeoMind chose this pattern over ESM. See [6 Component Build](./6-component-build.md) (v1.1).
 
 3. **The `processingExtensionId` generic AI processing contract** — the most important design innovation in this case: the component does not run AI itself; instead, the `processingExtensionId: ""` field lets the user pick an installed extension (object_detection / ocr / describe / any `locate-anything-v2`-compatible extension) to "outsource" the image to. This "component + pluggable extension" contract is the template for AI reuse across the NeoMind ecosystem. See [3 Extension Side](./3-extension-side.md) (v1.1).
 
-4. **Engineering details of ROI overlay rendering** — from single-rectangle ROI (`processingRoiX/Y/W/H`, normalized 0-1) to multi-ROI arrays (`processingRois: []`), from center-point detection (deprecated) to the `processingRoiOverlap: 0.6` IoU-threshold detection. This involves Canvas coordinate mapping, the non-linear scaling of `objectFit: contain`, and the async setup of ResizeObserver. See [5 Frontend Consume](./5-frontend-consume.md) and [7 Integration Test](./7-integration-test.md).
+4. **Engineering details of ROI overlay rendering** — from single-rectangle ROI (`processingRoiX/Y/W/H`, normalized 0-1) to multi-ROI arrays (`processingRois: []`), from center-point detection (deprecated) to the `processingRoiOverlap: 0.6` IoU-threshold detection. This involves Canvas coordinate mapping, the non-linear scaling of `object-cover`, and the async setup of ResizeObserver. See [5 Frontend Consume](./5-frontend-consume.md) and [7 Integration Test](./7-integration-test.md).
 
 5. **The React-in-IIFE pattern and its pitfalls** — writing React hooks inside a 1972-line IIFE has surprising traps: for example, `b060a25` fixes React error #310 (a useEffect that used hooks depending on uninitialized state), and `0601cd4` moves a conditional useState to the top level to keep hook order stable. These traps do not arise in bundled React projects but must be handled explicitly in the IIFE pattern. See [6 Component Build](./6-component-build.md) (v1.1).
 
@@ -86,8 +86,8 @@ graph LR
     DATA["4 Data Contract ★<br/>MVP"]
     FE["5 Frontend Consume ★<br/>MVP"]
     BUILD["6 Component Build ★<br/>MVP"]
-    ROI["7 ROI Overlay<br/>v1.1"]
-    OPS["8 Ops & Extensions<br/>v1.1"]
+    ROI["7 Integration Test<br/>v1.1"]
+    OPS["8 Deep Dive<br/>v1.1"]
 
     BG --> ARCH
     BG --> DATA
@@ -121,7 +121,7 @@ graph LR
 | `bundle.js` lines | 1972 (hand-written IIFE, not a build artifact) |
 | `manifest.json` lines | 40 |
 | Source repo | [camthink-ai/NeoMind-Dashboard-Components](https://github.com/camthink-ai/NeoMind-Dashboard-Components/tree/main/components/ne101_camera) |
-| Git commits (component dir) | 25+ |
+| Git commits (component dir) | 133 |
 | Prerequisite case | [6 metric_card](../6-metric-card-component.md) (starter component case) |
 | Successor case | none (this is currently the most complex case in the marketplace) |
 

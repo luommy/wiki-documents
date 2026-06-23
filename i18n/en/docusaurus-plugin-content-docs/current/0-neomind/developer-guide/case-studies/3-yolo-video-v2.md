@@ -782,7 +782,7 @@ If this is your first encounter with NeoMind streaming extensions, read in this 
 
 ### Bridge to ne101_camera
 
-Case 7 ne101_camera (the flagship case, coming soon) shows how a real camera product simultaneously uses 2 (device-bound inference) and 3 (RTSP streaming analysis) — the ne101 device's image metrics flow through #2's event-driven path, while its RTSP live stream flows through #3's Push path. Understanding this case's `init_session` → `start_push` → frame loop → `send_push_output` chain is a prerequisite for reading #7.
+Case 7 ne101_camera (the flagship case) shows how a real camera product simultaneously uses 2 (device-bound inference) and 3 (RTSP streaming analysis) — the ne101 device's image metrics flow through #2's event-driven path, while its RTSP live stream flows through #3's Push path. Understanding this case's `init_session` → `start_push` → frame loop → `send_push_output` chain is a prerequisite for reading #7.
 
 ### Summary
 

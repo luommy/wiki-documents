@@ -87,6 +87,8 @@ function classColor(label) {
 }
 ```
 
+Source: [`bundle.js` L55-L72](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L55-L72)
+
 The function does three things:
 
 1. **String hash (L58-L59)**: applies the classic `h = ((h << 5) - h + charCodeAt(i)) | 0` accumulator to hash the label string. This is a 32-bit integer hash where the shift-and-subtract is equivalent to multiplying by 31 (`((h << 5) - h) = h * 31`), the same algorithm used by Java's `String.hashCode()`. The `| 0` truncates the result to a 32-bit signed integer.
@@ -196,6 +198,8 @@ if (imgNat.w > 0 && imgNat.h > 0 && ctrSize.w > 0 && ctrSize.h > 0) {
     ovTf = { sx: 1, sy: scY, ox: 0, oy: (1 - scY) / 2 };
   }
 ```
+
+Source: [`bundle.js` L879-L899](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L879-L899)
 
 `ovTf` is a `{sx, sy, ox, oy}` 4-tuple representing the affine transform that maps normalized image coordinates `(px, py)` to normalized container coordinates `(tx, ty)`: `tx = px * sx + ox`, `ty = py * sy + oy`. Two branches:
 

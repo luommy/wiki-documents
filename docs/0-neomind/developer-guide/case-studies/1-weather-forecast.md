@@ -475,7 +475,7 @@ ctx.invoke_capability("device_metrics_write", &json!({
 |------|----|--------|
 | `Cargo.toml` → `version` | `"2.7.6"` | 基准 |
 | `metadata.json` → `version` | `"2.7.6"` | 一致（构建脚本自动同步） |
-| `metadata.json` → `builds` URL | `v2.7.6` | 一确 |
+| `metadata.json` → `builds` URL | `v2.7.6` | 一致 |
 
 注意：`src/lib.rs` 中 `ExtensionMetadata::new()` 传入的版本是 `"2.0.0"`——这是**运行时 API 版本**（SDK ABI 版本），与发布版本 `2.7.6` 不同。这是设计如此，不是 bug。
 

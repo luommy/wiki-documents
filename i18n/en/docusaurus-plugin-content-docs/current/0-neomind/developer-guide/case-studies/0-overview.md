@@ -13,11 +13,11 @@ This series is distinct from the [Extension API reference](../7-extension-develo
 
 | # | Case | Type | Difficulty | Size | Key Value |
 |---|------|------|-----------|------|-----------|
-| 1 | weather-forecast-v2 | Data extension | Beginner | ~400 LOC | First-extension template (HTTP fetch + periodic metrics + React frontend) |
-| 2 | yolo-device-inference | AI inference | Intermediate | ~700 LOC | Lazy model loading / cross-session reuse / device camera integration |
-| 3 | yolo-video-v2 | Streaming extension | Intermediate | ~700 LOC | stream session + video-frame processing + VLM dashboard interop |
-| 4 | onvif-bridge | Protocol bridge | Intermediate | ~700 LOC | IP camera / standard protocol integration (parallels NeoEyes) |
-| 5 | uink-rms-bridge | Protocol bridge | Intermediate | ~700 LOC | Production-verified bridging |
+| 1 | weather-forecast-v2 | Data extension | Beginner | ~700 LOC | First-extension template (HTTP fetch + periodic metrics + React frontend) |
+| 2 | yolo-device-inference | AI inference | Intermediate | ~1950 LOC | Lazy model loading / cross-session reuse / device camera integration |
+| 3 | yolo-video-v2 | Streaming extension | Intermediate | ~3900 LOC | stream session + video-frame processing + VLM dashboard interop |
+| 4 | onvif-bridge | Protocol bridge | Intermediate | ~2700 LOC | IP camera / standard protocol integration (parallels NeoEyes) |
+| 5 | uink-rms-bridge | Protocol bridge | Intermediate | ~2250 LOC | Production-verified bridging |
 | 6 | metric_card | Dashboard component | Beginner | ~400 LOC | Component template (value card + threshold / trend / unit) |
 | 7 | ne101_camera | Extension + component interop | Flagship | ~2500-3500 LOC (8 sub-pages) | End-to-end deep tutorial |
 

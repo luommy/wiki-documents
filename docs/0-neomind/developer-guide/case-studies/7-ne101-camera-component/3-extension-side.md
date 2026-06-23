@@ -322,7 +322,7 @@ var H = (imageMeta && imageMeta.height) || 1;
 
 **早退守卫**：L267 的 `if (!imageData) return {};` 是一个关键的安全网——如果既没有 `__imageData` 也没有 `input_raw.values.image`（比如设备刚上线还没抓拍，或者图像字段被后端误存为 null），Transform 直接返回空对象，不执行后续的扩展调用和指标生成。这避免了「无图像却调用 AI 扩展」的无效计算，也防止了 `__imageData` 为空字符串时扩展报错。
 
-**`imageMeta` 的角色**：L271-L272 的 `imageMeta`（包含 `width` / `height`）也是平台注入的，用于坐标归一化。扩展返回的检测框坐标通常是像素值（例如 `x1=320, y1=240`），需要除以图像宽高才能得到 0-1 归一化坐标（用于 Canvas 渲染时的 `objectFit: contain` 非线性缩放，见 [5](./5-frontend-consume.md)）。如果 `imageMeta` 缺失，宽高回退到 1，坐标会变成原始像素值——这是一种降级，检测框会画错位置，但不会崩溃。
+**`imageMeta` 的角色**：L271-L272 的 `imageMeta`（包含 `width` / `height`）也是平台注入的，用于坐标归一化。扩展返回的检测框坐标通常是像素值（例如 `x1=320, y1=240`），需要除以图像宽高才能得到 0-1 归一化坐标（用于 Canvas 渲染时的 `object-cover` 非线性缩放，见 [5](./5-frontend-consume.md)）。如果 `imageMeta` 缺失，宽高回退到 1，坐标会变成原始像素值——这是一种降级，检测框会画错位置，但不会崩溃。
 
 **设计决策：平台注入 __imageData vs Transform 自己拉图像 vs 组件传递**
 

@@ -1,5 +1,5 @@
 ---
-description: "ne101_camera deep dive: 133-commit version evolution, the rise and fall of Transform lifecycle debug traces (5 debug commits finally cleaned up by 00a59cc), the Boa engine console.log crash incident, the _configHash performance optimization, source hygiene recap (3 files, zero backups)"
+description: "ne101_camera deep dive: 133-commit version evolution, the rise and fall of Transform lifecycle debug traces (4 debug commits finally cleaned up by 00a59cc), the Boa engine console.log crash incident, the _configHash performance optimization, source hygiene recap (3 files, zero backups)"
 keywords: [ne101_camera, deep dive, version evolution, debug trace, Boa engine, _configHash, source hygiene]
 tags: [NeoMind, Case Study]
 sidebar_label: "8. Deep Dive"

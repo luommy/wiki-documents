@@ -13,11 +13,11 @@ sidebar_label: Overview
 
 | # | 案例 | 类型 | 难度 | 体量 | 价值点 |
 |---|------|------|------|------|--------|
-| 1 | weather-forecast-v2 | 数据型扩展 | 入门 | ~400 行 | 第一个扩展范本（HTTP 拉取 + 周期指标 + React 前端） |
-| 2 | yolo-device-inference | AI 推理 | 进阶 | ~700 行 | 模型懒加载 / 跨 session 复用 / 设备相机集成 |
-| 3 | yolo-video-v2 | 流式扩展 | 进阶 | ~700 行 | stream session + 视频帧处理 + VLM 仪表板联动 |
-| 4 | onvif-bridge | 协议桥接 | 进阶 | ~700 行 | IP 摄像头 / 标准协议接入（呼应 NeoEyes） |
-| 5 | uink-rms-bridge | 协议桥接 | 进阶 | ~700 行 | 真实生产验证的桥接 |
+| 1 | weather-forecast-v2 | 数据型扩展 | 入门 | ~700 行 | 第一个扩展范本（HTTP 拉取 + 周期指标 + React 前端） |
+| 2 | yolo-device-inference | AI 推理 | 进阶 | ~1950 行 | 模型懒加载 / 跨 session 复用 / 设备相机集成 |
+| 3 | yolo-video-v2 | 流式扩展 | 进阶 | ~3900 行 | stream session + 视频帧处理 + VLM 仪表板联动 |
+| 4 | onvif-bridge | 协议桥接 | 进阶 | ~2700 行 | IP 摄像头 / 标准协议接入（呼应 NeoEyes） |
+| 5 | uink-rms-bridge | 协议桥接 | 进阶 | ~2250 行 | 真实生产验证的桥接 |
 | 6 | metric_card | 仪表板组件 | 入门 | ~400 行 | 组件范本（数值卡 + 阈值/趋势/单位） |
 | 7 | ne101_camera | 扩展-组件联动 | 旗舰 | ~2500-3500 行（拆 8 子页） | 端到端深度教程 |
 

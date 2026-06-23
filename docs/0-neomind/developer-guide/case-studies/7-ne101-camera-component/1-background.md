@@ -47,7 +47,7 @@ NE101 支持的设备命令（device commands）是组件命令按钮的来源�
 
 **第一，metric_card 不能渲染图像。** NE101 最核心的价值是「抓拍到的 JPEG 图像」，而 metric_card 的 `extractValue()` 只能输出标量（数字/字符串）。要显示图像，需要专门的 `<img>` + Canvas 画布，metric_card 的渲染层完全没有这个能力。
 
-**第二，metric_card 不能画 ROI 叠加。** NE101 的典型用法是「圈出画面里的人行通道，统计经过的行人数」——这需要在图像上画半透明矩形（ROI）+ 在检测到的目标上画检测框 + 按类别上色。这套叠加渲染逻辑（Canvas 坐标系、`objectFit: contain` 的非线性映射、ResizeObserver 异步建立）根本无法塞进 metric_card 的「单卡片」布局。
+**第二，metric_card 不能画 ROI 叠加。** NE101 的典型用法是「圈出画面里的人行通道，统计经过的行人数」——这需要在图像上画半透明矩形（ROI）+ 在检测到的目标上画检测框 + 按类别上色。这套叠加渲染逻辑（Canvas 坐标系、`object-cover` 的非线性映射、ResizeObserver 异步建立）根本无法塞进 metric_card 的「单卡片」布局。
 
 **第三，metric_card 不能触发设备命令。** NE101 有 `trigger_capture`（立即抓拍）、`set_schedule`（设置定时）这类设备级命令，需要在组件里渲染按钮 + 调用 `fetchData({type: 'device_command', ...})`。metric_card 的 manifest 是 `has_actions: false`，根本没有命令面板的入口。
 
@@ -253,8 +253,8 @@ sequenceDiagram
 - **4 数据契约 ★（MVP）**：MQTT 主题命名、WebSocket 增量消息格式、`detections` 字段 schema、单矩形 ROI vs 多 ROI 数组的 JSON 结构。
 - **5 前端消费 ★（MVP）**：组件如何拉取 detections、解析 JSON string、按类别上色（commit `c276c23` 的 golden-angle HSV rotation）、画检测框。
 - **6 组件构建 ★（MVP）**：`NE101CameraPanel` 命名导出的写法、React hooks 在 IIFE 中的陷阱（commit `b060a25` / `0601cd4`）、配置面板的分层设计。
-- **7 ROI 叠加（v1.1）**：单矩形 vs 多 ROI 数组的渲染差异、归一化坐标到像素坐标的映射、`objectFit: contain` 的非线性缩放处理。
-- **8 运维与扩展（v1.1）**：版本演进（25+ commits 的关键节点）、调试 Trace 技巧、性能优化（避免重复创建 Transform、Canvas 重绘节流）。
+- **7 ROI 叠加（v1.1）**：单矩形 vs 多 ROI 数组的渲染差异、归一化坐标到像素坐标的映射、`object-cover` 的非线性缩放处理。
+- **8 运维与扩展（v1.1）**：版本演进（133 commits 的关键节点）、调试 Trace 技巧、性能优化（避免重复创建 Transform、Canvas 重绘节流）。
 
 ---
 

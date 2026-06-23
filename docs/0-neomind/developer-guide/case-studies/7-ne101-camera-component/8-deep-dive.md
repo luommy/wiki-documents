@@ -1,5 +1,5 @@
 ---
-description: "ne101_camera 深度复盘：133 commits 版本演进、Transform 生命周期调试 trace 兴衰（5 个 debug commit 最终被 00a59cc 清除）、Boa 引擎 console.log 崩溃事件、_configHash 性能优化、源码卫生复盘（3 文件零备份）"
+description: "ne101_camera 深度复盘：133 commits 版本演进、Transform 生命周期调试 trace 兴衰（4 个 debug commit 最终被 00a59cc 清除）、Boa 引擎 console.log 崩溃事件、_configHash 性能优化、源码卫生复盘（3 文件零备份）"
 keywords: [ne101_camera, 深度复盘, 版本演进, debug trace, Boa 引擎, _configHash, 源码卫生]
 tags: [NeoMind, 案例]
 sidebar_label: "8. Deep Dive"

@@ -123,9 +123,9 @@ AI 扩展的响应格式由扩展作者决定，ne101_camera 不能控制。为�
 
 | responseType | 数据路径 | 字段格式 |
 |---|---|---|
-| `boxes_x1y1x2y2` | `r.boxes` | `{x1,y1,x2,y2}` 归一化坐标 |
-| `objects_bbox` | `r.objects[].bbox` | `{x,y,w,h}` 像素坐标 |
-| `detections_bbox` | `r.detections[].bbox` | `{x,y,w,h}` 像素坐标 |
+| `boxes_x1y1x2y2` | `r.boxes` | `` `{x1,y1,x2,y2}` `` 归一化坐标 |
+| `objects_bbox` | `r.objects[].bbox` | `` `{x,y,w,h}` `` 像素坐标 |
+| `detections_bbox` | `r.detections[].bbox` | `` `{x,y,w,h}` `` 像素坐标 |
 | `ocr_text_blocks` | `r.text_blocks` | 见下方代码块（有 polygon） |
 
 分发逻辑在 [`bundle.js` L288-L329](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L288-L329)。其中前三种 responseType 的归一化逻辑高度相似——都是把各自格式的坐标转换成 `[x1,y1,x2,y2]` 并除以图像宽高 `W/H` 得到 0-1 范围。
@@ -534,7 +534,7 @@ var _vals = Object.assign({}, wsValues, imageData || {}, virtualDataState[0] || 
 
 ### 后续章节桥接
 
-- [5 前端消费](./5-frontend-consume.md)（MVP）—— 组件如何读取归一化后的 detections、用 `classColor` 的黄金角 HSV 按类别上色、把 bbox 从 0-1 归一化坐标映射到 Canvas 像素坐标（`objectFit: contain` 的非线性缩放）。
+- [5 前端消费](./5-frontend-consume.md)（MVP）—— 组件如何读取归一化后的 detections、用 `classColor` 的黄金角 HSV 按类别上色、把 bbox 从 0-1 归一化坐标映射到 Canvas 像素坐标（`object-cover` 的非线性缩放）。
 - [3 扩展侧](./3-extension-side.md)（v1.1）—— `generateTransformJsCode` 生成的代码在主控沙箱里的执行细节、`extensions.invoke()` 的调用契约、扩展如何消费 `input_raw` 并返回四种 responseType。
 - 回到 [2 架构总览](./2-architecture.md) —— 本页提到的双通道数据流和 JSON string 解析在 2.4 有架构层视角的概述。
 

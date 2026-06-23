@@ -1,5 +1,5 @@
 ---
-description: "ne101_camera 组件架构剖析：1972 行 IIFE 的 5 层拆解（helper / hook / sub-component / export）、3 个对外组件（NE101CameraPanel / ConfigPanel / AdvancedPanel）、数据流（WebSocket 优先 + REST 回退）、ROI 叠加管线、与 metric_card 的架构对比"
+description: "ne101_camera 组件架构剖析：1972 行 IIFE 的 5 层拆解（helper / template / sub-component / main / export）、3 个对外组件（NE101CameraPanel / ConfigPanel / AdvancedPanel）、数据流（WebSocket 优先 + REST 回退）、ROI 叠加管线、与 metric_card 的架构对比"
 keywords: [NeoMind, ne101_camera, IIFE 架构, React-in-IIFE, 设备绑定组件]
 tags: [NeoMind, 案例, 架构]
 sidebar_label: "2. Architecture"
