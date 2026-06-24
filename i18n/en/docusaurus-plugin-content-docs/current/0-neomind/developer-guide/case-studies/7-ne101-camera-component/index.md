@@ -120,7 +120,8 @@ graph LR
 | Author | CamThink Team |
 | `bundle.js` lines | 1972 (hand-written IIFE, not a build artifact) |
 | `manifest.json` lines | 40 |
-| Source repo | [camthink-ai/NeoMind-Dashboard-Components](https://github.com/camthink-ai/NeoMind-Dashboard-Components/tree/main/components/ne101_camera) |
+| Frontend component repo | [camthink-ai/NeoMind-Dashboard-Components](https://github.com/camthink-ai/NeoMind-Dashboard-Components/tree/main/components/ne101_camera) — `bundle.js` + `manifest.json` |
+| Device type definition | [camthink-ai/NeoMind-DeviceTypes](https://github.com/camthink-ai/NeoMind-DeviceTypes/tree/main/types) — `ne101_camera` device type JSON (metrics / commands) |
 | Git commits (component dir) | 133 |
 | Prerequisite case | [6 metric_card](../6-metric-card-component.md) (starter component case) |
 | Successor case | none (this is currently the most complex case in the marketplace) |

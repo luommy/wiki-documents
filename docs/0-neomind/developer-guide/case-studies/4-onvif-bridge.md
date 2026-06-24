@@ -957,6 +957,10 @@ onvif-bridge 在约 2700 行 Rust 代码中实现了完整的 ONVIF Profile S �
 
 推荐阅读顺序：[总览](./0-overview.md) → [案例 2 yolo-device-inference](./2-yolo-device-inference.md) → [案例 3 yolo-video-v2](./3-yolo-video-v2.md) → **本文（4 onvif-bridge）** → [案例 5 uink-rms-bridge](./5-uink-rms-bridge.md)。
 
+### 源码仓库
+
+- [源码仓库](https://github.com/camthink-ai/NeoMind-Extensions/tree/main/extensions/onvif-bridge) —— `src/lib.rs`、`discovery.rs`、`ptz.rs`、`soap_client.rs`（本文所有源码深链指向此目录）
+
 ---
 
 *最后更新: 2026-06-23*

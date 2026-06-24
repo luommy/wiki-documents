@@ -857,6 +857,10 @@ yolo-video-v2 is the most engineering-complex extension in the NeoMind ecosystem
 **Knowing where things go wrong is often deeper than knowing how to do them right.** Committed backup files and ONNX Runtime memory-leak workarounds may look like "code smells", but they document the constraints and compromises of real engineering environments. Their avoidance and reference value for future projects is no less than that of positive examples.
 :::
 
+### Source Repository
+
+- [Source repository](https://github.com/camthink-ai/NeoMind-Extensions/tree/main/extensions/yolo-video-v2) — All source deep-links in this article point to this directory
+
 ---
 
 *Last updated: 2026-06-23*

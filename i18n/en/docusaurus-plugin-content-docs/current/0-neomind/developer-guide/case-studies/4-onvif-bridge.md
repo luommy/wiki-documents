@@ -935,6 +935,10 @@ From a source code governance perspective, onvif-bridge's `src/` directory (5 fi
 
 Recommended reading order: [Overview](./0-overview.md) → [Case 2 yolo-device-inference](./2-yolo-device-inference.md) → [Case 3 yolo-video-v2](./3-yolo-video-v2.md) → **this article (4 onvif-bridge)** → [Case 5 uink-rms-bridge](./5-uink-rms-bridge.md).
 
+### Source Repository
+
+- [Source repository](https://github.com/camthink-ai/NeoMind-Extensions/tree/main/extensions/onvif-bridge) — `src/lib.rs`, `discovery.rs`, `ptz.rs`, `soap_client.rs` (all source deep-links in this article point to this directory)
+
 ---
 
 *Last updated: 2026-06-23*

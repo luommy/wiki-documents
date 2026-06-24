@@ -797,6 +797,10 @@ uink-rms-bridge 是 NeoMind 生态中**唯一一个前后端一体的厂商专�
 
 它的工程教训在于：2250 行单文件是可读性的边界，未来如果新增更多 RMS endpoint（如告警 / 日志），应该考虑拆分。
 
+### 源码仓库
+
+- [源码仓库](https://github.com/camthink-ai/NeoMind-Extensions/tree/main/extensions/uink-rms-bridge) —— `src/lib.rs`（本文所有源码深链指向此文件）
+
 ---
 
 *最后更新: 2026-06-23*

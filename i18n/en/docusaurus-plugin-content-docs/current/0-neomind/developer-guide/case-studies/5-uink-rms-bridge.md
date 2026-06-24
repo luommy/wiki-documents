@@ -746,6 +746,10 @@ uink-rms-bridge is the **only full-stack vendor-proprietary bridge extension** i
 
 Its engineering lesson: 2250 lines in a single file is the boundary of readability, and if more RMS endpoints are added in the future (like alerts / logs), splitting should be considered.
 
+### Source Repository
+
+- [Source repository](https://github.com/camthink-ai/NeoMind-Extensions/tree/main/extensions/uink-rms-bridge) — `src/lib.rs` (all source deep-links in this article point to this file)
+
 ---
 
 *Last updated: 2026-06-23*

@@ -930,6 +930,10 @@ yolo-video-v2 是 NeoMind 生态中工程复杂度最高的扩展，它完整展
 **知道哪里会出错，比知道怎么做更深刻。** 备份文件提交和 ONNX Runtime 内存泄漏 workaround 看似是「坏味道」，但它们记录了真实工程环境中的约束和妥协，对后续项目的规避和借鉴意义不亚于正面案例。
 :::
 
+### 源码仓库
+
+- [源码仓库](https://github.com/camthink-ai/NeoMind-Extensions/tree/main/extensions/yolo-video-v2) —— 本文所有源码深链指向此目录
+
 ---
 
 *最后更新: 2026-06-23*

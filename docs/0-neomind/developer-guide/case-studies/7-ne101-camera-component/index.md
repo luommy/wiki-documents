@@ -120,7 +120,8 @@ graph LR
 | 作者 | CamThink Team |
 | `bundle.js` 行数 | 1972 行（手写 IIFE，非打包产物） |
 | `manifest.json` 行数 | 40 行 |
-| 源码仓库 | [camthink-ai/NeoMind-Dashboard-Components](https://github.com/camthink-ai/NeoMind-Dashboard-Components/tree/main/components/ne101_camera) |
+| 前端组件仓库 | [camthink-ai/NeoMind-Dashboard-Components](https://github.com/camthink-ai/NeoMind-Dashboard-Components/tree/main/components/ne101_camera) —— `bundle.js` + `manifest.json` |
+| 设备类型定义 | [camthink-ai/NeoMind-DeviceTypes](https://github.com/camthink-ai/NeoMind-DeviceTypes/tree/main/types) —— `ne101_camera` 设备类型 JSON（metrics / commands） |
 | Git 提交数（组件目录） | 133 commits |
 | 前置案例 | [6 metric_card](../6-metric-card-component.md)（入门组件案例） |
 | 后续案例 | 暂无（本案例是当前组件市场最复杂的案例） |
