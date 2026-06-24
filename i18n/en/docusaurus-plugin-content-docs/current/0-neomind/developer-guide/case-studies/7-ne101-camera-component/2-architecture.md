@@ -719,6 +719,10 @@ Source: [manifest.json L18-L37](https://github.com/camthink-ai/NeoMind-Dashboard
 
 The former's value is wide coverage; the latter's value is collapsing a complex device link into a single panel. The two are not substitutes but a progression — ne101_camera builds on metric_card's three-piece set (IIFE injection + manifest contract + inline style) and adds four new capability layers: device binding, image canvas, AI processing pipeline, and ROI overlay.
 
+:::tip Engineering Lesson
+The NeoMind component marketplace hosts two complementary design paradigms: **"thin component + thick generality"** (metric_card, wide coverage) and **"thick component + thin specificity"** (ne101_camera, collapsing a complex device link). Understanding this progression helps you make the right choice between writing a component for general scenarios versus writing one for a dedicated device.
+:::
+
 ---
 
 ## Summary
@@ -728,6 +732,10 @@ This section decomposed ne101_camera's five-layer IIFE architecture, the three-e
 1. **The five-layer architecture** (helper / template / sub-component / main / export) is not a physical separation but a logical layering within one file. When reading the source, first build the five-layer model in your head, or the 1972 lines will overwhelm you.
 2. **The dual-channel data flow** (WebSocket + REST) is the core feature that distinguishes a device-bound component from a display component. metric_card is fine with a single `fetchData` channel; ne101 must run dual channels to balance realtime responsiveness and reliability.
 3. **Code generation (`generateTransformJsCode`)** is an architectural innovation unique to ne101_camera that physically strips "variable post-processing" out of the component code. This pattern will be reused in later case studies.
+
+:::tip Engineering Lesson
+When reading ne101_camera source code, first build the **five-layer model** (helper / template / sub-component / main / export) in your head, then slot each piece of code into its layer. With 1972 lines interleaving within a single file, you will be overwhelmed without the model. The core architectural trait of a device-bound component is its **dual-channel data flow** (WebSocket + REST) — this is the fundamental difference between it and a display-only component.
+:::
 
 ### Evolution Milestone Table
 

@@ -118,6 +118,10 @@ Before `c276c23`, detection-box color went through two iterations. The earliest 
 - **Alternative B**: random color (`Math.random()`). Rejected because the same class gets a different color on every render, causing severe visual flicker and preventing users from building "this color = this class" muscle memory.
 - **Rationale**: golden-angle rotation mathematically guarantees maximally dispersed hues for any class count; the pure-function hash guarantees cross-frame consistency; it is zero-config (no preset palette needed). The cost is that HSV space is not perceptually uniform (the blue region has lower human-eye discriminability), but in practice the effect is acceptable for ≤ 50 classes.
 
+:::tip Engineering Lesson
+For per-class coloring, **pure-function hash + golden-angle rotation** beats both fixed palettes and random colors: it guarantees cross-frame consistency (pure function), supports an unlimited class count (golden angle), and is zero-config (no mapping table to maintain).
+:::
+
 ---
 
 ## SVG Overlay: Polygon + Rect Fallback
@@ -549,6 +553,10 @@ The 6 design decisions covered on this page are consolidated below, each followi
 | **Transform lifecycle** | Three-tier dispatch verify/update/create ([L661-L824](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L661-L824), commit [`ac06344`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/ac06344)) | Always delete + create | Avoids detection flicker, preserves metric continuity, reduces API calls |
 
 The common theme across these 6 decisions: **at every "boundary" of frontend rendering, choose determinism over convenience.** Color uses a pure function to guarantee consistency; coordinates use explicit math to guarantee alignment; listeners use callback ref to guarantee timing; data uses metric-driven sourcing to guarantee a single source of truth; the lifecycle uses three-tier dispatch to guarantee continuity. This "explicit-over-implicit" philosophy is the fundamental reason ne101_camera can render stably amid the complex interactions of asynchronous images, asynchronous detections, and dynamically sized containers.
+
+:::tip Engineering Lesson
+**At every boundary of an asynchronous rendering pipeline, choose determinism over convenience**: pure functions guarantee cross-frame consistency, explicit math guarantees coordinate alignment, and callback ref guarantees precise timing. This "explicit over implicit" design philosophy is the key to stability in complex interactions.
+:::
 
 ### Key commit index
 

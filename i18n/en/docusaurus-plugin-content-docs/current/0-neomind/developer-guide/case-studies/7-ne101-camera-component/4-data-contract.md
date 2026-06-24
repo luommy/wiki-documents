@@ -345,6 +345,10 @@ This is one line of code but contains a **design decision**:
 - **Reason**: Silent null is "the safest degradation" — the user at least sees the image and scalar metrics like battery; only the detection boxes disappear. During debugging, developers can manually inspect `vDet` in DevTools to determine whether this catch was triggered.
 - **Cost**: If the detections JSON has a format bug (e.g., the backend wrote truncated JSON), users silently lose all detection boxes with no UI indication. This cost is considered acceptable because losing detection boxes is a "visual degradation," not "data corruption."
 
+:::note The Design Tradeoff of Defensive Parsing
+If the detections JSON has a format bug (e.g., the backend wrote truncated JSON), users will silently lose all detection boxes with no UI indication. This cost is considered acceptable because **losing detection boxes is a "visual degradation," not "data corruption"** — the image, battery, timestamp, and other scalar metrics are unaffected.
+:::
+
 **OCR polygon format compatibility**: Commit `403c0f1` (`fix(ne101): handle {x,y} object format for OCR polygon detection boxes`) fixed another related format pitfall. The `polygon` field returned by OCR extensions (array of polygon vertices) comes in two formats: `[[x,y], ...]` (array pairs) and `[{x, y}, ...]` (object arrays). The frontend renderer must handle both formats simultaneously, otherwise polygon drawing crashes. This is because `ocr-device-inference` and `locate-anything-v2`'s `text_detection` mode serialize polygons inconsistently — the former uses object arrays (consistent with PaddleOCR's native output), the latter uses array pairs (consistent with COCO format).
 
 ---
@@ -467,6 +471,10 @@ graph TB
 - **Alternative B**: 1.0 (full containment). Rejected because 1.0 requires the detection box to be fully inside the ROI, but in practice targets frequently hug the ROI edge; 1.0 misses these edge cases, undercounting.
 - **Reason**: Empirically, 0.6 balances precision and recall for most edge-detection scenarios — too low (e.g., 0.5) inflates counts, too high (e.g., 1.0) misses valid detections. Users can adjust via the config panel slider.
 
+:::tip ROI Threshold Tuning Advice
+The default `OVERLAP_TH = 0.6` suits most object-detection scenarios. If in-ROI counts seem inflated (large targets grazing the edge), raise it to 0.7-0.8; if too many detections are missed (targets hugging the ROI boundary), lower it to 0.4-0.5. In extreme cases, set it to 1.0 to require full containment.
+:::
+
 ---
 
 ## WS-Priority + REST Backfill Dual Channel
@@ -535,6 +543,10 @@ The 5 design decisions covered on this page are summarized below, each with the 
 | **Optimistic base64 judgment** | Anything not `http(s)://` is treated as base64 ([L637](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L637-L637)) | Strict: must start with `data:image` to count as base64 | Better to try a weird string as base64 once (`<img>` fails silently) than to request a base64 string as a URL |
 
 These 5 decisions share a common theme: **choosing permissive degradation over strict error-throwing in "contract ambiguity zones."** The backend's serialization strategy, the extension's response format, WS reliability — none of these are within the component's control, so the component can only use defensive code to cushion the blow. This "permissive input + strict normalization" philosophy is the fundamental reason ne101_camera can operate stably across the combinatorial space of 4 extensions x 2 image formats x 2 storage serializations.
+
+:::tip Design Philosophy
+**"Permissive input + strict normalization"** is the fundamental reason ne101_camera can operate stably across the combinatorial space of 4 extensions x 2 image formats x 2 storage serializations. All uncontrollable external inputs are caught by defensive code and degraded safely rather than crashing outright.
+:::
 
 ### Key commit index
 
