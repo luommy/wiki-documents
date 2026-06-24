@@ -13,16 +13,22 @@ sidebar_label: "Extension Side"
 
 ## processingExtensionId 通用契约
 
-ne101_camera 组件最容易被误解的一点是：它看起来在做「AI 物体检测」，但翻遍 1972 行 `bundle.js`，你找不到一行 YOLO 推理、一行 ONNX runtime、一行模型权重加载。组件本身**不做任何 AI**。所有 AI 推理都被外包给了用户通过 `processingExtensionId` 配置字段指定的扩展。这个字段位于 [`manifest.json` L23-L24](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L23-L24) 的 `default_config` 块里：
+ne101_camera 组件最容易被误解的一点是：它看起来在做「AI 物体检测」，但翻遍 1972 行 `bundle.js`，你找不到一行 YOLO 推理、一行 ONNX runtime、一行模型权重加载。
+
+**组件本身不做任何 AI。** 所有 AI 推理都被外包给了用户通过 `processingExtensionId` 配置字段指定的扩展。这个字段位于 [`manifest.json` L23-L24](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L23-L24) 的 `default_config` 块里：
 
 ```json
 "processingEnabled": false,
 "processingExtensionId": "",
 ```
 
-`processingEnabled` 是总开关（默认 false，开箱即用只是一个纯展示摄像头画面的组件），`processingExtensionId` 是扩展 ID 槽位（默认空字符串 = 未选中任何扩展 = 不做处理）。当用户在 `AdvancedPanel` 里把总开关打开并从下拉框选择了一个扩展（例如 `locate-anything-v2`）后，组件的 `generateTransformJsCode` 会把扩展 ID 写进生成的 Transform 代码的 `extensions.invoke()` 调用里，Transform 在主控沙箱执行时由平台负责把调用路由到对应扩展的 HTTP/RPC 端点。
+`processingEnabled` 是总开关（默认 false，开箱即用只是一个纯展示摄像头画面的组件），`processingExtensionId` 是扩展 ID 槽位（默认空字符串 = 未选中任何扩展 = 不做处理）。
 
-这个「组件 + 可插拔扩展」契约是 NeoMind 生态 AI 复用的**模板**：一个组件，N 个推理后端。同一个 ne101_camera 组件，搭配 `locate-anything-v2` 就是「开放词汇目标检测」，搭配 `ocr-device-inference` 就是「OCR 文字识别」，搭配 `yolo-device-inference` 就是「边缘设备端 YOLOv8 推理」。组件本身不需要知道这些扩展的内部实现，只需要知道如何调用它们、如何归一化它们的响应（见 [4.3](./4-data-contract.md)）。
+当用户在 `AdvancedPanel` 里把总开关打开并从下拉框选择了一个扩展（例如 `locate-anything-v2`）后，组件的 `generateTransformJsCode` 会把扩展 ID 写进生成的 Transform 代码的 `extensions.invoke()` 调用里，Transform 在主控沙箱执行时由平台负责把调用路由到对应扩展的 HTTP/RPC 端点。
+
+这个「组件 + 可插拔扩展」契约是 NeoMind 生态 AI 复用的**模板**：一个组件，N 个推理后端。同一个 ne101_camera 组件，搭配 `locate-anything-v2` 就是「开放词汇目标检测」，搭配 `ocr-device-inference` 就是「OCR 文字识别」，搭配 `yolo-device-inference` 就是「边缘设备端 YOLOv8 推理」。
+
+组件本身不需要知道这些扩展的内部实现，只需要知道如何调用它们、如何归一化它们的响应（见 [4.3](./4-data-contract.md)）。
 
 **为什么选择「可插拔扩展」而不是「内置 AI」**：如果组件自己打包了一个 YOLO 模型（例如把 onnxruntime-web + yolov8n.weights 嵌进 bundle），会有三个严重后果。
 
@@ -31,6 +37,10 @@ ne101_camera 组件最容易被误解的一点是：它看起来在做「AI 物�
 3. 模型更新和组件更新强耦合——YOLO 模型每迭代一版就要发一个新组件版本，而扩展是独立部署的（由用户或平台运维单独升级），扩展更新不需要触碰组件代码。
 
 「可插拔扩展」把这三个问题全部解开了：组件保持 80KB，用户自己选模型，扩展可以独立更新。
+
+:::tip 工程教训
+**组件零 AI、推理外包给扩展**是 NeoMind 组件市场的核心范式。同一个组件搭配不同扩展就能做不同任务（检测 / OCR / 描述），组件保持 80KB 轻量，扩展可独立升级。这就是「一组件多用途」范式的根基。
+:::
 
 下图展示了「组件 → processingExtensionId → N 个候选扩展」的扇出关系。组件只暴露一个槽位，由用户的下拉选择决定实际调用哪一个扩展，扩展之间互不感知。
 
@@ -174,7 +184,9 @@ responseType: how the extension returns detection results
   'ocr_text_blocks'= { success, data: { text_blocks: [...] } } (normalized 0-1)
 ```
 
-**`imageArg` 的两种取值**：`image_base64`（locate-anything-v2 系）把 base64 字符串直接作为参数值传；`image`（其它三个扩展）把 base64 放在 `image` 键下传。这种差异源于扩展作者各自的实现习惯——`locate-anything-v2` 的 API 设计得更「扁平」（直接传 base64 字符串），其它扩展更「结构化」（参数包在对象里）。模式目录通过 `imageArg` 字段把这种差异**归一化**了——组件在生成 Transform 代码时根据 `imageArg` 的值决定参数名，不需要用户关心。
+**`imageArg` 的两种取值**：`image_base64`（locate-anything-v2 系）把 base64 字符串直接作为参数值传；`image`（其它三个扩展）把 base64 放在 `image` 键下传。
+
+这种差异源于扩展作者各自的实现习惯——`locate-anything-v2` 的 API 设计得更「扁平」（直接传 base64 字符串），其它扩展更「结构化」（参数包在对象里）。模式目录通过 `imageArg` 字段把这种差异**归一化**了——组件在生成 Transform 代码时根据 `imageArg` 的值决定参数名，不需要用户关心。
 
 **Transform 中的实际调用**：[`bundle.js` L277-L278](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L277-L278) 生成的代码长这样：
 
@@ -309,7 +321,9 @@ var W = (imageMeta && imageMeta.width) || 1;
 var H = (imageMeta && imageMeta.height) || 1;
 ```
 
-**`__imageData` 不是 Transform 代码里定义的变量**——它是平台在调用 Transform 执行函数时通过参数注入的。平台知道这个 Transform 绑定的是哪个设备（通过 [`fillTemplate` L453](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L453-L453) 的 `rule: { device_id, device_type: 'ne101_camera' }`），在执行前会去设备的最新遥测里取图像字段，base64 编码后作为 `__imageData` 参数传进 Transform 函数。这个机制把「图像获取」（需要 MQTT 订阅、设备认证、base64 编码）和「图像消费」（AI 推理 + 归一化）完全解耦了——Transform 代码只管消费，平台管获取。
+**`__imageData` 不是 Transform 代码里定义的变量**——它是平台在调用 Transform 执行函数时通过参数注入的。平台知道这个 Transform 绑定的是哪个设备（通过 [`fillTemplate` L453](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L453-L453) 的 `rule: { device_id, device_type: 'ne101_camera' }`），在执行前会去设备的最新遥测里取图像字段，base64 编码后作为 `__imageData` 参数传进 Transform 函数。
+
+这个机制把「图像获取」（需要 MQTT 订阅、设备认证、base64 编码）和「图像消费」（AI 推理 + 归一化）完全解耦了——Transform 代码只管消费，平台管获取。
 
 ```js
   function fillTemplate(pipe) {
@@ -342,7 +356,9 @@ var H = (imageMeta && imageMeta.height) || 1;
 
 ## 扩展降级 Fallback
 
-NeoMind 的 AI 扩展生态会持续增长——未来可能出现「分割扩展」「姿态估计扩展」「深度估计扩展」。ne101_camera 的 `EXT_MODES` 目录（3.3）只列了当前已知的 4 个扩展，那如果用户安装了一个 `EXT_MODES` 里没有的新扩展，会发生什么？答案是：**宽容降级**，而不是报错拒绝。这个回退逻辑在 [`bundle.js` L181-L193](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L181-L193) 的 `getExtMode()` 函数里：
+NeoMind 的 AI 扩展生态会持续增长——未来可能出现「分割扩展」「姿态估计扩展」「深度估计扩展」。ne101_camera 的 `EXT_MODES` 目录（3.3）只列了当前已知的 4 个扩展，那如果用户安装了一个 `EXT_MODES` 里没有的新扩展，会发生什么？
+
+答案是：**宽容降级**，而不是报错拒绝。这个回退逻辑在 [`bundle.js` L181-L193](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L181-L193) 的 `getExtMode()` 函数里：
 
 ```javascript
 function getExtMode(extensionId, templateName) {
@@ -383,6 +399,10 @@ function getExtMode(extensionId, templateName) {
 - **备选方案**：严格模式——`EXT_MODES` 里没有的扩展直接在 `AdvancedPanel` 报错「此扩展不被 ne101_camera 支持」，阻止 Transform 创建。否决理由：这会让「新扩展 + 旧组件」的组合完全不可用——用户安装了一个新的 AI 扩展，但因为 ne101_camera 还没更新 `EXT_MODES`，就无法使用它。这种版本耦合是生态发展的阻碍。
 - **理由**：前向兼容性优先于严格性。新扩展大概率遵循常见的检测 API 约定（`detect` 命令 + `image` 参数 + 检测框响应），宽容回退让它们在组件更新前就能「基本能用」。偶尔的格式不匹配导致静默失败（无检测框），不是崩溃——用户可以等待组件更新或手动改 Transform 代码。
 - **代价**：静默失败比显式报错更难调试。缓解措施是 5 的调试日志和本节的文档化——让开发者知道「未知扩展走 boxes_x1y1x2y2 默认」这个行为，遇到空检测时能快速定位到响应格式不匹配。
+
+:::tip 工程教训
+在「组件 ↔ 扩展」契约的模糊地带，**选择宽容和适配而非严格和强制**。面对未知扩展选择默认回退而非报错拒绝（前向兼容），面对专家级参数选择硬编码安全默认而非暴露给用户（最低惊讶原则）。这种设计让生态可以独立演进，不会被版本耦合阻碍。
+:::
 
 ---
 

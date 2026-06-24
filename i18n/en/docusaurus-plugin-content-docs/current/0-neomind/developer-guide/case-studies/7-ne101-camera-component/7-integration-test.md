@@ -13,11 +13,23 @@ sidebar_label: "Integration Test"
 
 ## Test Strategy Overview
 
-The `components/ne101_camera/` directory ships **two** JS artifacts side by side: the business code `bundle.js` (1972 lines / 95353 bytes) and the test code `test_bundle.js` (960 lines / 35021 bytes). The test file is not an afterthought scaffolding — it is a registered executable artifact published with the component. Both platform operators and downstream developers can run `node components/ne101_camera/test_bundle.js` locally to reproduce the full pure-function regression. This "**component ships its own tests**" discipline is a soft requirement of the NeoMind marketplace and a distinguishing feature of ne101_camera versus the other 5 case studies.
+The `components/ne101_camera/` directory ships **two** JS artifacts side by side: the business code `bundle.js` (1972 lines / 95353 bytes) and the test code `test_bundle.js` (960 lines / 35021 bytes).
 
-The first principle of the testing philosophy comes from the IIFE pattern: `bundle.js` is a `var NE101CameraPanel = (function(){ ... })()` immediately-invoked expression with no `module.exports`, no `export`, and no entry point that Jest or Vitest can `import`. **A direct `require('bundle.js')` throws `NE101CameraPanel is not defined`** (because `window` does not exist in Node.js). So `test_bundle.js` adopts a **regex extraction + sandbox eval** pattern: [`extractFunction`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/test_bundle.js#L16-L35) locates the source string of an internal function by bracket counting, `new Function(...)` evaluates it in an isolated scope, and Node.js `assert` checks the return value. This pattern only tests **pure functions** (`classColor` / `batteryMeta` / `computeOvTf` / `mapBbox` / `pipeRois`) — React rendering is covered indirectly in 7.4-7.6 via "contract + behavior matrix" assertions.
+The test file is not an afterthought scaffolding — it is a registered executable artifact published with the component. Both platform operators and downstream developers can run `node components/ne101_camera/test_bundle.js` locally to reproduce the full pure-function regression.
 
-A crucial distinction: **`test_bundle.js` runs on Node.js**, while **the production Transform JS runs on the platform's Boa engine** (a Rust-based JS interpreter used to sandbox Transform code). These are two parallel runtimes — do not conflate them. `test_bundle.js` covers component helper pure functions; the Boa engine runs the JS string emitted by `generateTransformJsCode` ([L239-L456](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L239-L456)):
+This "**component ships its own tests**" discipline is a soft requirement of the NeoMind marketplace and a distinguishing feature of ne101_camera versus the other 5 case studies.
+
+:::tip Engineering Lesson
+The IIFE pattern has no module entry point and cannot be directly `import`ed by Jest/Vitest. ne101_camera's solution is "regex extraction + sandbox eval" — using bracket counting to locate internal function source code, then `new Function(...)` to evaluate it in an isolated scope. This pattern only tests pure-function mathematical correctness, turning geometric operations from runtime observations into offline assertions — a best practice for zero-dependency testing.
+:::
+
+**The first principle of the testing philosophy comes from the IIFE pattern**: `bundle.js` is a `var NE101CameraPanel = (function(){ ... })()` immediately-invoked expression with no `module.exports`, no `export`, and no entry point that Jest or Vitest can `import`. **A direct `require('bundle.js')` throws `NE101CameraPanel is not defined`** (because `window` does not exist in Node.js).
+
+So `test_bundle.js` adopts a **regex extraction + sandbox eval** pattern: [`extractFunction`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/test_bundle.js#L16-L35) locates the source string of an internal function by bracket counting, `new Function(...)` evaluates it in an isolated scope, and Node.js `assert` checks the return value.
+
+This pattern only tests **pure functions** (`classColor` / `batteryMeta` / `computeOvTf` / `mapBbox` / `pipeRois`) — React rendering is covered indirectly in 7.4-7.6 via "contract + behavior matrix" assertions.
+
+**A crucial distinction: `test_bundle.js` runs on Node.js**, while **the production Transform JS runs on the platform's Boa engine** (a Rust-based JS interpreter used to sandbox Transform code). These are two parallel runtimes — do not conflate them. `test_bundle.js` covers component helper pure functions; the Boa engine runs the JS string emitted by `generateTransformJsCode` ([L239-L456](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L239-L456)):
 
 ```js
 // bundle.js L239-L268 (trimmed — showing function signature + input handling)
@@ -128,7 +140,9 @@ sequenceDiagram
 
 ## ROI Overlay Verification Matrix
 
-ROI (Region of Interest) is the most complex subsystem in ne101_camera because it does geometry in **two independent coordinate systems** whose results must agree, otherwise users see detection boxes in the wrong place. The first coordinate system is **"detection vs ROI polygon" clipping inside the Transform JS**, implemented by the Sutherland-Hodgman polygon clipping algorithm generated by `generateTransformJsCode` ([`bundle.js` L342-L372](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L342-L372)) — it decides which detections are "inside the ROI":
+**ROI (Region of Interest) is the most complex subsystem in ne101_camera** because it does geometry in **two independent coordinate systems** whose results must agree, otherwise users see detection boxes in the wrong place.
+
+The first coordinate system is **"detection vs ROI polygon" clipping inside the Transform JS**, implemented by the Sutherland-Hodgman polygon clipping algorithm generated by `generateTransformJsCode` ([`bundle.js` L342-L372](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L342-L372)) — it decides which detections are "inside the ROI":
 
 ```js
 // bundle.js L342-L372
@@ -195,9 +209,17 @@ if (imgNat.w > 0 && imgNat.h > 0 && ctrSize.w > 0 && ctrSize.h > 0) {
 ```
 [Source: bundle.js L879-L899](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L879-L899) with what the clipping algorithm decided. If they disagree, the user sees "a detection box clearly outside the ROI polygon being highlighted red" or the opposite.
 
-**Why dual coordinate transforms are easy to get wrong**: Sutherland-Hodgman clips in the "image normalized space" (0-1 range) and outputs a boolean — whether ≥ `OVERLAP_TH` of the detection's area falls inside the ROI — which drives filtering. The `object-cover` transform is an affine map between "normalized image space → normalized container space" (parameters `sx`/`sy`/`ox`/`oy`), which decides where the SVG `<rect>` lands in the DOM. The two **share no code-level coupling** — the Transform JS runs in the Boa engine, the SVG transform runs in the browser — but they share the same implicit assumption "image aspect ratio → scaling strategy". If the Transform assumes 4:3 while the SVG assumes 16:9, the result is misalignment.
+**Why dual coordinate transforms are easy to get wrong**: Sutherland-Hodgman clips in the "image normalized space" (0-1 range) and outputs a boolean — whether ≥ `OVERLAP_TH` of the detection's area falls inside the ROI — which drives filtering.
 
-`test_bundle.js` uses the two extracted pure functions `computeOvTf` / `mapBbox` to build a 3×2×3 = **18-combination** verification matrix, covering three image aspect ratios (16:9 landscape / 4:3 standard / 1:1 square), two ROI shapes (single rectangle / multi-vertex concave polygon), and three `OVERLAP_TH` thresholds (0.3 lenient / 0.6 default / 0.9 strict). Each combination verifies two things: (a) the clipping result matches visual intuition (a detection fully inside the ROI must pass, fully outside must fail, edge-crossing ones are decided by the threshold); (b) `mapBbox` of `[0,0,1,1]` (the full image) covers the entire container (`left ≤ 0`, `top ≤ 0`, `width ≥ 100%`, `height ≥ 100%`). Together these assertions guarantee end-to-end alignment between "Transform judgment" and "visual overlay". The two key iterations were introduced by commit [`2109c45`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/2109c45) (center-point judgment → area-overlap judgment) and commit [`636a8ae`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/636a8ae) (configurable threshold); each iteration expanded the test matrix in lockstep.
+The `object-cover` transform is an affine map between "normalized image space → normalized container space" (parameters `sx`/`sy`/`ox`/`oy`), which decides where the SVG `<rect>` lands in the DOM. The two **share no code-level coupling** — the Transform JS runs in the Boa engine, the SVG transform runs in the browser — but they share the same implicit assumption "image aspect ratio → scaling strategy".
+
+If the Transform assumes 4:3 while the SVG assumes 16:9, the result is misalignment.
+
+**The `test_bundle.js` verification matrix**: uses the two extracted pure functions `computeOvTf` / `mapBbox` to build a 3×2×3 = **18-combination** verification matrix, covering three image aspect ratios (16:9 landscape / 4:3 standard / 1:1 square), two ROI shapes (single rectangle / multi-vertex concave polygon), and three `OVERLAP_TH` thresholds (0.3 lenient / 0.6 default / 0.9 strict).
+
+Each combination verifies two things: (a) the clipping result matches visual intuition (a detection fully inside the ROI must pass, fully outside must fail, edge-crossing ones are decided by the threshold); (b) `mapBbox` of `[0,0,1,1]` (the full image) covers the entire container (`left ≤ 0`, `top ≤ 0`, `width ≥ 100%`, `height ≥ 100%`).
+
+Together these assertions guarantee end-to-end alignment between "Transform judgment" and "visual overlay". The two key iterations were introduced by commit [`2109c45`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/2109c45) (center-point judgment → area-overlap judgment) and commit [`636a8ae`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/636a8ae) (configurable threshold); each iteration expanded the test matrix in lockstep.
 
 ```mermaid
 graph LR
@@ -344,7 +366,9 @@ stateDiagram-v2
 
 ## source_ts Alignment Verification
 
-`source_ts` (source timestamp) is ne101_camera's core mechanism for preventing "ghost detections". Cameras push 2-5 new frames per second, AI inference takes 200-800ms, which means **by the time the inference result returns, the displayed frame may already be the next one** — if you just draw the previous frame's detections on the current frame, you get a ghost: "the person has already walked out of frame, but the detection box stays in place". The `source_ts` solution: the Transform JS emits `source_ts` alongside detections (taken from the input image's `ts` / `timestamp` field, [`bundle.js` L436`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L436-L436)), and the main component strictly compares `source_ts` against the current image's `imgTs` when receiving virtual data — only matching pairs are displayed.
+**`source_ts` (source timestamp) is ne101_camera's core mechanism for preventing "ghost detections"**. Cameras push 2-5 new frames per second, AI inference takes 200-800ms, which means **by the time the inference result returns, the displayed frame may already be the next one** — if you just draw the previous frame's detections on the current frame, you get a ghost: "the person has already walked out of frame, but the detection box stays in place".
+
+The `source_ts` solution: the Transform JS emits `source_ts` alongside detections (taken from the input image's `ts` / `timestamp` field, [`bundle.js` L436`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L436-L436)), and the main component strictly compares `source_ts` against the current image's `imgTs` when receiving virtual data — only matching pairs are displayed.
 
 ```js
     L.push('out[\'' + pfx + 'source_ts\'] = input_raw && (input_raw.ts || input_raw.timestamp) || null;');
@@ -380,7 +404,17 @@ if (Array.isArray(vDet) && vDet.length > 0 && tsMatch) {
 2. **stale** — `vSourceTs` exists but does not equal `imgTsVal`, detections are **cached but not displayed** (L866-L869), and the user sees a "clean" current frame without detection boxes, avoiding ghosts
 3. **cache replay** — no new detection in virtual data (`vDet` is empty), but the cached `lastDetsTsRef.current` matches the current `imgTsVal`, so the cache is restored to display (L870-L873), handling the intermediate state "WS pushed a new frame but virtual data hasn't arrived due to inference latency".
 
-The test matrix covers these three states and their transitions: (a) fresh capture + matching source_ts → detections render; (b) inference result is one frame behind the image (stale) → cache but don't display; (c) cache hit (cache replay) → display from cache; (d) cache miss + no new detection → don't display. Case (b) is the easiest to get wrong — the intuitive implementation is "always show the most recent detection", but that is exactly the source of ghosts. Strict source_ts matching yields priority to "correctness" over "the most recent data", preferring a brief absence of detection boxes over showing misaligned detections. The side effect of this mechanism is "detection box flicker" (show-hide-show) when inference latency exceeds one frame interval, but this is the inevitable cost of correctness-first design. Commit [`e3a70be`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/e3a70be) also fixed a related pit: the backend serializes detection results as JSON strings, so the frontend must `JSON.parse` before comparing (L856-L857), otherwise `typeof vDet === 'string'` never equals `imgTsVal` (a number).
+**The test matrix covers these three states and their transitions**: (a) fresh capture + matching source_ts → detections render; (b) inference result is one frame behind the image (stale) → cache but don't display; (c) cache hit (cache replay) → display from cache; (d) cache miss + no new detection → don't display.
+
+Case (b) is the easiest to get wrong — the intuitive implementation is "always show the most recent detection", but that is exactly the source of ghosts. Strict source_ts matching yields priority to "correctness" over "the most recent data", preferring a brief absence of detection boxes over showing misaligned detections.
+
+The side effect of this mechanism is "detection box flicker" (show-hide-show) when inference latency exceeds one frame interval, but this is the inevitable cost of correctness-first design.
+
+:::tip Engineering Lesson
+In industrial vision scenarios, "misaligned detection" is more harmful than "temporarily no detection" — the former causes user misjudgment, the latter is just UI flicker. Strict `source_ts` matching prioritizes correctness over smoothness, preferring a brief absence of detection boxes over showing misaligned detections. This is standard practice in industrial vision systems and a typical expression of the "determinism first" philosophy.
+:::
+
+Commit [`e3a70be`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/e3a70be) also fixed a related pit: the backend serializes detection results as JSON strings, so the frontend must `JSON.parse` before comparing (L856-L857), otherwise `typeof vDet === 'string'` never equals `imgTsVal` (a number).
 
 ```mermaid
 stateDiagram-v2
@@ -407,7 +441,12 @@ stateDiagram-v2
 
 ## WS+REST Dual Channel Test
 
-The NeoMind platform provides two data channels for each device component: (1) **WebSocket push** — high-frequency small data (battery, temperature, ts), multiple times per second; (2) **REST polling** — low-frequency large data (image base64 / URL, inference results), at second-level intervals. ne101_camera merges the three streams at [`bundle.js` L631`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L631-L631) with a single `Object.assign({}, wsValues, imageData || {}, virtualDataState[0] || {})`:
+The NeoMind platform provides two data channels for each device component:
+
+1. **WebSocket push** — high-frequency small data (battery, temperature, ts), multiple times per second
+2. **REST polling** — low-frequency large data (image base64 / URL, inference results), at second-level intervals.
+
+ne101_camera merges the three streams at [`bundle.js` L631`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L631-L631) with a single `Object.assign({}, wsValues, imageData || {}, virtualDataState[0] || {})`:
 
 ```js
     // Merge: WS values as base (real-time small metrics), REST image data overlay, virtual metrics
@@ -421,11 +460,23 @@ The NeoMind platform provides two data channels for each device component: (1) *
 
 Source: [`bundle.js` L630-L636`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L630-L636)
 
-The merge order is strictly **WS-base → REST-overlay → virtual** — WS provides the baseline of real-time small metrics, REST overlays the image field with the latest image, and virtual data (Transform output of detections) covers detection-related fields last. This order seems obvious, but both commit [`b0be12b`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/b0be12b) (initial fetch on mount) and commit [`0eedd27`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/0eedd27) (update virtual data on WS-triggered REST fetch) fixed timing bugs related to merge order.
+**The merge order is strictly WS-base → REST-overlay → virtual** — WS provides the baseline of real-time small metrics, REST overlays the image field with the latest image, and virtual data (Transform output of detections) covers detection-related fields last.
 
-The most common failure mode is "**WS arrives first, REST later**": on component mount, the platform immediately starts pushing WS data (battery, temperature), but the REST fetch takes hundreds of milliseconds to return the first image. If the merge order is reversed (REST-base → WS-overlay), WS's small metrics will overlay REST's image field (because both use the `ts` field), resulting in a first screen with metrics but no image. `b0be12b` fixed exactly this — it actively triggers a REST fetch on mount instead of passively waiting for the platform's polling schedule, getting the image field into `imageData` state early. Another failure is "**virtual data lags behind the image**": inference is slower than image updates, the new image is already displayed, but the detection result still corresponds to the previous frame — this pit is solved in 7.5 with `source_ts`, but the prerequisite is that virtual data must be the **last layer** in the merge, otherwise WS's `ts` update arrives before virtual's `source_ts`, breaking alignment. `0eedd27` fixed this: after a WS-triggered REST fetch completes, the virtual data state must be **refreshed synchronously**, not waiting for the next Transform cycle.
+This order seems obvious, but both commit [`b0be12b`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/b0be12b) (initial fetch on mount) and commit [`0eedd27`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/0eedd27) (update virtual data on WS-triggered REST fetch) fixed timing bugs related to merge order.
 
-The test matrix covers pairwise combinations of the three channels: (a) WS-only (has ts and small metrics, no image) → REST fetch fills the image field; (b) REST-only (complete data but stale ts) → WS's ts update triggers a fresh REST fetch; (c) WS+REST both present → merged result agrees on the `ts` field; (d) adding virtual data → detection fields covered by virtual, image fields unchanged from REST. The last assertion is critical: **virtual data must not overlay the image field** (otherwise a low-resolution inference thumbnail replaces the original HD image), which requires virtual data's field set to be "detection-exclusive" (`detections` / `roi_count` / `texts` / `inference_time_ms` / `source_ts`) with no collision against image fields. Commit [`c4fe7bf`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/c4fe7bf) added another guard: `rawImageSrc` must be of type `string` (L636), preventing non-image metrics (numbers / objects) pushed by WS from being mistaken for image sources and crashing `.indexOf()`.
+**The most common failure mode** is "**WS arrives first, REST later**": on component mount, the platform immediately starts pushing WS data (battery, temperature), but the REST fetch takes hundreds of milliseconds to return the first image.
+
+If the merge order is reversed (REST-base → WS-overlay), WS's small metrics will overlay REST's image field (because both use the `ts` field), resulting in a first screen with metrics but no image. `b0be12b` fixed exactly this — it actively triggers a REST fetch on mount instead of passively waiting for the platform's polling schedule, getting the image field into `imageData` state early.
+
+**Another failure** is "**virtual data lags behind the image**": inference is slower than image updates, the new image is already displayed, but the detection result still corresponds to the previous frame — this pit is solved in 7.5 with `source_ts`, but the prerequisite is that virtual data must be the **last layer** in the merge, otherwise WS's `ts` update arrives before virtual's `source_ts`, breaking alignment.
+
+`0eedd27` fixed this: after a WS-triggered REST fetch completes, the virtual data state must be **refreshed synchronously**, not waiting for the next Transform cycle.
+
+**The test matrix covers pairwise combinations of the three channels**: (a) WS-only (has ts and small metrics, no image) → REST fetch fills the image field; (b) REST-only (complete data but stale ts) → WS's ts update triggers a fresh REST fetch; (c) WS+REST both present → merged result agrees on the `ts` field; (d) adding virtual data → detection fields covered by virtual, image fields unchanged from REST.
+
+The last assertion is critical: **virtual data must not overlay the image field** (otherwise a low-resolution inference thumbnail replaces the original HD image), which requires virtual data's field set to be "detection-exclusive" (`detections` / `roi_count` / `texts` / `inference_time_ms` / `source_ts`) with no collision against image fields.
+
+Commit [`c4fe7bf`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/c4fe7bf) added another guard: `rawImageSrc` must be of type `string` (L636), preventing non-image metrics (numbers / objects) pushed by WS from being mistaken for image sources and crashing `.indexOf()`.
 
 ```mermaid
 graph LR
@@ -462,6 +513,10 @@ graph LR
 - **Rationale**: fixed order makes the merge result a **deterministic function of inputs** — given the three streams' contents, the merge result is unique. This enables the 7.5 `source_ts` alignment (if merge order were nondeterministic, `source_ts` and `imgTs` could come from different streams and never align). The fix experience from commits `b0be12b` + `0eedd27` shows that any optimization breaking this order (e.g., "whoever arrives first wins") introduces hard-to-reproduce timing bugs.
 - **Cost**: if a stream's data is wrong (e.g., WS pushes an incorrect `ts`), the wrong field propagates through the fixed order to the merge result. This requires each stream's "self-cleaning" logic (WS's ts must be a number, REST's imageUrl must be a string) to complete before entering `Object.assign`, not relying on post-merge guards.
 
+:::tip Best Practice
+For multi-channel data merging, a fixed `Object.assign` order (rather than last-writer-wins) makes the merge result a deterministic function of inputs. Each stream must complete its self-cleaning (type validation, field filtering) before entering the merge, not relying on post-merge guards. The experience from commits `b0be12b` + `0eedd27` shows: any "whoever arrives first wins" optimization introduces hard-to-reproduce timing bugs.
+:::
+
 ---
 
 ## Design Decisions Summary
@@ -477,7 +532,13 @@ The 6 design decisions on this page are summarized below, each with the "choice 
 | **source_ts alignment** | strict matching — display only when `String(vSourceTs) === String(imgTs)` ([`L858-L874`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L858-L874), commit [`e3a70be`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/e3a70be) JSON string parsing) | best-effort / always-show-last | In industrial vision, "misaligned detection" is more harmful than "temporarily no detection"; ghost boxes cause user misjudgment |
 | **WS+REST merge order** | fixed three-layer `Object.assign({}, ws, rest, virtual)` ([`L631`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L631-L631), commits [`b0be12b`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/b0be12b) + [`0eedd27`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/0eedd27) + [`c4fe7bf`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/c4fe7bf)) | last-writer-wins | Fixed order makes the merge a deterministic function of inputs, which is the prerequisite for source_ts alignment; last-writer-wins is unpredictable |
 
-The common theme across these 6 decisions is "**determinism first**". Whether it's shape assertion in tests (verify shape, not implementation), the ROI parametric matrix (deterministic boundary coverage), exhaustive extension switching (deterministic path coverage), strict source_ts matching (deterministic display logic), or fixed merge order (deterministic merge function), each decision trades "flexible but error-prone" for "**predictable, reproducible, enumerable**". This engineering philosophy is continuous with the IIFE pattern's own "zero-build, zero-dependency, zero-hidden-behavior" principle — without any runtime tools (type checker, linter, bundler) as a safety net, determinism is the only line of defense.
+The common theme across these 6 decisions is "**determinism first**". Whether it's shape assertion in tests (verify shape, not implementation), the ROI parametric matrix (deterministic boundary coverage), exhaustive extension switching (deterministic path coverage), strict source_ts matching (deterministic display logic), or fixed merge order (deterministic merge function), each decision trades "flexible but error-prone" for "**predictable, reproducible, enumerable**".
+
+This engineering philosophy is continuous with the IIFE pattern's own "zero-build, zero-dependency, zero-hidden-behavior" principle — without any runtime tools (type checker, linter, bundler) as a safety net, determinism is the only line of defense.
+
+:::tip Engineering Lesson
+Under the IIFE pattern with no type checker, linter, or bundler as a safety net, "determinism" is the only line of defense. The common pattern across 6 design decisions: replacing "flexible but error-prone" with "predictable, reproducible, enumerable" — shape assertion verifies shape only, parametric matrix covers all boundaries, exhaustive directed complete graph misses no combinations, strict timestamp matching rejects ghosts, fixed merge order eliminates races.
+:::
 
 ### Key commit index
 

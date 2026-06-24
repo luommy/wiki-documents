@@ -48,7 +48,9 @@ graph TB
     RERENDER --> BADGES
 ```
 
-**为什么这条管线是 effect-driven 的**：ne101_camera 是 NeoMind 平台的「React-in-IIFE」组件（见 [2.1](./2-architecture.md)），它没有 Redux / Zustand 这类外部状态管理，所有跨帧状态都用 `React.useState` + `React.useRef` 管理。React 的核心心智模型就是「UI = f(state)」——只要 state 变了，渲染函数就会重跑。组件把 WS 推送、REST 回填、图像 `onLoad`、ResizeObserver 回调都接到了 `setState` 上，每一次外部事件都通过 state 变更驱动一次完整的重渲染。这种模式的代价是：没有虚拟 DOM diffing 的优化空间（每次都全量重算 `ovTf` 和 detections 映射），但因为单组件的 DOM 节点数在 50 以内（一个 `<svg>` + N 个 `<g>`），全量重渲染的开销可以忽略。真正昂贵的是 `neomind.createTransform` 这类异步 API 调用，它们被严格限制在 effect 里、用 `cancelled` 标志位做取消保护（见 [`bundle.js` L709](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L709-L709)）。
+**为什么这条管线是 effect-driven 的**：ne101_camera 是 NeoMind 平台的「React-in-IIFE」组件（见 [2.1](./2-architecture.md)），它没有 Redux / Zustand 这类外部状态管理，所有跨帧状态都用 `React.useState` + `React.useRef` 管理。React 的核心心智模型就是「UI = f(state)」——只要 state 变了，渲染函数就会重跑。组件把 WS 推送、REST 回填、图像 `onLoad`、ResizeObserver 回调都接到了 `setState` 上，每一次外部事件都通过 state 变更驱动一次完整的重渲染。
+
+这种模式的代价是：没有虚拟 DOM diffing 的优化空间（每次都全量重算 `ovTf` 和 detections 映射），但因为单组件的 DOM 节点数在 50 以内（一个 `<svg>` + N 个 `<g>`），全量重渲染的开销可以忽略。真正昂贵的是 `neomind.createTransform` 这类异步 API 调用，它们被严格限制在 effect 里、用 `cancelled` 标志位做取消保护（见 [`bundle.js` L709](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L709-L709)）。
 
 ```js
       var payload = Object.assign({}, tplCfg, {
@@ -96,7 +98,9 @@ Source: [`bundle.js` L704-L714](https://github.com/camthink-ai/NeoMind-Dashboard
 Source: [`bundle.js` L55-L72](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L55-L72)
 
 1. **字符串哈希（L58-L59）**：用经典的 `h = ((h << 5) - h + charCodeAt(i)) | 0` 累加器对 label 字符串做哈希。这是一个 32 位整数哈希，位移 5 + 减自身等价于乘以 31（`((h << 5) - h) = h * 31`），是 Java `String.hashCode()` 的同款算法。`| 0` 把结果截断成 32 位有符号整数。
-2. **黄金角旋转（L60）**：`hue = (Math.abs(h) * 137.508) % 360`。137.508° 是黄金角（golden angle），即圆周角按黄金比例分割后的较短弧。把哈希值乘以黄金角再 mod 360，等价于在色相环上按黄金比例步进取色——这是数学上让任意数量点在圆周上「最大化最小间距」的最优策略。同一个 label 永远哈希到同一个色相（纯函数，无副作用），而不同 label 即使哈希值只差 1，色相也会差 137.508°，视觉上几乎不可能撞色。
+2. **黄金角旋转（L60）**：`hue = (Math.abs(h) * 137.508) % 360`。137.508° 是黄金角（golden angle），即圆周角按黄金比例分割后的较短弧。把哈希值乘以黄金角再 mod 360，等价于在色相环上按黄金比例步进取色——这是数学上让任意数量点在圆周上「最大化最小间距」的最优策略。
+
+   同一个 label 永远哈希到同一个色相（纯函数，无副作用），而不同 label 即使哈希值只差 1，色相也会差 137.508°，视觉上几乎不可能撞色。
 3. **HSV → RGB（L61-L71）**：固定 `s = 0.78, v = 0.95`（饱和度和明度），用六段分段函数把 HSV 转成 RGB，最后返回 `rgba(r,g,b,α)` 三件套：`stroke`（描边，α=0.85）、`fill`（填充，α=0.08）、`text`（标签文字，α=0.95）。透明度的梯度让检测框在图像上既有可辨识的轮廓（描边深），又不会大面积遮挡图像内容（填充浅）。
 
 在 `c276c23` 之前，检测框的颜色经历了两次迭代。最早是固定蓝色（`#3b82f6` 系），后来 commit [`3cf1b27`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/3cf1b27)（`style(ne101): change detection box and label color from blue to red`）改成固定红色——但固定色在多类别场景下完全无法区分目标。黄金角 HSV 的引入彻底解决了这个问题：COCO 80 类、甚至 OpenImages 级别的 500+ 类都能得到视觉可分的色相。
@@ -107,6 +111,10 @@ Source: [`bundle.js` L55-L72](https://github.com/camthink-ai/NeoMind-Dashboard-C
 - **备选方案 A**：固定调色板（如 `['#ef4444', '#3b82f6', '#10b981', ...]`，按类别 index 取色）。否决理由：调色板长度固定（通常 10-20 色），第 N 个类别（N > 调色板长度）会回绕到第一个颜色，多类别场景下颜色重复；且需要维护「类别 → index」的映射表，跨帧跨设备无法保证一致性。
 - **备选方案 B**：随机色（`Math.random()`）。否决理由：同一类别每次渲染都换颜色，视觉闪烁严重，用户无法建立「这个颜色 = 这个类别」的肌肉记忆。
 - **理由**：黄金角旋转在数学上保证了任意类别数的色相最大化分散；纯函数哈希保证了跨帧一致性；零配置（不需要预设调色板）。代价是 HSV 空间不是感知均匀的（蓝色区域人眼区分度低），但实测在 ≤ 50 类的场景下效果可接受。
+
+:::tip 工程教训
+按类别上色时，**纯函数哈希 + 黄金角旋转**是优于固定调色板和随机色的选择：保证跨帧一致性（纯函数），支持无限类别数（黄金角），零配置（不需要维护映射表）。
+:::
 
 ---
 
@@ -162,7 +170,9 @@ Source: [`bundle.js` L1210-L1272](https://github.com/camthink-ai/NeoMind-Dashboa
 
 **Rect fallback（L1238-L1252）**：当只有 `det.bbox`（4 元素数组 `[x1, y1, x2, y2]`）时，渲染 `<rect>`。这是 object detection 场景（`objects_bbox` / `detections_bbox` responseType）的标准矩形框。bbox 的四个坐标值分别经过 `ovTf` 变换后，拼成 `<rect>` 的 `x / y / width / height`。
 
-**顶点格式兼容（L1227-L1228）**：commit [`403c0f1`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/403c0f1)（`fix(ne101): handle {x,y} object format for OCR polygon detection boxes`）修复了一个关键的格式兼容问题。OCR 扩展返回的 polygon 顶点有两种格式：`[x, y]` 数组对（COCO 格式）和 `{x, y}` 对象（PaddleOCR 原生格式）。L1227-L1228 用 `Array.isArray(p) ? p[0] : p.x` 做了双格式探测——如果顶点是数组就取下标 0/1，如果是对象就取 `.x / .y` 属性。这个兼容层在 polygon 模式（L1227-L1228）和标签定位（L1257-L1258）都出现了一次，确保两种格式的顶点都能正确映射到 SVG 坐标。
+**顶点格式兼容（L1227-L1228）**：commit [`403c0f1`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/403c0f1)（`fix(ne101): handle {x,y} object format for OCR polygon detection boxes`）修复了一个关键的格式兼容问题。OCR 扩展返回的 polygon 顶点有两种格式：`[x, y]` 数组对（COCO 格式）和 `{x, y}` 对象（PaddleOCR 原生格式）。
+
+L1227-L1228 用 `Array.isArray(p) ? p[0] : p.x` 做了双格式探测——如果顶点是数组就取下标 0/1，如果是对象就取 `.x / .y` 属性。这个兼容层在 polygon 模式（L1227-L1228）和标签定位（L1257-L1258）都出现了一次，确保两种格式的顶点都能正确映射到 SVG 坐标。
 
 **标签渲染（L1254-L1267）**：标签文字（`detLabel + detConf`）定位在检测框的第一个顶点或 bbox 左上角，垂直方向上偏移 -1.5（SVG 单位，即 viewBox 100 中的 1.5%）。标签用 `classColor` 返回的 `text` 颜色（α=0.95），monospace 字体加粗，确保在复杂背景图像上仍然可读。标签内容是 `label + confidence%`，例如 `person 95%`。
 
@@ -184,7 +194,9 @@ commit [`b746c02`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/c
 
 ## object-cover 坐标变换
 
-检测框的坐标是**归一化到图像空间的**（0-1 表示相对于原始图像宽高的比例），但图像在 DOM 里是用 `object-cover` 渲染的——图像会被缩放以完全覆盖容器，多余的部分被裁剪。这意味着图像的可见区域只是原始图像的一个子集，检测框坐标必须经过一个变换才能正确叠加在可见区域上。这个变换就是 `ovTf`，计算逻辑在 [`bundle.js` L879-L899](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L879-L899)。
+检测框的坐标是**归一化到图像空间的**（0-1 表示相对于原始图像宽高的比例），但图像在 DOM 里是用 `object-cover` 渲染的——图像会被缩放以完全覆盖容器，多余的部分被裁剪。这意味着图像的可见区域只是原始图像的一个子集，检测框坐标必须经过一个变换才能正确叠加在可见区域上。
+
+这个变换就是 `ovTf`，计算逻辑在 [`bundle.js` L879-L899](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L879-L899)。
 
 ```js
     // Object-cover transform: map normalized image coords (0-1) to container coords (0-1)
@@ -214,7 +226,9 @@ Source: [`bundle.js` L879-L899](https://github.com/camthink-ai/NeoMind-Dashboard
 - **图像宽高比 > 容器宽高比（L888-L894）**：图像比容器「更宽」，缩放后图像的两侧被裁剪，容器只显示图像中间的一段宽度。此时 `sy = 1`（纵向不缩放），`sx = (cH / iH * iW) / cW`（横向缩放，因为图像被压缩到了更窄的容器宽度上），`ox = (1 - sx) / 2`（横向偏移，让裁剪居中），`oy = 0`。
 - **图像宽高比 ≤ 容器宽高比（L895-L898）**：图像比容器「更高」，缩放后图像的上下被裁剪。此时 `sx = 1`（横向不缩放），`sy = (cW / iW * iH) / cH`（纵向缩放），`oy = (1 - sy) / 2`（纵向偏移），`ox = 0`。
 
-这个变换在渲染时被应用到每一个检测框的每一个坐标上：polygon 顶点在 [L1185-L1187](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1185-L1187)（ROI 多边形）和 [L1229-L1230](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1229-L1230)（检测框 polygon），bbox 四角在 [L1241-L1244](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1241-L1244)，标签位置在 [L1259-L1260](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1259-L1260)。变换公式统一是 `tx = (px * ovTf.sx + ovTf.ox) * 100`（乘以 100 是因为 SVG viewBox 是 100x100）。
+这个变换在渲染时被应用到每一个检测框的每一个坐标上：polygon 顶点在 [L1185-L1187](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1185-L1187)（ROI 多边形）和 [L1229-L1230](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1229-L1230)（检测框 polygon），bbox 四角在 [L1241-L1244](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1241-L1244)，标签位置在 [L1259-L1260](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1259-L1260)。
+
+变换公式统一是 `tx = (px * ovTf.sx + ovTf.ox) * 100`（乘以 100 是因为 SVG viewBox 是 100x100）。
 
 以检测框 polygon 顶点为例：
 
@@ -292,7 +306,9 @@ hasImage
 
 Source: [`bundle.js` L1153-L1168](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1153-L1168)
 
-容器尺寸通过 ResizeObserver 监听媒体 `<div>` 的尺寸变化写入。但这里有一个 React 的经典陷阱：**媒体 `<div>` 是条件渲染的**——只有当 `hasImage` 为 true 时才挂载（[L1153-L1156](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1153-L1156)），而图像是异步到达的（WS 推送或 REST 回填）。这意味着组件首次渲染时媒体 `<div>` 还不存在，一个普通的 `useEffect(() => { new ResizeObserver(mediaRef.current) }, [])` 会拿到 `mediaRef.current === null`，ResizeObserver 永远不会被挂载。
+容器尺寸通过 ResizeObserver 监听媒体 `<div>` 的尺寸变化写入。但这里有一个 React 的经典陷阱：**媒体 `<div>` 是条件渲染的**——只有当 `hasImage` 为 true 时才挂载（[L1153-L1156](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1153-L1156)），而图像是异步到达的（WS 推送或 REST 回填）。
+
+这意味着组件首次渲染时媒体 `<div>` 还不存在，一个普通的 `useEffect(() => { new ResizeObserver(mediaRef.current) }, [])` 会拿到 `mediaRef.current === null`，ResizeObserver 永远不会被挂载。
 
 commit [`d7836b8`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/d7836b8)（`fix(ne101_camera): ResizeObserver never set up when image loads async`）就是修这个问题的。修复方案是 **callback ref 模式**，位于 [`bundle.js` L534-L548](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L534-L548)：
 
@@ -313,7 +329,9 @@ if (!cbRef.current) {
 }
 ```
 
-这段代码的关键在于 `cbRef.current` 是一个**函数**（不是 ref 对象），作为 `ref={cbRef.current}` 传给媒体 `<div>`（[L1156](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1156-L1156)）。React 对函数类型的 ref 有特殊处理：当 DOM 元素挂载时，React 调用这个函数并传入元素；当元素卸载时，React 调用这个函数并传入 `null`。这正好解决了「异步挂载」的问题——无论媒体 `<div>` 什么时候出现，callback ref 都会被调用，ResizeObserver 都会被正确挂载。
+这段代码的关键在于 `cbRef.current` 是一个**函数**（不是 ref 对象），作为 `ref={cbRef.current}` 传给媒体 `<div>`（[L1156](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1156-L1156)）。
+
+React 对函数类型的 ref 有特殊处理：当 DOM 元素挂载时，React 调用这个函数并传入元素；当元素卸载时，React 调用这个函数并传入 `null`。这正好解决了「异步挂载」的问题——无论媒体 `<div>` 什么时候出现，callback ref 都会被调用，ResizeObserver 都会被正确挂载。
 
 callback 内部的逻辑三步走：
 
@@ -460,7 +478,9 @@ Source: [`bundle.js` L661-L824](https://github.com/camthink-ai/NeoMind-Dashboard
 
 **预览守卫（L653/L663）**：`_isPreview = typeof props.onConfigChange !== 'function'`——如果组件渲染在配置对话框的预览区（没有 `onConfigChange` 回调），直接 return，不操作 Transform。这防止了「用户在配置面板里调参数时，每次调一下就创建/删除一个 Transform」的灾难。
 
-**Tier 1（L722-L742）：ID + 哈希匹配 → 验证存在**。当存储的 `_transformId` 存在且 `_storedHash === _configHash` 时，说明配置没变，理论上 Transform 应该还在。但后端的 Transform 可能被外部删除（用户在另一个页面手动删了、或主控清理了过期实体），所以 Tier 1 会调用 `neomind.listTransforms({ id: _storedTid })` 验证它是否真的存在（L727-L739）。commit [`ac06344`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/ac06344)（`fix(ne101): verify stored Transform exists in Tier 1`）就是这个验证逻辑的引入点——在它之前，Tier 1 只检查哈希匹配就认为 Transform 存在，但外部删除会导致组件「以为 Transform 还在」却永远收不到检测结果。
+**Tier 1（L722-L742）：ID + 哈希匹配 → 验证存在**。当存储的 `_transformId` 存在且 `_storedHash === _configHash` 时，说明配置没变，理论上 Transform 应该还在。但后端的 Transform 可能被外部删除（用户在另一个页面手动删了、或主控清理了过期实体），所以 Tier 1 会调用 `neomind.listTransforms({ id: _storedTid })` 验证它是否真的存在（L727-L739）。
+
+commit [`ac06344`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/ac06344)（`fix(ne101): verify stored Transform exists in Tier 1`）就是这个验证逻辑的引入点——在它之前，Tier 1 只检查哈希匹配就认为 Transform 存在，但外部删除会导致组件「以为 Transform 还在」却永远收不到检测结果。
 
 **Tier 2（L744-L763）：有 ID 但哈希不同 → 更新**。当 `_transformId` 存在但配置变了（`_storedHash !== _configHash`），调用 `neomind.updateTransform(activeId, { js_code, ... })` 更新 Transform 的代码。更新成功后持久化新的 `_transformHash`。
 
@@ -529,7 +549,13 @@ stateDiagram-v2
 | **检测摘要徽章数据源** | 从 virtual metrics 读取（[L1067-L1145](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1067-L1145)） | 从 detections 数组实时聚合 | 避免重复计算，防止逻辑分歧，职责分离（组件只展示不计算） |
 | **Transform 生命周期** | 三级分发 verify/update/create（[L661-L824](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L661-L824)，commit [`ac06344`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/ac06344)） | 总是 delete + create | 避免检测闪烁，保留 metric 连续性，减少 API 调用 |
 
-这 6 个决策的共同主题是：**在前端渲染的每一个「边界」上选择确定性而非便利性**。颜色用纯函数保证一致性、坐标用显式数学保证对齐、监听用 callback ref 保证时序、数据用 metric-driven 保证单一真相源、生命周期用三级分发保证连续性。这种「显式优于隐式」的哲学是 ne101_camera 能在异步图像 + 异步检测 + 动态容器尺寸的复杂交互中保持稳定渲染的根本原因。
+这 6 个决策的共同主题是：**在前端渲染的每一个「边界」上选择确定性而非便利性**。颜色用纯函数保证一致性、坐标用显式数学保证对齐、监听用 callback ref 保证时序、数据用 metric-driven 保证单一真相源、生命周期用三级分发保证连续性。
+
+这种「显式优于隐式」的哲学是 ne101_camera 能在异步图像 + 异步检测 + 动态容器尺寸的复杂交互中保持稳定渲染的根本原因。
+
+:::tip 工程教训
+**在异步渲染管线的每个边界选择确定性而非便利性**：纯函数保证跨帧一致性、显式数学保证坐标对齐、callback ref 保证时序精确。这种「显式优于隐式」的设计哲学是复杂交互中保持稳定的关键。
+:::
 
 ### 关键 commit 索引
 

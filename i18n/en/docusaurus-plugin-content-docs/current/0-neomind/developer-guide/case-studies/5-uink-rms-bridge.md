@@ -17,7 +17,13 @@ sidebar_label: "uink-rms-bridge"
 
 The current version is `2.7.6`, with the core implementation concentrated in a single [`src/lib.rs`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs) file totaling 2250 lines, plus the [`DisplayEditorCard`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/frontend/) React + TypeScript frontend component (entrypoint `uink-rms-bridge-components.umd.cjs`).
 
-**Contrast with [Case 4 onvif-bridge](./4-onvif-bridge.md) (the core narrative axis of this case)**: onvif-bridge is a **standard protocol bridge** (ONVIF is an open specification, universal for any Profile S camera), while uink-rms-bridge is a **vendor-proprietary protocol bridge** (the Uink-RMS cloud API is a closed private interface, only usable with Uink's own devices). The two represent fundamentally different integration strategies in the NeoMind ecosystem: standard protocol bridging follows the "LAN UDP/HTTP direct-to-device + device-level WS-Security auth" path with low evolution risk (standards are stable) and no external cloud dependency; vendor-proprietary bridging follows the "public HTTPS via vendor cloud relay + account-level JWT auth" path with high evolution risk (vendor API v1.0.1 may change) and strong dependency on Uink-RMS cloud availability. Understanding this contrast is key to choosing a NeoMind integration strategy — this series calls 4 / 5 the "bridge twins."
+**Contrast with [Case 4 onvif-bridge](./4-onvif-bridge.md) (the core narrative axis of this case)**: onvif-bridge is a **standard protocol bridge** (ONVIF is an open specification, universal for any Profile S camera), while uink-rms-bridge is a **vendor-proprietary protocol bridge** (the Uink-RMS cloud API is a closed private interface, only usable with Uink's own devices).
+
+The two represent fundamentally different integration strategies in the NeoMind ecosystem: standard protocol bridging follows the "LAN UDP/HTTP direct-to-device + device-level WS-Security auth" path with low evolution risk (standards are stable) and no external cloud dependency.
+
+Vendor-proprietary bridging follows the "public HTTPS via vendor cloud relay + account-level JWT auth" path with high evolution risk (vendor API v1.0.1 may change) and strong dependency on Uink-RMS cloud availability.
+
+Understanding this contrast is key to choosing a NeoMind integration strategy — this series calls 4 / 5 the "bridge twins."
 
 **Three pain points drove this extension's design**:
 
@@ -25,13 +31,19 @@ The current version is `2.7.6`, with the core implementation concentrated in a s
 2. **Markdown → image rendering must happen on the extension side** — Uink-RMS's `POST /api/v1/devices/{id}/image` only accepts JPEG/PNG binary, not text formats, so the entire pipeline of pulldown-cmark parsing + ab_glyph font rendering + imageproc drawing + image crate JPEG encoding is handled by Rust
 3. The vendor cloud has **regional partitioning** — mainland China users must use `https://cn.rms.uink.com`, overseas users use `https://eu.rms.uink.com`, accounts are not interchangeable, and the extension must support regional routing
 
-**Target audience**: (1) Integrators connecting to third-party vendor cloud platforms (especially IoT clouds, display clouds) — you will see the complete closed loop from JWT login to device registration, telemetry pulling, and image push; (2) Developers wanting to understand how NeoMind bridges a "closed system" into the unified device model — uink-rms-bridge is the textbook example of the "wrap a vendor API" pattern. **What "production-verified" means concretely**: this extension went through at least 4 rounds of targeted fixes ([`f4c73cd`](https://github.com/camthink-ai/NeoMind-Extensions/commit/f4c73cd) initial release, [`261d8e6`](https://github.com/camthink-ai/NeoMind-Extensions/commit/261d8e6) flip and data source, [`39587eb`](https://github.com/camthink-ai/NeoMind-Extensions/commit/39587eb) SDK upgrade, [`422ba8d`](https://github.com/camthink-ai/NeoMind-Extensions/commit/422ba8d) security hardening), regression tested across 6 versions (v2.7.0 → v2.7.6), and is currently deployed in production.
+**Target audience**: (1) Integrators connecting to third-party vendor cloud platforms (especially IoT clouds, display clouds) — you will see the complete closed loop from JWT login to device registration, telemetry pulling, and image push. (2) Developers wanting to understand how NeoMind bridges a "closed system" into the unified device model — uink-rms-bridge is the textbook example of the "wrap a vendor API" pattern.
+
+**What "production-verified" means concretely**: this extension went through at least 4 rounds of targeted fixes ([`f4c73cd`](https://github.com/camthink-ai/NeoMind-Extensions/commit/f4c73cd) initial release, [`261d8e6`](https://github.com/camthink-ai/NeoMind-Extensions/commit/261d8e6) flip and data source, [`39587eb`](https://github.com/camthink-ai/NeoMind-Extensions/commit/39587eb) SDK upgrade, [`422ba8d`](https://github.com/camthink-ai/NeoMind-Extensions/commit/422ba8d) security hardening), regression tested across 6 versions (v2.7.0 -> v2.7.6), and is currently deployed in production.
 
 ---
 
 ## Architecture Overview
 
-uink-rms-bridge is a **full-stack vendor bridge extension** — the backend is a 2250-line `lib.rs` (Rust cdylib), and the frontend is `DisplayEditorCard` (React 18 + Vite + TypeScript UMD bundle). The backend communicates with the Uink-RMS regional cloud via synchronous HTTPS using ureq, and the frontend provides users with Markdown editing + real-time preview canvas. At runtime, after NeoMind Runtime loads the `.nep` package, the extension exposes 7 commands (sync_devices / list_devices / push_content / push_image / get_display_size / get_display / refresh_auth) through the Extension trait, with command routing dispatched centrally by [`execute_command`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L1445-L1475). All runtime state is protected by `parking_lot::RwLock`, including `config: RwLock<UinkConfig>`, `access_token: RwLock<Option<String>>`, and the device ID mapping `neo_to_rms_id: RwLock<HashMap<String, String>>`.
+uink-rms-bridge is a **full-stack vendor bridge extension** — the backend is a 2250-line `lib.rs` (Rust cdylib), and the frontend is `DisplayEditorCard` (React 18 + Vite + TypeScript UMD bundle). The backend communicates with the Uink-RMS regional cloud via synchronous HTTPS using ureq, and the frontend provides users with Markdown editing + real-time preview canvas.
+
+At runtime, after NeoMind Runtime loads the `.nep` package, the extension exposes 7 commands (sync_devices / list_devices / push_content / push_image / get_display_size / get_display / refresh_auth) through the Extension trait, with command routing dispatched centrally by [`execute_command`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L1445-L1475).
+
+All runtime state is protected by `parking_lot::RwLock`, including `config: RwLock<UinkConfig>`, `access_token: RwLock<Option<String>>`, and the device ID mapping `neo_to_rms_id: RwLock<HashMap<String, String>>`.
 
 ```mermaid
 graph TB
@@ -657,9 +669,17 @@ Uink-RMS service outage = extension completely unusable (cannot login, cannot pu
 
 ### Source Code Hygiene Anti-Pattern: Single File 2250 Lines
 
-uink-rms-bridge's `src/` directory contains **only `lib.rs`, totaling 2250 lines** (verified with `ls src/`: only `lib.rs`, no `discovery.rs` / `soap_client.rs` splits, no `.bak` backups). This is an **anti-pattern of single-file mega-extensions** — 2250 lines in one file hurts readability, and new contributors struggle to locate code (finding `cmd_push_content` requires scrolling to L1884). Contrast with [Case 4 onvif-bridge](./4-onvif-bridge.md) which splits the protocol into 5 files (lib.rs 1646 lines + discovery.rs 211 lines + soap_client.rs 516 lines + ptz.rs 214 lines + types.rs 78 lines), each with single responsibility and manageable line count.
+uink-rms-bridge's `src/` directory contains **only `lib.rs`, totaling 2250 lines** (verified with `ls src/`: only `lib.rs`, no `discovery.rs` / `soap_client.rs` splits, no `.bak` backups). This is an **anti-pattern of single-file mega-extensions** — 2250 lines in one file hurts readability, and new contributors struggle to locate code (finding `cmd_push_content` requires scrolling to L1884).
 
-**When to split? When is a single file acceptable?** uink-rms-bridge's rationale for a single file: all its logic revolves around a **single vendor cloud API** (Uink-RMS v1.0.1), where auth / device / image / display are just different endpoints of the same API, highly cohesive, and splitting would increase cross-file navigation cost. While onvif-bridge is **multiple independent protocol stacks** (WS-Discovery is UDP multicast, SOAP is HTTP, PTZ is command encapsulation), naturally separable. Rule of thumb: if modules share little state and few types (like WS-Discovery and SOAP), split; if all modules revolve around the same external API's different endpoints (like uink's auth + device + image), a single file is acceptable, but use `// ===` comment dividers (this extension does, see [L40](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L40), [L161](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L161), [L231](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L231), etc.).
+Contrast with [Case 4 onvif-bridge](./4-onvif-bridge.md) which splits the protocol into 5 files (lib.rs 1646 lines + discovery.rs 211 lines + soap_client.rs 516 lines + ptz.rs 214 lines + types.rs 78 lines), each with single responsibility and manageable line count.
+
+:::tip Engineering lesson
+**When to split? When is a single file acceptable?** uink-rms-bridge's rationale for a single file: all its logic revolves around a **single vendor cloud API** (Uink-RMS v1.0.1), where auth / device / image / display are just different endpoints of the same API, highly cohesive, and splitting would increase cross-file navigation cost.
+
+While onvif-bridge is **multiple independent protocol stacks** (WS-Discovery is UDP multicast, SOAP is HTTP, PTZ is command encapsulation), naturally separable.
+
+Rule of thumb: if modules share little state and few types (like WS-Discovery and SOAP), split; if all modules revolve around the same external API's different endpoints (like uink's auth + device + image), a single file is acceptable, but use `// ===` comment dividers (this extension does, see [L40](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L40), [L161](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L161), [L231](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L231), etc.).
+:::
 
 ### Troubleshooting Table
 

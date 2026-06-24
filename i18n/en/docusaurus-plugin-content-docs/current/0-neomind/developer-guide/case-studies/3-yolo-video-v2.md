@@ -11,11 +11,20 @@ sidebar_label: "yolo-video-v2"
 
 **yolo-video-v2** is the **most complex streaming extension** in the NeoMind ecosystem. It mounts an Ultralytics YOLOv11 object-detection model onto a live video stream and supports three input sources (RTSP/RTMP/HLS network streams, local cameras, and front-end base64 frame pushes). In Push mode it continuously pushes JPEG frames with detection overlays plus structured detection JSON back to the front end.
 
-It also ships business features such as ROI region counting, line-crossing counting, and smart-capture rules (threshold/presence/absence triggers). The current version is 2.7.6; the core code is about 2829 lines of Rust (`src/lib.rs`) plus 721 lines (`src/detector.rs`) and 387 lines (`src/video_source.rs`). It is the single largest crate in this series and the only extension that exercises the full SDK chain of `StreamCapability` + `StreamMode::Push` + the `send_push_output` FFI.
+**Business features** include ROI region counting, line-crossing counting, and smart-capture rules (threshold/presence/absence triggers).
 
-**What problem does it solve?** NeoMind's synchronous capability bridge (see [Case #2](./2-yolo-device-inference.md)) is designed for "event-driven + single-frame inference" — you run YOLO once when a device's image metric updates. But video analytics is a "continuous frame stream": an RTSP camera produces 25-30 frames per second, and every frame needs inference, statistics, and visualization. If you polled via the synchronous bridge, you would issue 30 cross-process calls per second, which is unacceptable in both latency and overhead.
+The current version is 2.7.6; the core code is about 2829 lines of Rust (`src/lib.rs`) plus 721 lines (`src/detector.rs`) and 387 lines (`src/video_source.rs`). It is the single largest crate in this series and the only extension that exercises the full SDK chain of `StreamCapability` + `StreamMode::Push` + the `send_push_output` FFI.
 
-yolo-video-v2 solves this with Push mode: the extension spawns a dedicated OS thread to run the frame loop in `init_session`, and each frame is pushed directly into the SDK's output channel via the `send_push_output` FFI. The `UnifiedExtensionService` then relays it to the front-end WebSocket, never blocking the runtime's main thread.
+**What problem does it solve?** NeoMind's synchronous capability bridge (see [Case #2](./2-yolo-device-inference.md)) is designed for "event-driven + single-frame inference" — you run YOLO once when a device's image metric updates.
+
+But video analytics is a **continuous frame stream**: an RTSP camera produces 25-30 frames per second, and every frame needs inference, statistics, and visualization. If you polled via the synchronous bridge, you would issue 30 cross-process calls per second, which is unacceptable in both latency and overhead.
+
+yolo-video-v2 solves this with **Push mode**:
+
+- The extension spawns a dedicated OS thread to run the frame loop in `init_session`
+- Each frame is pushed directly into the SDK's output channel via the `send_push_output` FFI
+- The `UnifiedExtensionService` then relays it to the front-end WebSocket
+- The runtime's main thread is never blocked
 
 **Key differences from yolo-device-inference** (this is the most important comparison for understanding this case):
 
@@ -631,7 +640,11 @@ The contract is "JPEG frame + JSON metadata pushed in parallel" — fundamentall
 
 ### Cooperation with the stream-player extension
 
-Commit `c41e6a6` introduced `stream-player`, a pure player extension (no detection) useful for debugging whether an RTSP source is reachable. When troubleshooting yolo-video-v2, you can first verify the source with stream-player, then switch to yolo-video-v2 to add detection — this avoids the "is the stream broken or the detection broken?" ambiguity.
+Commit `c41e6a6` introduced `stream-player`, a pure player extension (no detection) useful for debugging whether an RTSP source is reachable.
+
+:::tip Troubleshooting best practice
+When troubleshooting yolo-video-v2, first use stream-player to verify the stream source is healthy, then switch to yolo-video-v2 to add detection — this avoids the confusion of "is the stream broken or is the detection broken?"
+:::
 
 ---
 
@@ -754,6 +767,10 @@ This is the biggest deployment pain point; each platform has its own trap:
 
 `setup_native_lib_paths` ([`src/detector.rs` L63-L80](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/yolo-video-v2/src/detector.rs#L63-L80)) checks `NEOMIND_EXTENSION_DIR/lib/` and system paths, appending the dylib directory to the appropriate environment variable.
 
+:::note Cross-platform dylib troubleshooting
+Each platform has different pitfalls: Linux's `libonnxruntime.so.N` versioned symlink needs manual creation; Windows's DLL must be added to PATH; macOS's `DYLD_LIBRARY_PATH` set at runtime via `set_var` may be blocked by SIP. Always test model loading on the target platform before deployment.
+:::
+
 ### Persistent "Connecting" overlay bug
 
 Commit `261d8e6` fixed a front-end UX bug: the stream was already pushing frames but the front end kept showing a "Connecting" overlay. The root cause was that the front-end state machine did not correctly handle the first frame event after `start_push`. This bug illustrates that Push mode's front-end contract is more complex than Pull mode's — the front end must maintain an independent connection state machine in addition to consuming data.
@@ -764,11 +781,15 @@ Commit `60e4e5b` upgraded ffmpeg-next from v7 to v8 (note: the current `Cargo.to
 
 ### Source-hygiene anti-pattern
 
-**The extension's `src/` directory contains multiple backup files**: `detector.rs.backup`, `detector.rs.bak`, `lib.rs.backup`, `lib.rs.backup2`, plus root-level `Cargo.toml.bak` and `frontend/src/index.tsx.bak`. This is a **source-governance anti-pattern** — backup files should never be committed. Git itself is the version-management system; `git log` / `git diff` can show any historical version, and `git stash` can hold unfinished work. Committing `.bak` / `.backup` / `.backup2` files causes:
+**The extension's `src/` directory contains multiple backup files**: `detector.rs.backup`, `detector.rs.bak`, `lib.rs.backup`, `lib.rs.backup2`, plus root-level `Cargo.toml.bak` and `frontend/src/index.tsx.bak`.
 
-1. repository bloat
-2. IDE global search matching stale code and causing confusion
-3. CI / linters potentially compiling backup files by mistake.
+:::warning Source-governance anti-pattern
+Backup files should never be committed to a repository. Git itself is the version-management system; `git log` / `git diff` can show any historical version, and `git stash` can hold unfinished work. Committing `.bak` / `.backup` / `.backup2` files causes:
+
+1. **repository bloat**
+2. **IDE global search** matching stale code and causing confusion
+3. **CI / linters** potentially compiling backup files by mistake
+:::
 
 All deep links in this case study point **only to canonical files** (`src/lib.rs`, `src/detector.rs`, `src/video_source.rs`, `Cargo.toml`, `metadata.json`) and never reference backups. Compared with the 18 backup files in [Case #2](./2-yolo-device-inference.md), yolo-video-v2 has fewer backups but commits the same violation.
 
@@ -822,11 +843,19 @@ If you only care about the SDK's StreamCapability interface design, jump straigh
 
 ### Bridge to ne101_camera
 
-Case 7 ne101_camera (the flagship case) shows how a real camera product simultaneously uses 2 (device-bound inference) and 3 (RTSP streaming analysis) — the ne101 device's image metrics flow through #2's event-driven path, while its RTSP live stream flows through #3's Push path. Understanding this case's `init_session` → `start_push` → frame loop → `send_push_output` chain is a prerequisite for reading #7.
+Case 7 ne101_camera (the flagship case) shows how a real camera product simultaneously uses 2 (device-bound inference) and 3 (RTSP streaming analysis).
+
+:::tip Reading prerequisite
+The ne101 device's image metrics flow through #2's event-driven path, while the ne101 RTSP live stream flows through #3's Push path. Understanding this case's `init_session` -> `start_push` -> frame loop -> `send_push_output` chain is a prerequisite for reading #7.
+:::
 
 ### Summary
 
-yolo-video-v2 is the most engineering-complex extension in the NeoMind ecosystem. It comprehensively demonstrates Push streaming integration with the SDK, multi-backend video source abstraction, ROI/line-crossing/smart-capture business logic, cross-platform ONNX Runtime governance, and front-end MJPEG interplay. Its source also exposes engineering-practice problems (committed backup files, ONNX Runtime memory-leak workarounds) that are equally instructive — knowing where things go wrong is often deeper than knowing how to do them right.
+yolo-video-v2 is the most engineering-complex extension in the NeoMind ecosystem. It comprehensively demonstrates Push streaming integration with the SDK, multi-backend video source abstraction, ROI/line-crossing/smart-capture business logic, cross-platform ONNX Runtime governance, and front-end MJPEG interplay. Its source also exposes engineering-practice problems (committed backup files, ONNX Runtime memory-leak workarounds) that are equally instructive.
+
+:::tip The value of anti-patterns
+**Knowing where things go wrong is often deeper than knowing how to do them right.** Committed backup files and ONNX Runtime memory-leak workarounds may look like "code smells", but they document the constraints and compromises of real engineering environments. Their avoidance and reference value for future projects is no less than that of positive examples.
+:::
 
 ---
 

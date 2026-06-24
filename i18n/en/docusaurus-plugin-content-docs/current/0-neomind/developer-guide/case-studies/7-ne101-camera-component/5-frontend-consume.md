@@ -48,7 +48,13 @@ graph TB
     RERENDER --> BADGES
 ```
 
-**Why this pipeline is effect-driven**: ne101_camera is a "React-in-IIFE" component on the NeoMind platform (see [2.1](./2-architecture.md)). It has no external state management (Redux / Zustand); all cross-frame state is managed with `React.useState` + `React.useRef`. React's core mental model is "UI = f(state)" — whenever state changes, the render function re-runs. The component wires WS pushes, REST backfill, image `onLoad`, and ResizeObserver callbacks all into `setState`, so every external event drives a full re-render through state mutation. The cost of this pattern is the absence of virtual-DOM diffing optimizations (every render recomputes `ovTf` and the detections mapping from scratch), but since a single component's DOM node count stays under 50 (one `<svg>` + N `<g>` elements), the full-rerender overhead is negligible. What is genuinely expensive are async API calls like `neomind.createTransform`; these are strictly confined to effects and guarded by a `cancelled` flag (see [`bundle.js` L709](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L709-L709)).
+**Why this pipeline is effect-driven**: ne101_camera is a "React-in-IIFE" component on the NeoMind platform (see [2.1](./2-architecture.md)). It has no external state management (Redux / Zustand); all cross-frame state is managed with `React.useState` + `React.useRef`.
+
+React's core mental model is "UI = f(state)" — whenever state changes, the render function re-runs. The component wires WS pushes, REST backfill, image `onLoad`, and ResizeObserver callbacks all into `setState`, so every external event drives a full re-render through state mutation.
+
+**The cost of this pattern** is the absence of virtual-DOM diffing optimizations (every render recomputes `ovTf` and the detections mapping from scratch), but since a single component's DOM node count stays under 50 (one `<svg>` + N `<g>` elements), the full-rerender overhead is negligible.
+
+What is genuinely expensive are async API calls like `neomind.createTransform`; these are strictly confined to effects and guarded by a `cancelled` flag (see [`bundle.js` L709](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L709-L709)).
 
 ```js
 // bundle.js L704-L714
@@ -188,7 +194,9 @@ Commit [`b746c02`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/c
 
 ## The object-cover Coordinate Transform
 
-Detection-box coordinates are **normalized to image space** (0-1 means the ratio relative to the original image width/height), but the image is rendered in the DOM with `object-cover` — the image is scaled to completely cover the container, with excess cropped. This means only a subset of the original image is visible in the container, and detection-box coordinates must pass through a transform to overlay correctly on the visible region. This transform is `ovTf`, computed at [`bundle.js` L879-L899](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L879-L899):
+Detection-box coordinates are **normalized to image space** (0-1 means the ratio relative to the original image width/height), but the image is rendered in the DOM with `object-cover` — the image is scaled to completely cover the container, with excess cropped.
+
+This means only a subset of the original image is visible in the container, and detection-box coordinates must pass through a transform to overlay correctly on the visible region. This transform is `ovTf`, computed at [`bundle.js` L879-L899](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L879-L899):
 
 ```js
 // bundle.js L879-L899
@@ -297,7 +305,9 @@ hasImage
 
 Source: [`bundle.js` L1153-L1168](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1153-L1168)
 
-The container dimensions are written via a ResizeObserver listening to the media `<div>`'s size changes. But there is a classic React trap here: **the media `<div>` is conditionally rendered** — it only mounts when `hasImage` is true ([L1153-L1156](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1153-L1156)), and the image arrives asynchronously (WS push or REST backfill). This means on the component's first render the media `<div>` does not yet exist, and a naive `useEffect(() => { new ResizeObserver(mediaRef.current) }, [])` would find `mediaRef.current === null`, so the ResizeObserver would never be attached.
+The container dimensions are written via a ResizeObserver listening to the media `<div>`'s size changes. But there is a classic React trap here: **the media `<div>` is conditionally rendered** — it only mounts when `hasImage` is true ([L1153-L1156](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1153-L1156)), and the image arrives asynchronously (WS push or REST backfill).
+
+This means on the component's first render the media `<div>` does not yet exist, and a naive `useEffect(() => { new ResizeObserver(mediaRef.current) }, [])` would find `mediaRef.current === null`, so the ResizeObserver would never be attached.
 
 Commit [`d7836b8`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/d7836b8) (`fix(ne101_camera): ResizeObserver never set up when image loads async`) fixes exactly this. The solution is the **callback ref pattern**, at [`bundle.js` L534-L548](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L534-L548):
 
@@ -318,7 +328,9 @@ if (!cbRef.current) {
 }
 ```
 
-The key insight is that `cbRef.current` is a **function** (not a ref object), passed as `ref={cbRef.current}` to the media `<div>` ([L1156](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1156-L1156)). React treats function-typed refs specially: when the DOM element mounts, React invokes the function with the element; when it unmounts, React invokes the function with `null`. This precisely solves the "async mount" problem — no matter when the media `<div>` appears, the callback ref is invoked and the ResizeObserver is correctly attached.
+The key insight is that `cbRef.current` is a **function** (not a ref object), passed as `ref={cbRef.current}` to the media `<div>` ([L1156](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1156-L1156)).
+
+React treats function-typed refs specially: when the DOM element mounts, React invokes the function with the element; when it unmounts, React invokes the function with `null`. This precisely solves the "async mount" problem — no matter when the media `<div>` appears, the callback ref is invoked and the ResizeObserver is correctly attached.
 
 The callback logic has three steps:
 
@@ -352,7 +364,9 @@ Commit [`7c92a19`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/c
 
 ## Detection Summary Badges
 
-The bottom overlay bar ([`bundle.js` L1067-L1145](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1067-L1145)) renders a set of detection summary badges that let users quickly grasp "what was detected in this frame" without inspecting detection-box details. The design principle for these badges is **metric-driven** — the data source is the virtual metrics already computed by the Transform, not re-aggregated inside the component from the detections array.
+The bottom overlay bar ([`bundle.js` L1067-L1145](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1067-L1145)) renders a set of detection summary badges that let users quickly grasp "what was detected in this frame" without inspecting detection-box details.
+
+The design principle for these badges is **metric-driven** — the data source is the virtual metrics already computed by the Transform, not re-aggregated inside the component from the detections array.
 
 ```js
 // bundle.js L1067-L1095 (trimmed)

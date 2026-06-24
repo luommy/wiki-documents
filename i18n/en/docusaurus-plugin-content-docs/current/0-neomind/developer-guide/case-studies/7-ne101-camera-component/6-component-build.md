@@ -24,11 +24,19 @@ var NE101CameraPanel = (function () {
 })();
 ```
 
-These three lines — `var React = window.React`, `var jsx = window.jsxRuntime.jsx`, and `var jsxs = window.jsxRuntime.jsxs` — are the "injection trio" of the NeoMind component marketplace. Before loading a component, the platform mounts a global `window.React` (single React instance) and `window.jsxRuntime` (providing `jsx` and `jsxs` JSX transform functions) on the host page. The component "borrows" references from `window` at IIFE evaluation time (the instant the `<script>` tag executes). This means the bundle **does not package React** — the entire 1972-line file contains only business logic, no framework runtime: roughly 80KB unminified, smaller when minified.
+These three lines — `var React = window.React`, `var jsx = window.jsxRuntime.jsx`, and `var jsxs = window.jsxRuntime.jsxs` — are the "**injection trio**" of the NeoMind component marketplace.
 
-The fundamental difference between this pattern and ESM-bundled components (Vite / webpack output) is **React instance uniqueness**. ESM bundling typically treats React as `external` (not bundled) or `peerDependency`, but this relies on correct bundler configuration — if one component misconfigures and bundles React into its chunk, a second React instance is created, causing hooks to fail across instances (`useContext` returns undefined, `useRef` throws, `useState` loses state). The IIFE + `window.React` pattern eliminates this problem at the mechanism level: the platform guarantees exactly one React loaded, all 6 marketplace components share the same instance, and no bundler configuration can let a component "bring its own."
+Before loading a component, the platform mounts a global `window.React` (single React instance) and `window.jsxRuntime` (providing `jsx` and `jsxs` JSX transform functions) on the host page. The component "borrows" references from `window` at IIFE evaluation time (the instant the `<script>` tag executes).
 
-The last line of the IIFE is the closure's closing and export, at [`bundle.js` L1971-L1972](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1971-L1972): `return { default: NE101CameraPanel, ... };` followed by `})();`. The returned object is assigned to `var NE101CameraPanel`, which the platform's `<script>` loader then mounts onto `window.NE101CameraPanel`. All `function` and `var` declarations inside the IIFE are protected by the closure scope and do not leak to `window` — this is the core value of IIFE as a module substitute: **zero-dependency private namespace**.
+This means the bundle **does not package React** — the entire 1972-line file contains only business logic, no framework runtime: roughly 80KB unminified, smaller when minified.
+
+**The fundamental difference from ESM-bundled components** (Vite / webpack output) is **React instance uniqueness**. ESM bundling typically treats React as `external` (not bundled) or `peerDependency`, but this relies on correct bundler configuration — if one component misconfigures and bundles React into its chunk, a second React instance is created, causing hooks to fail across instances (`useContext` returns undefined, `useRef` throws, `useState` loses state).
+
+The IIFE + `window.React` pattern eliminates this problem at the mechanism level: the platform guarantees exactly one React loaded, all 6 marketplace components share the same instance, and no bundler configuration can let a component "bring its own."
+
+**The IIFE's closing and export**: the last line of the IIFE is the closure's closing and export, at [`bundle.js` L1971-L1972](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1971-L1972): `return { default: NE101CameraPanel, ... };` followed by `})();`.
+
+The returned object is assigned to `var NE101CameraPanel`, which the platform's `<script>` loader then mounts onto `window.NE101CameraPanel`. All `function` and `var` declarations inside the IIFE are protected by the closure scope and do not leak to `window` — this is the core value of IIFE as a module substitute: **zero-dependency private namespace**.
 
 ```js
 // bundle.js L1971-L1972
@@ -61,7 +69,11 @@ return {
 };
 ```
 
-This object has four keys, corresponding to two addressing modes of the platform loader. The [`global_name`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L38-L38) field in `manifest.json` (`"NE101CameraPanel"`) tells the platform "this bundle is mounted on `window.NE101CameraPanel`," while the [`export_name`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L39-L39) field (also `"NE101CameraPanel"`) tells the platform "from that object, read the `NE101CameraPanel` key's value as the main component." The platform component loader pseudocode: first fetch the bundle object from `window` by `global_name`, then read either `export_name` (named export) or `default` (depending on loader version) to get the component function.
+This object has four keys, corresponding to two addressing modes of the platform loader.
+
+The [`global_name`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L38-L38) field in `manifest.json` (`"NE101CameraPanel"`) tells the platform "this bundle is mounted on `window.NE101CameraPanel`," while the [`export_name`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L39-L39) field (also `"NE101CameraPanel"`) tells the platform "from that object, read the `NE101CameraPanel` key's value as the main component."
+
+The platform component loader pseudocode: first fetch the bundle object from `window` by `global_name`, then read either `export_name` (named export) or `default` (depending on loader version) to get the component function.
 
 ```js
 // manifest.json L38-L39
@@ -225,7 +237,9 @@ function ExtDropdown(props) {
 
 Source: [`bundle.js` L1353-L1969](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1353-L1969)
 
-**Why this layering works without a build step**: the key is JavaScript's **function hoisting**. All `function foo() { ... }` declarations inside the IIFE are hoisted to the top of the closure when the IIFE is evaluated, so when layer 5 (L1353) `AdvancedPanel` internally calls layer 4 (L1325) `INPUT_CLS` constant or layer 1 (L57) `classColor` function, there is no "define before use" ordering issue — they are all in the same closure scope. Cross-layer calls are ordinary closure variable lookups, requiring no ESM `import` / `export` resolution, and there is no circular dependency risk because all declarations are completed at IIFE evaluation time.
+**Why this layering works without a build step**: the key is JavaScript's **function hoisting**. All `function foo() { ... }` declarations inside the IIFE are hoisted to the top of the closure when the IIFE is evaluated.
+
+So when layer 5 (L1353) `AdvancedPanel` internally calls layer 4 (L1325) `INPUT_CLS` constant or layer 1 (L57) `classColor` function, there is no "define before use" ordering issue — they are all in the same closure scope. Cross-layer calls are ordinary closure variable lookups, requiring no ESM `import` / `export` resolution, and there is no circular dependency risk because all declarations are completed at IIFE evaluation time.
 
 ```mermaid
 graph TB
@@ -259,9 +273,13 @@ The dashed lines in the diagram represent "called by" direction: upper layers (s
 
 ## React-in-IIFE Pitfall 1: Hook Order
 
-React's Rules of Hooks mandates: **hooks must be called at the top level of the component function, never inside conditionals, loops, or nested functions**. The essence of this rule is that React internally tracks each hook's state by "call order index" — if one render calls 3 hooks and the next calls 4, the indices shift, and React throws error #310 ("Rendered more hooks than during the previous render") or worse, silent state corruption.
+React's Rules of Hooks mandates: **hooks must be called at the top level of the component function, never inside conditionals, loops, or nested functions**.
 
-Commit [`0601cd4`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/0601cd4) (`fix(ne101_camera): move conditional useState hook to fix React error #310`) fixed exactly this bug. In the original code, the ROI editor's `editingIdxState = React.useState(-1)` was written inside an `if (roiEnabled) { ... }` conditional block. When the user toggled the ROI switch from on to off in `AdvancedPanel`, this `useState` was no longer called, the total hook count changed from N to N-1, and React detected a hook count mismatch and crashed. The reverse (off to on) was equally fatal — hook count changed from N-1 to N.
+The essence of this rule is that React internally tracks each hook's state by "call order index" — if one render calls 3 hooks and the next calls 4, the indices shift, and React throws error #310 ("Rendered more hooks than during the previous render") or worse, silent state corruption.
+
+Commit [`0601cd4`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/0601cd4) (`fix(ne101_camera): move conditional useState hook to fix React error #310`) fixed exactly this bug.
+
+In the original code, the ROI editor's `editingIdxState = React.useState(-1)` was written inside an `if (roiEnabled) { ... }` conditional block. When the user toggled the ROI switch from on to off in `AdvancedPanel`, this `useState` was no longer called, the total hook count changed from N to N-1, and React detected a hook count mismatch and crashed. The reverse (off to on) was equally fatal — hook count changed from N-1 to N.
 
 The fix moved all ROI-related hooks **unconditionally above any conditional code**. See the current code: [`bundle.js` L1522-L1534](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1522-L1534).
 
@@ -283,7 +301,9 @@ var setEditingIdx = editingIdxState[1];
 
 The comment `// ROI hooks — MUST be called unconditionally, before any conditional code` is a **blood-tear warning** to future maintainers: `roiEnabled` is a plain variable (not a hook), and even when it is false, the 6 hooks below (`useState` x3 + `useRef` x2 + `useState` x1) must all execute. Conditional rendering (e.g., whether the ROI canvas is shown) happens in the JSX return after the hooks, guarded by `roiEnabled && jsx(...)`, not at the hook call layer.
 
-**Why this pitfall is IIFE-specific**: in a normal ESM + Vite + ESLint project, the `react-hooks/rules-of-hooks` plugin scans all hook calls **at build time** and flags "useState inside an if block" as a lint error — the code cannot even be committed. The IIFE pattern has no ESLint (no `.eslintrc` config, no build step), so this rule relies entirely on developer discipline — once neglected, the error surfaces only at runtime (the instant the user toggles the ROI switch). This is the hidden cost of the "zero-build" paradigm, and why ne101_camera maintains `test_bundle.js` for logic testing.
+**Why this pitfall is IIFE-specific**: in a normal ESM + Vite + ESLint project, the `react-hooks/rules-of-hooks` plugin scans all hook calls **at build time** and flags "useState inside an if block" as a lint error — the code cannot even be committed.
+
+The IIFE pattern has no ESLint (no `.eslintrc` config, no build step), so this rule relies entirely on developer discipline — once neglected, the error surfaces only at runtime (the instant the user toggles the ROI switch). This is the hidden cost of the "zero-build" paradigm, and why ne101_camera maintains `test_bundle.js` for logic testing.
 
 **Design decision: unconditional top-level hooks vs conditional hooks with guards**
 
@@ -298,7 +318,11 @@ The comment `// ROI hooks — MUST be called unconditionally, before any conditi
 
 The second hooks pitfall is more insidious than the first — it does not crash React, but makes **input fields appear frozen** (the user types but nothing shows in the box). The fix for this bug went through two iterations, involving two commits: [`44f1fa5`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/44f1fa5) (`fix(ne101_camera): input fields frozen — use local state instead of shared composingRef`) and [`b060a25`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/b060a25) (`fix(ne101_camera): React error #310 — use defaultValue instead of hooks in imeInput`).
 
-**The original implementation's bug**: the category filter and phrase input boxes in `AdvancedPanel` needed to support Chinese/Japanese IME (Input Method Editor). During the "composition" phase (user has typed pinyin but not yet selected a character), IME fires `onChange` continuously. Without handling, each keystroke would sync the incomplete pinyin to config, causing input chaos. The original solution used a **shared** `composingRef` (`React.useRef(false)`) to track the IME status of all input fields — set to true on `onCompositionStart`, false on `onCompositionEnd`, and in `onChange`, skip syncing if `composingRef.current` is true. The problem: this ref was **shared across all input fields** — if input A's `onCompositionStart` set the ref to true, then input A was unmounted (conditional rendering removed it), `onCompositionEnd` never fired, the ref stayed true, and **all** subsequent `onChange` calls across all inputs were skipped — the inputs appeared frozen.
+**The original implementation's bug**: the category filter and phrase input boxes in `AdvancedPanel` needed to support Chinese/Japanese IME (Input Method Editor). During the "composition" phase (user has typed pinyin but not yet selected a character), IME fires `onChange` continuously.
+
+Without handling, each keystroke would sync the incomplete pinyin to config, causing input chaos. The original solution used a **shared** `composingRef` (`React.useRef(false)`) to track the IME status of all input fields — set to true on `onCompositionStart`, false on `onCompositionEnd`, and in `onChange`, skip syncing if `composingRef.current` is true.
+
+**The problem**: this ref was **shared across all input fields** — if input A's `onCompositionStart` set the ref to true, then input A was unmounted (conditional rendering removed it), `onCompositionEnd` never fired, the ref stayed true, and **all** subsequent `onChange` calls across all inputs were skipped — the inputs appeared frozen.
 
 **Iteration 1 (commit `44f1fa5`)**: replaced the shared ref with **per-input local state**. This fixed the freezing (each input independently tracked its own IME status), but introduced a new problem: `imeInput` is a **factory function** (defined inside `AdvancedPanel`, returns JSX), not a React component. Calling `React.useState` inside a factory function violates the Rules of Hooks — when template switching caused some inputs to appear/disappear, the hook count changed, triggering React error #310 again.
 
@@ -372,7 +396,9 @@ function ConfigPanel(props) {
 
 This function is only 5 lines, returning an empty `<div>`. The reason is in the comments: **the title field is provided by the platform**. ComponentConfigDialog has a built-in `titleSection` where the user can set the component's display title (e.g., "Front Door Camera"); the component does not need to provide its own title input. `ConfigPanel` defers entirely to the platform's title field, keeping the visual clean. This "don't reinvent the wheel" attitude is the first principle of ne101_camera's configuration design.
 
-**AdvancedPanel: the heavy-logic Advanced tab**. See source start: [`bundle.js` L1363-L1448](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1363-L1448). `AdvancedPanel` is the second-longest function in the entire bundle (523 lines, behind only the main component's 861), carrying all of ne101_camera's "configuration complexity": AI processing master switch (`SwitchControl`), extension selector (`ExtDropdown`), template/mode picker, category filter input (`imeInput`), phrase input, class color filter, ROI toggle + polygon editor (drag-and-drop points on a Canvas), ROI overlap threshold slider (commit [`636a8ae`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/636a8ae)), NMS IoU threshold passthrough to `locate-anything-v2` (commit [`8656148`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/8656148)).
+**AdvancedPanel: the heavy-logic Advanced tab**. See source start: [`bundle.js` L1363-L1448](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1363-L1448).
+
+`AdvancedPanel` is the second-longest function in the entire bundle (523 lines, behind only the main component's 861), carrying all of ne101_camera's "configuration complexity": AI processing master switch (`SwitchControl`), extension selector (`ExtDropdown`), template/mode picker, category filter input (`imeInput`), phrase input, class color filter, ROI toggle + polygon editor (drag-and-drop points on a Canvas), ROI overlap threshold slider (commit [`636a8ae`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/636a8ae)), NMS IoU threshold passthrough to `locate-anything-v2` (commit [`8656148`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/8656148)).
 
 ```js
 // bundle.js L1363-L1448 (AdvancedPanel region start: ROI_ACTIONS + ExtDropdown)
@@ -413,7 +439,11 @@ function AdvancedPanel(props) {
 
 Source: [`bundle.js` L1363-L1448](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1363-L1448)
 
-**ExtDropdown: shadcn-style dropdown**. See source: [`bundle.js` L1371-L1446](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1371-L1446). This is a 76-line custom dropdown component replacing the native `<select>` element. Using native `<select>` would break the shadcn design system's visual consistency (native select styling cannot be fully customized and differs between macOS and Windows). `ExtDropdown` uses `button` + floating `div` to simulate dropdown behavior, with all classNames matching the shadcn Select component's DOM contract (`bg-popover` / `text-popover-foreground` / `shadow-md` / `rounded-md` / `border`). It also supports a loading state (displaying "Loading extensions...") and click-outside-to-close (`useEffect` + `document.addEventListener('mousedown', ...)`).
+**ExtDropdown: shadcn-style dropdown**. See source: [`bundle.js` L1371-L1446](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1371-L1446).
+
+This is a 76-line custom dropdown component replacing the native `<select>` element. Using native `<select>` would break the shadcn design system's visual consistency (native select styling cannot be fully customized and differs between macOS and Windows).
+
+`ExtDropdown` uses `button` + floating `div` to simulate dropdown behavior, with all classNames matching the shadcn Select component's DOM contract (`bg-popover` / `text-popover-foreground` / `shadow-md` / `rounded-md` / `border`). It also supports a loading state (displaying "Loading extensions...") and click-outside-to-close (`useEffect` + `document.addEventListener('mousedown', ...)`).
 
 **Design decision: two-panel division vs one big form**
 
@@ -426,7 +456,9 @@ Source: [`bundle.js` L1363-L1448](https://github.com/camthink-ai/NeoMind-Dashboa
 
 ## The shadcn CSS Class Replica Strategy
 
-The NeoMind Dashboard UI is built with the [shadcn/ui](https://ui.shadcn.com/) component library. The defining characteristic of shadcn/ui is not "install an npm package" but **copy component source code into the project's `components/ui/` directory** — meaning the platform page already has shadcn's Tailwind CSS class definitions loaded (e.g., `bg-background` / `text-muted-foreground` / `data-[state=checked]:bg-primary`). ne101_camera's component **cannot import these shadcn components** (IIFE has no module resolution), but it can **replicate the className strings** of shadcn components, letting Tailwind's JIT compiler (already running on the platform) apply the same styles to the component's DOM elements.
+The NeoMind Dashboard UI is built with the [shadcn/ui](https://ui.shadcn.com/) component library. The defining characteristic of shadcn/ui is not "install an npm package" but **copy component source code into the project's `components/ui/` directory** — meaning the platform page already has shadcn's Tailwind CSS class definitions loaded (e.g., `bg-background` / `text-muted-foreground` / `data-[state=checked]:bg-primary`).
+
+ne101_camera's component **cannot import these shadcn components** (IIFE has no module resolution), but it can **replicate the className strings** of shadcn components, letting Tailwind's JIT compiler (already running on the platform) apply the same styles to the component's DOM elements.
 
 This is the "shadcn CSS class replica" strategy: **verbatim copy** the `className="..."` strings from shadcn component source code into the IIFE's constants or JSX. See the Shared UI layer: [`bundle.js` L1321-L1348](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1321-L1348).
 
@@ -443,7 +475,9 @@ var DESC_CLS = 'text-sm text-muted-foreground';
 
 `INPUT_CLS` ([L1325](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1325-L1325)) is the className **verbatim copied** from the platform's `components/ui/input.tsx` file. As long as the platform's Tailwind compiler has scanned these class names (it will, because shadcn's Input component is used elsewhere on the platform), ne101_camera's `<input>` element gets the exact same visual treatment as the platform's native Input — including hover, focus, and disabled states.
 
-**SwitchControl: using `data-state` to trigger shadcn Switch's CSS rules**. See source: [`L1334-L1348`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1334-L1348). shadcn's Switch component uses the Tailwind variant `data-[state=checked]:bg-primary` to control the switch color — when the `data-state` attribute is `checked`, the background becomes the theme primary color; when `unchecked`, it becomes the input gray. `SwitchControl` manually constructs a `<button role="switch" data-state={checked ? 'checked' : 'unchecked'}>`, with the className containing `data-[state=checked]:bg-primary data-[state=unchecked]:bg-input`, perfectly matching shadcn Switch's DOM contract. The Tailwind compiler sees these class names and generates CSS rules identical to the platform's Switch component.
+**SwitchControl: using `data-state` to trigger shadcn Switch's CSS rules**. See source: [`L1334-L1348`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1334-L1348).
+
+shadcn's Switch component uses the Tailwind variant `data-[state=checked]:bg-primary` to control the switch color — when the `data-state` attribute is `checked`, the background becomes the theme primary color; when `unchecked`, it becomes the input gray. `SwitchControl` manually constructs a `<button role="switch" data-state={checked ? 'checked' : 'unchecked'}>`, with the className containing `data-[state=checked]:bg-primary data-[state=unchecked]:bg-input`, perfectly matching shadcn Switch's DOM contract. The Tailwind compiler sees these class names and generates CSS rules identical to the platform's Switch component.
 
 ```js
 // bundle.js L1334-L1348
@@ -515,7 +549,11 @@ The 7 design decisions from this page are consolidated below, each with "choice 
 | **Display + Advanced dual panels** | `ConfigPanel` (stub, [L1353-L1357](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1353-L1357)) + `AdvancedPanel` (heavy logic, [L1363-L1969](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1363-L1969)) | Single large form | Matches platform Display/Advanced dual-tab user mental model; ordinary users not intimidated by advanced fields |
 | **shadcn CSS class replica** | Verbatim copy className strings ([L1321-L1348](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1321-L1348)) | Inline styles / request platform component API | Tailwind JIT global scanning gives replica classes consistent styling; inline styles cannot match hover/focus pseudo-classes |
 
-The common theme across these 7 decisions: **choosing the simplest approach that works under the "zero-build" constraint**. The IIFE pattern trades away tree-shaking, type checking, and linting for an ultra-minimal deployment model (one `.js` file + one `.json` manifest). Under this constraint, every engineering decision seeks a path that "works correctly without build tools" — function hoisting substitutes for module resolution, closures substitute for import/export, className replica substitutes for a component library, uncontrolled input substitutes for controlled state. This engineering philosophy of "returning to browser primitives" is the fundamental reason the NeoMind component marketplace can sustain "6 components, zero build steps, single-file deployment."
+The common theme across these 7 decisions: **choosing the simplest approach that works under the "zero-build" constraint**.
+
+The IIFE pattern trades away tree-shaking, type checking, and linting for an ultra-minimal deployment model (one `.js` file + one `.json` manifest). Under this constraint, every engineering decision seeks a path that "works correctly without build tools" — function hoisting substitutes for module resolution, closures substitute for import/export, className replica substitutes for a component library, uncontrolled input substitutes for controlled state.
+
+This engineering philosophy of "returning to browser primitives" is the fundamental reason the NeoMind component marketplace can sustain "6 components, zero build steps, single-file deployment."
 
 ### Key commit index
 

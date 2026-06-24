@@ -27,7 +27,11 @@ Source: [`bundle.js` L1-L5](https://github.com/camthink-ai/NeoMind-Dashboard-Com
 
 These three lines (`var React = window.React`, `var jsx = window.jsxRuntime.jsx`, `var jsxs = window.jsxRuntime.jsxs`) are the NeoMind component market's standard "injection triple", shared with metric_card ([6 metric_card 3.2](../6-metric-card-component.md)). The implication is that **the bundle does not pack React** — it borrows a single instance already loaded by the host page, guaranteeing one React instance for the whole dashboard and preventing cross-instance hook failures (the classic `useContext` returns undefined / `useRef` throws symptoms).
 
-Why use `var Name = (function(){ ... })()` (an IIFE) instead of UMD / CommonJS / ESM? The root cause is that **the Dashboard host injects the bundle via a `<script>` tag**. A `<script>` tag has no module scope, so an IIFE is the only zero-dependency mechanism that emulates private naming via function scope + closure: every `function classColor` / `var white` inside the function body stays out of `window`, and only the final `return { ... }` object is attached to `window.NE101CameraPanel`. UMD also works under `<script>` but adds a `define` / `module.exports` detection branch that is redundant for NeoMind's "no bundler" philosophy; CommonJS's `require` simply does not work in the browser.
+Why use `var Name = (function(){ ... })()` (an IIFE) instead of UMD / CommonJS / ESM? The root cause is that **the Dashboard host injects the bundle via a `<script>` tag**.
+
+A `<script>` tag has no module scope, so an IIFE is the only zero-dependency mechanism that emulates private naming via function scope + closure: every `function classColor` / `var white` inside the function body stays out of `window`, and only the final `return { ... }` object is attached to `window.NE101CameraPanel`.
+
+UMD also works under `<script>` but adds a `define` / `module.exports` detection branch that is redundant for NeoMind's "no bundler" philosophy; CommonJS's `require` simply does not work in the browser.
 
 The final line [`bundle.js` L1971](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1971) is a **named-export + default dual exposure**:
 
@@ -228,7 +232,11 @@ Source: [`bundle.js` L239-L456](https://github.com/camthink-ai/NeoMind-Dashboard
 
 `generateTransformJsCode(pipe)` ([L239](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L239-L264)) takes a pipeline config object (containing `extId` / `template` / `categories` / `phrase` / `classFilter` / `roiEnabled` / `roiAction` / `roiX/Y/W/H`) and returns a JavaScript code string. This string is stuffed into a TransformAutomation entity on the NeoMind controller, which schedules it after each capture, invokes `extensions.invoke()`, and writes results back to virtual metrics.
 
-Why code generation instead of hardcoded branches? Because different `processingTemplate` values (`object_detection` / `ocr` / `describe` / `barcode`) need radically different post-processing (OCR assembles polygons, describe assembles description text, object_detection aggregates by class). Writing `if (template === 'ocr') { ... } else if ...` would bloat the main component's render function to the point of unreadability. Generating the post-processing as an independent string and letting the controller `eval` it in a sandbox effectively physically strips the "variable post-processing" out of the component code. The trade-offs of this decision are discussed in 2.5 #4.
+Why code generation instead of hardcoded branches? Because different `processingTemplate` values (`object_detection` / `ocr` / `describe` / `barcode`) need radically different post-processing (OCR assembles polygons, describe assembles description text, object_detection aggregates by class).
+
+Writing `if (template === 'ocr') { ... } else if ...` would bloat the main component's render function to the point of unreadability. Generating the post-processing as an independent string and letting the controller `eval` it in a sandbox effectively physically strips the "variable post-processing" out of the component code.
+
+The trade-offs of this decision are discussed in 2.5 #4.
 
 ### Layer 3: Sub-component (L458-L1970)
 
@@ -707,7 +715,9 @@ The full 18-field `default_config` of ne101_camera is as follows:
 
 Source: [manifest.json L18-L37](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L18-L37)
 
-**One-sentence summary**: metric_card is "thin component + thick generality"; ne101_camera is "thick component + thin specificity". The former's value is wide coverage; the latter's value is collapsing a complex device link into a single panel. The two are not substitutes but a progression — ne101_camera builds on metric_card's three-piece set (IIFE injection + manifest contract + inline style) and adds four new capability layers: device binding, image canvas, AI processing pipeline, and ROI overlay.
+**One-sentence summary**: metric_card is "thin component + thick generality"; ne101_camera is "thick component + thin specificity".
+
+The former's value is wide coverage; the latter's value is collapsing a complex device link into a single panel. The two are not substitutes but a progression — ne101_camera builds on metric_card's three-piece set (IIFE injection + manifest contract + inline style) and adds four new capability layers: device binding, image canvas, AI processing pipeline, and ROI overlay.
 
 ---
 

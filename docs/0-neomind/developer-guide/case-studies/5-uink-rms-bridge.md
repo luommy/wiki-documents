@@ -17,7 +17,11 @@ sidebar_label: "uink-rms-bridge"
 
 当前版本 `2.7.6`，核心实现集中在单个 [`src/lib.rs`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs) 文件共 2250 行，外加 React + TypeScript 编写的 [`DisplayEditorCard`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/frontend/) 前端组件（entrypoint `uink-rms-bridge-components.umd.cjs`）。
 
-**与 [案例 4 onvif-bridge](./4-onvif-bridge.md) 的对比（本案例核心叙事轴）**：onvif-bridge 是**标准协议桥接**（ONVIF 是开放规范，任何 Profile S 摄像头通用），uink-rms-bridge 是**厂商专有协议桥接**（Uink-RMS 云 API 是封闭的私有接口，仅 Uink 自家设备可用）。两者代表 NeoMind 生态中两种截然不同的集成策略：标准协议桥接走「局域网 UDP/HTTP 直连设备 + 设备级 WS-Security 鉴权」的路径，演进风险低（标准稳定），不依赖任何外部云；厂商专有桥接走「公网 HTTPS 经厂商云中转 + 账号级 JWT 鉴权」的路径，演进风险高（厂商 API v1.0.1 可能变），强依赖 Uink-RMS 云服务可用性。理解这种对比，是选择 NeoMind 集成策略的关键——本系列把 4 / 5 称为「协议桥接双子星」。
+**与 [案例 4 onvif-bridge](./4-onvif-bridge.md) 的对比（本案例核心叙事轴）**：onvif-bridge 是**标准协议桥接**（ONVIF 是开放规范，任何 Profile S 摄像头通用），uink-rms-bridge 是**厂商专有协议桥接**（Uink-RMS 云 API 是封闭的私有接口，仅 Uink 自家设备可用）。
+
+两者代表 NeoMind 生态中两种截然不同的集成策略：标准协议桥接走「局域网 UDP/HTTP 直连设备 + 设备级 WS-Security 鉴权」的路径，演进风险低（标准稳定），不依赖任何外部云；厂商专有桥接走「公网 HTTPS 经厂商云中转 + 账号级 JWT 鉴权」的路径，演进风险高（厂商 API v1.0.1 可能变），强依赖 Uink-RMS 云服务可用性。
+
+理解这种对比，是选择 NeoMind 集成策略的关键——本系列把 4 / 5 称为「协议桥接双子星」。
 
 **三大痛点驱动了该扩展的设计**：
 
@@ -30,13 +34,19 @@ sidebar_label: "uink-rms-bridge"
 1. 要接入第三方厂商云平台（尤其是 IoT 云、显示云）的集成商——你会看到从 JWT 登录到设备注册、遥测拉取、图像推送的完整闭环
 2. 想理解 NeoMind 如何把一个「封闭系统」桥接到统一设备模型的开发者——uink-rms-bridge 是「厂商 API 包一层」模式的范本
 
-**「生产验证」的具体含义**：该扩展经历了至少 4 轮针对性修复（[`f4c73cd`](https://github.com/camthink-ai/NeoMind-Extensions/commit/f4c73cd) 初始发布、[`261d8e6`](https://github.com/camthink-ai/NeoMind-Extensions/commit/261d8e6) 翻转与数据源、[`39587eb`](https://github.com/camthink-ai/NeoMind-Extensions/commit/39587eb) SDK 升级、[`422ba8d`](https://github.com/camthink-ai/NeoMind-Extensions/commit/422ba8d) 安全加固），跨 6 个版本（v2.7.0 → v2.7.6）回归，目前在生产部署运行。
+**「生产验证」的具体含义**：该扩展经历了至少 4 轮针对性修复（[`f4c73cd`](https://github.com/camthink-ai/NeoMind-Extensions/commit/f4c73cd) 初始发布、[`261d8e6`](https://github.com/camthink-ai/NeoMind-Extensions/commit/261d8e6) 翻转与数据源、[`39587eb`](https://github.com/camthink-ai/NeoMind-Extensions/commit/39587eb) SDK 升级、[`422ba8d`](https://github.com/camthink-ai/NeoMind-Extensions/commit/422ba8d) 安全加固），跨 6 个版本（v2.7.0 → v2.7.6）回归。
+
+目前在生产部署运行。
 
 ---
 
 ## 架构总览
 
-uink-rms-bridge 是一个**前后端一体的厂商桥接扩展**——后端是 2250 行的 `lib.rs`（Rust cdylib），前端是 `DisplayEditorCard`（React 18 + Vite + TypeScript UMD 包）。后端通过 ureq 同步 HTTPS 与 Uink-RMS 区域云通信，前端给用户提供 Markdown 编辑 + 实时预览画布。运行时由 NeoMind Runtime 加载 `.nep` 包后，扩展通过 Extension trait 暴露 7 个命令（sync_devices / list_devices / push_content / push_image / get_display_size / get_display / refresh_auth），命令路由由 [`execute_command`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L1445-L1475) 统一分发。所有运行时状态由 `parking_lot::RwLock` 保护，包括 `config: RwLock<UinkConfig>`、`access_token: RwLock<Option<String>>` 和设备 ID 映射 `neo_to_rms_id: RwLock<HashMap<String, String>>`。
+uink-rms-bridge 是一个**前后端一体的厂商桥接扩展**——后端是 2250 行的 `lib.rs`（Rust cdylib），前端是 `DisplayEditorCard`（React 18 + Vite + TypeScript UMD 包）。后端通过 ureq 同步 HTTPS 与 Uink-RMS 区域云通信，前端给用户提供 Markdown 编辑 + 实时预览画布。
+
+运行时由 NeoMind Runtime 加载 `.nep` 包后，扩展通过 Extension trait 暴露 7 个命令（sync_devices / list_devices / push_content / push_image / get_display_size / get_display / refresh_auth），命令路由由 [`execute_command`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L1445-L1475) 统一分发。
+
+所有运行时状态由 `parking_lot::RwLock` 保护，包括 `config: RwLock<UinkConfig>`、`access_token: RwLock<Option<String>>` 和设备 ID 映射 `neo_to_rms_id: RwLock<HashMap<String, String>>`。
 
 ```mermaid
 graph TB
@@ -92,7 +102,9 @@ graph TB
 
 ### 模块职责拆分（注意：单文件大）
 
-注意 `src/` 目录下**只有 `lib.rs` 一个文件**（用 `ls src/` 验证：仅 `lib.rs`，无备份、无其他 `.rs`）。这与 [案例 4 onvif-bridge](./4-onvif-bridge.md) 的 5 文件拆分形成鲜明对比。下表按 lib.rs 内的逻辑分区列出：
+注意 `src/` 目录下**只有 `lib.rs` 一个文件**（用 `ls src/` 验证：仅 `lib.rs`，无备份、无其他 `.rs`）。
+
+这与 [案例 4 onvif-bridge](./4-onvif-bridge.md) 的 5 文件拆分形成鲜明对比。下表按 lib.rs 内的逻辑分区列出：
 
 | 逻辑层 | 行范围 | 职责 |
 |--------|--------|------|
@@ -126,7 +138,11 @@ graph TB
 
 ### JWT 鉴权链（login → refresh → 重试 + backoff）
 
-Uink-RMS 采用账号级 JWT 鉴权（区别于 onvif-bridge 的设备级 WS-Security）。鉴权状态由三个字段管理：`access_token: RwLock<Option<String>>`、`refresh_token: RwLock<Option<String>>`、`token_expiry: AtomicI64`。核心入口是 [`ensure_token`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L794-L823)：先检查 `token_expiry - now > 120`（提前 2 分钟刷新），若过期则优先走 `refresh()`（用 refresh_token 换新 access_token），失败再走 `login()`（email + password 重新登录）。关键设计是**登录失败退避**——`last_login_failure_ts: AtomicI64` 记录上次失败时间，5 分钟内不重试（避免密码错误时疯狂打 RMS 服务器）。login 函数把 `expires_in` 减去 120 秒作为本地 expiry，留出刷新窗口：
+Uink-RMS 采用账号级 JWT 鉴权（区别于 onvif-bridge 的设备级 WS-Security）。鉴权状态由三个字段管理：`access_token: RwLock<Option<String>>`、`refresh_token: RwLock<Option<String>>`、`token_expiry: AtomicI64`。
+
+**核心入口是 [`ensure_token`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L794-L823)**：先检查 `token_expiry - now > 120`（提前 2 分钟刷新），若过期则优先走 `refresh()`（用 refresh_token 换新 access_token），失败再走 `login()`（email + password 重新登录）。
+
+关键设计是**登录失败退避**——`last_login_failure_ts: AtomicI64` 记录上次失败时间，5 分钟内不重试（避免密码错误时疯狂打 RMS 服务器）。login 函数把 `expires_in` 减去 120 秒作为本地 expiry，留出刷新窗口：
 
 ```rust
 // lib.rs L794-L823
@@ -166,7 +182,9 @@ fn ensure_token(&self) -> Result<()> {
 
 ### 区域端点路由（UinkConfig::api_base_url）
 
-[`UinkConfig`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L685-L721) 是扩展的唯一配置结构，包含 `server_region: String`（枚举 China / Europe / Custom）、`custom_server_url: String`、`email`、`password`、`sync_interval_secs`（默认 300）、`poll_interval_secs`（默认 60）。`api_base_url()` 方法做简单的 match：`"China" => "https://cn.rms.uink.com"`、`"Europe" => "https://eu.rms.uink.com"`、其他则使用 `custom_server_url`。这把区域选择固化在配置里，用户在 UI 上选下拉框即可切换。默认区域是 China（见 `impl Default`）：
+[`UinkConfig`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L685-L721) 是扩展的唯一配置结构，包含 `server_region: String`（枚举 China / Europe / Custom）、`custom_server_url: String`、`email`、`password`、`sync_interval_secs`（默认 300）、`poll_interval_secs`（默认 60）。
+
+`api_base_url()` 方法做简单的 match：`"China" => "https://cn.rms.uink.com"`、`"Europe" => "https://eu.rms.uink.com"`、其他则使用 `custom_server_url`。这把区域选择固化在配置里，用户在 UI 上选下拉框即可切换。默认区域是 China（见 `impl Default`）：
 
 ```rust
 // lib.rs L685-L721 (trimmed: first 30 lines)
@@ -284,7 +302,9 @@ fn render_markdown_to_image(
 
 [Source: lib.rs L475-L640](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L475-L640)
 
-标题缩放规则见——标题缩放规则见 [L504 注释](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L504)："H1 = 2.0x base, decreasing by 0.2 per level"（H1=2.0x、H2=1.8x、H3=1.6x...）；(4) `wrap_line` 做 CJK + Latin 混排自动换行（CJK 字符可在任意位置断行，Latin 按词宽累加）。最终用 image crate 编码为 PNG 字节。
+标题缩放规则见 [L504 注释](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L504)："H1 = 2.0x base, decreasing by 0.2 per level"（H1=2.0x、H2=1.8x、H3=1.6x...）。
+
+`wrap_line` 做 CJK + Latin 混排自动换行（CJK 字符可在任意位置断行，Latin 按词宽累加）。最终用 image crate 编码为 PNG 字节。
 
 ### 图像推送（push_image_to_device）
 
@@ -315,15 +335,21 @@ async fn execute_command(&self, command: &str, args: &serde_json::Value) -> Resu
 }
 ```
 
-[Source: lib.rs L1445-L1523](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L1445-L1523)若用户传了 `dither_algorithm` / `resize_mode` / `padding_color` 参数，走处理端点；否则走 raw 端点直接推原图。支持的抖动算法有 8 种（ordered / floyd-steinberg / atkinson / burkes / sierra / stucki / jarvis-judice-ninke / threshold），resize 模式有 fit / cover / fill 三种。图像大小限制 10MB。
+[Source: lib.rs L1445-L1523](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L1445-L1523)
+
+若用户传了 `dither_algorithm` / `resize_mode` / `padding_color` 参数，走处理端点；否则走 raw 端点直接推原图。支持的抖动算法有 8 种（ordered / floyd-steinberg / atkinson / burkes / sierra / stucki / jarvis-judice-ninke / threshold），resize 模式有 fit / cover / fill 三种。图像大小限制 10MB。
 
 ### 设备注册与 ID 映射（uink_epaper device template）
 
-扩展首次 sync 时通过 `device_template_register` capability 注册 `uink_epaper` 设备模板（含 battery / temperature / signal_strength / refresh_count / online_status / sn / model 等 14 个指标）。然后 [`fetch_rms_devices`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L877) 分页拉取 RMS 设备列表，对每个设备生成 `neo_device_id = format!("uink-{}", device.device_id)` 并调用 `device_register`。关键的 ID 映射存在 `neo_to_rms_id: RwLock<HashMap<String, String>>`（[L730](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L730)）——所有 push 命令先通过 `resolve_rms_id()` 把 NeoMind device_id 翻译回 RMS device_id。
+扩展首次 sync 时通过 `device_template_register` capability 注册 `uink_epaper` 设备模板（含 battery / temperature / signal_strength / refresh_count / online_status / sn / model 等 14 个指标）。
+
+然后 [`fetch_rms_devices`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L877) 分页拉取 RMS 设备列表，对每个设备生成 `neo_device_id = format!("uink-{}", device.device_id)` 并调用 `device_register`。关键的 ID 映射存在 `neo_to_rms_id: RwLock<HashMap<String, String>>`（[L730](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L730)）——所有 push 命令先通过 `resolve_rms_id()` 把 NeoMind device_id 翻译回 RMS device_id。
 
 ### configure() 热更新
 
-[`configure`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L1523-L1540) 接受 JSON 配置，写入 `UinkConfig` 的 RwLock，然后**主动清空 access_token / refresh_token / token_expiry**——这强制下次操作重新登录，避免用旧 token 访问新区域端点。同时重置 `template_registered` 和 `last_sync_ts`，让 auto-sync 立即用新配置跑一次：
+[`configure`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L1523-L1540) 接受 JSON 配置，写入 `UinkConfig` 的 RwLock，然后**主动清空 access_token / refresh_token / token_expiry**——这强制下次操作重新登录，避免用旧 token 访问新区域端点。
+
+同时重置 `template_registered` 和 `last_sync_ts`，让 auto-sync 立即用新配置跑一次：
 
 ```rust
 // lib.rs L1523-L1540
@@ -393,11 +419,17 @@ sequenceDiagram
 
 ### 决策 1：ureq 同步 HTTP（而非 reqwest async）
 
-**我们选 ureq v2（同步）**；替代方案是 reqwest + tokio multi-thread runtime；理由见 [`Cargo.toml` L23 注释](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/Cargo.toml#L23)："Use sync HTTP client to avoid Tokio runtime issues in dynamic libraries"。cdylib 被 NeoMind 主进程 `dlopen` 加载时，如果扩展内部自建 tokio runtime，会与主进程已有的 runtime 冲突（panic "Cannot start a runtime from within a runtime"）。ureq 是纯同步的，在 `execute_command` 的 async 上下文里用 `block_on` 包裹也不会嵌套 runtime。Tokio 仍然出现在依赖里（[L26-L27](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/Cargo.toml#L26-L27)），但只启用 `rt + sync` feature——这是 SDK 的 FFI 宏为 `RwLock` wrapper 需要的，不用于异步 IO。这个决策与 [案例 4 onvif-bridge](./4-onvif-bridge.md) 一致（跨案例呼应：所有 native cdylib 扩展都用同步 HTTP）。
+**我们选 ureq v2（同步）**；替代方案是 reqwest + tokio multi-thread runtime；理由见 [`Cargo.toml` L23 注释](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/Cargo.toml#L23)："Use sync HTTP client to avoid Tokio runtime issues in dynamic libraries"。
+
+cdylib 被 NeoMind 主进程 `dlopen` 加载时，如果扩展内部自建 tokio runtime，会与主进程已有的 runtime 冲突（panic "Cannot start a runtime from within a runtime"）。ureq 是纯同步的，在 `execute_command` 的 async 上下文里用 `block_on` 包裹也不会嵌套 runtime。
+
+Tokio 仍然出现在依赖里（[L26-L27](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/Cargo.toml#L26-L27)），但只启用 `rt + sync` feature——这是 SDK 的 FFI 宏为 `RwLock` wrapper 需要的，不用于异步 IO。这个决策与 [案例 4 onvif-bridge](./4-onvif-bridge.md) 一致（跨案例呼应：所有 native cdylib 扩展都用同步 HTTP）。
 
 ### 决策 2：Markdown 在扩展侧 Rust 渲染（而非前端 canvas / 而非云侧）
 
-**我们选扩展侧 Rust 渲染**（pulldown-cmark + ab_glyph + imageproc）；替代方案 A 是前端 Canvas API 渲染后上传 base64；替代方案 B 是把 Markdown 文本发给 Uink-RMS 云端让云渲染。理由：
+**我们选扩展侧 Rust 渲染**（pulldown-cmark + ab_glyph + imageproc）；替代方案 A 是前端 Canvas API 渲染后上传 base64；替代方案 B 是把 Markdown 文本发给 Uink-RMS 云端让云渲染。
+
+理由：
 
 1. e-paper 设备算力 / 带宽极有限，LPWAN 下行只收图像二进制，Uink-RMS API `POST /image` 也只接 JPEG/PNG，不支持文本格式——方案 B 不可行
 2. 前端 Canvas 渲染依赖浏览器字体，不同用户机器字体不一致，渲染结果不可预测，且把渲染 CPU 开销放在前端不如放在扩展侧
@@ -407,7 +439,9 @@ sequenceDiagram
 
 ### 决策 3：SDK 远程 crate 而非 workspace path（commit 39587eb）
 
-**我们选 `neomind-extension-sdk = "0.6.3"`（crates.io 远程 crate）**；替代方案是 workspace path 依赖（`neomind-extension-sdk = { path = "../../sdk" }`）；理由见 commit [`39587eb`](https://github.com/camthink-ai/NeoMind-Extensions/commit/39587eb)："chore: update neomind-extension-sdk to 0.6.3, use remote crate for uink-rms-bridge"。uink-rms-bridge 的 `.nep` 包可能独立分发给客户（不随主仓库源码分发），workspace path 依赖在脱离 monorepo 后无法编译。远程 crate 解耦了扩展与主仓库的构建耦合，代价是 SDK 升级需要发版到 crates.io 才能被扩展消费（多一步发布流程）。
+**我们选 `neomind-extension-sdk = "0.6.3"`（crates.io 远程 crate）**；替代方案是 workspace path 依赖（`neomind-extension-sdk = { path = "../../sdk" }`）；理由见 commit [`39587eb`](https://github.com/camthink-ai/NeoMind-Extensions/commit/39587eb)："chore: update neomind-extension-sdk to 0.6.3, use remote crate for uink-rms-bridge"。
+
+uink-rms-bridge 的 `.nep` 包可能独立分发给客户（不随主仓库源码分发），workspace path 依赖在脱离 monorepo 后无法编译。远程 crate 解耦了扩展与主仓库的构建耦合，代价是 SDK 升级需要发版到 crates.io 才能被扩展消费（多一步发布流程）。
 
 ### 决策 4：区域端点硬编码 China / Europe（而非完全自定义）
 
@@ -448,7 +482,9 @@ parking_lot::RwLock 比 std::sync::RwLock 性能更好且不中毒（poisoning�
 
 ### 决策 6：前端 Canvas 翻转支持（commit 261d8e6）
 
-**我们选在前端 Canvas 编辑器加 flipH / flipV 开关**（见 commit [`261d8e6`](https://github.com/camthink-ai/NeoMind-Extensions/commit/261d8e6) 的 `Canvas.tsx` 改动）；替代方案是在 Rust 侧用 `image::imageops::flip_horizontal` 翻转。理由：某些 Uink e-paper 设备的硬件安装方向相反（倒装 / 侧装），显示内容需要镜像。把这个翻转放在前端 Canvas 层，让用户在编辑时就能看到翻转后的效果（所见即所得），比在推送时后端翻转更直观。commit 还顺带加了 safe area 指示线（`EXPORT_PAD_RATIO = 0.03`）和数据源绑定（`dataSource` prop）。
+**我们选在前端 Canvas 编辑器加 flipH / flipV 开关**（见 commit [`261d8e6`](https://github.com/camthink-ai/NeoMind-Extensions/commit/261d8e6) 的 `Canvas.tsx` 改动）；替代方案是在 Rust 侧用 `image::imageops::flip_horizontal` 翻转。
+
+理由：某些 Uink e-paper 设备的硬件安装方向相反（倒装 / 侧装），显示内容需要镜像。把这个翻转放在前端 Canvas 层，让用户在编辑时就能看到翻转后的效果（所见即所得），比在推送时后端翻转更直观。commit 还顺带加了 safe area 指示线（`EXPORT_PAD_RATIO = 0.03`）和数据源绑定（`dataSource` prop）。
 
 ---
 
@@ -489,7 +525,9 @@ fn commands(&self) -> Vec<ExtensionCommand> {
 
 [Source: lib.rs L1220-L1443](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L1220-L1443)
 
-这些命令在 NeoMind 前端表现为 Agent 可调用的工具。用户可以对 Agent 说"把会议室的电子纸内容改成欢迎词"，Agent 会调用 `push_content` 命令。命令参数通过 `ParameterDefinition` 声明类型和约束（如 `content_type` 的 options 是 `["text", "markdown", "image"]`），前端据此自动渲染表单。
+这些命令在 NeoMind 前端表现为 Agent 可调用的工具。用户可以对 Agent 说"把会议室的电子纸内容改成欢迎词"，Agent 会调用 `push_content` 命令。
+
+命令参数通过 `ParameterDefinition` 声明类型和约束（如 `content_type` 的 options 是 `["text", "markdown", "image"]`），前端据此自动渲染表单。
 
 **设备类型集成**：扩展通过 `device_template_register` capability 注册 `uink_epaper` 设备模板（见 [`auto_sync` L1552-L1606](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L1552-L1606)），模板声明了 14 个指标：
 
@@ -557,7 +595,9 @@ fn produce_metrics(&self) -> Result<Vec<ExtensionMetricValue>> {
 
 [Source: lib.rs L1477-L1521](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L1477-L1521)设备级遥测（battery 等）通过 `device_metrics_write` capability 直接写入 NeoMind 设备指标存储，不走 produce_metrics 路径——这样前端设备面板能实时看到每个 e-paper 的电量和信号。
 
-**前端组件 DisplayEditorCard**：这是 uink-rms-bridge 与 [案例 4 onvif-bridge](./4-onvif-bridge.md)（无前端）的关键差异。`DisplayEditorCard` 是一个 380x420px 的交互卡片，内含 Canvas 编辑器（支持文字 / 图片 / 矩形元素拖拽排布）、Markdown 编辑模态框、实时预览。组件通过 Vite 构建为 `uink-rms-bridge-components.umd.cjs`，由 NeoMind Runtime 动态加载。组件绑定 device data source 后，用户编辑完点推送，组件调用 `push_content` 命令把 Canvas 导出的 base64 图像或 Markdown 文本发给扩展。commit [`261d8e6`](https://github.com/camthink-ai/NeoMind-Extensions/commit/261d8e6) 为这个组件加了翻转支持和数据源绑定。
+**前端组件 DisplayEditorCard**：这是 uink-rms-bridge 与 [案例 4 onvif-bridge](./4-onvif-bridge.md)（无前端）的关键差异。`DisplayEditorCard` 是一个 380x420px 的交互卡片，内含 Canvas 编辑器（支持文字 / 图片 / 矩形元素拖拽排布）、Markdown 编辑模态框、实时预览。
+
+组件通过 Vite 构建为 `uink-rms-bridge-components.umd.cjs`，由 NeoMind Runtime 动态加载。组件绑定 device data source 后，用户编辑完点推送，组件调用 `push_content` 命令把 Canvas 导出的 base64 图像或 Markdown 文本发给扩展。commit [`261d8e6`](https://github.com/camthink-ai/NeoMind-Extensions/commit/261d8e6) 为这个组件加了翻转支持和数据源绑定。
 
 **configure() 与配置面板联动**：扩展声明了 6 个配置参数（server_region / custom_server_url / email / password / sync_interval_secs / poll_interval_secs），NeoMind 配置面板根据 `ParameterDefinition` 自动渲染表单。用户修改配置后，Runtime 调用 `configure()`，扩展更新 RwLock 内的 config 并清空 token，下次 `produce_metrics` 周期触发 auto-sync 时自动用新配置登录。
 
@@ -651,7 +691,9 @@ Markdown → Image 渲染是扩展最易出 bug 的部分（字体覆盖、CJK �
 
 ### 平台 .nep 分发
 
-扩展通过 [`metadata.json`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/metadata.json) 声明 5 个构建目标：darwin-aarch64（macOS Apple Silicon）、darwin-x86_64（macOS Intel）、linux-x86_64、linux-aarch64、windows-x86_64。每个平台编译为独立的 `.nep` 文件（native extension package），通过 GitHub Releases 分发（`https://github.com/camthink-ai/NeoMind-Extensions/releases/download/v2.7.6/uink-rms-bridge-2.7.6-{platform}.nep`）。NeoMind Runtime 启动时根据当前平台自动下载对应 `.nep` 并 `dlopen` 加载。
+扩展通过 [`metadata.json`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/metadata.json) 声明 5 个构建目标：darwin-aarch64（macOS Apple Silicon）、darwin-x86_64（macOS Intel）、linux-x86_64、linux-aarch64、windows-x86_64。
+
+每个平台编译为独立的 `.nep` 文件（native extension package），通过 GitHub Releases 分发（`https://github.com/camthink-ai/NeoMind-Extensions/releases/download/v2.7.6/uink-rms-bridge-2.7.6-{platform}.nep`）。NeoMind Runtime 启动时根据当前平台自动下载对应 `.nep` 并 `dlopen` 加载。
 
 ### 生产演进历史（重点：该扩展是"演进痕迹最多"的案例之一）
 
@@ -670,13 +712,23 @@ Markdown → Image 渲染是扩展最易出 bug 的部分（字体覆盖、CJK �
 
 ### 厂商云依赖风险
 
-Uink-RMS 服务中断 = 扩展完全不可用（无法登录、无法推送、无法拉取遥测）。建议运维监控 cn/eu endpoint 的 HTTPS 可达性（`GET /api/v1/health` 或类似），设置告警。扩展自身的 `error_count` 指标和 `last_error` 字段可以反映最近的失败原因，但这是被动的——扩展不会主动通知云端不可达。
+Uink-RMS 服务中断 = 扩展完全不可用（无法登录、无法推送、无法拉取遥测）。建议运维监控 cn/eu endpoint 的 HTTPS 可达性（`GET /api/v1/health` 或类似），设置告警。
+
+扩展自身的 `error_count` 指标和 `last_error` 字段可以反映最近的失败原因，但这是被动的——扩展不会主动通知云端不可达。
 
 ### 源码卫生反例：单文件 2250 行
 
-uink-rms-bridge 的 `src/` 目录**只有 `lib.rs` 一个文件，共 2250 行**（用 `ls src/` 验证：仅 `lib.rs`，无 `discovery.rs` / `soap_client.rs` 等拆分，无 `.bak` 备份）。这是一个**单文件巨型扩展的反例**——2250 行单文件可读性差，新贡献者定位代码困难（找 `cmd_push_content` 要滚到 L1884）。对比 [案例 4 onvif-bridge](./4-onvif-bridge.md) 把协议拆成 5 个文件（lib.rs 1646 行 + discovery.rs 211 行 + soap_client.rs 516 行 + ptz.rs 214 行 + types.rs 78 行），每个文件职责单一、行数可控。
+uink-rms-bridge 的 `src/` 目录**只有 `lib.rs` 一个文件，共 2250 行**（用 `ls src/` 验证：仅 `lib.rs`，无 `discovery.rs` / `soap_client.rs` 等拆分，无 `.bak` 备份）。这是一个**单文件巨型扩展的反例**——2250 行单文件可读性差，新贡献者定位代码困难（找 `cmd_push_content` 要滚到 L1884）。
 
-**何时该拆分？何时单文件可接受？** uink-rms-bridge 选择单文件的理由是：它的所有逻辑围绕**单一厂商云 API**展开（Uink-RMS v1.0.1），auth / device / image / display 都是这个 API 的不同 endpoint，逻辑高度内聚，拆开反而增加跨文件跳转成本。而 onvif-bridge 是**多个独立协议栈**（WS-Discovery 是 UDP 多播、SOAP 是 HTTP、PTZ 是命令封装），天然分离。经验法则：如果模块之间共享很少的状态和类型（如 WS-Discovery 和 SOAP），拆分；如果所有模块都围绕同一个外部 API 的不同 endpoint（如 uink 的 auth + device + image），单文件可接受，但建议用 `// ===` 注释分区（本扩展确实这样做了，见 [L40](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L40)、[L161](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L161)、[L231](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L231) 等）。
+对比 [案例 4 onvif-bridge](./4-onvif-bridge.md) 把协议拆成 5 个文件（lib.rs 1646 行 + discovery.rs 211 行 + soap_client.rs 516 行 + ptz.rs 214 行 + types.rs 78 行），每个文件职责单一、行数可控。
+
+:::tip 工程教训
+**何时该拆分？何时单文件可接受？** uink-rms-bridge 选择单文件的理由是：它的所有逻辑围绕**单一厂商云 API**展开（Uink-RMS v1.0.1），auth / device / image / display 都是这个 API 的不同 endpoint，逻辑高度内聚，拆开反而增加跨文件跳转成本。
+
+而 onvif-bridge 是**多个独立协议栈**（WS-Discovery 是 UDP 多播、SOAP 是 HTTP、PTZ 是命令封装），天然分离。
+
+经验法则：如果模块之间共享很少的状态和类型（如 WS-Discovery 和 SOAP），拆分；如果所有模块都围绕同一个外部 API 的不同 endpoint（如 uink 的 auth + device + image），单文件可接受，但建议用 `// ===` 注释分区（本扩展确实这样做了，见 [L40](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L40)、[L161](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L161)、[L231](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L231) 等）。
+:::
 
 ### 排障表
 
@@ -730,7 +782,9 @@ uink-rms-bridge 的 `src/` 目录**只有 `lib.rs` 一个文件，共 2250 行**
 
 ### 推荐阅读顺序
 
-如果你刚进入 NeoMind 协议桥接主题，建议先读 [案例 4 onvif-bridge](./4-onvif-bridge.md) 再读本案例。4 展示了「标准协议桥接」的工程范式（SOAP / WS-Discovery / WS-Security），5 展示了「厂商专有桥接」的工程范式（JWT / Markdown 渲染 / 区域路由）。读完两者，你会理解 NeoMind 生态中两种截然不同的集成策略及其取舍。然后可以继续阅读 [案例总览](./0-overview.md) 了解完整案例矩阵。
+如果你刚进入 NeoMind 协议桥接主题，建议先读 [案例 4 onvif-bridge](./4-onvif-bridge.md) 再读本案例。4 展示了「标准协议桥接」的工程范式（SOAP / WS-Discovery / WS-Security），5 展示了「厂商专有桥接」的工程范式（JWT / Markdown 渲染 / 区域路由）。
+
+读完两者，你会理解 NeoMind 生态中两种截然不同的集成策略及其取舍。然后可以继续阅读 [案例总览](./0-overview.md) 了解完整案例矩阵。
 
 ### 小结
 

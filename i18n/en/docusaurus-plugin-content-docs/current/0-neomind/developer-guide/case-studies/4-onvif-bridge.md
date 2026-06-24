@@ -9,11 +9,15 @@ sidebar_label: "onvif-bridge"
 
 ## Case Background
 
-**onvif-bridge** is the **standard protocol bridge** case study in the NeoMind ecosystem. ONVIF (Open Network Video Interface Forum) is an open standard for network video devices, defining specifications for device discovery (WS-Discovery), media stream negotiation (RTSP URL retrieval), PTZ control, and event subscription. It covers multiple profiles including Profile S (streaming), Profile T (advanced streaming), and Profile G (video storage). Any IP camera compliant with ONVIF Profile S — Hikvision, Dahua, Vivotek, Tiandy — can be integrated into NeoMind via onvif-bridge without vendor-specific SDKs or adaptation layers.
+**onvif-bridge** is the **standard protocol bridge** case study in the NeoMind ecosystem. ONVIF (Open Network Video Interface Forum) is an open standard for network video devices, defining specifications for device discovery (WS-Discovery), media stream negotiation (RTSP URL retrieval), PTZ control, and event subscription. It covers multiple profiles including Profile S (streaming), Profile T (advanced streaming), and Profile G (video storage).
+
+Any IP camera compliant with ONVIF Profile S — Hikvision, Dahua, Vivotek, Tiandy — can be integrated into NeoMind via onvif-bridge without vendor-specific SDKs or adaptation layers.
 
 The current version is 2.7.6, with approximately 2700 lines of core code distributed across 5 Rust source files: `lib.rs` (1646 lines, Extension trait + command dispatch), `soap_client.rs` (516 lines, SOAP envelope + WS-Security), `discovery.rs` (211 lines, WS-Discovery UDP multicast), `ptz.rs` (214 lines, PTZ commands), and `types.rs` (78 lines, data structures).
 
-**What problem does it solve?** NeoMind's frontend needs unified management of heterogeneous IP cameras. If every vendor used its own SDK (Hikvision SDK, Dahua SDK, Tiandy SDK), the codebase would explode, maintenance costs would be prohibitive, and onboarding new vendors would take weeks. onvif-bridge wraps the ONVIF standard protocol into NeoMind's commands and metrics, so the frontend only needs to call unified commands like `discover` / `get_stream_uri` / `ptz_move` to operate any ONVIF-compliant camera. This is an **open-standard-driven integration strategy** — adapting to the protocol, not to the vendor.
+**What problem does it solve?** NeoMind's frontend needs unified management of heterogeneous IP cameras. If every vendor used its own SDK (Hikvision SDK, Dahua SDK, Tiandy SDK), the codebase would explode, maintenance costs would be prohibitive, and onboarding new vendors would take weeks.
+
+onvif-bridge wraps the ONVIF standard protocol into NeoMind's commands and metrics, so the frontend only needs to call unified commands like `discover` / `get_stream_uri` / `ptz_move` to operate any ONVIF-compliant camera. This is an **open-standard-driven integration strategy** — adapting to the protocol, not to the vendor.
 
 **Preview of comparison with 5 uink-rms-bridge**: [5 uink-rms-bridge](./5-uink-rms-bridge.md) is a **vendor-proprietary protocol** bridge (closed SDK + private binary protocol), while onvif-bridge is a **standard protocol** bridge (open specification + SOAP/WS-Discovery). These two represent fundamentally different integration strategies in the NeoMind ecosystem — "standard protocol bridging" vs. "proprietary protocol bridging" — each with vastly different applicable scenarios, engineering complexity, and maintenance costs. Case 5 in this series will specifically compare these two strategies.
 
@@ -859,7 +863,13 @@ src/
   types.rs        (78 lines)
 ```
 
-This contrasts sharply with [Case 2 yolo-device-inference](./2-yolo-device-inference.md) (`src/` contains 18 backup files) and [Case 3 yolo-video-v2](./3-yolo-video-v2.md) (`src/` contains multiple backup files). onvif-bridge likely remains clean because: (1) as a more recently developed extension (introduced together with BACnet/OPC-UA in commit `422ba8d`), it has not yet been polluted by multiple iterations; (2) protocol bridging code is more structured than AI inference code — each file has a single responsibility (SOAP / Discovery / PTZ / Types), making it less likely to produce temporary copies during refactoring. onvif-bridge serves as a **positive example** for source code governance — a clean `src/` directory ensures that `grep` / `rg` search results are not polluted by noise, making code reviews more focused.
+This contrasts sharply with [Case 2 yolo-device-inference](./2-yolo-device-inference.md) (`src/` contains 18 backup files) and [Case 3 yolo-video-v2](./3-yolo-video-v2.md) (`src/` contains multiple backup files). onvif-bridge likely remains clean because: (1) as a more recently developed extension (introduced together with BACnet/OPC-UA in commit `422ba8d`), it has not yet been polluted by multiple iterations; (2) protocol bridging code is more structured than AI inference code — each file has a single responsibility (SOAP / Discovery / PTZ / Types), making it less likely to produce temporary copies during refactoring.
+
+onvif-bridge serves as a **positive example** for source code governance — a clean `src/` directory ensures that `grep` / `rg` search results are not polluted by noise, making code reviews more focused.
+
+:::tip Engineering lesson
+**Separation of protocol bridging and stream processing responsibilities** is the core design philosophy of onvif-bridge. onvif-bridge only returns the RTSP URL string and never touches any video frame — subsequent stream pulling, decoding, and inference are handled by other extensions. This orthogonal architecture lets protocol bridging and AI inference evolve independently, and is a model of NeoMind ecosystem composability.
+:::
 
 ### Troubleshooting Quick Reference
 
@@ -918,6 +928,10 @@ onvif-bridge implements complete ONVIF Profile S core capabilities in approximat
 3. the architecture pattern of a pure backend extension — no frontend, no ONNX, synchronous HTTP, single responsibility.
 
 From a source code governance perspective, onvif-bridge's `src/` directory (5 files, zero backup files) is the cleanest case study in this series and can serve as a positive reference for code hygiene.
+
+:::tip Engineering lesson
+**Adapt to the protocol, not to the vendor** — this is the key strategy for reducing integration costs. One codebase built on the ONVIF open standard is compatible with all Profile S devices (Hikvision, Dahua, Vivotek, etc.), avoiding the maintenance burden of N vendor SDKs. Hand-writing the ~2700-line protocol stack loses type-safe WSDL bindings but gains full control over vendor non-standard implementations.
+:::
 
 Recommended reading order: [Overview](./0-overview.md) → [Case 2 yolo-device-inference](./2-yolo-device-inference.md) → [Case 3 yolo-video-v2](./3-yolo-video-v2.md) → **this article (4 onvif-bridge)** → [Case 5 uink-rms-bridge](./5-uink-rms-bridge.md).
 

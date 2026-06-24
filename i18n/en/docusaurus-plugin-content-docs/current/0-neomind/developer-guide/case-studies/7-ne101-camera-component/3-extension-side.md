@@ -13,7 +13,9 @@ sidebar_label: "Extension Side"
 
 ## The processingExtensionId Generic Contract
 
-The most easily misunderstood fact about ne101_camera is this: although it looks like it is doing "AI object detection", a full read of the 1972-line `bundle.js` will find zero lines of YOLO inference, zero references to an ONNX runtime, zero model-weight loads. The component itself **does no AI whatsoever**. All inference is outsourced to whichever extension the user picks via the `processingExtensionId` config field. This field lives in the `default_config` block of [`manifest.json` L23-L24](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L23-L24):
+The most easily misunderstood fact about ne101_camera is this: although it looks like it is doing "AI object detection", a full read of the 1972-line `bundle.js` will find zero lines of YOLO inference, zero references to an ONNX runtime, zero model-weight loads.
+
+**The component itself does no AI whatsoever.** All inference is outsourced to whichever extension the user picks via the `processingExtensionId` config field. This field lives in the `default_config` block of [`manifest.json` L23-L24](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L23-L24):
 
 ```json
 "processingEnabled": false,
@@ -31,6 +33,10 @@ This "component + pluggable extension" contract is the **template** for AI reuse
 3. model updates would be tightly coupled to component updates — every YOLO iteration would require a new component release, whereas extensions are deployed independently (upgraded by the user or platform ops without touching the component).
 
 The pluggable-extension design dissolves all three problems: the component stays at 80KB, the user picks the model, and extensions can evolve on their own release cadence.
+
+:::tip Engineering lesson
+**Component does zero AI; inference is outsourced to extensions** — this is the core paradigm of the NeoMind component marketplace. The same component paired with different extensions does different tasks (detection / OCR / description), stays lightweight at 80KB, and extensions can upgrade independently. This is the foundation of the "one component, many uses" paradigm.
+:::
 
 The diagram below shows the fan-out from "component → processingExtensionId → N candidate extensions". The component exposes one slot; the user's dropdown choice determines which extension is actually invoked, and extensions are mutually unaware of each other.
 
@@ -383,6 +389,10 @@ A similar fallback appears in `getExtModes(extensionId)` at [`bundle.js` L196-L1
 - **Alternative**: strict mode — extensions not in `EXT_MODES` trigger an `AdvancedPanel` error "this extension is not supported by ne101_camera", blocking Transform creation. Rejected because: this makes the "new extension + old component" combination entirely unusable — the user installs a new AI extension but cannot use it because ne101_camera has not yet updated `EXT_MODES`. This version coupling is a hindrance to ecosystem growth.
 - **Rationale**: forward-compatibility takes priority over strictness. New extensions most likely follow common detection-API conventions (`detect` command + `image` parameter + box response), and the lenient fallback lets them "mostly work" before the component catches up. Occasional shape mismatches cause silent failure (no boxes), not crashes — users can wait for a component update or hand-edit the Transform code.
 - **Cost**: silent failure is harder to debug than an explicit error. The mitigations are the 5 debug log and this very documentation — making sure developers know "unknown extensions fall through to boxes_x1y1x2y2", so empty detections quickly point to a response-shape mismatch.
+
+:::tip Engineering lesson
+In the fuzzy zones of the "component to extension" contract, **choose leniency and adaptation over strictness and coercion**. Facing unknown extensions, choose default fallback over rejection (forward compatibility); facing expert-grade parameters, choose hardcoded safe defaults over UI exposure (principle of least astonishment). This design lets the ecosystem evolve independently without version-coupling blockers.
+:::
 
 ---
 

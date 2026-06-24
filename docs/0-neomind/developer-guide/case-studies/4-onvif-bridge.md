@@ -9,13 +9,19 @@ sidebar_label: "onvif-bridge"
 
 ## 案例背景
 
-**onvif-bridge** 是 NeoMind 生态中的**标准协议桥接**案例。ONVIF（Open Network Video Interface Forum）是网络视频设备的开放标准，定义了设备发现（WS-Discovery）、媒体流协商（RTSP URL 获取）、PTZ 控制、事件订阅等接口规范。覆盖 Profile S（流媒体）、Profile T（高级流媒体）、Profile G（视频存储）等多个 profile。任何符合 ONVIF Profile S 的 IP 摄像头——海康、大华、安讯威、Tiandy——都可以通过 onvif-bridge 接入 NeoMind，无需厂商私有 SDK，无需适配层。
+**onvif-bridge** 是 NeoMind 生态中的**标准协议桥接**案例。ONVIF（Open Network Video Interface Forum）是网络视频设备的开放标准，定义了设备发现（WS-Discovery）、媒体流协商（RTSP URL 获取）、PTZ 控制、事件订阅等接口规范。覆盖 Profile S（流媒体）、Profile T（高级流媒体）、Profile G（视频存储）等多个 profile。
+
+任何符合 ONVIF Profile S 的 IP 摄像头——海康、大华、安讯威、Tiandy——都可以通过 onvif-bridge 接入 NeoMind，无需厂商私有 SDK，无需适配层。
 
 当前版本 2.7.6，核心代码分布在 5 个 Rust 源文件中约 2700 行：`lib.rs`（1646 行，Extension trait + 命令分发）、`soap_client.rs`（516 行，SOAP envelope + WS-Security）、`discovery.rs`（211 行，WS-Discovery UDP 多播）、`ptz.rs`（214 行，PTZ 命令）、`types.rs`（78 行，数据结构）。
 
-**它解决了什么问题？** NeoMind 的前端需要统一管理异构 IP 摄像头。如果每个厂商都用自己的 SDK（海康 SDK、大华 SDK、Tiandy SDK），代码量爆炸、维护成本高、新厂商接入周期长。onvif-bridge 把 ONVIF 标准协议封装为 NeoMind 的命令和指标，前端只需调用 `discover` / `get_stream_uri` / `ptz_move` 等统一命令，就能操作任何 ONVIF 兼容摄像头。这是**开放标准驱动的集成策略**——不是适配厂商，而是适配协议。
+**它解决了什么问题？** NeoMind 的前端需要统一管理异构 IP 摄像头。如果每个厂商都用自己的 SDK（海康 SDK、大华 SDK、Tiandy SDK），代码量爆炸、维护成本高、新厂商接入周期长。
 
-**与 5 uink-rms-bridge 的对比预告**：[5 uink-rms-bridge](./5-uink-rms-bridge.md) 是**厂商专有协议**（封闭 SDK + 私有二进制协议），onvif-bridge 是**标准协议**（开放规范 + SOAP/WS-Discovery）。两者代表 NeoMind 生态中两种截然不同的集成策略——「标准协议桥接」vs「专有协议桥接」——各自的适用场景、工程复杂度、维护成本差异巨大。本系列 5 会专门对比这两种策略。
+onvif-bridge 把 ONVIF 标准协议封装为 NeoMind 的命令和指标，前端只需调用 `discover` / `get_stream_uri` / `ptz_move` 等统一命令，就能操作任何 ONVIF 兼容摄像头。这是**开放标准驱动的集成策略**——不是适配厂商，而是适配协议。
+
+**与 5 uink-rms-bridge 的对比预告**：[5 uink-rms-bridge](./5-uink-rms-bridge.md) 是**厂商专有协议**（封闭 SDK + 私有二进制协议），onvif-bridge 是**标准协议**（开放规范 + SOAP/WS-Discovery）。
+
+两者代表 NeoMind 生态中两种截然不同的集成策略——「标准协议桥接」vs「专有协议桥接」——各自的适用场景、工程复杂度、维护成本差异巨大。本系列 5 会专门对比这两种策略。
 
 **与 NeoEyes 摄像头产品线的关系**：NeoEyes NE101 / NE301 等硬件设备部分支持 ONVIF 协议栈，onvif-bridge 也可以作为这些自研设备的通用接入路径。当客户混部 NeoEyes 摄像头和第三方 ONVIF 摄像头时，onvif-bridge 提供统一的管理面板。
 
@@ -40,7 +46,9 @@ sidebar_label: "onvif-bridge"
 
 ## 架构总览
 
-onvif-bridge 是一个**纯后端协议桥接扩展**——没有 frontend 组件、没有 ONNX 模型、没有视频解码逻辑。它的职责是：用标准协议（WS-Discovery + SOAP）与 ONVIF 摄像头通信，把结果转化为 NeoMind 的命令返回值和虚拟指标。扩展进程内通过 `parking_lot::RwLock` 管理 `HashMap<String, OnvifDevice>` 设备注册表，所有命令操作都围绕这个注册表展开。
+onvif-bridge 是一个**纯后端协议桥接扩展**——没有 frontend 组件、没有 ONNX 模型、没有视频解码逻辑。它的职责是：用标准协议（WS-Discovery + SOAP）与 ONVIF 摄像头通信，把结果转化为 NeoMind 的命令返回值和虚拟指标。
+
+扩展进程内通过 `parking_lot::RwLock` 管理 `HashMap<String, OnvifDevice>` 设备注册表，所有命令操作都围绕这个注册表展开。
 
 ```mermaid
 graph TB
@@ -114,7 +122,9 @@ graph TB
 | 线程模型 | runtime 主线程 | 专用 OS 线程 | **同步阻塞，无额外线程** |
 | 代码规模 | ~1200 行 | ~4000 行 | **~2700 行** |
 
-这张对比表揭示了一个关键事实：onvif-bridge 与 AI 推理扩展在架构上几乎完全正交。它不碰模型、不碰视频解码、不碰前端渲染。它只做一件事——用标准协议与设备对话，把结果返回给 NeoMind。后续的推理、渲染由其他扩展或前端组件完成。这种**职责分离**正是标准协议桥接的核心设计哲学。
+这张对比表揭示了一个关键事实：onvif-bridge 与 AI 推理扩展在架构上几乎完全正交。它不碰模型、不碰视频解码、不碰前端渲染。它只做一件事——用标准协议与设备对话，把结果返回给 NeoMind。
+
+后续的推理、渲染由其他扩展或前端组件完成。这种**职责分离**正是标准协议桥接的核心设计哲学。
 
 ---
 
@@ -198,7 +208,9 @@ pub fn discover_devices(timeout_ms: u64) -> Result<Vec<DiscoveryMatch>, String> 
 
 *Source: [`src/discovery.rs` L134-L211](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/discovery.rs#L134-L211)*
 
-**find_local_ipv4 的必要性**（[`src/discovery.rs` L119-L131](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/discovery.rs#L119-L131)）：macOS 的网络栈在多播绑定时，如果绑定到 `0.0.0.0`（INADDR_ANY），内核不知道用哪个网卡接口发送多播包，会报 `No route to host`。解决方案是先创建一个临时 UDP socket 连接到 `8.8.8.8:80`（不实际发包，只是让内核选择默认路由的网卡），然后读取该 socket 的 `local_addr()` 获取本机真实 IP。这个修复在 commit `59d3490` 中引入。
+**find_local_ipv4 的必要性**（[`src/discovery.rs` L119-L131](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/discovery.rs#L119-L131)）：macOS 的网络栈在多播绑定时，如果绑定到 `0.0.0.0`（INADDR_ANY），内核不知道用哪个网卡接口发送多播包，会报 `No route to host`。
+
+解决方案是先创建一个临时 UDP socket 连接到 `8.8.8.8:80`（不实际发包，只是让内核选择默认路由的网卡），然后读取该 socket 的 `local_addr()` 获取本机真实 IP。这个修复在 commit `59d3490` 中引入。
 
 ```rust
 fn find_local_ipv4() -> Option<Ipv4Addr> {
@@ -299,7 +311,9 @@ onvif-bridge 实现了 ONVIF Core 和 Media 规范中的核心协商函数：
 | `get_snapshot_uri` | [`L346-L365`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/soap_client.rs#L346-L365) | `GetSnapshotUri` | JPEG 抓拍地址 |
 | `is_ptz_supported` | [`L368-L385`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/soap_client.rs#L368-L385) | 检查 `GetProfiles` 响应 | 布尔值 |
 
-**resolve_service_url**（[`src/soap_client.rs` L390-L407](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/soap_client.rs#L390-L407)）是一个容易被忽略但很关键的函数——ONVIF 设备的不同服务（device/media/ptz）有不同的 URL 路径（`/onvif/device_service`、`/onvif/media_service`、`/onvif/ptz_service`）。WS-Discovery 返回的 device URL 通常已经是 `/onvif/device_service` 结尾，调用 media 服务时需要替换路径后缀而非追加。
+**resolve_service_url**（[`src/soap_client.rs` L390-L407](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/soap_client.rs#L390-L407)）是一个容易被忽略但很关键的函数——ONVIF 设备的不同服务（device/media/ptz）有不同的 URL 路径（`/onvif/device_service`、`/onvif/media_service`、`/onvif/ptz_service`）。
+
+WS-Discovery 返回的 device URL 通常已经是 `/onvif/device_service` 结尾，调用 media 服务时需要替换路径后缀而非追加。
 
 ```rust
 pub fn get_device_info(device: &OnvifDevice) -> Result<serde_json::Value, String> {
@@ -459,7 +473,9 @@ sequenceDiagram
     NM-->>FE: PTZ 命令已执行
 ```
 
-这个时序图揭示了一个重要事实：onvif-bridge 在整个链路中**不触碰任何视频帧**。它的终点是返回一个 RTSP URL——后续的拉流、解码、推理、渲染全部由其他组件完成（例如 [案例 3 yolo-video-v2](./3-yolo-video-v2.md) 可以消费这个 RTSP URL 跑实时检测）。这种设计保证了协议桥接和流处理可以独立演进。
+这个时序图揭示了一个重要事实：onvif-bridge 在整个链路中**不触碰任何视频帧**。它的终点是返回一个 RTSP URL——后续的拉流、解码、推理、渲染全部由其他组件完成（例如 [案例 3 yolo-video-v2](./3-yolo-video-v2.md) 可以消费这个 RTSP URL 跑实时检测）。
+
+这种设计保证了协议桥接和流处理可以独立演进。
 
 ---
 
@@ -513,7 +529,9 @@ sequenceDiagram
 
 **替代方案**：直接 `UdpSocket::bind("0.0.0.0:0")` 绑定到所有接口。
 
-**理由**：macOS 的网络栈在多播绑定时，如果 socket 绑定到 `0.0.0.0`（INADDR_ANY），内核无法确定用哪个网卡接口发送多播包，会直接返回 `No route to host`（errno 65）。这个问题在 commit `59d3490` 中被修复——该 commit 的标题就是 `fix(onvif): improve WS-Discovery multicast reliability`。Linux 和 Windows 对 `0.0.0.0` 的多播处理更宽容，但为了跨平台一致性，onvif-bridge 统一采用 `find_local_ipv4`。权衡的代价是多机网卡场景下可能选中非期望的接口（例如同时有 Wi-Fi 和以太网），但这可以通过用户手动 `add_device` 绕过。
+**理由**：macOS 的网络栈在多播绑定时，如果 socket 绑定到 `0.0.0.0`（INADDR_ANY），内核无法确定用哪个网卡接口发送多播包，会直接返回 `No route to host`（errno 65）。这个问题在 commit `59d3490` 中被修复——该 commit 的标题就是 `fix(onvif): improve WS-Discovery multicast reliability`。
+
+Linux 和 Windows 对 `0.0.0.0` 的多播处理更宽容，但为了跨平台一致性，onvif-bridge 统一采用 `find_local_ipv4`。权衡的代价是多机网卡场景下可能选中非期望的接口（例如同时有 Wi-Fi 和以太网），但这可以通过用户手动 `add_device` 绕过。
 
 ### 决策 5：扩展内不解析 RTSP 流
 
@@ -782,7 +800,9 @@ WS-Discovery 的 UDP 多播**默认不穿越路由器**（TTL=1），在以下�
 
 ### macOS 多播修复详解（commit 59d3490）
 
-commit `59d3490`（`fix(onvif): improve WS-Discovery multicast reliability`）修复了 macOS 上的多播绑定问题。修复前，`discover_devices` 直接绑定到 `0.0.0.0`，macOS 内核无法确定发送多播包的网络接口，返回 `No route to host`（errno 65）。修复后的 `find_local_ipv4()` 函数（[`src/discovery.rs` L119-L131](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/discovery.rs#L119-L131)）通过创建临时 UDP socket 连接 `8.8.8.8:80`，读取内核选择的默认出口 IP，然后绑定到该具体地址。这个技巧不发送任何实际网络流量——`connect()` 对 UDP 只是设置默认目标地址并触发内核路由查询。
+commit `59d3490`（`fix(onvif): improve WS-Discovery multicast reliability`）修复了 macOS 上的多播绑定问题。修复前，`discover_devices` 直接绑定到 `0.0.0.0`，macOS 内核无法确定发送多播包的网络接口，返回 `No route to host`（errno 65）。
+
+修复后的 `find_local_ipv4()` 函数（[`src/discovery.rs` L119-L131](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/discovery.rs#L119-L131)）通过创建临时 UDP socket 连接 `8.8.8.8:80`，读取内核选择的默认出口 IP，然后绑定到该具体地址。这个技巧不发送任何实际网络流量——`connect()` 对 UDP 只是设置默认目标地址并触发内核路由查询。
 
 ### 厂商实现差异与宽容解析
 
@@ -869,6 +889,10 @@ src/
 
 onvif-bridge 可以作为**源码治理的正例**——干净的 `src/` 目录让 `grep` / `rg` 的搜索结果不被噪音污染，让代码审查更聚焦。
 
+:::tip 工程教训
+**协议桥接与流处理职责分离**是 onvif-bridge 的核心设计哲学。onvif-bridge 只返回 RTSP URL 字符串，不触碰任何视频帧——后续拉流、解码、推理由其他扩展完成。这种正交架构让协议桥接和 AI 推理可以独立演进，是 NeoMind 生态可组合性的典范。
+:::
+
 ### 排障速查表
 
 | 症状 | 可能原因 | 排查步骤 | 修复方案 |
@@ -926,6 +950,10 @@ onvif-bridge 在约 2700 行 Rust 代码中实现了完整的 ONVIF Profile S �
 3. 纯后端扩展的架构模式——无 frontend、无 ONNX、同步 HTTP、职责单一。
 
 从源码治理角度看，onvif-bridge 的 `src/` 目录（5 个文件，零备份文件）是本系列中最干净的案例，可以作为代码卫生的正例参照。
+
+:::tip 工程教训
+**适配协议而非适配厂商**是降低集成成本的关键策略。一套基于 ONVIF 开放标准的代码兼容所有 Profile S 设备（海康、大华、宇视等），避免了 N 个厂商 SDK 的维护负担。手写协议栈约 2700 行虽然失去类型安全 WSDL 绑定，但获得了对厂商非标准实现的完全控制力。
+:::
 
 推荐阅读顺序：[总览](./0-overview.md) → [案例 2 yolo-device-inference](./2-yolo-device-inference.md) → [案例 3 yolo-video-v2](./3-yolo-video-v2.md) → **本文（4 onvif-bridge）** → [案例 5 uink-rms-bridge](./5-uink-rms-bridge.md)。
 

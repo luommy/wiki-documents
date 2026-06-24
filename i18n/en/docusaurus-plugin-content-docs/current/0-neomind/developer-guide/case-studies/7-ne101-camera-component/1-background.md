@@ -15,7 +15,9 @@ sidebar_label: "Business Background"
 
 **CamThink NE101** is a battery-powered edge-AI sensing camera designed by the CamThink team (which also maintains the NeoMind Dashboard). Its core capability is "on-demand capture + edge metric reporting": unlike a traditional IPC camera that streams continuously, NE101 spends most of its time in low-power sleep and wakes up to capture a single JPEG still only under specific trigger conditions (scheduled wake-up or external commands via MQTT).
 
-After each capture the device reports a telemetry bundle: the latest JPEG image (fetched via REST, URL stored in `values.image_url`), the battery percentage, the cellular signal strength, and the enclosure temperature. This "event-driven + low-frequency sampling" design lets a single battery last 3-6 months, but it also means the component cannot use a "subscribe to video stream" model — it must use a "fetch the latest still" polling/event pattern.
+**After each capture** the device reports a telemetry bundle: the latest JPEG image (fetched via REST, URL stored in `values.image_url`), the battery percentage, the cellular signal strength, and the enclosure temperature. This "event-driven + low-frequency sampling" design lets a single battery last 3-6 months.
+
+But it also means the component cannot use a "subscribe to video stream" model — it must use a "fetch the latest still" polling/event pattern.
 
 NE101 talks to the NeoMind controller over MQTT: the device publishes telemetry to the `devices/{device_id}/telemetry` topic, NeoMind subscribes and forwards deltas to the frontend component via WebSocket. This link dictates why the ne101_camera data access is "device binding" (DeviceBinding subscribes directly to a specific device's telemetry stream) rather than "data source binding" (DataSource was designed for "periodic metrics produced by extensions").
 
@@ -126,7 +128,9 @@ Before ne101_camera was built, monitoring an NE101 camera on NeoMind required "a
 3. Manual `curl` or Postman calls to `/devices/{id}/commands` to trigger captures;
 4. For AI detection, manually calling the extension API and writing the result back.
 
-This assembly had three obvious pain points: **(a) no unified control panel** — users had to jump between three or four components, a fragmented experience; **(b) no image + ROI overlay** — image_display could only show the raw JPEG, with no way to draw ROI rectangles or detection boxes; **(c) no AI processing pipeline** — all inference had to be triggered manually, with no "capture-then-infer" automation. ne101_camera exists to eliminate these three pain points: it bundles all of the above into a 3×3 default-size card providing a five-in-one panel of "image + metrics + command buttons + ROI config + AI extension picker".
+This assembly had three obvious pain points: **(a) no unified control panel** — users had to jump between three or four components, a fragmented experience; **(b) no image + ROI overlay** — image_display could only show the raw JPEG, with no way to draw ROI rectangles or detection boxes; **(c) no AI processing pipeline** — all inference had to be triggered manually, with no "capture-then-infer" automation.
+
+ne101_camera exists to eliminate these three pain points: it bundles all of the above into a 3×3 default-size card providing a five-in-one panel of "image + metrics + command buttons + ROI config + AI extension picker".
 
 To make the "before vs after" experience concrete, the table below contrasts the same monitoring task ("count pedestrian flow at a walkway every 30 minutes") under the two approaches. As you can see, ne101_camera compresses a 7-step manual flow into 2 steps of config plus an automatic loop — and that is the real reason it is called the "flagship component": not because of its line count, but because it collapses a fragmented cross-component chain into a single panel.
 
@@ -192,7 +196,15 @@ This section lists 4 key design decisions and the alternatives that were rejecte
 
 ### Design decision recap
 
-These four decisions share a common theme: **push complexity to the edges and keep the component itself "thin"**. ne101_camera does not bake in AI, does not pretend to be a data source, does not lock the detection algorithm, and does not force a config-format migration — each decision leaves the choice to the user or to the downstream extension. This "thin component + thick contract" philosophy is the core design principle of the NeoMind component marketplace, and it is why a 1972-line component can be called "flagship" rather than "bloated": the vast majority of those 1972 lines are glue code that "exposes choice correctly", not monolithic logic that "does everything itself". Later sections (especially 3 Extension Side and 6 Component Build) will return to this theme repeatedly.
+These four decisions share a common theme: **push complexity to the edges and keep the component itself "thin"**. ne101_camera does not bake in AI, does not pretend to be a data source, does not lock the detection algorithm, and does not force a config-format migration — each decision leaves the choice to the user or to the downstream extension.
+
+This **"thin component + thick contract"** philosophy is the core design principle of the NeoMind component marketplace, and it is why a 1972-line component can be called "flagship" rather than "bloated": the vast majority of those 1972 lines are glue code that "exposes choice correctly", not monolithic logic that "does everything itself".
+
+:::tip Engineering lesson
+The **"thin component + thick contract"** philosophy is the core design principle of the NeoMind component marketplace. Push complexity to the edges — outsource AI to extensions, use device binding instead of pretending to be a data source, use IoU instead of locking to center-point detection, use backward-compatible config formats instead of forcing migration. Every decision leaves the choice to the user or downstream, and that is why 1972 lines of code are called "flagship" rather than "bloated".
+:::
+
+Later sections (especially 3 Extension Side and 6 Component Build) will return to this theme repeatedly.
 
 ---
 

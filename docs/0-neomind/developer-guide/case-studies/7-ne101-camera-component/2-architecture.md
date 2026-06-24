@@ -25,9 +25,13 @@ var NE101CameraPanel = (function () {
 
 Source: [`bundle.js` L1-L5](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1-L5)
 
-这三行 `var React = window.React` + `var jsx = window.jsxRuntime.jsx` + `var jsxs = window.jsxRuntime.jsxs` 是 NeoMind 组件市场的「注入三连」，也是与 metric_card（[6 metric_card 3.2](../6-metric-card-component.md)）共享的底层约定。它意味着 **bundle 不打包 React**，而是从宿主页面已经加载好的单例里「借」一份 React，从而保证全仪表板只有一个 React 实例，hooks 不会跨实例失效（`useContext` 返回 undefined、`useRef` 报错这类经典症状）。
+这三行 `var React = window.React` + `var jsx = window.jsxRuntime.jsx` + `var jsxs = window.jsxRuntime.jsxs` 是 NeoMind 组件市场的「注入三连」，也是与 metric_card（[6 metric_card 3.2](../6-metric-card-component.md)）共享的底层约定。
 
-为什么用 `var Name = (function(){ ... })()` 这种 IIFE 形式而不是 UMD / CommonJS / ESM？根本原因是 **Dashboard 宿主通过 `<script>` 标签注入 bundle**。`<script>` 标签没有模块作用域，IIFE 是唯一能用「函数作用域 + 闭包」模拟私有命名空间的零依赖手段：函数体内的 `function classColor` / `var white` 等等不会泄漏到 `window` 上，只有最后那一句 `return { ... }` 的对象挂到 `window.NE101CameraPanel`。UMD 虽然也能跑在 `<script>` 下，但它多了一层 `define` / `module.exports` 的探测分支，对「不跑打包器」的 NeoMind 范式是冗余的；CommonJS 的 `require` 在浏览器里根本不工作。
+它意味着 **bundle 不打包 React**，而是从宿主页面已经加载好的单例里「借」一份 React，从而保证全仪表板只有一个 React 实例，hooks 不会跨实例失效（`useContext` 返回 undefined、`useRef` 报错这类经典症状）。
+
+为什么用 `var Name = (function(){ ... })()` 这种 IIFE 形式而不是 UMD / CommonJS / ESM？根本原因是 **Dashboard 宿主通过 `<script>` 标签注入 bundle**。`<script>` 标签没有模块作用域，IIFE 是唯一能用「函数作用域 + 闭包」模拟私有命名空间的零依赖手段：函数体内的 `function classColor` / `var white` 等等不会泄漏到 `window` 上，只有最后那一句 `return { ... }` 的对象挂到 `window.NE101CameraPanel`。
+
+UMD 虽然也能跑在 `<script>` 下，但它多了一层 `define` / `module.exports` 的探测分支，对「不跑打包器」的 NeoMind 范式是冗余的；CommonJS 的 `require` 在浏览器里根本不工作。
 
 最后一行 [`bundle.js` L1971](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1971) 是**命名导出 + default 双暴露**：
 
@@ -46,7 +50,9 @@ Source: [`bundle.js` L1971](https://github.com/camthink-ai/NeoMind-Dashboard-Com
   "export_name": "NE101CameraPanel"
 ```
 
-Source: [manifest.json L39](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L39)（从 `NE101CameraPanel.NE101CameraPanel` 取主组件），而不是 default；但 default 同时被保留，是为了兼容那些仍写 `bundle.default` 的旧版 Dashboard 加载器（见 2.5 决策 #2）。这种「双暴露」是 ne101_camera 区别于 metric_card 的一个细节——metric_card 也写了 `default + MetricCard`，但只导出一个组件，而 ne101_camera 要把 `ConfigPanel` / `AdvancedPanel` 一起带出去给配置对话框使用。
+Source: [manifest.json L39](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L39)（从 `NE101CameraPanel.NE101CameraPanel` 取主组件），而不是 default；但 default 同时被保留，是为了兼容那些仍写 `bundle.default` 的旧版 Dashboard 加载器（见 2.5 决策 #2）。
+
+这种「双暴露」是 ne101_camera 区别于 metric_card 的一个细节——metric_card 也写了 `default + MetricCard`，但只导出一个组件，而 ne101_camera 要把 `ConfigPanel` / `AdvancedPanel` 一起带出去给配置对话框使用。
 
 下图把 IIFE 的「window 注入 → IIFE 闭包 → 五层 → return 对象」这条主线画清楚。
 
@@ -78,7 +84,9 @@ graph TB
     L5 -->|"挂到 window.NE101CameraPanel"| HOST
 ```
 
-图里的实线是「加载/注入」方向，虚线是「读取」方向。IIFE 闭包内部那五层不是物理分离的文件，而是按行号分段的「逻辑层」——这也是为什么读 ne101_camera 源码比读 metric_card 吃力：同一个文件里 helper、sub-component、main 互相穿插，必须先在脑子里建立五层模型。
+图里的实线是「加载/注入」方向，虚线是「读取」方向。IIFE 闭包内部那五层不是物理分离的文件，而是按行号分段的「逻辑层」。
+
+这也是为什么读 ne101_camera 源码比读 metric_card 吃力：同一个文件里 helper、sub-component、main 互相穿插，必须先在脑子里建立五层模型。
 
 ---
 
@@ -228,11 +236,15 @@ Source: [`bundle.js` L239-L456](https://github.com/camthink-ai/NeoMind-Dashboard
 
 `generateTransformJsCode(pipe)`（[L239](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L239-L264)）接收一个 pipeline 配置对象（包含 `extId` / `template` / `categories` / `phrase` / `classFilter` / `roiEnabled` / `roiAction` / `roiX/Y/W/H`），返回一段字符串形式的 JavaScript 代码。这段代码会被塞进 NeoMind 主控的 TransformAutomation 实体里，由主控在每次抓拍后调度执行，调用扩展的 `extensions.invoke()` 并把结果写回虚拟指标。
 
-为什么用代码生成而不是硬编码条件分支？因为不同 `processingTemplate`（`object_detection` / `ocr` / `describe` / `barcode`）需要完全不同的后处理（OCR 要拼多边形、describe 要拼描述文本、object_detection 要按类别聚合），如果用 `if (template === 'ocr') { ... } else if ...` 的写法，主组件的渲染函数会膨胀到不可读。把后处理逻辑生成成独立字符串、让主控在沙箱里 `eval` 执行，等于把「可变的后处理」从组件代码里物理剥离出去。这个决策的权衡见 2.5 #4。
+为什么用代码生成而不是硬编码条件分支？因为不同 `processingTemplate`（`object_detection` / `ocr` / `describe` / `barcode`）需要完全不同的后处理（OCR 要拼多边形、describe 要拼描述文本、object_detection 要按类别聚合），如果用 `if (template === 'ocr') { ... } else if ...` 的写法，主组件的渲染函数会膨胀到不可读。
+
+把后处理逻辑生成成独立字符串、让主控在沙箱里 `eval` 执行，等于把「可变的后处理」从组件代码里物理剥离出去。这个决策的权衡见 2.5 #4。
 
 ### 第 3 层：Sub-component 层（L458-L1970）
 
-这一层包含所有「被 main component 渲染或被 Dashboard 配置对话框渲染」的 React 函数组件。和 metric_card 只导出一个 `MetricCard` 不同，ne101_camera 的 sub-component 层有 **5 个公开/私有组件**，这也是它 1972 行代码量的主要来源：
+这一层包含所有「被 main component 渲染或被 Dashboard 配置对话框渲染」的 React 函数组件。
+
+和 metric_card 只导出一个 `MetricCard` 不同，ne101_camera 的 sub-component 层有 **5 个公开/私有组件**，这也是它 1972 行代码量的主要来源：
 
 - `NoDevice`（[L458](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L458-L469)）—— 设备未绑定时显示的占位卡片，告诉用户「请在配置面板里绑定设备」。
 
@@ -502,7 +514,9 @@ sequenceDiagram
 
 Source: [`bundle.js` L1601-L1602](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1601-L1602)
 
-**Priority 1：`deviceImageSrc` prop**。这个 prop 来自平台的 device store，由 WebSocket 推送填充。平台订阅 `devices/{device_id}/telemetry` 主题，每收到一条消息就更新 store，再通过 React props 把 `deviceImageSrc` 注入组件。这是**实时通道**——延迟低（毫秒级），但可靠性受限于 WebSocket 连接状态（重连中会丢消息），且大体积的 base64 图像可能超出 WS 消息大小限制（见 [`bundle.js` L515-L517](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L515-L517) 的注释）。
+**Priority 1：`deviceImageSrc` prop**。这个 prop 来自平台的 device store，由 WebSocket 推送填充。平台订阅 `devices/{device_id}/telemetry` 主题，每收到一条消息就更新 store，再通过 React props 把 `deviceImageSrc` 注入组件。
+
+这是**实时通道**——延迟低（毫秒级），但可靠性受限于 WebSocket 连接状态（重连中会丢消息），且大体积的 base64 图像可能超出 WS 消息大小限制（见 [`bundle.js` L515-L517](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L515-L517) 的注释）。
 
 ```js
 // bundle.js L515-L517 — WS-triggered fetch comment
@@ -544,7 +558,9 @@ Source: [`bundle.js` L1613-L1628](https://github.com/camthink-ai/NeoMind-Dashboa
 - commit [`b0be12b`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/b0be12b)（`fix(ne101): initial fetch on mount for image + virtual metrics`）—— 修复了「组件挂载时如果 WebSocket 还没推送第一条消息，画面就空白」的问题，在 mount effect 里主动触发一次 REST 拉取。
 - commit [`0eedd27`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/0eedd27)（`fix(ne101): update virtual data on WS-triggered REST fetch`）—— 修复了「WS 推送的增量只含小指标（battery/ts），大图像要靠 REST 补」的问题，让 WS 触发的 REST fetch 同时刷新 virtual metrics。
 
-检测数据的解析有一个容易踩的坑：后端把 `detections` 虚拟指标存成 **JSON 字符串**而不是数组。[`bundle.js` L857](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L853-L867) 用 try/catch 做了防御性解析：
+检测数据的解析有一个容易踩的坑：后端把 `detections` 虚拟指标存成 **JSON 字符串**而不是数组。
+
+[`bundle.js` L857](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L853-L867) 用 try/catch 做了防御性解析：
 
 ```js
 // bundle.js L853-L867 — detections parse + source_ts alignment
@@ -711,7 +727,13 @@ ne101_camera 的 18 字段 `default_config` 完整内容如下：
 
 Source: [manifest.json L18-L37](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L18-L37)
 
-**总结一句话**：metric_card 是「薄组件 + 厚通用性」，ne101_camera 是「厚组件 + 薄专用性」。前者的价值在于覆盖面广，后者的价值在于把一条复杂的设备链路收敛成单一面板。两者不是替代关系，而是递进关系——ne101_camera 在 metric_card 的 IIFE 注入 + manifest 契约 + 内联 style 三件套基础上，增加了设备绑定、图像画布、AI 处理流水线、ROI 叠加四层新能力。
+**总结一句话**：metric_card 是「薄组件 + 厚通用性」，ne101_camera 是「厚组件 + 薄专用性」。
+
+前者的价值在于覆盖面广，后者的价值在于把一条复杂的设备链路收敛成单一面板。两者不是替代关系，而是递进关系——ne101_camera 在 metric_card 的 IIFE 注入 + manifest 契约 + 内联 style 三件套基础上，增加了设备绑定、图像画布、AI 处理流水线、ROI 叠加四层新能力。
+
+:::tip 工程教训
+NeoMind 组件市场存在两种互补的设计范式：**「薄组件 + 厚通用性」**（metric_card，覆盖面广）与**「厚组件 + 薄专用性」**（ne101_camera，收敛复杂链路）。理解这种递进关系，有助于在「为通用场景写组件」和「为专用设备写组件」之间做出正确选择。
+:::
 
 ---
 
@@ -722,6 +744,10 @@ Source: [manifest.json L18-L37](https://github.com/camthink-ai/NeoMind-Dashboard
 1. **五层架构**（helper / template / sub-component / main / export）不是物理分离，而是同一文件里的逻辑分层。读源码时要先在脑子里建立五层模型，否则会被 1972 行的代码量压垮。
 2. **双通道数据流**（WebSocket + REST）是设备绑定组件区别于显示型组件的核心特征。metric_card 用单一 `fetchData` 通道就够，ne101 必须双通道才能兼顾实时性和可靠性。
 3. **代码生成（`generateTransformJsCode`）** 是 ne101_camera 独有的架构创新，把「可变的后处理」从组件代码里物理剥离。这个模式在后续案例里会被复用。
+
+:::tip 工程教训
+读 ne101_camera 源码时，先在脑子里建立**五层模型**（helper / template / sub-component / main / export），再把代码归位。同一个文件里 1972 行互相穿插，没有五层模型就会被代码量压垮。设备绑定组件的核心架构特征是**双通道数据流**（WebSocket + REST），这是它与显示型组件的根本区别。
+:::
 
 ### 演进里程碑表
 
