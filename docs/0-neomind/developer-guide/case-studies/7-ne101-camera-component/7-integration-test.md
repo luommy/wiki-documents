@@ -108,8 +108,8 @@ sequenceDiagram
     participant V as Node.js vm 沙箱
     participant W as sandbox.window
     T->>T: fs.readFile bundle.js
-    T->>V: vm.runInNewContext(source,<br/>{window:{}, console})
-    V->>W: 求值 IIFE<br/>window.NE101CameraPanel = {...}
+    T->>V: vm.runInNewContext source<br/>window, console
+    V->>W: 求值 IIFE<br/>window.NE101CameraPanel = ...
     T->>W: assert typeof window.NE101CameraPanel.default === 'function'
     T->>W: assert typeof window.NE101CameraPanel.NE101CameraPanel === 'function'
     T->>W: assert typeof window.NE101CameraPanel.ConfigPanel === 'function'
@@ -299,7 +299,13 @@ Source: [`bundle.js` L277-L278`](https://github.com/camthink-ai/NeoMind-Dashboar
 
 (c) 检测结果的归一化器（normalizer）根据 `responseType` 切换：`boxes_x1y1x2y2` 走 `[x1,y1,x2,y2]` 到 bbox 对象的转换、`objects_bbox` / `detections_bbox` 已经是 bbox 对象形状直接用、`ocr_text_blocks` 还要把对象坐标转成数组并渲染为多边形（commit [`403c0f1`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/403c0f1) + [`b746c02`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/b746c02)）。
 
-测试矩阵覆盖 4 个扩展的**有向完全图**——每个扩展切换到其它 3 个扩展（共 4×3 = 12 条有向边），加上回到自身的 4 条自环，共 16 种切换路径。每条路径验证三个断言：(1) 新扩展的 mode 列表被正确加载（`availableModes.length > 0`）；(2) Transform 被重建（`_configHash` 变化触发 Tier 2/3 更新）；(3) 用新扩展的 `responseType` 喂入模拟响应，归一化器输出的检测数组结构正确。最关键的回归断言是 commit [`8656148`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/8656148) 引入的：**只有 `locate-anything-v2` 在 Transform JS 里硬编码了 `nms_iou_threshold: 0.5`**（[L282](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L282-L282)），其它三个扩展不传这个参数。
+测试矩阵覆盖 4 个扩展的**有向完全图**——每个扩展切换到其它 3 个扩展（共 4×3 = 12 条有向边），加上回到自身的 4 条自环，共 16 种切换路径。每条路径验证三个断言：
+
+1. 新扩展的 mode 列表被正确加载（`availableModes.length > 0`）
+2. Transform 被重建（`_configHash` 变化触发 Tier 2/3 更新）
+3. 用新扩展的 `responseType` 喂入模拟响应，归一化器输出的检测数组结构正确。
+
+最关键的回归断言是 commit [`8656148`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/8656148) 引入的：**只有 `locate-anything-v2` 在 Transform JS 里硬编码了 `nms_iou_threshold: 0.5`**（[L282](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L282-L282)），其它三个扩展不传这个参数。
 
 ```js
     // Pass NMS threshold to locate-anything-v2 — extension postprocess_args reads it from args
@@ -368,7 +374,11 @@ if (Array.isArray(vDet) && vDet.length > 0 && tsMatch) {
   detections = lastDetsRef.current;
 }
 ```
-[Source: bundle.js L858-L874](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L858-L874)(1) **match**——`String(vSourceTs) === String(imgTsVal)`，检测数组立即赋值给 `detections` 并同时写入 `lastDetsRef.current` / `lastDetsTsRef.current` 双缓存（L862-L865）；(2) **stale**——`vSourceTs` 存在但不等于 `imgTsVal`，检测结果**只写缓存不显示**（L866-L869），用户看到的是没有检测框的「干净」当前帧，避免鬼影；(3) **cache replay**——virtual data 里没有新检测（`vDet` 为空），但缓存里的 `lastDetsTsRef.current` 与当前 `imgTsVal` 匹配，这时从缓存恢复显示（L870-L873），应对「WS 推了一帧图但 virtual data 因为推理延迟还没到」的中间状态。
+[Source: bundle.js L858-L874](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L858-L874)
+
+1. **match**——`String(vSourceTs) === String(imgTsVal)`，检测数组立即赋值给 `detections` 并同时写入 `lastDetsRef.current` / `lastDetsTsRef.current` 双缓存（L862-L865）
+2. **stale**——`vSourceTs` 存在但不等于 `imgTsVal`，检测结果**只写缓存不显示**（L866-L869），用户看到的是没有检测框的「干净」当前帧，避免鬼影
+3. **cache replay**——virtual data 里没有新检测（`vDet` 为空），但缓存里的 `lastDetsTsRef.current` 与当前 `imgTsVal` 匹配，这时从缓存恢复显示（L870-L873），应对「WS 推了一帧图但 virtual data 因为推理延迟还没到」的中间状态。
 
 测试矩阵覆盖这三个状态及其转换：(a) fresh capture + 匹配 source_ts → 检测渲染；(b) 推理结果晚于图像 1 帧（stale）→ 缓存但不显示；(c) 缓存命中（cache replay）→ 显示缓存；(d) 缓存未命中且无新检测 → 不显示。其中 (b) 是最容易写错的——直觉实现是「优先显示最近的检测」，但这正是鬼影的来源。严格的 source_ts 匹配把「优先级」让位给「正确性」，宁可短暂无检测框也不能显示错位的检测。这个机制的副作用是 AI 推理延迟超过一帧间隔时会看到「检测框闪烁」（显示-隐藏-显示），但这是正确性优先设计的必然代价。commit [`e3a70be`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/e3a70be) 还修了一个相关的坑：后端把检测结果序列化为 JSON 字符串存储，前端必须先 `JSON.parse` 再比对（L856-L857），否则 `typeof vDet === 'string'` 永远不等于 `imgTsVal`（数字）。
 
@@ -397,7 +407,12 @@ stateDiagram-v2
 
 ## 7.6 WS+REST 双通道测试
 
-NeoMind 平台为每个设备组件提供两条数据通道：(1) **WebSocket 推送**——高频小数据（电池、温度、ts），每秒多次；(2) **REST 轮询**——低频大数据（图像 base64 / URL、推理结果），秒级间隔。ne101_camera 在 [`bundle.js` L631`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L631-L631) 用一行 `Object.assign({}, wsValues, imageData || {}, virtualDataState[0] || {})` 合并三条流:
+NeoMind 平台为每个设备组件提供两条数据通道：
+
+1. **WebSocket 推送**——高频小数据（电池、温度、ts），每秒多次
+2. **REST 轮询**——低频大数据（图像 base64 / URL、推理结果），秒级间隔。
+
+ne101_camera 在 [`bundle.js` L631`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L631-L631) 用一行 `Object.assign({}, wsValues, imageData || {}, virtualDataState[0] || {})` 合并三条流:
 
 ```js
     // Merge: WS values as base (real-time small metrics), REST image data overlay, virtual metrics

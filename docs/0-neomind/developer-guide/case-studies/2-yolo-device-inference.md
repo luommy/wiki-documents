@@ -157,7 +157,13 @@ pub struct Detection {
 }
 ```
 
-**为什么 `BoundingBox` 选 `{x, y, width, height}` 而非 `{xmin, ymin, xmax, ymax}`？** 三个理由：(1) `imageproc::rect::Rect::at(x,y).of_size(w,h)` 的 API 就是左上角 + 尺寸语义，画框时零转换；(2) 前端 CSS `left/top/width/height` 也是这套语义，React 组件直接 `style={bbox}` 即可定位；(3) YOLO 原生输出是 `cx, cy, w, h`（中心点 + 尺寸），转换到 `x, y, w, h` 只需 `x = cx - w/2`，比转 `xmax/ymax` 少两次加减。`usls` 返回的 `hbbs` 给的是 `xmin/ymin/xmax/ymax`，扩展在 L832-L837 做了一次显式转换。
+**为什么 `BoundingBox` 选 `{x, y, width, height}` 而非 `{xmin, ymin, xmax, ymax}`？** 三个理由：
+
+1. `imageproc::rect::Rect::at(x,y).of_size(w,h)` 的 API 就是左上角 + 尺寸语义，画框时零转换
+2. 前端 CSS `left/top/width/height` 也是这套语义，React 组件直接 `style={bbox}` 即可定位
+3. YOLO 原生输出是 `cx, cy, w, h`（中心点 + 尺寸），转换到 `x, y, w, h` 只需 `x = cx - w/2`，比转 `xmax/ymax` 少两次加减。
+
+`usls` 返回的 `hbbs` 给的是 `xmin/ymin/xmax/ymax`，扩展在 L832-L837 做了一次显式转换。
 
 ### 3.3 懒加载模型包装器（核心工程亮点）
 
@@ -194,7 +200,13 @@ impl YOLODetector {
 }
 ```
 
-**为什么懒加载而非预加载？** ONNX Runtime 的初始化包含：(1) `dlopen("libonnxruntime.so")`，(2) 解析 ONNX 模型图，(3) 分配推理会话的内存池（通常 100-300MB）。如果扩展在 `YoloDeviceInference::new()` 时就加载模型，那么 NeoMind 主进程在加载扩展阶段就会卡住数秒，且模型内存会在「扩展已加载但用户尚未绑定任何设备」的空窗期一直占用——这对内存受限的边缘设备（如树莓派 4GB）是不可接受的。懒加载把成本推迟到「首次真正需要推理的时刻」，让扩展加载保持轻量。
+**为什么懒加载而非预加载？** ONNX Runtime 的初始化包含：
+
+1. `dlopen("libonnxruntime.so")`
+2. 解析 ONNX 模型图
+3. 分配推理会话的内存池（通常 100-300MB）。
+
+如果扩展在 `YoloDeviceInference::new()` 时就加载模型，那么 NeoMind 主进程在加载扩展阶段就会卡住数秒，且模型内存会在「扩展已加载但用户尚未绑定任何设备」的空窗期一直占用——这对内存受限的边缘设备（如树莓派 4GB）是不可接受的。懒加载把成本推迟到「首次真正需要推理的时刻」，让扩展加载保持轻量。
 
 **为什么不用 `OnceLock<YOLO>`？** 本案例的 `YOLODetector` 没有用 `std::sync::OnceLock`，而是用 `Option<YOLO> + bool` 手动管理。原因是 `OnceLock` 要求内部值 `Send + Sync` 且初始化后不可变——但 `YOLO::forward(&mut self)` 需要可变引用，且扩展支持 `reload_model()`（L638-L667）在运行时替换模型。`Mutex<YOLODetector>` + `Option<YOLO>` 的组合更灵活，允许「重置 + 重新加载」语义。
 
@@ -318,7 +330,7 @@ sequenceDiagram
 
     RT->>EXT: handle_event(device.image.updated)
     EXT->>CAP: invoke_capability_sync("device_metrics_read")
-    CAP-->>EXT: { image: "data:image/jpeg;base64,..." }
+    CAP-->>EXT: image (base64 JPEG data URI)
 
     alt load_attempted == false (首次推理)
         EXT->>DET: ensure_loaded()
@@ -334,7 +346,7 @@ sequenceDiagram
     EXT->>DET: model.forward(&[image_tensor])
     DET->>ORT: ort::session.run()
     ORT-->>DET: bbox + class + confidence
-    DET-->>EXT: InferenceResult { detections, ... }
+    DET-->>EXT: InferenceResult detections, ...
 
     EXT->>EXT: draw_detections_on_image() [可选]
     EXT->>CAP: write virtual.yolo.detections
@@ -488,13 +500,22 @@ CI 流水线必须在每个目标平台上原生构建（不能用 cross-compile
 2. `61c4bdf`——显式设置 `ORT_DYLIB_PATH` 环境变量为 ORT dylib 的绝对路径。这是因为 macOS 的 SIP 让运行时 `set_var("DYLD_LIBRARY_PATH")` 对后续 `dlopen` 无效，必须用 `ort` crate 的专用环境变量。
 3. `1fe9d3b`——为 `std::os::unix::fs::symlink` 添加 `cfg(unix)` 守卫，避免 Windows 编译失败（Windows 无 Unix 符号链接 API）。
 
-**教训**：跨平台动态库加载没有银弹。每个平台的库命名约定、查找路径、安全限制都不同。最佳实践是：(1) 显式设置专用环境变量（如 `ORT_DYLIB_PATH`）而非依赖通用查找路径；(2) 运行时创建符号链接处理版本号差异；(3) 用 `cfg` 守卫平台特定 API。
+**教训**：跨平台动态库加载没有银弹。每个平台的库命名约定、查找路径、安全限制都不同。最佳实践是：
+
+1. 显式设置专用环境变量（如 `ORT_DYLIB_PATH`）而非依赖通用查找路径
+2. 运行时创建符号链接处理版本号差异
+3. 用 `cfg` 守卫平台特定 API。
 
 ### 反例：源仓库卫生问题（备份文件堆积）
 
 > **源仓库卫生警告**：在 `yolo-device-inference/src/` 目录下，除了正式的 `lib.rs` 外，还存在 **18 个备份文件**（`lib.rs.backup`、`lib.rs.bak4` ~ `lib.rs.bak14`、`lib.rs.before_init_fix`、`lib.rs.final`、`lib.rs.final2`、`lib.rs.final4` ~ `lib.rs.final9`），即 `lib.rs*` 文件共 19 个。这是开发过程中未及时清理的痕迹——开发者在迭代时用 `.final` / `.bakN` 命名保存中间版本，但从未在合并前清理。
 >
-> **为什么这是问题？** (1) 新贡献者会困惑哪个是真实源文件；(2) 备份文件可能被 IDE 全文搜索误命中，导致引用错误的代码；(3) 增加仓库体积和 clone 时间；(4) 本文档的深链规则必须明确「只引用 `src/lib.rs`，忽略所有备份文件」就是被这个问题逼出来的。
+> **为什么这是问题？**
+>
+> 1. 新贡献者会困惑哪个是真实源文件
+> 2. 备份文件可能被 IDE 全文搜索误命中，导致引用错误的代码
+> 3. 增加仓库体积和 clone 时间
+> 4. 本文档的深链规则必须明确「只引用 `src/lib.rs`，忽略所有备份文件」就是被这个问题逼出来的。
 >
 > **最佳实践**：使用 Git 分支和 `git stash` 管理中间版本，永远不要在源目录堆积 `.bak` / `.final` 文件。PR 合并前应运行 `git status` 确认没有未跟踪的备份文件。如果需要长期保存某个中间状态，用 `git tag` 或单独的 `experiments/` 分支目录。
 

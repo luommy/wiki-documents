@@ -494,10 +494,21 @@ The merge order is **WS base -> REST image overlay -> virtual metrics overlay**.
 **Why dual-channel is needed** — this is a **design decision**:
 
 - **Choice**: WS + REST dual-channel, WS priority, REST backfill.
-- **Alternative A**: WS-only. Rejected because: (1) WebSocket drops messages during reconnection (network jitter, tab switch), leaving the component blank; (2) large base64 images may exceed the WS message size limit (platform default 1MB), so WS only pushes small metrics and images must come via REST; (3) on first mount the WS subscription hasn't been established yet, leaving the screen blank for several hundred milliseconds.
-- **Alternative B**: REST-only (timed polling). Rejected because: (1) polling latency is high (after NE101 captures, you wait for the next poll cycle to see it), degrading UX; (2) polling generates many wasteful requests (most polls find no image change), wasting bandwidth and backend resources; (3) multiple components polling the same device simultaneously cause thundering herd.
+- **Alternative A**: WS-only. Rejected because:
+
+    1. WebSocket drops messages during reconnection (network jitter, tab switch), leaving the component blank
+    2. large base64 images may exceed the WS message size limit (platform default 1MB), so WS only pushes small metrics and images must come via REST
+    3. on first mount the WS subscription hasn't been established yet, leaving the screen blank for several hundred milliseconds.
+- **Alternative B**: REST-only (timed polling). Rejected because:
+
+    1. polling latency is high (after NE101 captures, you wait for the next poll cycle to see it), degrading UX
+    2. polling generates many wasteful requests (most polls find no image change), wasting bandwidth and backend resources
+    3. multiple components polling the same device simultaneously cause thundering herd.
 - **Reason**: WS provides real-time responsiveness (see new image within seconds of NE101 capture); REST provides a reliability floor (within 500ms of mount, there is always data). The two are complementary and indispensable.
-- **Cost**: (1) Code complexity doubles — the component maintains both WS listener and REST fetch paths; (2) data races — WS pushes and REST returns may interleave, and stale REST data may overwrite fresh WS data. Races are mitigated by `Object.assign`'s "last wins" semantics + REST only firing during WS holes.
+- **Cost**:
+
+    1. Code complexity doubles — the component maintains both WS listener and REST fetch paths
+    2. data races — WS pushes and REST returns may interleave, and stale REST data may overwrite fresh WS data. Races are mitigated by `Object.assign`'s "last wins" semantics + REST only firing during WS holes.
 
 ---
 

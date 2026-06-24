@@ -419,7 +419,7 @@ sequenceDiagram
     participant FFMPEG as ffmpeg-next
     participant DET as YoloDetector
 
-    FE->>RT: WebSocket connect + init {source_url, rois, lines}
+    FE->>RT: WebSocket connect + init source_url, rois, lines
     RT->>EXT: init_session(session)
     EXT->>EXT: parse source_url → is_network_stream
     EXT->>EXT: insert ActiveStream into registry
@@ -431,7 +431,7 @@ sequenceDiagram
         FFMPEG-->>THR: RGB24 frame
         THR->>THR: resize → 640x640
         THR->>DET: detect(image, conf, max_obj)
-        DET-->>THR: Vec<Detection>
+        DET-->>THR: Vec of Detection
         THR->>THR: ROI count + line crossing + capture rules
         THR->>THR: draw + encode JPEG
         THR->>RT: send_push_output(image_jpeg + metadata)
@@ -502,7 +502,11 @@ This section lists five key decisions, each with the chosen approach, the altern
 
 ### Decision 2: Move ROI drawing to the front end
 
-**We chose front-end canvas overlay; the alternative was back-end-drawn JPEG with boxes; rationale**: commit `60e4e5b` removed back-end ROI drawing (the comment at [`src/lib.rs` L1585-L1587](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/yolo-video-v2/src/lib.rs#L1585-L1587) explicitly says "ROI/Line overlay drawing is handled by the frontend canvas to avoid double-drawing"). The back end now only ships JPEG + metadata JSON, and the front end draws ROI polygons and crossing lines on a canvas. Benefits: (1) less JPEG re-encoding overhead; (2) the front end can restyle ROIs dynamically without restarting the stream; (3) avoids the visual ghosting caused by back-end JPEG + front-end canvas double drawing.
+**We chose front-end canvas overlay; the alternative was back-end-drawn JPEG with boxes; rationale**: commit `60e4e5b` removed back-end ROI drawing (the comment at [`src/lib.rs` L1585-L1587](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/yolo-video-v2/src/lib.rs#L1585-L1587) explicitly says "ROI/Line overlay drawing is handled by the frontend canvas to avoid double-drawing"). The back end now only ships JPEG + metadata JSON, and the front end draws ROI polygons and crossing lines on a canvas. Benefits:
+
+1. less JPEG re-encoding overhead
+2. the front end can restyle ROIs dynamically without restarting the stream
+3. avoids the visual ghosting caused by back-end JPEG + front-end canvas double drawing.
 
 ```rust
 // lib.rs L1585-L1587
@@ -530,7 +534,13 @@ This section lists five key decisions, each with the chosen approach, the altern
 
 ### Decision 5: usls + ort-load-dynamic
 
-**We chose runtime dynamic loading of ONNX Runtime; the alternative was static linking; rationale**: the `ort-load-dynamic` feature of `usls` ([`Cargo.toml` L33](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/yolo-video-v2/Cargo.toml#L33)) avoids statically linking ONNX Runtime; instead `setup_native_lib_paths` locates the dylib at runtime. Benefits: (1) smaller package size (the ONNX Runtime dylib is about 50MB; static linking would bloat every platform's .nep); (2) flexible cross-platform distribution (one .nep can pair with different platforms' dylibs); (3) ONNX Runtime can be upgraded at deploy time without recompiling the extension. The cost is the need for correct library-search paths at runtime — exactly the pain point addressed by commit `3919c6a` (Linux so.N versioned symlinks) and `40da6b8` (Windows DLL path + macOS dylib).
+**We chose runtime dynamic loading of ONNX Runtime; the alternative was static linking; rationale**: the `ort-load-dynamic` feature of `usls` ([`Cargo.toml` L33](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/yolo-video-v2/Cargo.toml#L33)) avoids statically linking ONNX Runtime; instead `setup_native_lib_paths` locates the dylib at runtime. Benefits:
+
+1. smaller package size (the ONNX Runtime dylib is about 50MB; static linking would bloat every platform's .nep)
+2. flexible cross-platform distribution (one .nep can pair with different platforms' dylibs)
+3. ONNX Runtime can be upgraded at deploy time without recompiling the extension.
+
+The cost is the need for correct library-search paths at runtime — exactly the pain point addressed by commit `3919c6a` (Linux so.N versioned symlinks) and `40da6b8` (Windows DLL path + macOS dylib).
 
 ---
 
@@ -611,7 +621,13 @@ The front-end component `YoloVideoDisplay` (entrypoint: `yolo-video-v2-component
   "entrypoint": "yolo-video-v2-components.umd.cjs"
 }
 ```
-[Source: metadata.json L32-L37](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/yolo-video-v2/metadata.json#L32-L37): (1) receive `image_jpeg` chunks and render to `<img>` or canvas; (2) parse metadata JSON (`detections` / `roi_stats` / `line_stats` / `capture_events`) to draw overlays; (3) send `start_stream` / `stop_stream` / `update_stream_config` commands. The contract is "JPEG frame + JSON metadata pushed in parallel" — fundamentally different from #2's "virtual metric + data URI".
+[Source: metadata.json L32-L37](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/yolo-video-v2/metadata.json#L32-L37)
+
+1. receive `image_jpeg` chunks and render to `<img>` or canvas
+2. parse metadata JSON (`detections` / `roi_stats` / `line_stats` / `capture_events`) to draw overlays
+3. send `start_stream` / `stop_stream` / `update_stream_config` commands.
+
+The contract is "JPEG frame + JSON metadata pushed in parallel" — fundamentally different from #2's "virtual metric + data URI".
 
 ### Cooperation with the stream-player extension
 
@@ -623,7 +639,11 @@ Commit `c41e6a6` introduced `stream-player`, a pure player extension (no detecti
 
 ### Test directory layout
 
-The extension maintains three classes of test assets: (1) `tests/unit_test.rs` and `tests/integration_test.rs` cover core logic (StreamConfig deserialization, ROI counting, line-crossing direction); (2) `examples/memory_test.rs` is a standalone memory-stress binary built with `Cargo_test.toml` (a separate Cargo config); (3) `test_memory.sh` is a shell script that runs long-running Push-mode stress tests.
+The extension maintains three classes of test assets:
+
+1. `tests/unit_test.rs` and `tests/integration_test.rs` cover core logic (StreamConfig deserialization, ROI counting, line-crossing direction)
+2. `examples/memory_test.rs` is a standalone memory-stress binary built with `Cargo_test.toml` (a separate Cargo config)
+3. `test_memory.sh` is a shell script that runs long-running Push-mode stress tests.
 
 ### Memory stress testing
 
@@ -679,7 +699,14 @@ if s.frame_count % 30 == 0 {
 
 ### End-to-end verification
 
-The E2E flow: (1) prepare an RTSP source (or transcode a local file to RTSP with ffmpeg); (2) the front end sends `start_stream` with `source_url` + `confidence_threshold: 0.5` + `target_fps: 10`; (3) observe whether the push output frame rate approaches target_fps; (4) check whether the `detections` array in the metadata JSON contains reasonable boxes; (5) configure an ROI region and verify `roi_stats` counts; (6) trigger `stop_stream` and verify the thread exits with no residuals.
+The E2E flow:
+
+1. prepare an RTSP source (or transcode a local file to RTSP with ffmpeg)
+2. the front end sends `start_stream` with `source_url` + `confidence_threshold: 0.5` + `target_fps: 10`
+3. observe whether the push output frame rate approaches target_fps
+4. check whether the `detections` array in the metadata JSON contains reasonable boxes
+5. configure an ROI region and verify `roi_stats` counts
+6. trigger `stop_stream` and verify the thread exits with no residuals.
 
 ### Cross-platform ONNX Runtime dylib verification
 
@@ -737,7 +764,13 @@ Commit `60e4e5b` upgraded ffmpeg-next from v7 to v8 (note: the current `Cargo.to
 
 ### Source-hygiene anti-pattern
 
-**The extension's `src/` directory contains multiple backup files**: `detector.rs.backup`, `detector.rs.bak`, `lib.rs.backup`, `lib.rs.backup2`, plus root-level `Cargo.toml.bak` and `frontend/src/index.tsx.bak`. This is a **source-governance anti-pattern** — backup files should never be committed. Git itself is the version-management system; `git log` / `git diff` can show any historical version, and `git stash` can hold unfinished work. Committing `.bak` / `.backup` / `.backup2` files causes: (1) repository bloat; (2) IDE global search matching stale code and causing confusion; (3) CI / linters potentially compiling backup files by mistake. All deep links in this case study point **only to canonical files** (`src/lib.rs`, `src/detector.rs`, `src/video_source.rs`, `Cargo.toml`, `metadata.json`) and never reference backups. Compared with the 18 backup files in [Case #2](./2-yolo-device-inference.md), yolo-video-v2 has fewer backups but commits the same violation.
+**The extension's `src/` directory contains multiple backup files**: `detector.rs.backup`, `detector.rs.bak`, `lib.rs.backup`, `lib.rs.backup2`, plus root-level `Cargo.toml.bak` and `frontend/src/index.tsx.bak`. This is a **source-governance anti-pattern** — backup files should never be committed. Git itself is the version-management system; `git log` / `git diff` can show any historical version, and `git stash` can hold unfinished work. Committing `.bak` / `.backup` / `.backup2` files causes:
+
+1. repository bloat
+2. IDE global search matching stale code and causing confusion
+3. CI / linters potentially compiling backup files by mistake.
+
+All deep links in this case study point **only to canonical files** (`src/lib.rs`, `src/detector.rs`, `src/video_source.rs`, `Cargo.toml`, `metadata.json`) and never reference backups. Compared with the 18 backup files in [Case #2](./2-yolo-device-inference.md), yolo-video-v2 has fewer backups but commits the same violation.
 
 ### Troubleshooting quick reference
 
@@ -778,7 +811,14 @@ Commit `60e4e5b` upgraded ffmpeg-next from v7 to v8 (note: the current `Cargo.to
 
 ### Recommended reading order
 
-If this is your first encounter with NeoMind streaming extensions, read in this order: (1) start with the [Overview](./0-overview.md) to grasp the extension model; (2) read [Case #1](./1-weather-forecast.md) to learn the basics of synchronous extensions; (3) read [Case #2](./2-yolo-device-inference.md) to understand AI inference + the synchronous capability bridge; (4) finish with this case (3) to contrast Push versus Pull. If you only care about the SDK's StreamCapability interface design, jump straight to 3.1.
+If this is your first encounter with NeoMind streaming extensions, read in this order:
+
+1. start with the [Overview](./0-overview.md) to grasp the extension model
+2. read [Case #1](./1-weather-forecast.md) to learn the basics of synchronous extensions
+3. read [Case #2](./2-yolo-device-inference.md) to understand AI inference + the synchronous capability bridge
+4. finish with this case (3) to contrast Push versus Pull.
+
+If you only care about the SDK's StreamCapability interface design, jump straight to 3.1.
 
 ### Bridge to ne101_camera
 

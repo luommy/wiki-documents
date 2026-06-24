@@ -157,7 +157,13 @@ pub struct Detection {
 }
 ```
 
-**Why `{x, y, width, height}` over `{xmin, ymin, xmax, ymax}`?** Three reasons: (1) `imageproc::rect::Rect::at(x,y).of_size(w,h)` uses top-left + size semantics, so drawing needs zero conversion; (2) frontend CSS `left/top/width/height` matches this exactly, so React components can use `style={bbox}` directly; (3) YOLO native output is `cx, cy, w, h` (center + size), which converts to `x, y, w, h` with just `x = cx - w/2` — fewer ops than converting to `xmax/ymax`. `usls` returns `hbbs` in `xmin/ymin/xmax/ymax` form, and the extension performs an explicit conversion at L832-L837.
+**Why `{x, y, width, height}` over `{xmin, ymin, xmax, ymax}`?** Three reasons:
+
+1. `imageproc::rect::Rect::at(x,y).of_size(w,h)` uses top-left + size semantics, so drawing needs zero conversion
+2. frontend CSS `left/top/width/height` matches this exactly, so React components can use `style={bbox}` directly
+3. YOLO native output is `cx, cy, w, h` (center + size), which converts to `x, y, w, h` with just `x = cx - w/2` — fewer ops than converting to `xmax/ymax`.
+
+`usls` returns `hbbs` in `xmin/ymin/xmax/ymax` form, and the extension performs an explicit conversion at L832-L837.
 
 ### 3.3 Lazy-Loading Model Wrapper (Core Engineering Highlight)
 
@@ -194,7 +200,13 @@ impl YOLODetector {
 }
 ```
 
-**Why lazy loading over preloading?** ONNX Runtime initialization includes: (1) `dlopen("libonnxruntime.so")`, (2) parsing the ONNX model graph, (3) allocating the inference session memory pool (typically 100-300MB). If the extension loaded the model in `YoloDeviceInference::new()`, the NeoMind host process would stall for several seconds during extension loading, and model memory would be occupied during the "extension loaded but no device bound yet" idle window — unacceptable on memory-constrained edge devices (e.g., Raspberry Pi 4GB). Lazy loading defers the cost to "the moment inference is actually needed," keeping extension loading lightweight.
+**Why lazy loading over preloading?** ONNX Runtime initialization includes:
+
+1. `dlopen("libonnxruntime.so")`
+2. parsing the ONNX model graph
+3. allocating the inference session memory pool (typically 100-300MB).
+
+If the extension loaded the model in `YoloDeviceInference::new()`, the NeoMind host process would stall for several seconds during extension loading, and model memory would be occupied during the "extension loaded but no device bound yet" idle window — unacceptable on memory-constrained edge devices (e.g., Raspberry Pi 4GB). Lazy loading defers the cost to "the moment inference is actually needed," keeping extension loading lightweight.
 
 **Why not `OnceLock<YOLO>`?** This case's `YOLODetector` does not use `std::sync::OnceLock`, instead managing state manually via `Option<YOLO> + bool`. The reason is that `OnceLock` requires the inner value to be `Send + Sync` and immutable after initialization — but `YOLO::forward(&mut self)` requires a mutable reference, and the extension supports `reload_model()` (L638-L667) for runtime model replacement. The `Mutex<YOLODetector>` + `Option<YOLO>` combination is more flexible, allowing "reset + reload" semantics.
 
@@ -318,7 +330,7 @@ sequenceDiagram
 
     RT->>EXT: handle_event(device.image.updated)
     EXT->>CAP: invoke_capability_sync("device_metrics_read")
-    CAP-->>EXT: { image: "data:image/jpeg;base64,..." }
+    CAP-->>EXT: image (base64 JPEG data URI)
 
     alt load_attempted == false (first inference)
         EXT->>DET: ensure_loaded()
@@ -334,7 +346,7 @@ sequenceDiagram
     EXT->>DET: model.forward(&[image_tensor])
     DET->>ORT: ort::session.run()
     ORT-->>DET: bbox + class + confidence
-    DET-->>EXT: InferenceResult { detections, ... }
+    DET-->>EXT: InferenceResult detections, ...
 
     EXT->>EXT: draw_detections_on_image() [optional]
     EXT->>CAP: write virtual.yolo.detections
@@ -488,13 +500,22 @@ The CI pipeline must build natively on each target platform (no cross-compile), 
 2. `61c4bdf` — Explicitly set the `ORT_DYLIB_PATH` environment variable to the absolute path of the ORT dylib. This is because macOS SIP makes runtime `set_var("DYLD_LIBRARY_PATH")` ineffective for subsequent `dlopen`; the `ort` crate's dedicated env var must be used.
 3. `1fe9d3b` — Added `cfg(unix)` guard for `std::os::unix::fs::symlink`, preventing Windows compilation failure (Windows lacks the Unix symlink API).
 
-**Lesson**: Cross-platform dynamic library loading has no silver bullet. Each platform's library naming convention, lookup path, and security restrictions differ. Best practices: (1) explicitly set dedicated env vars (like `ORT_DYLIB_PATH`) rather than relying on generic lookup paths; (2) create symlinks at runtime to handle version suffix differences; (3) use `cfg` guards for platform-specific APIs.
+**Lesson**: Cross-platform dynamic library loading has no silver bullet. Each platform's library naming convention, lookup path, and security restrictions differ. Best practices:
+
+1. explicitly set dedicated env vars (like `ORT_DYLIB_PATH`) rather than relying on generic lookup paths
+2. create symlinks at runtime to handle version suffix differences
+3. use `cfg` guards for platform-specific APIs.
 
 ### Reverse Example: Source Repository Hygiene (Backup File Pileup)
 
 > **Source repository hygiene warning**: In the `yolo-device-inference/src/` directory, in addition to the official `lib.rs`, there are **18 backup files** (`lib.rs.backup`, `lib.rs.bak4` through `lib.rs.bak14`, `lib.rs.before_init_fix`, `lib.rs.final`, `lib.rs.final2`, `lib.rs.final4` through `lib.rs.final9`) — that is, 19 `lib.rs*` files in total. This is the residue of incomplete cleanup during development — developers saved intermediate versions with `.final` / `.bakN` naming but never cleaned up before merging.
 >
-> **Why is this a problem?** (1) New contributors are confused about which is the real source file; (2) backup files may be hit by IDE full-text search, leading to references to wrong code; (3) increases repository size and clone time; (4) the deep-link rule in this document — "only reference `src/lib.rs`, ignore all backup files" — was forced into existence by this very problem.
+> **Why is this a problem?**
+>
+> 1. New contributors are confused about which is the real source file
+> 2. backup files may be hit by IDE full-text search, leading to references to wrong code
+> 3. increases repository size and clone time
+> 4. the deep-link rule in this document — "only reference `src/lib.rs`, ignore all backup files" — was forced into existence by this very problem.
 >
 > **Best practice**: Use Git branches and `git stash` to manage intermediate versions; never pile up `.bak` / `.final` files in the source directory. Before merging a PR, run `git status` to confirm no untracked backup files remain. If you need to preserve an intermediate state long-term, use `git tag` or a separate `experiments/` branch directory.
 

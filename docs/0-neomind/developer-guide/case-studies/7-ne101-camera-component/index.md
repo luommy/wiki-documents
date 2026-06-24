@@ -62,7 +62,7 @@ sidebar_label: "ne101_camera Flagship"
 
 读完本案例的 8 节内容，你会掌握以下 5 个关键能力：
 
-1. **设备绑定 vs 数据源的本质区别**——为什么 NE101 用 `has_device_binding: true` + `device_type_filter: ["ne101_camera"]` 而不是 `has_data_source: true`。这关系到组件在仪表板编辑器里能否显示「绑定设备」面板、能否调用 `trigger_capture` 这种设备命令。详见 [1 业务背景](./1-background.md)。
+1. **设备绑定 vs 数据源的本质区别**——为什么 NE101 用 `has_device_binding: true` + `device_type_filter: ["ne101_camera"]` 而不是 `has_data_source: true`。这关系到组件在仪表板编辑器里能否显示「绑定设备」面板、能否接收设备遥测增量（如 `image_url` 变化推送）。详见 [1 业务背景](./1-background.md)。
 
 2. **1972 行 IIFE 如何保持可维护**——`bundle.js` 没有任何打包步骤，全是手写 IIFE。我们会拆解它的模块分层（helper / template / sub-component / main / export），并解释为什么 NeoMind 选择这种范式而非 ESM。详见 [6 组件构建](./6-component-build.md)（v1.1）。
 

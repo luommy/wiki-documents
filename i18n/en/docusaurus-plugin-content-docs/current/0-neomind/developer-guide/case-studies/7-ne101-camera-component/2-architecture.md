@@ -396,7 +396,15 @@ graph TB
 
 `ConfigPanel` is the Display tab content, responsible for user-visible display configuration (title, location, etc.). ne101_camera currently cedes the title field to the platform's `ComponentConfigDialog` (see the comment at [`bundle.js` L1354-L1356](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1353-L1357)), so `ConfigPanel` itself returns `null`, but it remains exported to avoid breaking the "main + Display + Advanced" three-piece contract.
 
-`AdvancedPanel` ([L1448](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1448-L1970)) is where the real complexity lands: (1) the AI processing master toggle; (2) the extension picker dropdown (`ExtDropdown`); (3) template picker (object_detection / ocr / describe / barcode); (4) class filter / phrase input; (5) ROI toggle + polygon editor (user drags points on a canvas); (6) ROI overlap threshold slider (`processingRoiOverlap`, commit [`636a8ae`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/636a8ae)); (7) NMS IoU threshold pass-through to `locate-anything-v2` (commit [`8656148`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/8656148)).
+`AdvancedPanel` ([L1448](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1448-L1970)) is where the real complexity lands, containing:
+
+1. the AI processing master toggle
+2. the extension picker dropdown (`ExtDropdown`)
+3. template picker (object_detection / ocr / describe / barcode)
+4. class filter / phrase input
+5. ROI toggle + polygon editor (user drags points on a canvas)
+6. ROI overlap threshold slider (`processingRoiOverlap`, commit [`636a8ae`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/636a8ae))
+7. NMS IoU threshold pass-through to `locate-anything-v2` (commit [`8656148`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/8656148)).
 
 The core hooks of `NE101CameraPanel` (located at [`bundle.js` L484-L513](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L484-L513)) form its state machine skeleton:
 
@@ -463,19 +471,19 @@ sequenceDiagram
     participant UI as NE101CameraPanel
 
     DEV->>MQTT: publish telemetry<br/>(image_url + battery + signal + temp + virtual.detections)
-    MQTT->>NM: forward to devices/{id}/telemetry
+    MQTT->>NM: forward to devices/id/telemetry
     NM->>STORE: write device.currentValues
     STORE->>WS: push incremental<br/>(deviceImageSrc / virtualMetrics change)
     WS->>UI: props.deviceImageSrc updated<br/>props.virtualMetrics updated
 
     Note over UI: Priority 1: deviceImageSrc prop<br/>(explicit comment L1601-L1602)
 
-    UI->>UI: render <img> + Canvas
+    UI->>UI: render img + Canvas
 
     Note over UI,REST: On first mount / during WS reconnect<br/>when deviceImageSrc is empty
 
     UI->>REST: neomind.fetchDeviceValues(deviceId)<br/>(L1613-L1628)
-    REST->>NM: GET /devices/{id}/values
+    REST->>NM: GET /devices/id/values
     NM-->>REST: full currentValues
     REST-->>UI: parse imageUrl + detections
     UI->>UI: JSON.parse detections string<br/>(L857, commit e3a70be)
@@ -569,9 +577,17 @@ This section lists five architectural decisions that shape ne101_camera's curren
 
 **Alternative**: use Rollup / Webpack to externalize React or bundle it directly.
 
-**Rationale**: (1) The Dashboard host already provides React; each component packing its own copy would produce N React instances across the dashboard, breaking hooks across instances (`useContext` returns undefined, `useRef` throws); (2) IIFE shared singleton saves about 140KB per component (React + ReactDOM minified), which is 1.4MB across 10 components; (3) it guarantees the component's React version matches the host, avoiding "component uses React 18's `useSyncExternalStore`, host is still on React 17" version mismatches.
+**Rationale**:
 
-**Cost**: (1) No tree-shaking — the entire helper layer ships in the bundle even if some functions are unused; (2) no TypeScript type checking — the parameter types of `getFirst(vals, keys)` and similar functions live only in comments and convention; (3) no ESLint `rules-of-hooks` — hook-order bugs can only be caught at runtime (commit `0601cd4` is exactly such a bug). metric_card accepts this cost because it is 352 lines; ne101_camera accepts it at 1972 lines because `test_bundle.js` provides logic-test coverage as a safety net.
+1. The Dashboard host already provides React; each component packing its own copy would produce N React instances across the dashboard, breaking hooks across instances (`useContext` returns undefined, `useRef` throws)
+2. IIFE shared singleton saves about 140KB per component (React + ReactDOM minified), which is 1.4MB across 10 components
+3. it guarantees the component's React version matches the host, avoiding "component uses React 18's `useSyncExternalStore`, host is still on React 17" version mismatches.
+
+**Cost**:
+
+1. No tree-shaking — the entire helper layer ships in the bundle even if some functions are unused
+2. no TypeScript type checking — the parameter types of `getFirst(vals, keys)` and similar functions live only in comments and convention
+3. no ESLint `rules-of-hooks` — hook-order bugs can only be caught at runtime (commit `0601cd4` is exactly such a bug). metric_card accepts this cost because it is 352 lines; ne101_camera accepts it at 1972 lines because `test_bundle.js` provides logic-test coverage as a safety net.
 
 ### Decision 2: Named export + default dual exposure
 
@@ -579,7 +595,11 @@ This section lists five architectural decisions that shape ne101_camera's curren
 
 **Alternative**: expose only `default` and have the platform read the main component from `bundle.default`.
 
-**Rationale**: (1) manifest's [`export_name: "NE101CameraPanel"`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L39) explicitly selects the named export, and the platform loader reads the main component from `window.NE101CameraPanel.NE101CameraPanel`; (2) keeping `default` preserves backward compatibility with older Dashboard loaders (v1.x era wrote `bundle.default`), avoiding a one-shot breaking upgrade; (3) `ConfigPanel` and `AdvancedPanel` must be named exports because the configuration dialog references them individually to render the Display tab and Advanced tab.
+**Rationale**:
+
+1. manifest's [`export_name: "NE101CameraPanel"`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L39) explicitly selects the named export, and the platform loader reads the main component from `window.NE101CameraPanel.NE101CameraPanel`
+2. keeping `default` preserves backward compatibility with older Dashboard loaders (v1.x era wrote `bundle.default`), avoiding a one-shot breaking upgrade
+3. `ConfigPanel` and `AdvancedPanel` must be named exports because the configuration dialog references them individually to render the Display tab and Advanced tab.
 
 **Cost**: the return object has one layer of redundancy (`default` and `NE101CameraPanel` point to the same function), but this is the standard cost of forward compatibility and is negligible.
 
@@ -589,9 +609,16 @@ This section lists five architectural decisions that shape ne101_camera's curren
 
 **Alternative**: use only WebSocket and rely on the platform store's push to cover every scenario.
 
-**Rationale**: (1) WebSocket can drop messages (during reconnect, network jitter), so on first mount when WS has not pushed yet, the screen would be blank; (2) large base64 images may exceed WS message-size limits (see the comment at [`bundle.js` L515-L517](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L515-L517)) — WS only pushes small metrics (battery/ts), images must come via REST; (3) REST guarantees "first mount always has data", which is the user-experience floor. commit [`b0be12b`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/b0be12b) adds exactly this mount effect for that floor.
+**Rationale**:
 
-**Cost**: (1) the component maintains two data paths, roughly doubling code complexity; (2) WebSocket push and REST pull can race (REST returning stale data overwriting fresh WS data), requiring deduplication via `lastFetchTsRef` and `fetchingRef` ([`bundle.js` L523-L524](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L523-L524)). commit [`0eedd27`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/0eedd27) once fixed this race.
+1. WebSocket can drop messages (during reconnect, network jitter), so on first mount when WS has not pushed yet, the screen would be blank
+2. large base64 images may exceed WS message-size limits (see the comment at [`bundle.js` L515-L517](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L515-L517)) — WS only pushes small metrics (battery/ts), images must come via REST
+3. REST guarantees "first mount always has data", which is the user-experience floor. commit [`b0be12b`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/b0be12b) adds exactly this mount effect for that floor.
+
+**Cost**:
+
+1. the component maintains two data paths, roughly doubling code complexity
+2. WebSocket push and REST pull can race (REST returning stale data overwriting fresh WS data), requiring deduplication via `lastFetchTsRef` and `fetchingRef` ([`bundle.js` L523-L524](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L523-L524)). commit [`0eedd27`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/0eedd27) once fixed this race.
 
 ```js
 // bundle.js L523-L524 — race-condition dedup refs
@@ -607,9 +634,17 @@ Source: [`bundle.js` L523-L524](https://github.com/camthink-ai/NeoMind-Dashboard
 
 **Alternative**: hardcode the processing logic inside the component with conditional branches (`if (template === 'ocr') { ... } else if (template === 'describe') { ... }`).
 
-**Rationale**: (1) Different `processingTemplate` values (`object_detection` / `ocr` / `describe` / `barcode`) have radically different post-processing — OCR assembles polygons and extracts text, describe assembles description strings, object_detection aggregates by class — hardcoding would bloat the main render function beyond readability; (2) code generation physically strips the "variable post-processing" out of the component code and lets the controller execute it in an isolated sandbox, keeping the AI scheduling logic out of the component bundle; (3) generated code is declarative (user changes config -> regenerate), easier to reason about than imperative `if/else`.
+**Rationale**:
 
-**Cost**: (1) string-concatenated code has no syntax checking — typos only surface at runtime; (2) the controller must `eval` this code in a sandbox, introducing (controlled) security risk; (3) debugging is hard — stack frames point into the generated string, not the source. `test_bundle.js` contains snapshot tests specifically for `generateTransformJsCode` to mitigate this.
+1. Different `processingTemplate` values (`object_detection` / `ocr` / `describe` / `barcode`) have radically different post-processing — OCR assembles polygons and extracts text, describe assembles description strings, object_detection aggregates by class — hardcoding would bloat the main render function beyond readability
+2. code generation physically strips the "variable post-processing" out of the component code and lets the controller execute it in an isolated sandbox, keeping the AI scheduling logic out of the component bundle
+3. generated code is declarative (user changes config -> regenerate), easier to reason about than imperative `if/else`.
+
+**Cost**:
+
+1. string-concatenated code has no syntax checking — typos only surface at runtime
+2. the controller must `eval` this code in a sandbox, introducing (controlled) security risk
+3. debugging is hard — stack frames point into the generated string, not the source. `test_bundle.js` contains snapshot tests specifically for `generateTransformJsCode` to mitigate this.
 
 ### Decision 5: Golden-angle HSV for class coloring
 
@@ -617,9 +652,17 @@ Source: [`bundle.js` L523-L524](https://github.com/camthink-ai/NeoMind-Dashboard
 
 **Alternative**: fixed palette (`['#ef4444', '#3b82f6', '#10b981', ...]`, taking color by class index).
 
-**Rationale**: (1) golden-angle rotation guarantees visually separable colors for any class count — a fixed palette starts repeating after the 9th color, while ne101_camera may encounter COCO's 80 classes or OpenImages' 500+; (2) the same class label always hashes to the same color, consistent across frames and devices, with no "class -> color" mapping table to maintain; (3) hashing is a pure function with no side effects, suitable for the helper layer. commit [`c276c23`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/c276c23) introduced this rule; the prior implementation was a fixed palette.
+**Rationale**:
 
-**Cost**: (1) hash collisions are rare but non-zero (two labels could hash to nearby hues); (2) generated colors are not designer-controlled, possibly producing "brand-color dissonance"; (3) HSV is not perceptually uniform (the blue region is harder for the eye to distinguish), theoretically inferior to OKLCH. In practice, with fewer than 50 classes, the effect is acceptable.
+1. golden-angle rotation guarantees visually separable colors for any class count — a fixed palette starts repeating after the 9th color, while ne101_camera may encounter COCO's 80 classes or OpenImages' 500+
+2. the same class label always hashes to the same color, consistent across frames and devices, with no "class -> color" mapping table to maintain
+3. hashing is a pure function with no side effects, suitable for the helper layer. commit [`c276c23`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/c276c23) introduced this rule; the prior implementation was a fixed palette.
+
+**Cost**:
+
+1. hash collisions are rare but non-zero (two labels could hash to nearby hues)
+2. generated colors are not designer-controlled, possibly producing "brand-color dissonance"
+3. HSV is not perceptually uniform (the blue region is harder for the eye to distinguish), theoretically inferior to OKLCH. In practice, with fewer than 50 classes, the effect is acceptable.
 
 ---
 

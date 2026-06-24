@@ -363,15 +363,15 @@ sequenceDiagram
     participant DS as DataSource
     participant RO as ResizeObserver
 
-    RT->>MC: mount, 注入 props {config, dataSource, fetchData}
+    RT->>MC: mount, inject props config, dataSource, fetchData
     MC->>MC: useState([]) / useRef(null) 初始化
     MC->>RO: observe(containerRef)
-    RO-->>MC: containerSize {w, h}
+    RO-->>MC: containerSize w, h
 
     Note over MC: useEffect 1: dataSource 变化触发
-    MC->>FD: fetchData({timeRange: 24})
+    MC->>FD: fetchData timeRange 24
     FD->>DS: 解析 dataSource 配置
-    DS-->>FD: {value: 84} 或 {series: [...]}
+    DS-->>FD: value 84 或 series [...]
     FD-->>MC: result
     MC->>MC: extractValue(result) → values[]
     MC->>MC: getLayout(count, w, h) → cols
@@ -380,7 +380,7 @@ sequenceDiagram
 
     loop 每 30 秒
         Note over MC: useEffect 2: setInterval
-        MC->>FD: fetchData({timeRange: 24})
+        MC->>FD: fetchData timeRange 24
         FD-->>MC: 新 result
         MC->>MC: extractValue → 更新 values[]
         MC-->>RT: 重渲染（fid 校验通过才更新）

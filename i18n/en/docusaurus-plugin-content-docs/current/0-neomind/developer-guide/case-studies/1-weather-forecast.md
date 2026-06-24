@@ -350,12 +350,12 @@ sequenceDiagram
     participant Geo as Open-Meteo Geocoding
     participant Forecast as Open-Meteo Forecast
 
-    Runtime->>Ext: execute_command("get_weather", {location, ...})
+    Runtime->>Ext: execute_command get_weather (location, ...)
     Note over Ext: read RwLock<String> city cache
-    Ext->>Geo: GET /search?name=<location>
-    Geo-->>Ext: { latitude, longitude }
+    Ext->>Geo: GET /search?name=location
+    Geo-->>Ext: latitude, longitude
     Ext->>Forecast: GET /forecast?latitude=...&current=...
-    Forecast-->>Ext: { temperature, wind_speed, humidity, ... }
+    Forecast-->>Ext: temperature, wind_speed, humidity, ...
     Note over Ext: store_weather_metrics()<br/>AtomicI64 fixed-point ×100 write
     Ext-->>Runtime: ProduceMetrics → ExtensionMetricValue /100 restore
 ```

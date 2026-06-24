@@ -363,15 +363,15 @@ sequenceDiagram
     participant DS as DataSource
     participant RO as ResizeObserver
 
-    RT->>MC: mount, inject props {config, dataSource, fetchData}
+    RT->>MC: mount, inject props config, dataSource, fetchData
     MC->>MC: useState([]) / useRef(null) initialization
     MC->>RO: observe(containerRef)
-    RO-->>MC: containerSize {w, h}
+    RO-->>MC: containerSize w, h
 
     Note over MC: useEffect 1: dataSource change triggers
-    MC->>FD: fetchData({timeRange: 24})
+    MC->>FD: fetchData timeRange 24
     FD->>DS: resolve dataSource config
-    DS-->>FD: {value: 84} or {series: [...]}
+    DS-->>FD: value 84 or series [...]
     FD-->>MC: result
     MC->>MC: extractValue(result) → values[]
     MC->>MC: getLayout(count, w, h) → cols
@@ -380,7 +380,7 @@ sequenceDiagram
 
     loop Every 30 seconds
         Note over MC: useEffect 2: setInterval
-        MC->>FD: fetchData({timeRange: 24})
+        MC->>FD: fetchData timeRange 24
         FD-->>MC: new result
         MC->>MC: extractValue → update values[]
         MC-->>RT: re-render (only if fid check passes)

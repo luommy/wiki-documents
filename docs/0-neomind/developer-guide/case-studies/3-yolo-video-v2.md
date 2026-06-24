@@ -27,7 +27,10 @@ yolo-video-v2 用 Push 模式解决了这个问题：扩展在 `init_session` �
 | 帧率 | 设备图像更新频率（通常 < 1 FPS） | 视频原生帧率（25~30 FPS） |
 | 线程模型 | runtime 主线程 + `block_in_place` | 专用 OS 线程跑帧循环，与 tokio runtime 完全解耦 |
 
-**目标读者**：(1) 要在 NeoMind 上跑实时视频分析的视觉工程师——你会看到完整的 RTSP 取流 + YOLO 推理 + JPEG 编码 + Push 推送链路；(2) 想理解 Push 流模式的 SDK 开发者——本案例是 SDK `StreamCapability` 接口唯一的「完整生产级」参考实现。
+**目标读者**：
+
+1. 要在 NeoMind 上跑实时视频分析的视觉工程师——你会看到完整的 RTSP 取流 + YOLO 推理 + JPEG 编码 + Push 推送链路
+2. 想理解 Push 流模式的 SDK 开发者——本案例是 SDK `StreamCapability` 接口唯一的「完整生产级」参考实现
 
 **你将学到**：
 
@@ -419,7 +422,7 @@ sequenceDiagram
     participant FFMPEG as ffmpeg-next
     participant DET as YoloDetector
 
-    FE->>RT: WebSocket connect + init {source_url, rois, lines}
+    FE->>RT: WebSocket connect + init source_url, rois, lines
     RT->>EXT: init_session(session)
     EXT->>EXT: parse source_url → is_network_stream
     EXT->>EXT: insert ActiveStream into registry
@@ -431,7 +434,7 @@ sequenceDiagram
         FFMPEG-->>THR: RGB24 frame
         THR->>THR: resize → 640x640
         THR->>DET: detect(image, conf, max_obj)
-        DET-->>THR: Vec<Detection>
+        DET-->>THR: Vec of Detection
         THR->>THR: ROI count + line crossing + capture rules
         THR->>THR: draw + encode JPEG
         THR->>RT: send_push_output(image_jpeg + metadata)
@@ -502,7 +505,11 @@ pub fn parse_source_url(url: &str) -> SourceType {
 
 ### 决策 2：ROI 绘制移到前端
 
-**我们选前端 canvas 叠加；替代方案是后端绘制带框 JPEG；理由**：commit `60e4e5b` 把 backend ROI drawing 移除（[`src/lib.rs` L1585-L1587](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/yolo-video-v2/src/lib.rs#L1585-L1587) 的注释明确写了 "ROI/Line overlay drawing is handled by the frontend canvas to avoid double-drawing"）。后端只发 JPEG + metadata JSON，前端用 canvas 绘制 ROI 多边形和越线。好处：(1) 减少 JPEG 重编码开销（后端不用每帧都画一遍）；(2) 前端可以动态调整 ROI 样式而不需要重启流；(3) 避免后端 JPEG + 前端 canvas 双重绘制导致视觉重影。
+**我们选前端 canvas 叠加；替代方案是后端绘制带框 JPEG；理由**：commit `60e4e5b` 把 backend ROI drawing 移除（[`src/lib.rs` L1585-L1587](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/yolo-video-v2/src/lib.rs#L1585-L1587) 的注释明确写了 "ROI/Line overlay drawing is handled by the frontend canvas to avoid double-drawing"）。后端只发 JPEG + metadata JSON，前端用 canvas 绘制 ROI 多边形和越线。好处：
+
+1. 减少 JPEG 重编码开销（后端不用每帧都画一遍）
+2. 前端可以动态调整 ROI 样式而不需要重启流
+3. 避免后端 JPEG + 前端 canvas 双重绘制导致视觉重影
 
 ```rust
 // lib.rs L1585-L1587
@@ -530,7 +537,13 @@ pub fn parse_source_url(url: &str) -> SourceType {
 
 ### 决策 5：usls + ort-load-dynamic
 
-**我们选运行时动态加载 ONNX Runtime；替代方案是静态链接；理由**：`usls` 的 `ort-load-dynamic` feature（[`Cargo.toml` L33`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/yolo-video-v2/Cargo.toml#L33)）让扩展不静态链接 ONNX Runtime，而是在运行时通过 `setup_native_lib_paths` 定位 dylib。好处：(1) 包体积小（ONNX Runtime dylib 约 50MB，静态链接会让每个平台 .nep 膨胀）；(2) 跨平台分发灵活（同一份 .nep 可以搭配不同平台的 dylib）；(3) 可以在部署时升级 ONNX Runtime 而不需要重新编译扩展。代价是运行时需要正确的库搜索路径——这正是 commit `3919c6a`（Linux so.N 版本化符号链接）和 `40da6b8`（Windows DLL 路径 + macOS dylib）修复的痛点。
+**我们选运行时动态加载 ONNX Runtime；替代方案是静态链接；理由**：`usls` 的 `ort-load-dynamic` feature（[`Cargo.toml` L33`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/yolo-video-v2/Cargo.toml#L33)）让扩展不静态链接 ONNX Runtime，而是在运行时通过 `setup_native_lib_paths` 定位 dylib。好处：
+
+1. 包体积小（ONNX Runtime dylib 约 50MB，静态链接会让每个平台 .nep 膨胀）
+2. 跨平台分发灵活（同一份 .nep 可以搭配不同平台的 dylib）
+3. 可以在部署时升级 ONNX Runtime 而不需要重新编译扩展
+
+代价是运行时需要正确的库搜索路径——这正是 commit `3919c6a`（Linux so.N 版本化符号链接）和 `40da6b8`（Windows DLL 路径 + macOS dylib）修复的痛点。
 
 ---
 
@@ -611,7 +624,13 @@ fn produce_metrics(&self) -> Result<Vec<ExtensionMetricValue>> {
   "entrypoint": "yolo-video-v2-components.umd.cjs"
 }
 ```
-[Source: metadata.json L32-L37](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/yolo-video-v2/metadata.json#L32-L37)：(1) 接收 `image_jpeg` chunk 渲染到 `<img>` 或 canvas；(2) 解析 metadata JSON 中的 `detections` / `roi_stats` / `line_stats` / `capture_events` 绘制叠加层；(3) 发送 `start_stream` / `stop_stream` / `update_stream_config` 命令。前端契约是「JPEG 帧 + JSON metadata 并行推送」，这与 2 的「虚拟指标 + data URI」截然不同。
+[Source: metadata.json L32-L37](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/yolo-video-v2/metadata.json#L32-L37)
+
+1. 接收 `image_jpeg` chunk 渲染到 `<img>` 或 canvas
+2. 解析 metadata JSON 中的 `detections` / `roi_stats` / `line_stats` / `capture_events` 绘制叠加层
+3. 发送 `start_stream` / `stop_stream` / `update_stream_config` 命令
+
+前端契约是「JPEG 帧 + JSON metadata 并行推送」，这与 2 的「虚拟指标 + data URI」截然不同。
 
 ### 与 stream-player 扩展的协作
 
@@ -623,7 +642,11 @@ commit `c41e6a6` 引入了 `stream-player` 扩展——一个纯播放器（不�
 
 ### 测试目录结构
 
-扩展维护了三类测试资产：(1) `tests/unit_test.rs` 和 `tests/integration_test.rs` 覆盖核心逻辑（StreamConfig 反序列化、ROI 计数、越线方向判定）；(2) `examples/memory_test.rs` 是一个独立的内存压测二进制，配合 `Cargo_test.toml`（独立 Cargo 配置）构建；(3) `test_memory.sh` 是 shell 脚本，跑长时间 push 模式压测。
+扩展维护了三类测试资产：
+
+1. `tests/unit_test.rs` 和 `tests/integration_test.rs` 覆盖核心逻辑（StreamConfig 反序列化、ROI 计数、越线方向判定）
+2. `examples/memory_test.rs` 是一个独立的内存压测二进制，配合 `Cargo_test.toml`（独立 Cargo 配置）构建
+3. `test_memory.sh` 是 shell 脚本，跑长时间 push 模式压测
 
 ### 内存压测
 
@@ -679,7 +702,14 @@ if s.frame_count % 30 == 0 {
 
 ### 端到端验证
 
-端到端验证流程：(1) 准备一个 RTSP 流源（或用 ffmpeg 把本地视频文件转成 RTSP）；(2) 前端发送 `start_stream` 命令，配置 `source_url` + `confidence_threshold: 0.5` + `target_fps: 10`；(3) 观察 push 输出帧率是否接近 target_fps；(4) 检查 metadata JSON 中 `detections` 数组是否有合理的目标框；(5) 配置一个 ROI 区域，验证 `roi_stats` 计数正确；(6) 触发 `stop_stream`，验证线程退出且无残留。
+端到端验证流程：
+
+1. 准备一个 RTSP 流源（或用 ffmpeg 把本地视频文件转成 RTSP）
+2. 前端发送 `start_stream` 命令，配置 `source_url` + `confidence_threshold: 0.5` + `target_fps: 10`
+3. 观察 push 输出帧率是否接近 target_fps
+4. 检查 metadata JSON 中 `detections` 数组是否有合理的目标框
+5. 配置一个 ROI 区域，验证 `roi_stats` 计数正确
+6. 触发 `stop_stream`，验证线程退出且无残留
 
 ### 跨平台 ONNX Runtime dylib 验证
 
@@ -737,7 +767,13 @@ commit `60e4e5b` 把 ffmpeg-next 从 v7 升级到 v8（注意：当前 `Cargo.to
 
 ### 源码卫生反例
 
-**该扩展 `src/` 目录下存在多个备份文件**：`detector.rs.backup`、`detector.rs.bak`、`lib.rs.backup`、`lib.rs.backup2`，以及根目录的 `Cargo.toml.bak` 和 `frontend/src/index.tsx.bak`。这是**源码治理反例**——备份文件不应该提交到仓库。Git 本身就是版本管理系统，`git log` / `git diff` 可以查看任何历史版本，`git stash` 可以暂存未完成的工作。提交 `.bak` / `.backup` / `.backup2` 文件会导致：(1) 仓库体积膨胀；(2) IDE 全局搜索时匹配到过时代码，造成混淆；(3) CI / linter 可能误编译备份文件。本案例的所有深链接**仅指向 canonical 文件**（`src/lib.rs`、`src/detector.rs`、`src/video_source.rs`、`Cargo.toml`、`metadata.json`），不引用任何备份文件。对比 [案例 #2](./2-yolo-device-inference.md) 的 18 个备份文件，yolo-video-v2 的备份较少但同样违规。
+**该扩展 `src/` 目录下存在多个备份文件**：`detector.rs.backup`、`detector.rs.bak`、`lib.rs.backup`、`lib.rs.backup2`，以及根目录的 `Cargo.toml.bak` 和 `frontend/src/index.tsx.bak`。这是**源码治理反例**——备份文件不应该提交到仓库。Git 本身就是版本管理系统，`git log` / `git diff` 可以查看任何历史版本，`git stash` 可以暂存未完成的工作。提交 `.bak` / `.backup` / `.backup2` 文件会导致：
+
+1. 仓库体积膨胀
+2. IDE 全局搜索时匹配到过时代码，造成混淆
+3. CI / linter 可能误编译备份文件
+
+本案例的所有深链接**仅指向 canonical 文件**（`src/lib.rs`、`src/detector.rs`、`src/video_source.rs`、`Cargo.toml`、`metadata.json`），不引用任何备份文件。对比 [案例 #2](./2-yolo-device-inference.md) 的 18 个备份文件，yolo-video-v2 的备份较少但同样违规。
 
 ### 排障速查表
 
@@ -778,7 +814,14 @@ commit `60e4e5b` 把 ffmpeg-next 从 v7 升级到 v8（注意：当前 `Cargo.to
 
 ### 推荐阅读顺序
 
-如果你是第一次接触 NeoMind 流式扩展，建议按以下顺序阅读：(1) 先读 [总览](./0-overview.md) 理解扩展模型；(2) 读 [案例 #1](./1-weather-forecast.md) 掌握基础同步扩展；(3) 读 [案例 #2](./2-yolo-device-inference.md) 理解 AI 推理 + 同步能力桥；(4) 最后读本案例 #3，对比 Push 与 Pull 的差异。如果你只关心 SDK 的 StreamCapability 接口设计，可以直接从 3.1 开始读。
+如果你是第一次接触 NeoMind 流式扩展，建议按以下顺序阅读：
+
+1. 先读 [总览](./0-overview.md) 理解扩展模型
+2. 读 [案例 #1](./1-weather-forecast.md) 掌握基础同步扩展
+3. 读 [案例 #2](./2-yolo-device-inference.md) 理解 AI 推理 + 同步能力桥
+4. 最后读本案例 #3，对比 Push 与 Pull 的差异
+
+如果你只关心 SDK 的 StreamCapability 接口设计，可以直接从 3.1 开始读。
 
 ### 延伸到 ne101_camera
 

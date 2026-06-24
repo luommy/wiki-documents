@@ -398,7 +398,15 @@ graph TB
 
 `ConfigPanel` 是「Display tab」的内容，负责用户可见的显示配置（标题、位置等）。ne101_camera 当前把标题字段让给了平台的 `ComponentConfigDialog`（见 [`bundle.js` L1354-L1356](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1353-L1357) 的注释），所以 `ConfigPanel` 本身返回 `null`，但保留导出是为了不破坏「主组件 + Display + Advanced」的三件套契约。
 
-`AdvancedPanel`（[L1448](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1448-L1970)）是真正承载复杂度的配置面板，包含：(1) AI 处理总开关；(2) 扩展选择下拉框（`ExtDropdown`）；(3) 模板选择（object_detection / ocr / describe / barcode）；(4) 类别过滤 / 短语输入；(5) ROI 开关 + 多边形编辑器（用户在画布上拖拽点）；(6) ROI 重叠阈值滑块（`processingRoiOverlap`，commit [`636a8ae`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/636a8ae)）；(7) NMS IoU 阈值透传给 `locate-anything-v2`（commit [`8656148`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/8656148)）。
+`AdvancedPanel`（[L1448](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1448-L1970)）是真正承载复杂度的配置面板，包含：
+
+1. AI 处理总开关
+2. 扩展选择下拉框（`ExtDropdown`）
+3. 模板选择（object_detection / ocr / describe / barcode）
+4. 类别过滤 / 短语输入
+5. ROI 开关 + 多边形编辑器（用户在画布上拖拽点）
+6. ROI 重叠阈值滑块（`processingRoiOverlap`，commit [`636a8ae`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/636a8ae)）
+7. NMS IoU 阈值透传给 `locate-anything-v2`（commit [`8656148`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/8656148)）。
 
 `NE101CameraPanel` 主组件的核心 hooks（位于 [`bundle.js` L484-L513](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L484-L513)）构成了它的状态机骨架：
 
@@ -465,19 +473,19 @@ sequenceDiagram
     participant UI as NE101CameraPanel
 
     DEV->>MQTT: 发布 telemetry<br/>(image_url + battery + signal + temp + virtual.detections)
-    MQTT->>NM: 转发到 devices/{id}/telemetry
+    MQTT->>NM: 转发到 devices/id/telemetry
     NM->>STORE: 写入 device.currentValues
     STORE->>WS: 推送增量<br/>(deviceImageSrc / virtualMetrics 变化)
     WS->>UI: props.deviceImageSrc 更新<br/>props.virtualMetrics 更新
 
     Note over UI: Priority 1: deviceImageSrc prop<br/>(L1601-L1602 注释明确)
 
-    UI->>UI: 渲染 <img> + Canvas
+    UI->>UI: 渲染 img + Canvas
 
     Note over UI,REST: 首次挂载 / WS 重连中<br/>deviceImageSrc 为空时
 
     UI->>REST: neomind.fetchDeviceValues(deviceId)<br/>(L1613-L1628)
-    REST->>NM: GET /devices/{id}/values
+    REST->>NM: GET /devices/id/values
     NM-->>REST: 全量 currentValues
     REST-->>UI: 解析 imageUrl + detections
     UI->>UI: JSON.parse detections 字符串<br/>(L857, commit e3a70be)
@@ -573,9 +581,17 @@ Source: [`bundle.js` L1613-L1628](https://github.com/camthink-ai/NeoMind-Dashboa
 
 **替代方案**：用 Rollup / Webpack 把 React 作为 external 或直接打进 bundle。
 
-**理由**：(1) Dashboard 宿主已经提供 React，每个组件再打包一份会让全仪表板出现 N 个 React 实例，hooks 跨实例失效（`useContext` 返回 undefined、`useRef` 报错）；(2) IIFE 共享单例每个组件节省约 140KB（React + ReactDOM minified），10 个组件就是 1.4MB；(3) 保证组件的 React 版本与宿主一致，不会出现「组件用 React 18 的 `useSyncExternalStore`，宿主还停在 React 17」的版本错配。
+**理由**：
 
-**代价**：(1) 没有 tree-shaking，整个 helper 层即使某些函数没被用到也会进 bundle；(2) 没有 TypeScript 类型检查，`getFirst(vals, keys)` 这类函数的参数类型全靠注释和约定；(3) 没有 ESLint 的 `rules-of-hooks`，hooks 顺序错误只能靠运行时发现（commit `0601cd4` 就是这类 bug）。metric_card 接受这个代价因为只有 352 行；ne101_camera 1972 行仍然接受，靠的是 `test_bundle.js` 做逻辑测试兜底。
+1. Dashboard 宿主已经提供 React，每个组件再打包一份会让全仪表板出现 N 个 React 实例，hooks 跨实例失效（`useContext` 返回 undefined、`useRef` 报错）
+2. IIFE 共享单例每个组件节省约 140KB（React + ReactDOM minified），10 个组件就是 1.4MB
+3. 保证组件的 React 版本与宿主一致，不会出现「组件用 React 18 的 `useSyncExternalStore`，宿主还停在 React 17」的版本错配。
+
+**代价**：
+
+1. 没有 tree-shaking，整个 helper 层即使某些函数没被用到也会进 bundle
+2. 没有 TypeScript 类型检查，`getFirst(vals, keys)` 这类函数的参数类型全靠注释和约定
+3. 没有 ESLint 的 `rules-of-hooks`，hooks 顺序错误只能靠运行时发现（commit `0601cd4` 就是这类 bug）。metric_card 接受这个代价因为只有 352 行；ne101_camera 1972 行仍然接受，靠的是 `test_bundle.js` 做逻辑测试兜底。
 
 ### 决策 2：命名导出 + default 双暴露
 
@@ -583,7 +599,11 @@ Source: [`bundle.js` L1613-L1628](https://github.com/camthink-ai/NeoMind-Dashboa
 
 **替代方案**：只暴露 `default`，让平台从 `bundle.default` 取主组件。
 
-**理由**：(1) manifest 的 [`export_name: "NE101CameraPanel"`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L39) 明确选了命名导出，平台的加载器从 `window.NE101CameraPanel.NE101CameraPanel` 取主组件；(2) 但保留 default 兼容旧版 Dashboard 加载器（v1.x 时代写的是 `bundle.default`），避免一次破坏性升级；(3) `ConfigPanel` 和 `AdvancedPanel` 必须用命名导出，因为配置对话框要分别引用它们渲染 Display tab 和 Advanced tab。
+**理由**：
+
+1. manifest 的 [`export_name: "NE101CameraPanel"`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L39) 明确选了命名导出，平台的加载器从 `window.NE101CameraPanel.NE101CameraPanel` 取主组件
+2. 但保留 default 兼容旧版 Dashboard 加载器（v1.x 时代写的是 `bundle.default`），避免一次破坏性升级
+3. `ConfigPanel` 和 `AdvancedPanel` 必须用命名导出，因为配置对话框要分别引用它们渲染 Display tab 和 Advanced tab。
 
 **代价**：return 对象多一层冗余（`default` 和 `NE101CameraPanel` 指向同一个函数），但这是「向前兼容」的标准代价，可忽略。
 
@@ -593,9 +613,16 @@ Source: [`bundle.js` L1613-L1628](https://github.com/camthink-ai/NeoMind-Dashboa
 
 **替代方案**：只用 WebSocket，依赖平台 store 的推送覆盖所有场景。
 
-**理由**：(1) WebSocket 可能丢消息（重连中、网络抖动），首次挂载时如果 WS 还没推送第一条，画面会空白；(2) 大体积的 base64 图像可能超出 WS 消息大小限制（见 [`bundle.js` L515-L517](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L515-L517) 的注释），WS 只推小指标（battery/ts），图像必须 REST 拉；(3) REST 保证「首次挂载一定有数据」，这是用户体验的底线。commit [`b0be12b`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/b0be12b) 就是专门为这个底线加的 mount effect。
+**理由**：
 
-**代价**：(1) 组件要维护两条数据路径，代码复杂度翻倍；(2) WS 推送和 REST 拉取可能产生「数据竞态」（REST 返回旧数据覆盖了 WS 推送的新数据），需要用 `lastFetchTsRef` 和 `fetchingRef`（[`bundle.js` L523-L524](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L523-L524)）做去重。commit [`0eedd27`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/0eedd27) 修过一次这个竞态。
+1. WebSocket 可能丢消息（重连中、网络抖动），首次挂载时如果 WS 还没推送第一条，画面会空白
+2. 大体积的 base64 图像可能超出 WS 消息大小限制（见 [`bundle.js` L515-L517](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L515-L517) 的注释），WS 只推小指标（battery/ts），图像必须 REST 拉
+3. REST 保证「首次挂载一定有数据」，这是用户体验的底线。commit [`b0be12b`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/b0be12b) 就是专门为这个底线加的 mount effect。
+
+**代价**：
+
+1. 组件要维护两条数据路径，代码复杂度翻倍
+2. WS 推送和 REST 拉取可能产生「数据竞态」（REST 返回旧数据覆盖了 WS 推送的新数据），需要用 `lastFetchTsRef` 和 `fetchingRef`（[`bundle.js` L523-L524](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L523-L524)）做去重。commit [`0eedd27`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/0eedd27) 修过一次这个竞态。
 
 ```js
 // bundle.js L523-L524 — race-condition dedup refs
@@ -611,9 +638,17 @@ Source: [`bundle.js` L523-L524](https://github.com/camthink-ai/NeoMind-Dashboard
 
 **替代方案**：在组件内部用条件分支硬编码处理逻辑（`if (template === 'ocr') { ... } else if (template === 'describe') { ... }`）。
 
-**理由**：(1) 不同 `processingTemplate`（`object_detection` / `ocr` / `describe` / `barcode`）的后处理差异极大——OCR 要把检测框拼成多边形并提取文本、describe 要拼描述字符串、object_detection 要按类别聚合计数——硬编码会让主组件的渲染函数膨胀到不可读；(2) 代码生成把「可变的后处理」从组件代码里物理剥离，让主控在独立沙箱里执行，避免组件 bundle 承担 AI 调度逻辑；(3) 生成的代码是「声明式」的（用户改配置 → 重新生成），比命令式的 `if/else` 更容易推理。
+**理由**：
 
-**代价**：(1) 字符串拼接的代码没有语法检查，拼错了只能在运行时发现；(2) 主控需要在沙箱里 `eval` 这段代码，有（受控的）安全风险；(3) 调试困难——出错时栈帧指向生成的字符串，不指向源码。`test_bundle.js` 里有专门针对 `generateTransformJsCode` 的快照测试来缓解这个问题。
+1. 不同 `processingTemplate`（`object_detection` / `ocr` / `describe` / `barcode`）的后处理差异极大——OCR 要把检测框拼成多边形并提取文本、describe 要拼描述字符串、object_detection 要按类别聚合计数——硬编码会让主组件的渲染函数膨胀到不可读
+2. 代码生成把「可变的后处理」从组件代码里物理剥离，让主控在独立沙箱里执行，避免组件 bundle 承担 AI 调度逻辑
+3. 生成的代码是「声明式」的（用户改配置 → 重新生成），比命令式的 `if/else` 更容易推理。
+
+**代价**：
+
+1. 字符串拼接的代码没有语法检查，拼错了只能在运行时发现
+2. 主控需要在沙箱里 `eval` 这段代码，有（受控的）安全风险
+3. 调试困难——出错时栈帧指向生成的字符串，不指向源码。`test_bundle.js` 里有专门针对 `generateTransformJsCode` 的快照测试来缓解这个问题。
 
 ### 决策 5：黄金角 HSV 给类别上色
 
@@ -621,9 +656,17 @@ Source: [`bundle.js` L523-L524](https://github.com/camthink-ai/NeoMind-Dashboard
 
 **替代方案**：固定调色板（`['#ef4444', '#3b82f6', '#10b981', ...]`，按类别 index 取色）。
 
-**理由**：(1) 黄金角旋转保证任意类别数都有视觉可分的颜色——固定调色板在第 9 种颜色之后就开始重复，而 ne101_camera 可能遇到 COCO 的 80 类、OpenImages 的 500+ 类；(2) 同一个类别标签永远哈希到同一个颜色，跨帧跨设备一致，不需要维护「类别 → 颜色」的映射表；(3) 哈希是纯函数，无副作用，可以直接放进 helper 层。commit [`c276c23`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/c276c23) 引入这条规则，之前的实现是固定调色板。
+**理由**：
 
-**代价**：(1) 哈希碰撞的概率虽然低但不为零（两个类别标签可能哈希到相近色相）；(2) 生成的颜色不受设计师控制，可能出现「品牌色不协调」的视觉问题；(3) HSV 空间不是感知均匀的（蓝色区域人眼区分度低），理论上不如 OKLCH。实测在 ≤ 50 类的场景下效果可接受。
+1. 黄金角旋转保证任意类别数都有视觉可分的颜色——固定调色板在第 9 种颜色之后就开始重复，而 ne101_camera 可能遇到 COCO 的 80 类、OpenImages 的 500+ 类
+2. 同一个类别标签永远哈希到同一个颜色，跨帧跨设备一致，不需要维护「类别 → 颜色」的映射表
+3. 哈希是纯函数，无副作用，可以直接放进 helper 层。commit [`c276c23`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/c276c23) 引入这条规则，之前的实现是固定调色板。
+
+**代价**：
+
+1. 哈希碰撞的概率虽然低但不为零（两个类别标签可能哈希到相近色相）
+2. 生成的颜色不受设计师控制，可能出现「品牌色不协调」的视觉问题
+3. HSV 空间不是感知均匀的（蓝色区域人眼区分度低），理论上不如 OKLCH。实测在 ≤ 50 类的场景下效果可接受。
 
 ---
 

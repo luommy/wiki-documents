@@ -24,7 +24,13 @@ The most easily misunderstood fact about ne101_camera is this: although it looks
 
 This "component + pluggable extension" contract is the **template** for AI reuse across the NeoMind ecosystem: one component, N inference backends. The same ne101_camera component, paired with `locate-anything-v2`, becomes "open-vocabulary object detection"; paired with `ocr-device-inference`, it becomes "OCR text recognition"; paired with `yolo-device-inference`, it becomes "edge-device YOLOv8 inference". The component never needs to know how those extensions are implemented internally — only how to invoke them and how to normalize their responses (see [4.3](./4-data-contract.md)).
 
-**Why "pluggable extension" beats "baked-in AI"**: if the component shipped its own YOLO model (say, embedding onnxruntime-web + yolov8n.weights into the bundle), three serious consequences would follow. First, bundle size would explode — a quantized YOLOv8n weight is ~12MB and onnxruntime-web's WASM adds ~12MB, taking the bundle from 80KB to over 25MB and pushing load time from milliseconds to seconds. Second, model choice would be locked — a user wanting OCR would need a different "OCR-baked" variant of the component, multiplying the component-market SKU count. Third, model updates would be tightly coupled to component updates — every YOLO iteration would require a new component release, whereas extensions are deployed independently (upgraded by the user or platform ops without touching the component). The pluggable-extension design dissolves all three problems: the component stays at 80KB, the user picks the model, and extensions can evolve on their own release cadence.
+**Why "pluggable extension" beats "baked-in AI"**: if the component shipped its own YOLO model (say, embedding onnxruntime-web + yolov8n.weights into the bundle), three serious consequences would follow.
+
+1. bundle size would explode — a quantized YOLOv8n weight is ~12MB and onnxruntime-web's WASM adds ~12MB, taking the bundle from 80KB to over 25MB and pushing load time from milliseconds to seconds.
+2. model choice would be locked — a user wanting OCR would need a different "OCR-baked" variant of the component, multiplying the component-market SKU count.
+3. model updates would be tightly coupled to component updates — every YOLO iteration would require a new component release, whereas extensions are deployed independently (upgraded by the user or platform ops without touching the component).
+
+The pluggable-extension design dissolves all three problems: the component stays at 80KB, the user picks the model, and extensions can evolve on their own release cadence.
 
 The diagram below shows the fan-out from "component → processingExtensionId → N candidate extensions". The component exposes one slot; the user's dropdown choice determines which extension is actually invoked, and extensions are mutually unaware of each other.
 
@@ -365,7 +371,11 @@ A similar fallback appears in `getExtModes(extensionId)` at [`bundle.js` L196-L1
 
 **The shape of the default mode**: the fallback returns a mode object with the triple `{command: 'detect', imageArg: 'image', responseType: 'boxes_x1y1x2y2'}`. This is a **guess-based default** — most YOLO-style detection extensions accept the `image` parameter name, use a `detect` command, and return some form of detection-box array. If the new extension happens to follow this convention (many will), it works out of the box. `boxes_x1y1x2y2` is the most "raw" response shape (just four coordinate values) with the simplest normalization logic, making it a reasonable default guess.
 
-**Risk and cost**: if the unknown extension's response shape is not `boxes_x1y1x2y2` (say it returns `ocr_text_blocks` or some novel `segments` format), the normalizer will not find the expected field (`r.boxes` is undefined) and the detections array will be empty. This is a **silent failure** — the Transform does not error, but no detection boxes render. The user sees a degraded "image shows but no detections" experience. This risk is deemed acceptable because: (1) it is not a crash (the component remains usable, only detection is degraded); (2) the debug log (mentioned in [5](./5-frontend-consume.md) as `console.warn('empty detections')`) helps developers locate the problem; (3) once the component updates `EXT_MODES` to include the new extension, the correct response shape takes over.
+**Risk and cost**: if the unknown extension's response shape is not `boxes_x1y1x2y2` (say it returns `ocr_text_blocks` or some novel `segments` format), the normalizer will not find the expected field (`r.boxes` is undefined) and the detections array will be empty. This is a **silent failure** — the Transform does not error, but no detection boxes render. The user sees a degraded "image shows but no detections" experience. This risk is deemed acceptable because:
+
+1. it is not a crash (the component remains usable, only detection is degraded)
+2. the debug log (mentioned in [5](./5-frontend-consume.md) as `console.warn('empty detections')`) helps developers locate the problem
+3. once the component updates `EXT_MODES` to include the new extension, the correct response shape takes over.
 
 **Design decision: lenient fallback vs strict rejection**
 

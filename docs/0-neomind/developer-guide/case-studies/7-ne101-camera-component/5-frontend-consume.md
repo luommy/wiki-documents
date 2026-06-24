@@ -13,7 +13,15 @@ sidebar_label: "5. Frontend Consume"
 
 ## 5.1 渲染管线总览
 
-ne101_camera 的渲染不是一次性的 JSX 模板，而是一条由多个 effect 驱动的**状态管线**。这条管线的起点是平台注入的 props（`device` / `deviceImageSrc` / `virtualMetrics` / `config` / `onConfigChange`），终点是挂载在媒体 `<div>` 上的 SVG 叠加层。中间穿过五个状态节点：(1) Transform lifecycle effect（创建/更新/删除后端 Transform，见 5.7）；(2) WS + REST 合并 effect（拉取图像和 virtual 指标，见 [4.7](./4-data-contract.md)）；(3) `imageData` / `wsValues` / `virtualData` 三个 state 的 `setState`；(4) `imgNatState`（图像原始宽高）+ `ctrSizeState`（容器宽高）驱动的 `ovTf` 坐标变换计算（见 5.4）；(5) detections 数组按类别上色后映射成 SVG `<g>` 元素（见 5.2 / 5.3）。任何一个节点的状态变化都会触发 React 重渲染，重新走一遍从 `ovTf` 计算到 SVG 映射的路径。
+ne101_camera 的渲染不是一次性的 JSX 模板，而是一条由多个 effect 驱动的**状态管线**。这条管线的起点是平台注入的 props（`device` / `deviceImageSrc` / `virtualMetrics` / `config` / `onConfigChange`），终点是挂载在媒体 `<div>` 上的 SVG 叠加层。中间穿过五个状态节点：
+
+1. Transform lifecycle effect（创建/更新/删除后端 Transform，见 5.7）
+2. WS + REST 合并 effect（拉取图像和 virtual 指标，见 [4.7](./4-data-contract.md)）
+3. `imageData` / `wsValues` / `virtualData` 三个 state 的 `setState`
+4. `imgNatState`（图像原始宽高）+ `ctrSizeState`（容器宽高）驱动的 `ovTf` 坐标变换计算（见 5.4）
+5. detections 数组按类别上色后映射成 SVG `<g>` 元素（见 5.2 / 5.3）。
+
+任何一个节点的状态变化都会触发 React 重渲染，重新走一遍从 `ovTf` 计算到 SVG 映射的路径。
 
 下图把这条 effect-driven 管线画成流程图，标出每一步的输入/输出和触发条件。
 
@@ -164,7 +172,12 @@ commit [`b746c02`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/c
 
 - **选择**：用 SVG `<svg viewBox="0 0 100 100" preserveAspectRatio="none">` 叠加层渲染检测框。
 - **备选方案**：用 `<canvas>` 2D context 手动绘制。
-- **理由**：(1) SVG 是声明式的，可以直接写成 JSX，与 React 的渲染模型天然契合——状态变了，React 重新调用 `detections.map` 生成新的 `<polygon>` / `<rect>`，无需手动 `clearRect` + 重绘；(2) SVG 原生支持 `<text>` 元素，文字渲染由浏览器引擎处理，无需 Canvas 的 `fillText` + 字体加载 + 像素测量；(3) SVG 的 `viewBox="0 0 100 100"` + `preserveAspectRatio="none"` 让检测框坐标可以直接用归一化值（0-100），与后端返回的 0-1 归一化坐标天然对齐（乘以 100 即可）；(4) Canvas 需要手动处理 DPI 缩放、重绘调度、事件命中检测，代码量会翻倍。
+- **理由**：
+
+    1. SVG 是声明式的，可以直接写成 JSX，与 React 的渲染模型天然契合——状态变了，React 重新调用 `detections.map` 生成新的 `<polygon>` / `<rect>`，无需手动 `clearRect` + 重绘
+    2. SVG 原生支持 `<text>` 元素，文字渲染由浏览器引擎处理，无需 Canvas 的 `fillText` + 字体加载 + 像素测量
+    3. SVG 的 `viewBox="0 0 100 100"` + `preserveAspectRatio="none"` 让检测框坐标可以直接用归一化值（0-100），与后端返回的 0-1 归一化坐标天然对齐（乘以 100 即可）
+    4. Canvas 需要手动处理 DPI 缩放、重绘调度、事件命中检测，代码量会翻倍。
 - **代价**：SVG 在检测框数量极大（>500）时性能不如 Canvas（每个 `<g>` 都是一个 DOM 节点）。但 ne101_camera 的典型场景（单帧摄像头画面）检测数通常 ≤ 30，SVG 的性能开销可以忽略。
 
 ---
@@ -302,7 +315,13 @@ if (!cbRef.current) {
 
 这段代码的关键在于 `cbRef.current` 是一个**函数**（不是 ref 对象），作为 `ref={cbRef.current}` 传给媒体 `<div>`（[L1156](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1156-L1156)）。React 对函数类型的 ref 有特殊处理：当 DOM 元素挂载时，React 调用这个函数并传入元素；当元素卸载时，React 调用这个函数并传入 `null`。这正好解决了「异步挂载」的问题——无论媒体 `<div>` 什么时候出现，callback ref 都会被调用，ResizeObserver 都会被正确挂载。
 
-callback 内部的逻辑三步走：(1) L538 断开旧的 ResizeObserver（如果存在），防止内存泄漏；(2) L539 把元素存入 `mediaRef`，供其他逻辑使用；(3) L541-L545 创建新的 ResizeObserver，回调里调用 `setCtrSize` 更新容器尺寸状态。`ctrSizeState` 的初始值是 `{w: 0, h: 0}`（[L530](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L530-L530)），当它从 0 变成实际尺寸时，会触发重渲染，`ovTf` 从 `null` 变成有效值，检测框从「不渲染」（L1211 的 `&& ovTf` 守卫）变成「渲染」。
+callback 内部的逻辑三步走：
+
+1. L538 断开旧的 ResizeObserver（如果存在），防止内存泄漏
+2. L539 把元素存入 `mediaRef`，供其他逻辑使用
+3. L541-L545 创建新的 ResizeObserver，回调里调用 `setCtrSize` 更新容器尺寸状态。
+
+`ctrSizeState` 的初始值是 `{w: 0, h: 0}`（[L530](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L530-L530)），当它从 0 变成实际尺寸时，会触发重渲染，`ovTf` 从 `null` 变成有效值，检测框从「不渲染」（L1211 的 `&& ovTf` 守卫）变成「渲染」。
 
 ```js
     var imgNatState = React.useState({ w: 0, h: 0 });
@@ -376,7 +395,12 @@ Source: [`bundle.js` L1067-L1145](https://github.com/camthink-ai/NeoMind-Dashboa
 
 - **选择**：从 virtual metrics（`total_count` / `count_by_class` / `roi_count` / `texts`）读取数据。
 - **备选方案**：在组件渲染函数里从 `detections` 数组实时聚合（`detections.length`、`detections.reduce(...)` 按 label 分组计数）。
-- **理由**：Transform 在后端沙箱里**已经**计算了这些聚合（见 [4.4](./4-data-contract.md) 的 `total_count` / `count_by_class` / `roi_count` 输出契约）。如果组件再算一次，就是重复计算，且有两个风险：(1) 两次计算的逻辑可能不一致（比如 Transform 用了 ROI 过滤后的 detections 算 `roi_count`，但组件拿到的 detections 是过滤前的），导致徽章数字与检测框数量对不上；(2) 每次 render 都重新 reduce 一个可能很长的数组，浪费 CPU。metric-driven 方案让组件只做「展示」，不做「计算」，职责清晰。
+- **理由**：Transform 在后端沙箱里**已经**计算了这些聚合（见 [4.4](./4-data-contract.md) 的 `total_count` / `count_by_class` / `roi_count` 输出契约）。如果组件再算一次，就是重复计算，且有两个风险：
+
+    1. 两次计算的逻辑可能不一致（比如 Transform 用了 ROI 过滤后的 detections 算 `roi_count`，但组件拿到的 detections 是过滤前的），导致徽章数字与检测框数量对不上
+    2. 每次 render 都重新 reduce 一个可能很长的数组，浪费 CPU。
+
+    metric-driven 方案让组件只做「展示」，不做「计算」，职责清晰。
 - **代价**：如果 Transform 出 bug 算错了 metric，组件会忠实地展示错误数字。这个代价用 4.8 的「宽容降级」哲学来缓解——metric 缺失时回退到 `detections.length`，不会白屏。
 
 ---
@@ -440,7 +464,12 @@ Source: [`bundle.js` L661-L824](https://github.com/camthink-ai/NeoMind-Dashboard
 
 **Tier 2（L744-L763）：有 ID 但哈希不同 → 更新**。当 `_transformId` 存在但配置变了（`_storedHash !== _configHash`），调用 `neomind.updateTransform(activeId, { js_code, ... })` 更新 Transform 的代码。更新成功后持久化新的 `_transformHash`。
 
-**Tier 3（L766-L821）：无 ID → 创建**。当既没有存储的 ID 也没有 ref 里的 ID 时，进入创建流程。创建前先做两个检查：(1) 扩展是否已安装且未停止（L806-L817）；(2) 是否已有同名 Transform 可复用（L783-L800）。如果都没有，调用 `neomind.createTransform(payload)` 创建。创建过程中用哨兵值 `'_creating_'`（L719/L770）防止并发创建——如果上一个 effect 已经在创建中（`transformIdRef.current === '_creating_'`），当前 effect 直接 return，等创建完成后的 re-render 触发 Tier 2。
+**Tier 3（L766-L821）：无 ID → 创建**。当既没有存储的 ID 也没有 ref 里的 ID 时，进入创建流程。创建前先做两个检查：
+
+1. 扩展是否已安装且未停止（L806-L817）
+2. 是否已有同名 Transform 可复用（L783-L800）。
+
+如果都没有，调用 `neomind.createTransform(payload)` 创建。创建过程中用哨兵值 `'_creating_'`（L719/L770）防止并发创建——如果上一个 effect 已经在创建中（`transformIdRef.current === '_creating_'`），当前 effect 直接 return，等创建完成后的 re-render 触发 Tier 2。
 
 **删除路径（L668-L679）**：当 `processingEnabled` 为 false 或扩展未选或设备未绑定时，删除已存储的 Transform 并清空 `_transformId / _transformHash`。
 
@@ -478,7 +507,11 @@ stateDiagram-v2
 
 - **选择**：三级分发（Tier 1 verify / Tier 2 update / Tier 3 create）。
 - **备选方案**：每次配置变化都 `deleteTransform` + `createTransform`。
-- **理由**：(1) 避免闪烁——删除再创建的间隙（可能几百毫秒）组件会处于「无 Transform」状态，检测中断，用户看到检测框消失再出现；(2) 保留 virtual metric 连续性——Transform 的 ID 变了，后端可能会清空旧 ID 的 virtual metrics 缓存，导致短暂的数据空洞；(3) 减少 API 调用——Tier 1 的快路径（哈希匹配）只做一次 `listTransforms` 验证，比「先 delete 再 create」少一次网络往返。
+- **理由**：
+
+    1. 避免闪烁——删除再创建的间隙（可能几百毫秒）组件会处于「无 Transform」状态，检测中断，用户看到检测框消失再出现
+    2. 保留 virtual metric 连续性——Transform 的 ID 变了，后端可能会清空旧 ID 的 virtual metrics 缓存，导致短暂的数据空洞
+    3. 减少 API 调用——Tier 1 的快路径（哈希匹配）只做一次 `listTransforms` 验证，比「先 delete 再 create」少一次网络往返。
 - **代价**：代码复杂度高——三个分支 + 哨兵 + 取消保护 + 持久化回调，这一个 effect 就占了 163 行（L661-L824）。但这是 ne101_camera 作为「设备绑定 + AI 处理」组件的核心复杂度来源，无法简化。
 
 ---

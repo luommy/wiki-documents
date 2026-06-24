@@ -25,7 +25,12 @@ sidebar_label: "5. uink-rms-bridge"
 2. **Markdown → image 渲染必须在扩展侧完成**——Uink-RMS 的 `POST /api/v1/devices/{id}/image` 只接受 JPEG/PNG 二进制，不接受文本格式，所以 pulldown-cmark 解析 + ab_glyph 字体渲染 + imageproc 绘制 + image crate 编码 JPEG 这条管线完全由 Rust 侧负责
 3. 厂商云存在**区域分割**——中国大陆用户必须走 `https://cn.rms.uink.com`，海外用户走 `https://eu.rms.uink.com`，两者账号不互通，扩展必须支持区域路由
 
-**目标读者**：(1) 要接入第三方厂商云平台（尤其是 IoT 云、显示云）的集成商——你会看到从 JWT 登录到设备注册、遥测拉取、图像推送的完整闭环；(2) 想理解 NeoMind 如何把一个「封闭系统」桥接到统一设备模型的开发者——uink-rms-bridge 是「厂商 API 包一层」模式的范本。**「生产验证」的具体含义**：该扩展经历了至少 4 轮针对性修复（[`f4c73cd`](https://github.com/camthink-ai/NeoMind-Extensions/commit/f4c73cd) 初始发布、[`261d8e6`](https://github.com/camthink-ai/NeoMind-Extensions/commit/261d8e6) 翻转与数据源、[`39587eb`](https://github.com/camthink-ai/NeoMind-Extensions/commit/39587eb) SDK 升级、[`422ba8d`](https://github.com/camthink-ai/NeoMind-Extensions/commit/422ba8d) 安全加固），跨 6 个版本（v2.7.0 → v2.7.6）回归，目前在生产部署运行。
+**目标读者**：
+
+1. 要接入第三方厂商云平台（尤其是 IoT 云、显示云）的集成商——你会看到从 JWT 登录到设备注册、遥测拉取、图像推送的完整闭环
+2. 想理解 NeoMind 如何把一个「封闭系统」桥接到统一设备模型的开发者——uink-rms-bridge 是「厂商 API 包一层」模式的范本
+
+**「生产验证」的具体含义**：该扩展经历了至少 4 轮针对性修复（[`f4c73cd`](https://github.com/camthink-ai/NeoMind-Extensions/commit/f4c73cd) 初始发布、[`261d8e6`](https://github.com/camthink-ai/NeoMind-Extensions/commit/261d8e6) 翻转与数据源、[`39587eb`](https://github.com/camthink-ai/NeoMind-Extensions/commit/39587eb) SDK 升级、[`422ba8d`](https://github.com/camthink-ai/NeoMind-Extensions/commit/422ba8d) 安全加固），跨 6 个版本（v2.7.0 → v2.7.6）回归，目前在生产部署运行。
 
 ---
 
@@ -198,7 +203,9 @@ impl Default for UinkConfig {
 
 ### 3.3 Markdown → Image 渲染管线（pulldown-cmark + ab_glyph + imageproc）
 
-这是本扩展最复杂的部分，约 400 行代码（L230-L640）。管线分四步：(1) [`parse_markdown`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L248-L376) 用 pulldown-cmark 0.12 解析 Markdown 为 `Vec<TextBlock>`（Heading / Paragraph 两种块，Paragraph 内含 Plain / Bold / Code 三种 inline）：
+这是本扩展最复杂的部分，约 400 行代码（L230-L640）。管线分四步：
+
+1. [`parse_markdown`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L248-L376) 用 pulldown-cmark 0.12 解析 Markdown 为 `Vec<TextBlock>`（Heading / Paragraph 两种块，Paragraph 内含 Plain / Bold / Code 三种 inline）：
 
 ```rust
 // lib.rs L248-L376 (trimmed: first 30 lines)
@@ -224,7 +231,9 @@ fn parse_markdown(md: &str) -> Vec<TextBlock> {
 }
 ```
 
-[Source: lib.rs L248-L376](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L248-L376)(2) [`load_system_font_data`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L215-L225) 从 macOS PingFang 或 Linux Noto Sans CJK 路径加载字体（`eprintln!("[uink-rms-bridge] Loaded font: {}", path)` 在 L218）：
+[Source: lib.rs L248-L376](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L248-L376)
+
+2. [`load_system_font_data`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L215-L225) 从 macOS PingFang 或 Linux Noto Sans CJK 路径加载字体（`eprintln!("[uink-rms-bridge] Loaded font: {}", path)` 在 L218）：
 
 ```rust
 // lib.rs L215-L225
@@ -242,7 +251,9 @@ fn load_system_font_data() -> Result<Vec<u8>> {
 }
 ```
 
-[Source: lib.rs L215-L225](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L215-L225)(3) [`render_markdown_to_image`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L475-L640) 遍历 blocks，用 ab_glyph 的 `PxScale` + imageproc 的 `draw_text_mut` 逐行绘制到 `ImageBuffer::<Rgb<u8>>`：
+[Source: lib.rs L215-L225](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L215-L225)
+
+3. [`render_markdown_to_image`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L475-L640) 遍历 blocks，用 ab_glyph 的 `PxScale` + imageproc 的 `draw_text_mut` 逐行绘制到 `ImageBuffer::<Rgb<u8>>`：
 
 ```rust
 // lib.rs L475-L640 (trimmed: first 30 lines)
@@ -355,22 +366,22 @@ sequenceDiagram
     U->>FE: 编辑 Markdown
     FE->>FE: Canvas 实时预览
     U->>FE: 点击"推送"
-    FE->>RT: execute_command("push_content",<br/>{device_id, content_type:"markdown", content})
+    FE->>RT: execute_command push_content<br/>device_id, content_type markdown, content
     RT->>EXT: 路由到 cmd_push_content
     EXT->>EXT: resolve_rms_id(device_id)
     EXT->>EXT: get_display_size(rms_id)<br/>→ (800, 480)
     EXT->>EXT: get_font_data()<br/>→ PingFang.ttc bytes
     EXT->>PARSE: parse_markdown(md)
-    PARSE-->>EXT: Vec<TextBlock>
+    PARSE-->>EXT: Vec of TextBlock
     EXT->>RENDER: render_markdown_to_image<br/>(blocks, 800, 480, font)
     RENDER-->>EXT: ImageBuffer Rgb
     EXT->>ENC: encode PNG/JPEG
-    ENC-->>EXT: Vec<u8> bytes
+    ENC-->>EXT: Vec of u8 bytes
     EXT->>EXT: push_image_to_device<br/>(multipart/form-data)
-    EXT->>RMS: POST /api/v1/devices/{id}/image
+    EXT->>RMS: POST /api/v1/devices/id/image
     Note over EXT,RMS: ensure_token() 先刷新 JWT
     RMS-->>EXT: 200 OK + image_url
-    EXT-->>RT: {success, image_size_bytes}
+    EXT-->>RT: success, image_size_bytes
     RT-->>FE: 命令结果
     RMS->>EP: LPWAN/蜂窝下行（秒级延迟）
     EP-->>EP: e-paper 刷新显示
@@ -386,7 +397,13 @@ sequenceDiagram
 
 ### 决策 2：Markdown 在扩展侧 Rust 渲染（而非前端 canvas / 而非云侧）
 
-**我们选扩展侧 Rust 渲染**（pulldown-cmark + ab_glyph + imageproc）；替代方案 A 是前端 Canvas API 渲染后上传 base64；替代方案 B 是把 Markdown 文本发给 Uink-RMS 云端让云渲染。理由：(1) e-paper 设备算力 / 带宽极有限，LPWAN 下行只收图像二进制，Uink-RMS API `POST /image` 也只接 JPEG/PNG，不支持文本格式——方案 B 不可行；(2) 前端 Canvas 渲染依赖浏览器字体，不同用户机器字体不一致，渲染结果不可预测，且把渲染 CPU 开销放在前端不如放在扩展侧；(3) Rust 侧用 ab_glyph + 内嵌系统字体（PingFang / Noto CJK）渲染，字体可控、跨平台一致、性能高。代价是扩展侧代码量增加 400 行（L230-L640）。
+**我们选扩展侧 Rust 渲染**（pulldown-cmark + ab_glyph + imageproc）；替代方案 A 是前端 Canvas API 渲染后上传 base64；替代方案 B 是把 Markdown 文本发给 Uink-RMS 云端让云渲染。理由：
+
+1. e-paper 设备算力 / 带宽极有限，LPWAN 下行只收图像二进制，Uink-RMS API `POST /image` 也只接 JPEG/PNG，不支持文本格式——方案 B 不可行
+2. 前端 Canvas 渲染依赖浏览器字体，不同用户机器字体不一致，渲染结果不可预测，且把渲染 CPU 开销放在前端不如放在扩展侧
+3. Rust 侧用 ab_glyph + 内嵌系统字体（PingFang / Noto CJK）渲染，字体可控、跨平台一致、性能高
+
+代价是扩展侧代码量增加 400 行（L230-L640）。
 
 ### 决策 3：SDK 远程 crate 而非 workspace path（commit 39587eb）
 
@@ -409,11 +426,25 @@ impl UinkConfig {
 }
 ```
 
-[Source: lib.rs L713-L720](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L713-L720)理由：(1) Uink-RMS 目前只有 cn / eu 两个区域，下拉框选比手填 URL 更友好，降低用户配置心智负担；(2) 硬编码端点可以避免用户填错 URL（少个 `/`、多了 `/api/v1` 等）；(3) 保留 `Custom` 选项和 `custom_server_url` 字段作为扩展点——如果 Uink 未来开新区域或客户自建 RMS 实例，用户仍可填完整 URL。代价是 Uink 新增区域时需要改代码发新版（但这种情况罕见）。
+[Source: lib.rs L713-L720](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L713-L720)
+
+理由：
+
+1. Uink-RMS 目前只有 cn / eu 两个区域，下拉框选比手填 URL 更友好，降低用户配置心智负担
+2. 硬编码端点可以避免用户填错 URL（少个 `/`、多了 `/api/v1` 等）
+3. 保留 `Custom` 选项和 `custom_server_url` 字段作为扩展点——如果 Uink 未来开新区域或客户自建 RMS 实例，用户仍可填完整 URL
+
+代价是 Uink 新增区域时需要改代码发新版（但这种情况罕见）。
 
 ### 决策 5：`RwLock<HashMap>` 而非 DashMap / SQLite
 
-**我们选 `RwLock<HashMap<String, String>>`**（[L730](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L730)）；替代方案 A 是 DashMap（无锁并发 HashMap）；替代方案 B 是落盘 SQLite 持久化。理由：(1) 单个客户的 e-paper 设备量通常几十到几百台，HashMap 读写都是 O(1)，性能不是瓶颈；(2) DashMap 引入额外依赖且 API 复杂度上升，对这个规模无收益；(3) SQLite 落盘带来 IO 开销和文件锁问题，而设备映射在每次 sync 后从 RMS 重建即可，无需持久化。parking_lot::RwLock 比 std::sync::RwLock 性能更好且不中毒（poisoning），是 NeoMind 扩展的统一选择。
+**我们选 `RwLock<HashMap<String, String>>`**（[L730](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L730)）；替代方案 A 是 DashMap（无锁并发 HashMap）；替代方案 B 是落盘 SQLite 持久化。理由：
+
+1. 单个客户的 e-paper 设备量通常几十到几百台，HashMap 读写都是 O(1)，性能不是瓶颈
+2. DashMap 引入额外依赖且 API 复杂度上升，对这个规模无收益
+3. SQLite 落盘带来 IO 开销和文件锁问题，而设备映射在每次 sync 后从 RMS 重建即可，无需持久化
+
+parking_lot::RwLock 比 std::sync::RwLock 性能更好且不中毒（poisoning），是 NeoMind 扩展的统一选择。
 
 ### 决策 6：前端 Canvas 翻转支持（commit 261d8e6）
 
@@ -581,17 +612,38 @@ mod tests {
 
 ### 渲染回归测试策略
 
-Markdown → Image 渲染是扩展最易出 bug 的部分（字体覆盖、CJK 换行、标题缩放）。建议补充的回归用例：(1) 纯中文长文本换行（验证 CJK anywhere-break）；(2) 中英文混排（验证 Latin 词不拆、CJK 可拆）；(3) H1-H6 六级标题缩放比例（2.0x / 1.8x / 1.6x / 1.4x / 1.2x / 1.0x）；(4) 加粗文本的 double-strike 渲染效果；(5) emoji 字符（当前字体可能不覆盖，需验证降级行为）；(6) 空 Markdown / 超长 Markdown 边界。`test_parse_markdown` 只验证 AST 结构，未验证渲染像素——像素级回归需要固定字体 + golden image 比对。
+Markdown → Image 渲染是扩展最易出 bug 的部分（字体覆盖、CJK 换行、标题缩放）。建议补充的回归用例：
+
+1. 纯中文长文本换行（验证 CJK anywhere-break）
+2. 中英文混排（验证 Latin 词不拆、CJK 可拆）
+3. H1-H6 六级标题缩放比例（2.0x / 1.8x / 1.6x / 1.4x / 1.2x / 1.0x）
+4. 加粗文本的 double-strike 渲染效果
+5. emoji 字符（当前字体可能不覆盖，需验证降级行为）
+6. 空 Markdown / 超长 Markdown 边界
+
+`test_parse_markdown` 只验证 AST 结构，未验证渲染像素——像素级回归需要固定字体 + golden image 比对。
 
 > 注：源码 `2.0f32.max(...)` 中的 `.max` 导致 H2+ 被 clamp 到 2.0x，实际渲染中所有标题级别字号相同。这是源码 bug（应为 `.min`），当前缩放表描述的是注释中的设计意图而非运行时行为。
 
 ### "生产验证"的具体含义
 
-该扩展的"生产验证"不是一次性完成的，而是跨 6 个版本（v2.7.0 → v2.7.6）的迭代验证：(1) **跨版本回归**——每次版本 bump（[`24b47d2`](https://github.com/camthink-ai/NeoMind-Extensions/commit/24b47d2) v2.7.0、[`ff762aa`](https://github.com/camthink-ai/NeoMind-Extensions/commit/ff762aa) v2.7.1、[`cd075d5`](https://github.com/camthink-ai/NeoMind-Extensions/commit/cd075d5) v2.7.2、[`8e81400`](https://github.com/camthink-ai/NeoMind-Extensions/commit/8e81400) v2.7.4、[`d2db401`](https://github.com/camthink-ai/NeoMind-Extensions/commit/d2db401) v2.7.5、[`1e9a1f1`](https://github.com/camthink-ai/NeoMind-Extensions/commit/1e9a1f1) v2.7.6）都跑全套单测 + 手动 E2E；(2) **多区域实测**——cn.rms.uink.com 和 eu.rms.uink.com 两个端点都验证过 JWT 登录 + 设备列表 + 图像推送全链路；(3) **真实设备刷新测试**——在 UINK 7.5（800x480）和 UINK 2.13（250x122）两种分辨率设备上推送 Markdown，确认 e-paper 实际刷新显示正确。
+该扩展的"生产验证"不是一次性完成的，而是跨 6 个版本（v2.7.0 → v2.7.6）的迭代验证：
+
+1. **跨版本回归**——每次版本 bump（[`24b47d2`](https://github.com/camthink-ai/NeoMind-Extensions/commit/24b47d2) v2.7.0、[`ff762aa`](https://github.com/camthink-ai/NeoMind-Extensions/commit/ff762aa) v2.7.1、[`cd075d5`](https://github.com/camthink-ai/NeoMind-Extensions/commit/cd075d5) v2.7.2、[`8e81400`](https://github.com/camthink-ai/NeoMind-Extensions/commit/8e81400) v2.7.4、[`d2db401`](https://github.com/camthink-ai/NeoMind-Extensions/commit/d2db401) v2.7.5、[`1e9a1f1`](https://github.com/camthink-ai/NeoMind-Extensions/commit/1e9a1f1) v2.7.6）都跑全套单测 + 手动 E2E
+2. **多区域实测**——cn.rms.uink.com 和 eu.rms.uink.com 两个端点都验证过 JWT 登录 + 设备列表 + 图像推送全链路
+3. **真实设备刷新测试**——在 UINK 7.5（800x480）和 UINK 2.13（250x122）两种分辨率设备上推送 Markdown，确认 e-paper 实际刷新显示正确
 
 ### 手动 E2E 流程
 
-完整的手动验证流程：(1) 配置 server_region + email + password；(2) 调用 `sync_devices` 等待设备列表返回；(3) 调用 `list_devices` 确认设备注册成功；(4) 调用 `push_content` 推送一段 Markdown（含标题 + 列表 + 加粗）；(5) 等待 5-30 秒观察 e-paper 屏幕刷新（LPWAN 延迟）；(6) 调用 `get_display` 拉取 preview_url 确认推送成功；(7) 拔掉设备电源等 5 分钟，调用 `refresh_status` 确认 offline 状态被正确上报。
+完整的手动验证流程：
+
+1. 配置 server_region + email + password
+2. 调用 `sync_devices` 等待设备列表返回
+3. 调用 `list_devices` 确认设备注册成功
+4. 调用 `push_content` 推送一段 Markdown（含标题 + 列表 + 加粗）
+5. 等待 5-30 秒观察 e-paper 屏幕刷新（LPWAN 延迟）
+6. 调用 `get_display` 拉取 preview_url 确认推送成功
+7. 拔掉设备电源等 5 分钟，调用 `refresh_status` 确认 offline 状态被正确上报
 
 ---
 
@@ -669,7 +721,12 @@ uink-rms-bridge 的 `src/` 目录**只有 `lib.rs` 一个文件，共 2250 行**
 
 ### 桥接策略决策树
 
-当你需要把一个外部设备 / 系统接入 NeoMind 时，按以下顺序评估：(1) **该设备是否有标准协议？**（ONVIF / OPC-UA / Modbus / MQTT / BACnet）——有则优先用标准协议桥接（如 [案例 #4](./4-onvif-bridge.md)），标准协议稳定、多厂商通用、无云依赖。(2) **只有厂商专有 API 时**——评估厂商 API 的稳定性和文档质量，做好 API 版本跟踪。(3) **厂商 API 是否需要云中转？**——是则评估云服务 SLA 和区域可用性，设计中考虑 token 刷新和退避。(4) **是否需要前端交互？**——如果用户需要编辑内容并预览（如 e-paper 内容编辑），则需要前端组件（DisplayEditorCard 模式）；如果只是数据采集和控制（如摄像头 PTZ），则纯后端即可。
+当你需要把一个外部设备 / 系统接入 NeoMind 时，按以下顺序评估：
+
+1. **该设备是否有标准协议？**（ONVIF / OPC-UA / Modbus / MQTT / BACnet）——有则优先用标准协议桥接（如 [案例 #4](./4-onvif-bridge.md)），标准协议稳定、多厂商通用、无云依赖
+2. **只有厂商专有 API 时**——评估厂商 API 的稳定性和文档质量，做好 API 版本跟踪
+3. **厂商 API 是否需要云中转？**——是则评估云服务 SLA 和区域可用性，设计中考虑 token 刷新和退避
+4. **是否需要前端交互？**——如果用户需要编辑内容并预览（如 e-paper 内容编辑），则需要前端组件（DisplayEditorCard 模式）；如果只是数据采集和控制（如摄像头 PTZ），则纯后端即可
 
 ### 推荐阅读顺序
 
@@ -677,7 +734,14 @@ uink-rms-bridge 的 `src/` 目录**只有 `lib.rs` 一个文件，共 2250 行**
 
 ### 小结
 
-uink-rms-bridge 是 NeoMind 生态中**唯一一个前后端一体的厂商专有桥接扩展**。它的工程价值在于：(1) 完整展示了 JWT 鉴权链（login → refresh → backoff）的 Rust 实现；(2) 在扩展侧完成了 Markdown → Image 的全管线渲染（pulldown-cmark + ab_glyph + imageproc），这是其他扩展没有的独特能力；(3) 通过区域端点路由（cn / eu）处理了厂商云的地理分割问题；(4) 通过 DisplayEditorCard 前端组件提供了用户友好的内容编辑体验。它的工程教训在于：2250 行单文件是可读性的边界，未来如果新增更多 RMS endpoint（如告警 / 日志），应该考虑拆分。
+uink-rms-bridge 是 NeoMind 生态中**唯一一个前后端一体的厂商专有桥接扩展**。它的工程价值在于：
+
+1. 完整展示了 JWT 鉴权链（login → refresh → backoff）的 Rust 实现
+2. 在扩展侧完成了 Markdown → Image 的全管线渲染（pulldown-cmark + ab_glyph + imageproc），这是其他扩展没有的独特能力
+3. 通过区域端点路由（cn / eu）处理了厂商云的地理分割问题
+4. 通过 DisplayEditorCard 前端组件提供了用户友好的内容编辑体验
+
+它的工程教训在于：2250 行单文件是可读性的边界，未来如果新增更多 RMS endpoint（如告警 / 日志），应该考虑拆分。
 
 ---
 

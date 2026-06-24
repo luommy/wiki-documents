@@ -13,20 +13,13 @@ sidebar_label: "1. Background"
 
 ## 1.1 NE101 设备：CamThink 感知摄像头
 
-**CamThink NE101** 是一款电池供电的边缘 AI 感知摄像头，由 CamThink 团队（也是 NeoMind Dashboard 的维护方）设计。它的核心能力是「按需抓拍 + 边缘指标上报」：不像传统 IPC 摄像头持续推流，NE101 大部分时间处于低功耗休眠状态，只有在三种触发条件下才醒来抓拍一张 JPEG 静图——(1) 用户主动调用 `trigger_capture` 命令；(2) 内置定时器到点（cron 形式的 `set_schedule`）；(3) 外部系统通过 MQTT `cmd` 主题下发指令。
+**CamThink NE101** 是一款电池供电的边缘 AI 感知摄像头，由 CamThink 团队（也是 NeoMind Dashboard 的维护方）设计。它的核心能力是「按需抓拍 + 边缘指标上报」：不像传统 IPC 摄像头持续推流，NE101 大部分时间处于低功耗休眠状态，只有在特定触发条件下才醒来抓拍一张 JPEG 静图（定时唤醒或外部系统通过 MQTT 下发指令）。
 
 每次抓拍完成后，设备会上报一组遥测：最新 JPEG 图像（通过 REST 拉取，URL 存在 `values.image_url` 里）+ 电池百分比 + 蜂窝信号强度 + 机壳温度。这种「事件驱动 + 低频采样」的设计让一节电池能撑 3-6 个月，但也意味着组件不能用「订阅视频流」的思路，而必须用「拉取最新一张」的轮询/事件模式。
 
 NE101 与 NeoMind 主控之间走 MQTT 协议：设备把遥测发到 `devices/{device_id}/telemetry` 主题，NeoMind 订阅后通过 WebSocket 把增量推给前端组件。这种链路决定了 ne101_camera 组件的数据接入方式不是「数据源绑定」（DataSource 是为「扩展周期产出的指标」设计的），而是「设备绑定」（DeviceBinding 直接订阅某个具体设备的遥测流）。
 
-NE101 支持的设备命令（device commands）是组件命令按钮的来源，主要包括：
-
-- `trigger_capture` —— 立即唤醒设备抓拍一张 JPEG，最常用的用户主动操作。组件在「命令」区渲染一个按钮，点击后调用 `fetchData({type: 'device_command', command: 'trigger_capture'})`。
-- `set_schedule` —— 设置定时抓拍的 cron 表达式（例如 `0 */30 * * * *` 表示每 30 分钟一次）。组件把这个命令封装成一个「定时配置」子面板。
-- `reboot` —— 远程重启设备，用于排查蜂窝连接掉线等问题。这个命令在 UI 上做了二次确认，避免误触。
-- `set_capture_params` —— 调整抓拍参数（分辨率、JPEG 质量、是否启用 IR 补光），属于高级配置，默认折叠隐藏。
-
-这四类命令的存在进一步印证了 1.2 的论点：metric_card 这种纯展示型组件根本无法承载命令触发能力，必须有专门的设备绑定组件来渲染命令按钮 + 调用设备命令 API。
+NE101 设备本身的抓拍触发由设备固件管理（定时器或外部 MQTT 指令），ne101_camera 组件**不负责命令触发**——其 manifest 的 `has_actions: false` 明确声明了这一点。组件的角色是**消费设备上报的数据**：接收遥测增量（image_url + battery + signal + temp），展示最新抓拍图像，并通过 `processingExtensionId` 将图像交给 AI 扩展处理。
 
 > **源码佐证**：manifest 的 `description.zh` 就写明了「显示最新抓拍、电量状态和触发控制」——这三个能力组合正是 NE101 设备能力的镜像。详见 [manifest.json L4-L7](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L4-L7):
 
@@ -43,17 +36,15 @@ NE101 支持的设备命令（device commands）是组件命令按钮的来源�
 
 ## 1.2 为什么不能拿 metric_card 凑合
 
-读者第一反应可能是：「NE101 不就是上报电池、信号、温度几个数值吗？拿 [6 metric_card](../6-metric-card-component.md) 绑个数据源不就行了？」答案是不行，原因有四：
+读者第一反应可能是：「NE101 不就是上报电池、信号、温度几个数值吗？拿 [6 metric_card](../6-metric-card-component.md) 绑个数据源不就行了？」答案是不行，原因有三：
 
 **第一，metric_card 不能渲染图像。** NE101 最核心的价值是「抓拍到的 JPEG 图像」，而 metric_card 的 `extractValue()` 只能输出标量（数字/字符串）。要显示图像，需要专门的 `<img>` + Canvas 画布，metric_card 的渲染层完全没有这个能力。
 
 **第二，metric_card 不能画 ROI 叠加。** NE101 的典型用法是「圈出画面里的人行通道，统计经过的行人数」——这需要在图像上画半透明矩形（ROI）+ 在检测到的目标上画检测框 + 按类别上色。这套叠加渲染逻辑（Canvas 坐标系、`object-cover` 的非线性映射、ResizeObserver 异步建立）根本无法塞进 metric_card 的「单卡片」布局。
 
-**第三，metric_card 不能触发设备命令。** NE101 有 `trigger_capture`（立即抓拍）、`set_schedule`（设置定时）这类设备级命令，需要在组件里渲染按钮 + 调用 `fetchData({type: 'device_command', ...})`。metric_card 的 manifest 是 `has_actions: false`，根本没有命令面板的入口。
+**第三，metric_card 不能配置 AI 处理流水线。** NE101 真正的杀手锏是「图像 → AI 扩展 → 检测结果回写」这条链路，需要在配置面板里选扩展（`processingExtensionId`）、选模板（`processingTemplate`）、调 ROI 阈值（`processingRoiOverlap`）。这套配置在 metric_card 里完全无对应字段。
 
-**第四，metric_card 不能配置 AI 处理流水线。** NE101 真正的杀手锏是「图像 → AI 扩展 → 检测结果回写」这条链路，需要在配置面板里选扩展（`processingExtensionId`）、选模板（`processingTemplate`）、调 ROI 阈值（`processingRoiOverlap`）。这套配置在 metric_card 里完全无对应字段。
-
-综上，NE101 需要一个**专门的设备绑定组件**，把「图像展示 + ROI 叠加 + 命令触发 + AI 处理配置」四合一打包。这就是 ne101_camera 存在的根本理由。
+综上，NE101 需要一个**专门的设备绑定组件**，把「图像展示 + ROI 叠加 + AI 处理配置」三合一打包。这就是 ne101_camera 存在的根本理由。
 
 ---
 
@@ -143,13 +134,13 @@ ne101_camera 的 manifest 只有 40 行，但信息密度极高。除了 1.3 讲
 |------|--------------------------|------------------------|
 | 1 | 创建 metric_card，绑定 NE101 的 battery/signal 指标 | 拖入 ne101_camera，自动绑定到 NE101 设备 |
 | 2 | 创建 image_display，手动填入 image_url | （已包含）自动显示最新抓拍 |
-| 3 | 用 Postman 调 `set_schedule` 每 30 分钟抓拍 | 在「定时」面板填 cron 表达式 |
+| 3 | 用 Postman 触发设备抓拍或等待定时抓拍 | 设备固件管理定时抓拍，组件自动接收 |
 | 4 | 用 Postman 调扩展 API，传 image_url + 模板 | 在「AI 处理」面板选扩展 + 模板 |
 | 5 | 手动把检测结果写回设备虚拟指标 | （自动）Transform 自动回写 detections |
 | 6 | 自己写脚本画 ROI + 检测框叠加 | 在画布上拖拽画 ROI 矩形 |
 | 7 | 每次想看新数据都得重复 3-6 步 | 抓拍后自动刷新，零干预 |
 
-这个对照也解释了为什么 ne101_camera 的 `bundle.js` 有 1972 行而 metric_card 只有 352 行——前者把后者的「拉一个数 + 渲染一张卡」扩展成了「拉图 + 拉指标 + 触发命令 + 调度扩展 + 解析检测 + 画 ROI + 画检测框」七合一的复杂状态机。
+这个对照也解释了为什么 ne101_camera 的 `bundle.js` 有 1972 行而 metric_card 只有 352 行——前者把后者的「拉一个数 + 渲染一张卡」扩展成了「拉图 + 拉指标 + 调度扩展 + 解析检测 + 画 ROI + 画检测框」六合一的复杂状态机。
 
 ---
 
@@ -161,7 +152,11 @@ ne101_camera 的 manifest 只有 40 行，但信息密度极高。除了 1.3 讲
 
 **选择**：组件只负责「图像展示 + 命令触发 + ROI 配置」，AI 推理通过 `processingExtensionId` 字段委托给用户选择的扩展（`locate-anything-v2` 兼容系）。
 
-**被否决的备选**：组件内置 AI 推理逻辑（直接调 YOLO 模型）。否决理由有三：(1) 组件 bundle 会膨胀到几 MB，违反「手写 IIFE，无构建步骤」的范式；(2) AI 模型迭代很快，把模型版本绑死在组件版本里会导致升级困难；(3) 不同用户要的 AI 能力不同（有人要目标检测，有人要 OCR，有人要图像描述），内置一种能力就剥夺了用户的选择权。
+**被否决的备选**：组件内置 AI 推理逻辑（直接调 YOLO 模型）。否决理由有三：
+
+1. 组件 bundle 会膨胀到几 MB，违反「手写 IIFE，无构建步骤」的范式
+2. AI 模型迭代很快，把模型版本绑死在组件版本里会导致升级困难
+3. 不同用户要的 AI 能力不同（有人要目标检测，有人要 OCR，有人要图像描述），内置一种能力就剥夺了用户的选择权。
 
 **代价**：组件必须依赖外部扩展才能真正发挥价值——如果用户没安装任何 `locate-anything-v2` 兼容扩展，`processingExtensionId` 下拉框是空的，组件就退化成一个「纯图像展示 + 命令触发」的面板。这个代价被认为可接受，因为 NeoMind 生态默认推荐安装至少一个 AI 扩展。
 
@@ -169,7 +164,11 @@ ne101_camera 的 manifest 只有 40 行，但信息密度极高。除了 1.3 讲
 
 **选择**：走「设备绑定」路径，manifest 写 `has_device_binding: true` + `device_type_filter: ["ne101_camera"]`，明确不用数据源绑定。
 
-**被否决的备选**：用 `has_data_source: true` + 把 NE101 的遥测伪装成扩展指标。否决理由：(1) 数据源抽象是为「扩展周期产出」设计的，把设备遥测塞进去会扭曲抽象边界；(2) 数据源绑定无法触发 `trigger_capture` 这类设备命令（DataSource 只有读，没有写）；(3) 数据源绑定无法在编辑器里做「设备类型过滤」，会把所有设备都列在下拉框里，体验糟糕。
+**被否决的备选**：用 `has_data_source: true` + 把 NE101 的遥测伪装成扩展指标。否决理由：
+
+1. 数据源抽象是为「扩展周期产出」设计的，把设备遥测塞进去会扭曲抽象边界
+2. 数据源绑定无法在编辑器里做「设备类型过滤」，会把所有设备都列在下拉框里，体验糟糕
+3. 设备特有的字段（如 `image_url`）在数据源抽象里没有对应位置，需要额外的适配层。
 
 **代价**：组件代码必须显式处理设备对象（`device.id`、`device.type`、`device.metrics`），而不能依赖 DataSource 的统一 `fetchData()` 接口。这导致组件的 data layer 比 metric_card 复杂得多。
 
@@ -187,7 +186,10 @@ ne101_camera 的 manifest 只有 40 行，但信息密度极高。除了 1.3 讲
 
 **选择**：manifest 同时保留 `processingRoiX/Y/W/H`（单矩形，L32-L35）和 `processingRois`（数组，L36）。运行时优先读数组，数组为空时回退到单矩形。
 
-**被否决的备选**：废弃单矩形字段，统一用数组（数组里只放一个元素即等同于单矩形）。否决理由：(1) 已有用户的配置 JSON 里写的是单矩形字段，强制迁移会破坏存量配置；(2) 单矩形字段在配置面板里只需要 4 个 input，UI 更简洁；多 ROI 需要 Canvas 交互式绘制，UI 复杂度高。
+**被否决的备选**：废弃单矩形字段，统一用数组（数组里只放一个元素即等同于单矩形）。否决理由：
+
+1. 已有用户的配置 JSON 里写的是单矩形字段，强制迁移会破坏存量配置
+2. 单矩形字段在配置面板里只需要 4 个 input，UI 更简洁；多 ROI 需要 Canvas 交互式绘制，UI 复杂度高。
 
 **代价**：组件代码要同时处理两种格式（见 bundle.js L1034-L1036 的 fallback 逻辑），有少量重复代码。但这个代价换来的是平滑升级路径，值得。
 
@@ -211,14 +213,14 @@ sequenceDiagram
     participant UI as ne101_camera 组件
 
     DEV->>MQTT: 发布 telemetry<br/>(image_url + battery + signal + temp)
-    MQTT->>NM: 转发到 devices/{id}/telemetry
+    MQTT->>NM: 转发到 devices/id/telemetry
     NM->>UI: WebSocket 推送增量<br/>(image_url 变化)
-    UI->>NM: REST 拉取 JPEG<br/>GET {image_url}
+    UI->>NM: REST 拉取 JPEG<br/>GET image_url
     NM-->>UI: 返回 JPEG 二进制
-    UI->>UI: 渲染 <img> + Canvas
+    UI->>UI: 渲染 img + Canvas
 
     Note over UI,EXT: 用户在配置面板选 processingExtensionId
-    UI->>NM: 创建 Transform<br/>{deviceId, extId, template,<br/> roiEnabled, overlapThreshold, rois}
+    UI->>NM: 创建 Transform<br/>deviceId, extId, template,<br/> roiEnabled, overlapThreshold, rois
     NM->>EXT: 调用扩展 process(image_url, config)
     EXT->>EXT: YOLO 推理 / OCR / 描述
     EXT->>NM: 写回虚拟指标 detections

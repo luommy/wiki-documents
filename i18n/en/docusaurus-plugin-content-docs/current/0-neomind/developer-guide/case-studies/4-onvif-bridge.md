@@ -418,19 +418,19 @@ sequenceDiagram
     participant CAM as ONVIF Camera
 
     Note over FE,EXT: Phase 1: WS-Discovery Device Discovery
-    FE->>NM: execute_command("discover", {timeout_ms: 5000})
+    FE->>NM: execute_command discover (timeout_ms 5000)
     NM->>EXT: cmd_discover()
     EXT->>EXT: find_local_ipv4() detect local IP
     EXT->>+CAM: UDP Probe -> 239.255.255.250:3702
     CAM-->>-EXT: UDP ProbeMatch (contains XAddrs)
     EXT->>EXT: parse_probe_matches() deduplicate
-    EXT-->>NM: {devices: [...], count: N}
+    EXT-->>NM: devices [...] count N
     NM-->>FE: Device list
 
     Note over FE,EXT: Phase 2: SOAP Capability Negotiation
-    FE->>NM: add_device({url, username, password})
+    FE->>NM: add_device url, username, password
     NM->>EXT: cmd_add_device()
-    FE->>NM: get_device({device_id})
+    FE->>NM: get_device device_id
     NM->>EXT: cmd_get_device()
     EXT->>+CAM: SOAP GetDeviceInformation
     CAM-->>-EXT: Manufacturer / Model / Firmware
@@ -440,19 +440,19 @@ sequenceDiagram
     NM-->>FE: Device info card
 
     Note over FE,EXT: Phase 3: Get RTSP Stream
-    FE->>NM: get_stream_uri({device_id, profile_token})
+    FE->>NM: get_stream_uri device_id, profile_token
     NM->>EXT: cmd_get_stream_uri()
     EXT->>+CAM: SOAP GetStreamUri
     CAM-->>-EXT: rtsp://192.168.1.100:554/...
-    EXT-->>NM: {stream_uri: "rtsp://..."}
+    EXT-->>NM: stream_uri rtsp://...
     NM-->>FE: RTSP URL (passed to video component for streaming)
 
     Note over FE,EXT: Phase 4 (optional): PTZ Control
-    FE->>NM: ptz_move({device_id, profile_token, pan, tilt, zoom})
+    FE->>NM: ptz_move device_id, profile_token, pan, tilt, zoom
     NM->>EXT: cmd_ptz_move()
     EXT->>+CAM: SOAP ContinuousMove
     CAM-->>-EXT: OK
-    EXT-->>NM: {success: true}
+    EXT-->>NM: success true
     NM-->>FE: PTZ command executed
 ```
 
@@ -482,7 +482,13 @@ The tradeoff is losing the type-safe WSDL bindings provided by `onvif-rs`, but t
 
 **Alternative**: Use `PasswordText` mode — place the cleartext password directly in the SOAP header (`<wsse:Password>cleartext password</wsse:Password>`).
 
-**Rationale**: (1) ONVIF device SOAP communication **frequently uses HTTP rather than HTTPS** — a large number of cameras ship with TLS disabled by default, so with PasswordText mode, packet capture reveals the admin password directly; (2) Although SHA-1 hashing in PasswordDigest is not cryptographically secure (SHA-1 has known collision attacks), in the ONVIF context it provides **replay attack protection** when combined with nonce + timestamp — even if an attacker captures the digest, they cannot replay it after the created timestamp expires; (3) Some vendor devices mandate PasswordDigest mode (e.g., Hikvision firmware default configuration), where PasswordText is rejected outright with a `ter:NotAuthorized` SOAP Fault. The tradeoff is that each SOAP request must compute a SHA-1 hash, but this overhead is in the microsecond range and completely negligible.
+**Rationale**:
+
+1. ONVIF device SOAP communication **frequently uses HTTP rather than HTTPS** — a large number of cameras ship with TLS disabled by default, so with PasswordText mode, packet capture reveals the admin password directly
+2. Although SHA-1 hashing in PasswordDigest is not cryptographically secure (SHA-1 has known collision attacks), in the ONVIF context it provides **replay attack protection** when combined with nonce + timestamp — even if an attacker captures the digest, they cannot replay it after the created timestamp expires
+3. Some vendor devices mandate PasswordDigest mode (e.g., Hikvision firmware default configuration), where PasswordText is rejected outright with a `ter:NotAuthorized` SOAP Fault.
+
+The tradeoff is that each SOAP request must compute a SHA-1 hash, but this overhead is in the microsecond range and completely negligible.
 
 ### Decision 3: ureq Synchronous HTTP instead of reqwest Async
 
@@ -512,7 +518,13 @@ The tradeoff is the inability to make parallel requests to multiple devices, but
 
 **Alternative**: Integrate `ffmpeg-next` inside the extension to directly pull RTSP streams and decode them into JPEG frames for frontend push.
 
-**Rationale**: (1) **Separation of concerns** — protocol bridging (SOAP/WS-Discovery) and video processing (RTSP pulling / H.264 decoding) are completely different engineering domains; mixing them in one extension would double the codebase and make independent testing difficult; (2) **Composability** — after the RTSP URL is returned to the frontend, it can be fed to [Case 3 yolo-video-v2](./3-yolo-video-v2.md) for real-time AI detection, played directly by a frontend `<video>` tag, or recorded by a third-party NVR — onvif-bridge should not constrain how the stream is consumed; (3) **Build artifact size** — not pulling in `ffmpeg-next` / `nokhwa` reduces the `.nep` package from approximately 15MB to 3MB, which is significant for edge deployment (bandwidth-constrained scenarios). The tradeoff is that users need to combine onvif-bridge + yolo-video-v2 themselves to achieve the "camera discovery + AI detection" end-to-end pipeline, but NeoMind's extension composition mechanism is designed exactly for this.
+**Rationale**:
+
+1. **Separation of concerns** — protocol bridging (SOAP/WS-Discovery) and video processing (RTSP pulling / H.264 decoding) are completely different engineering domains; mixing them in one extension would double the codebase and make independent testing difficult
+2. **Composability** — after the RTSP URL is returned to the frontend, it can be fed to [Case 3 yolo-video-v2](./3-yolo-video-v2.md) for real-time AI detection, played directly by a frontend `<video>` tag, or recorded by a third-party NVR — onvif-bridge should not constrain how the stream is consumed
+3. **Build artifact size** — not pulling in `ffmpeg-next` / `nokhwa` reduces the `.nep` package from approximately 15MB to 3MB, which is significant for edge deployment (bandwidth-constrained scenarios).
+
+The tradeoff is that users need to combine onvif-bridge + yolo-video-v2 themselves to achieve the "camera discovery + AI detection" end-to-end pipeline, but NeoMind's extension composition mechanism is designed exactly for this.
 
 ---
 
@@ -899,7 +911,11 @@ A detailed comparison will be presented in [Case #5](./5-uink-rms-bridge.md). Re
 
 ### Summary
 
-onvif-bridge implements complete ONVIF Profile S core capabilities in approximately 2700 lines of Rust code — WS-Discovery device discovery, SOAP/WS-Security device capability negotiation, and PTZ control. It has zero dependencies on any ONVIF/SOAP crate, with everything hand-written, making it a model of pure protocol engineering. As the **standard protocol bridge** case study in the NeoMind ecosystem, it demonstrates: (1) how open standards reduce integration costs — one codebase compatible with all Profile S devices; (2) the engineering tradeoffs of hand-writing a protocol stack — controllability vs. type safety; (3) the architecture pattern of a pure backend extension — no frontend, no ONNX, synchronous HTTP, single responsibility.
+onvif-bridge implements complete ONVIF Profile S core capabilities in approximately 2700 lines of Rust code — WS-Discovery device discovery, SOAP/WS-Security device capability negotiation, and PTZ control. It has zero dependencies on any ONVIF/SOAP crate, with everything hand-written, making it a model of pure protocol engineering. As the **standard protocol bridge** case study in the NeoMind ecosystem, it demonstrates:
+
+1. how open standards reduce integration costs — one codebase compatible with all Profile S devices
+2. the engineering tradeoffs of hand-writing a protocol stack — controllability vs. type safety
+3. the architecture pattern of a pure backend extension — no frontend, no ONNX, synchronous HTTP, single responsibility.
 
 From a source code governance perspective, onvif-bridge's `src/` directory (5 files, zero backup files) is the cleanest case study in this series and can serve as a positive reference for code hygiene.
 

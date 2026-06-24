@@ -13,20 +13,13 @@ sidebar_label: "1. Business Background"
 
 ## 1.1 The NE101 Device: CamThink Sensing Camera
 
-**CamThink NE101** is a battery-powered edge-AI sensing camera designed by the CamThink team (which also maintains the NeoMind Dashboard). Its core capability is "on-demand capture + edge metric reporting": unlike a traditional IPC camera that streams continuously, NE101 spends most of its time in low-power sleep and wakes up to capture a single JPEG still only under three trigger conditions — (1) an explicit `trigger_capture` command from a user; (2) the built-in scheduler firing (cron-style `set_schedule`); (3) an external system issuing a command via the MQTT `cmd` topic.
+**CamThink NE101** is a battery-powered edge-AI sensing camera designed by the CamThink team (which also maintains the NeoMind Dashboard). Its core capability is "on-demand capture + edge metric reporting": unlike a traditional IPC camera that streams continuously, NE101 spends most of its time in low-power sleep and wakes up to capture a single JPEG still only under specific trigger conditions (scheduled wake-up or external commands via MQTT).
 
 After each capture the device reports a telemetry bundle: the latest JPEG image (fetched via REST, URL stored in `values.image_url`), the battery percentage, the cellular signal strength, and the enclosure temperature. This "event-driven + low-frequency sampling" design lets a single battery last 3-6 months, but it also means the component cannot use a "subscribe to video stream" model — it must use a "fetch the latest still" polling/event pattern.
 
 NE101 talks to the NeoMind controller over MQTT: the device publishes telemetry to the `devices/{device_id}/telemetry` topic, NeoMind subscribes and forwards deltas to the frontend component via WebSocket. This link dictates why the ne101_camera data access is "device binding" (DeviceBinding subscribes directly to a specific device's telemetry stream) rather than "data source binding" (DataSource was designed for "periodic metrics produced by extensions").
 
-The device commands NE101 supports are the source of the component's command buttons:
-
-- `trigger_capture` — wakes the device to capture a single JPEG immediately; the most common user-initiated operation. The component renders a button in the "commands" area that calls `fetchData({type: 'device_command', command: 'trigger_capture'})` on click.
-- `set_schedule` — sets the cron expression for scheduled captures (e.g. `0 */30 * * * *` means every 30 minutes). The component wraps this command in a "schedule config" sub-panel.
-- `reboot` — remotely reboots the device, useful for troubleshooting cellular dropouts. This command gets a confirmation dialog in the UI to prevent accidental triggers.
-- `set_capture_params` — tunes capture parameters (resolution, JPEG quality, whether to enable IR illumination); an advanced setting collapsed by default.
-
-The existence of these four command types further reinforces the 1.2 argument: a purely display-oriented component like metric_card cannot carry command-triggering capability at all; a dedicated device-bound component is required to render command buttons and call the device-command API.
+The NE101 device's capture triggering is managed by the device firmware (built-in timer or external MQTT commands); the ne101_camera component **does not handle command triggering** — its manifest declares `has_actions: false`. The component's role is to **consume device-reported data**: receive telemetry deltas (image_url + battery + signal + temp), display the latest capture, and pass the image to an AI extension for processing via `processingExtensionId`.
 
 > **Source evidence**: the manifest's `description.en` literally says "displays latest capture, battery status, and trigger controls" — this trio mirrors the NE101 device capabilities. See [manifest.json L4-L7](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L4-L7):
 
@@ -43,17 +36,15 @@ The existence of these four command types further reinforces the 1.2 argument: a
 
 ## 1.2 Why metric_card Cannot Fill In
 
-A natural first reaction is: "NE101 just reports battery, signal, and temperature numbers — can't I bind a data source to [6 metric_card](../6-metric-card-component.md) and be done?" The answer is no, for four reasons:
+A natural first reaction is: "NE101 just reports battery, signal, and temperature numbers — can't I bind a data source to [6 metric_card](../6-metric-card-component.md) and be done?" The answer is no, for three reasons:
 
 **First, metric_card cannot render images.** The core value of NE101 is "the JPEG image that was captured", while metric_card's `extractValue()` only outputs scalars (numbers/strings). Showing an image needs a dedicated `<img>` + Canvas, and metric_card's render layer has no such capability.
 
 **Second, metric_card cannot draw ROI overlays.** A typical NE101 use case is "draw a box around the walkway and count pedestrians passing through" — this requires drawing semi-transparent rectangles (ROIs) over the image, drawing detection boxes over detected targets, and coloring them per class. This overlay logic (Canvas coordinate system, non-linear mapping of `object-cover`, async setup of ResizeObserver) simply does not fit metric_card's "single card" layout.
 
-**Third, metric_card cannot trigger device commands.** NE101 has device-level commands like `trigger_capture` (capture now) and `set_schedule` (set timer), which require rendering buttons in the component and calling `fetchData({type: 'device_command', ...})`. metric_card's manifest is `has_actions: false` and has no command-panel entry at all.
+**Third, metric_card cannot configure the AI processing pipeline.** NE101's real killer feature is the "image → AI extension → detection write-back" chain, which requires a config panel for picking the extension (`processingExtensionId`), picking the template (`processingTemplate`), and tuning the ROI threshold (`processingRoiOverlap`). None of these fields exist in metric_card.
 
-**Fourth, metric_card cannot configure the AI processing pipeline.** NE101's real killer feature is the "image → AI extension → detection write-back" chain, which requires a config panel for picking the extension (`processingExtensionId`), picking the template (`processingTemplate`), and tuning the ROI threshold (`processingRoiOverlap`). None of these fields exist in metric_card.
-
-In short, NE101 needs a **dedicated device-bound component** that bundles "image display + ROI overlay + command trigger + AI processing config" into one. That is the fundamental reason ne101_camera exists.
+In short, NE101 needs a **dedicated device-bound component** that bundles "image display + ROI overlay + AI processing config" into one. That is the fundamental reason ne101_camera exists.
 
 ---
 
@@ -143,13 +134,13 @@ To make the "before vs after" experience concrete, the table below contrasts the
 |------|---------------------------------|----------------------------|
 | 1 | Create metric_card, bind NE101 battery/signal metrics | Drag in ne101_camera, auto-binds to the NE101 device |
 | 2 | Create image_display, manually paste image_url | (included) auto-displays the latest capture |
-| 3 | Use Postman to call `set_schedule` for 30-min captures | Fill the cron expression in the "schedule" panel |
+| 3 | Trigger a capture via Postman or wait for the scheduled capture | Device firmware manages scheduled captures; component receives automatically |
 | 4 | Use Postman to call the extension API with image_url + template | Pick extension + template in the "AI processing" panel |
 | 5 | Manually write detections back to the device virtual metric | (automatic) Transform auto-writes detections |
 | 6 | Write your own script to draw ROI + detection boxes | Drag on the canvas to draw ROI rectangles |
 | 7 | Repeat steps 3-6 every time you want fresh data | Auto-refreshes after each capture, zero intervention |
 
-This contrast also explains why ne101_camera's `bundle.js` is 1972 lines while metric_card is only 352 — the former extends the latter's "pull a number + render a card" into a seven-in-one state machine of "pull image + pull metrics + trigger commands + schedule extension + parse detections + draw ROI + draw detection boxes".
+This contrast also explains why ne101_camera's `bundle.js` is 1972 lines while metric_card is only 352 — the former extends the latter's "pull a number + render a card" into a six-in-one state machine of "pull image + pull metrics + schedule extension + parse detections + draw ROI + draw detection boxes".
 
 ---
 
@@ -161,15 +152,23 @@ This section lists 4 key design decisions and the alternatives that were rejecte
 
 **Chosen**: the component only handles "image display + command trigger + ROI config"; AI inference is delegated via the `processingExtensionId` field to a user-selected extension (the `locate-anything-v2`-compatible family).
 
-**Rejected alternative**: bake AI inference into the component (call YOLO directly). Rejected for three reasons: (1) the component bundle would balloon to multiple MB, violating the "hand-written IIFE, no build step" pattern; (2) AI models iterate fast, and tying the model version to the component version makes upgrades painful; (3) different users want different AI capabilities (some want object detection, some OCR, some image description), and baking in one capability removes user choice.
+**Rejected alternative**: bake AI inference into the component (call YOLO directly). Rejected for three reasons:
 
-**Cost**: the component depends on an external extension to deliver real value — if the user has not installed any `locate-anything-v2`-compatible extension, the `processingExtensionId` dropdown is empty and the component degrades to a "pure image display + command trigger" panel. This cost is considered acceptable because the NeoMind ecosystem recommends installing at least one AI extension by default.
+1. the component bundle would balloon to multiple MB, violating the "hand-written IIFE, no build step" pattern
+2. AI models iterate fast, and tying the model version to the component version makes upgrades painful
+3. different users want different AI capabilities (some want object detection, some OCR, some image description), and baking in one capability removes user choice.
+
+**Cost**: the component depends on an external extension to deliver real value — if the user has not installed any `locate-anything-v2`-compatible extension, the `processingExtensionId` dropdown is empty and the component degrades to a "pure image display" panel. This cost is considered acceptable because the NeoMind ecosystem recommends installing at least one AI extension by default.
 
 ### Decision 2: Use `has_device_binding` + `device_type_filter`, not `has_data_source`
 
 **Chosen**: take the "device binding" path — the manifest declares `has_device_binding: true` + `device_type_filter: ["ne101_camera"]` and explicitly opts out of data-source binding.
 
-**Rejected alternative**: use `has_data_source: true` and disguise device telemetry as extension metrics. Rejected because: (1) the DataSource abstraction was designed for "periodic extension output", and shoehorning device telemetry into it distorts the abstraction boundary; (2) data-source binding cannot trigger device commands like `trigger_capture` (DataSource is read-only); (3) data-source binding cannot do "device type filtering" in the editor, so the dropdown would list every device — a terrible experience.
+**Rejected alternative**: use `has_data_source: true` and disguise device telemetry as extension metrics. Rejected because:
+
+1. the DataSource abstraction was designed for "periodic extension output", and shoehorning device telemetry into it distorts the abstraction boundary
+2. data-source binding cannot do "device type filtering" in the editor, so the dropdown would list every device — a terrible experience
+3. device-specific fields (like `image_url`) have no natural slot in the DataSource abstraction and would require an extra adapter layer.
 
 **Cost**: the component code must explicitly handle the device object (`device.id`, `device.type`, `device.metrics`) rather than relying on DataSource's uniform `fetchData()` interface. This makes the data layer noticeably more complex than metric_card's.
 
@@ -211,14 +210,14 @@ sequenceDiagram
     participant UI as ne101_camera Component
 
     DEV->>MQTT: publish telemetry<br/>(image_url + battery + signal + temp)
-    MQTT->>NM: forward to devices/{id}/telemetry
+    MQTT->>NM: forward to devices/id/telemetry
     NM->>UI: WebSocket push delta<br/>(image_url changed)
-    UI->>NM: REST fetch JPEG<br/>GET {image_url}
+    UI->>NM: REST fetch JPEG<br/>GET image_url
     NM-->>UI: return JPEG binary
-    UI->>UI: render <img> + Canvas
+    UI->>UI: render img + Canvas
 
     Note over UI,EXT: user picks processingExtensionId in config panel
-    UI->>NM: create Transform<br/>{deviceId, extId, template,<br/> roiEnabled, overlapThreshold, rois}
+    UI->>NM: create Transform<br/>deviceId, extId, template,<br/> roiEnabled, overlapThreshold, rois
     NM->>EXT: call extension process(image_url, config)
     EXT->>EXT: YOLO inference / OCR / describe
     EXT->>NM: write back virtual metric detections

@@ -13,7 +13,15 @@ sidebar_label: "5. Frontend Consume"
 
 ## 5.1 Rendering Pipeline Overview
 
-The ne101_camera rendering path is not a one-shot JSX template but a **state pipeline** driven by multiple effects. The pipeline starts from platform-injected props (`device` / `deviceImageSrc` / `virtualMetrics` / `config` / `onConfigChange`) and ends at the SVG overlay layer mounted on the media `<div>`. In between it passes through five state nodes: (1) the Transform lifecycle effect (create/update/delete the backend Transform, see 5.7); (2) the WS + REST merge effect (fetch image and virtual metrics, see [4.7](./4-data-contract.md)); (3) the `imageData` / `wsValues` / `virtualData` triplet of `setState` calls; (4) the `ovTf` coordinate transform computation driven by `imgNatState` (image natural dimensions) + `ctrSizeState` (container dimensions, see 5.4); (5) the detections array, colored per-class, mapped into SVG `<g>` elements (see 5.2 / 5.3). Any state change at any node triggers a React re-render that re-runs the path from `ovTf` computation through SVG mapping.
+The ne101_camera rendering path is not a one-shot JSX template but a **state pipeline** driven by multiple effects. The pipeline starts from platform-injected props (`device` / `deviceImageSrc` / `virtualMetrics` / `config` / `onConfigChange`) and ends at the SVG overlay layer mounted on the media `<div>`. In between it passes through five state nodes:
+
+1. the Transform lifecycle effect (create/update/delete the backend Transform, see 5.7)
+2. the WS + REST merge effect (fetch image and virtual metrics, see [4.7](./4-data-contract.md))
+3. the `imageData` / `wsValues` / `virtualData` triplet of `setState` calls
+4. the `ovTf` coordinate transform computation driven by `imgNatState` (image natural dimensions) + `ctrSizeState` (container dimensions, see 5.4)
+5. the detections array, colored per-class, mapped into SVG `<g>` elements (see 5.2 / 5.3).
+
+Any state change at any node triggers a React re-render that re-runs the path from `ovTf` computation through SVG mapping.
 
 The diagram below renders this effect-driven pipeline as a flowchart, annotating each step's inputs/outputs and trigger conditions.
 
@@ -168,7 +176,12 @@ Commit [`b746c02`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/c
 
 - **Choice**: an SVG `<svg viewBox="0 0 100 100" preserveAspectRatio="none">` overlay layer.
 - **Alternative**: a `<canvas>` 2D context with manual drawing.
-- **Rationale**: (1) SVG is declarative and can be written directly as JSX, fitting React's rendering model naturally — when state changes, React re-invokes `detections.map` to produce new `<polygon>` / `<rect>` elements, with no manual `clearRect` + redraw; (2) SVG natively supports `<text>` elements, so text rendering is handled by the browser engine with no need for Canvas `fillText` + font loading + pixel measurement; (3) SVG's `viewBox="0 0 100 100"` + `preserveAspectRatio="none"` lets detection-box coordinates use normalized values (0-100) directly, aligning naturally with the backend's 0-1 normalized coordinates (multiply by 100); (4) Canvas would require manual DPI scaling, redraw scheduling, and hit-testing, roughly doubling the code volume.
+- **Rationale**:
+
+    1. SVG is declarative and can be written directly as JSX, fitting React's rendering model naturally — when state changes, React re-invokes `detections.map` to produce new `<polygon>` / `<rect>` elements, with no manual `clearRect` + redraw
+    2. SVG natively supports `<text>` elements, so text rendering is handled by the browser engine with no need for Canvas `fillText` + font loading + pixel measurement
+    3. SVG's `viewBox="0 0 100 100"` + `preserveAspectRatio="none"` lets detection-box coordinates use normalized values (0-100) directly, aligning naturally with the backend's 0-1 normalized coordinates (multiply by 100)
+    4. Canvas would require manual DPI scaling, redraw scheduling, and hit-testing, roughly doubling the code volume.
 - **Cost**: SVG underperforms Canvas when the detection-box count is very large (> 500) (each `<g>` is a DOM node). But ne101_camera's typical scenario (a single camera frame) usually has ≤ 30 detections, so SVG's overhead is negligible.
 
 ---
@@ -307,7 +320,13 @@ if (!cbRef.current) {
 
 The key insight is that `cbRef.current` is a **function** (not a ref object), passed as `ref={cbRef.current}` to the media `<div>` ([L1156](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1156-L1156)). React treats function-typed refs specially: when the DOM element mounts, React invokes the function with the element; when it unmounts, React invokes the function with `null`. This precisely solves the "async mount" problem — no matter when the media `<div>` appears, the callback ref is invoked and the ResizeObserver is correctly attached.
 
-The callback logic has three steps: (1) L538 disconnects the previous ResizeObserver if one exists, preventing memory leaks; (2) L539 stores the element in `mediaRef` for use by other logic; (3) L541-L545 creates a new ResizeObserver whose callback invokes `setCtrSize` to update the container-dimension state. The initial value of `ctrSizeState` is `{w: 0, h: 0}` ([L530](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L530-L530)); when it transitions from 0 to the actual size, a re-render is triggered, `ovTf` goes from `null` to a valid value, and detection boxes transition from "not rendered" (the `&& ovTf` guard at L1211) to "rendered."
+The callback logic has three steps:
+
+1. L538 disconnects the previous ResizeObserver if one exists, preventing memory leaks
+2. L539 stores the element in `mediaRef` for use by other logic
+3. L541-L545 creates a new ResizeObserver whose callback invokes `setCtrSize` to update the container-dimension state.
+
+The initial value of `ctrSizeState` is `{w: 0, h: 0}` ([L530](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L530-L530)); when it transitions from 0 to the actual size, a re-render is triggered, `ovTf` goes from `null` to a valid value, and detection boxes transition from "not rendered" (the `&& ovTf` guard at L1211) to "rendered."
 
 ```js
     var imgNatState = React.useState({ w: 0, h: 0 });
@@ -381,7 +400,12 @@ The rendering condition is `hasAnySummary` (L1063), meaning at least `total_coun
 
 - **Choice**: read data from virtual metrics (`total_count` / `count_by_class` / `roi_count` / `texts`).
 - **Alternative**: aggregate in real time from the `detections` array inside the component's render function (`detections.length`, `detections.reduce(...)` to group-count by label).
-- **Rationale**: the Transform **already** computed these aggregations in the backend sandbox (see the `total_count` / `count_by_class` / `roi_count` output contracts in [4.4](./4-data-contract.md)). If the component computed them again, it would be duplicate computation with two risks: (1) the two computations' logic could diverge (e.g. the Transform computed `roi_count` from ROI-filtered detections, but the component received unfiltered detections), causing badge numbers to disagree with the visible detection-box count; (2) every render would re-reduce a potentially long array, wasting CPU. The metric-driven approach keeps the component purely a "presenter" that does no "computation," keeping responsibilities clean.
+- **Rationale**: the Transform **already** computed these aggregations in the backend sandbox (see the `total_count` / `count_by_class` / `roi_count` output contracts in [4.4](./4-data-contract.md)). If the component computed them again, it would be duplicate computation with two risks:
+
+    1. the two computations' logic could diverge (e.g. the Transform computed `roi_count` from ROI-filtered detections, but the component received unfiltered detections), causing badge numbers to disagree with the visible detection-box count
+    2. every render would re-reduce a potentially long array, wasting CPU.
+
+    The metric-driven approach keeps the component purely a "presenter" that does no "computation," keeping responsibilities clean.
 - **Cost**: if the Transform has a bug and computes a metric incorrectly, the component will faithfully display the wrong number. This cost is mitigated by the "graceful degradation" philosophy of 4.8 — when a metric is missing, it falls back to `detections.length`, never producing a blank screen.
 
 ---
@@ -445,7 +469,12 @@ Source: [`bundle.js` L661-L824](https://github.com/camthink-ai/NeoMind-Dashboard
 
 **Tier 2 (L744-L763): ID exists but hash differs → update**. When `_transformId` exists but the configuration changed (`_storedHash !== _configHash`), `neomind.updateTransform(activeId, { js_code, ... })` is called to update the Transform's code. On success, the new `_transformHash` is persisted.
 
-**Tier 3 (L766-L821): no ID → create**. When neither a stored ID nor a ref ID is present, the create flow begins. Before creating, two checks run: (1) is the extension installed and not stopped (L806-L817); (2) is there an existing same-name Transform that can be reused (L783-L800). If neither yields a match, `neomind.createTransform(payload)` is invoked. During creation, the sentinel value `'_creating_'` (L719/L770) prevents concurrent creation — if a previous effect is already creating (`transformIdRef.current === '_creating_'`), the current effect returns immediately and waits for the re-render triggered by successful creation to hit Tier 2.
+**Tier 3 (L766-L821): no ID → create**. When neither a stored ID nor a ref ID is present, the create flow begins. Before creating, two checks run:
+
+1. is the extension installed and not stopped (L806-L817)
+2. is there an existing same-name Transform that can be reused (L783-L800).
+
+If neither yields a match, `neomind.createTransform(payload)` is invoked. During creation, the sentinel value `'_creating_'` (L719/L770) prevents concurrent creation — if a previous effect is already creating (`transformIdRef.current === '_creating_'`), the current effect returns immediately and waits for the re-render triggered by successful creation to hit Tier 2.
 
 **Delete path (L668-L679)**: when `processingEnabled` is false, or no extension is selected, or no device is bound, the stored Transform is deleted and `_transformId / _transformHash` are cleared.
 
@@ -483,7 +512,11 @@ stateDiagram-v2
 
 - **Choice**: three-tier dispatch (Tier 1 verify / Tier 2 update / Tier 3 create).
 - **Alternative**: `deleteTransform` + `createTransform` on every configuration change.
-- **Rationale**: (1) avoid flicker — during the gap between delete and re-create (potentially hundreds of milliseconds), the component is in a "no Transform" state, detections are interrupted, and users see detection boxes vanish and reappear; (2) preserve virtual-metric continuity — when the Transform's ID changes, the backend may clear the old ID's virtual-metric cache, causing a transient data hole; (3) reduce API calls — Tier 1's fast path (hash match) only does one `listTransforms` verification, one fewer network round-trip than "delete then create."
+- **Rationale**:
+
+    1. avoid flicker — during the gap between delete and re-create (potentially hundreds of milliseconds), the component is in a "no Transform" state, detections are interrupted, and users see detection boxes vanish and reappear
+    2. preserve virtual-metric continuity — when the Transform's ID changes, the backend may clear the old ID's virtual-metric cache, causing a transient data hole
+    3. reduce API calls — Tier 1's fast path (hash match) only does one `listTransforms` verification, one fewer network round-trip than "delete then create."
 - **Cost**: high code complexity — three branches + sentinel + cancellation guard + persistence callback occupy 163 lines (L661-L824) for this single effect. But this is the core complexity source of ne101_camera as a "device-bound + AI-processing" component and cannot be simplified away.
 
 ---

@@ -350,12 +350,12 @@ sequenceDiagram
     participant Geo as Open-Meteo Geocoding
     participant Forecast as Open-Meteo Forecast
 
-    Runtime->>Ext: execute_command("get_weather", {location, ...})
+    Runtime->>Ext: execute_command get_weather (location, ...)
     Note over Ext: 读 RwLock<String> city 缓存
-    Ext->>Geo: GET /search?name=<location>
-    Geo-->>Ext: { latitude, longitude }
+    Ext->>Geo: GET /search?name=location
+    Geo-->>Ext: latitude, longitude
     Ext->>Forecast: GET /forecast?latitude=...&current=...
-    Forecast-->>Ext: { temperature, wind_speed, humidity, ... }
+    Forecast-->>Ext: temperature, wind_speed, humidity, ...
     Note over Ext: store_weather_metrics()<br/>AtomicI64 定点数 ×100 写入
     Ext-->>Runtime: ProduceMetrics → ExtensionMetricValue /100 还原
 ```

@@ -353,22 +353,22 @@ sequenceDiagram
     U->>FE: Edit Markdown
     FE->>FE: Canvas real-time preview
     U->>FE: Click "Push"
-    FE->>RT: execute_command("push_content",<br/>{device_id, content_type:"markdown", content})
+    FE->>RT: execute_command push_content<br/>device_id, content_type markdown, content
     RT->>EXT: Route to cmd_push_content
     EXT->>EXT: resolve_rms_id(device_id)
     EXT->>EXT: get_display_size(rms_id)<br/>→ (800, 480)
     EXT->>EXT: get_font_data()<br/>→ PingFang.ttc bytes
     EXT->>PARSE: parse_markdown(md)
-    PARSE-->>EXT: Vec<TextBlock>
+    PARSE-->>EXT: Vec of TextBlock
     EXT->>RENDER: render_markdown_to_image<br/>(blocks, 800, 480, font)
     RENDER-->>EXT: ImageBuffer Rgb
     EXT->>ENC: encode PNG/JPEG
-    ENC-->>EXT: Vec<u8> bytes
+    ENC-->>EXT: Vec of u8 bytes
     EXT->>EXT: push_image_to_device<br/>(multipart/form-data)
-    EXT->>RMS: POST /api/v1/devices/{id}/image
+    EXT->>RMS: POST /api/v1/devices/id/image
     Note over EXT,RMS: ensure_token() refreshes JWT first
     RMS-->>EXT: 200 OK + image_url
-    EXT-->>RT: {success, image_size_bytes}
+    EXT-->>RT: success, image_size_bytes
     RT-->>FE: Command result
     RMS->>EP: LPWAN/cellular downlink (seconds latency)
     EP-->>EP: e-paper refresh display
@@ -384,7 +384,13 @@ sequenceDiagram
 
 ### Decision 2: Markdown rendering on the extension side in Rust (not frontend canvas / not cloud-side)
 
-**We chose extension-side Rust rendering** (pulldown-cmark + ab_glyph + imageproc); alternative A was frontend Canvas API rendering then uploading base64; alternative B was sending Markdown text to Uink-RMS cloud for server-side rendering. Rationale: (1) e-paper devices have extremely limited compute / bandwidth, LPWAN downlink only accepts image binary, and Uink-RMS API `POST /image` also only accepts JPEG/PNG, not text formats — alternative B is infeasible; (2) frontend Canvas rendering depends on browser fonts, which vary across user machines, making rendering results unpredictable, and offloading rendering CPU to the frontend is worse than handling it on the extension side; (3) Rust-side rendering with ab_glyph + embedded system fonts (PingFang / Noto CJK) gives controllable fonts, cross-platform consistency, and high performance. The tradeoff is 400 extra lines of code (L230-L640).
+**We chose extension-side Rust rendering** (pulldown-cmark + ab_glyph + imageproc); alternative A was frontend Canvas API rendering then uploading base64; alternative B was sending Markdown text to Uink-RMS cloud for server-side rendering. Rationale:
+
+1. e-paper devices have extremely limited compute / bandwidth, LPWAN downlink only accepts image binary, and Uink-RMS API `POST /image` also only accepts JPEG/PNG, not text formats — alternative B is infeasible
+2. frontend Canvas rendering depends on browser fonts, which vary across user machines, making rendering results unpredictable, and offloading rendering CPU to the frontend is worse than handling it on the extension side
+3. Rust-side rendering with ab_glyph + embedded system fonts (PingFang / Noto CJK) gives controllable fonts, cross-platform consistency, and high performance.
+
+The tradeoff is 400 extra lines of code (L230-L640).
 
 ### Decision 3: SDK remote crate instead of workspace path (commit 39587eb)
 
@@ -407,11 +413,23 @@ impl UinkConfig {
 }
 ```
 
-[Source: lib.rs L713-L720](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L713-L720) Rationale: (1) Uink-RMS currently has only cn / eu regions, and a dropdown is more user-friendly than manually typing a URL, reducing configuration cognitive load; (2) hardcoded endpoints prevent users from mistyping URLs (missing a `/`, adding `/api/v1`, etc.); (3) the `Custom` option and `custom_server_url` field are retained as extension points — if Uink opens new regions or customers self-host RMS instances, users can still fill in a full URL. The tradeoff is that adding a new Uink region requires a code change and new release (but this is rare).
+[Source: lib.rs L713-L720](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L713-L720) Rationale:
+
+1. Uink-RMS currently has only cn / eu regions, and a dropdown is more user-friendly than manually typing a URL, reducing configuration cognitive load
+2. hardcoded endpoints prevent users from mistyping URLs (missing a `/`, adding `/api/v1`, etc.)
+3. the `Custom` option and `custom_server_url` field are retained as extension points — if Uink opens new regions or customers self-host RMS instances, users can still fill in a full URL.
+
+The tradeoff is that adding a new Uink region requires a code change and new release (but this is rare).
 
 ### Decision 5: `RwLock<HashMap>` instead of DashMap / SQLite
 
-**We chose `RwLock<HashMap<String, String>>`** ([L730](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L730)); alternative A was DashMap (lock-free concurrent HashMap); alternative B was persisted SQLite. Rationale: (1) a single customer's e-paper device count is typically tens to hundreds, HashMap reads/writes are O(1), performance is not a bottleneck; (2) DashMap adds an extra dependency and API complexity with no benefit at this scale; (3) SQLite persistence brings IO overhead and file locking issues, while device mappings can be rebuilt from RMS after each sync, no persistence needed. parking_lot::RwLock performs better than std::sync::RwLock and doesn't poison, making it the unified choice for NeoMind extensions.
+**We chose `RwLock<HashMap<String, String>>`** ([L730](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L730)); alternative A was DashMap (lock-free concurrent HashMap); alternative B was persisted SQLite. Rationale:
+
+1. a single customer's e-paper device count is typically tens to hundreds, HashMap reads/writes are O(1), performance is not a bottleneck
+2. DashMap adds an extra dependency and API complexity with no benefit at this scale
+3. SQLite persistence brings IO overhead and file locking issues, while device mappings can be rebuilt from RMS after each sync, no persistence needed.
+
+parking_lot::RwLock performs better than std::sync::RwLock and doesn't poison, making it the unified choice for NeoMind extensions.
 
 ### Decision 6: Frontend Canvas flip support (commit 261d8e6)
 
@@ -577,17 +595,38 @@ mod tests {
 
 ### Rendering Regression Test Strategy
 
-Markdown → Image rendering is the most bug-prone part of the extension (font coverage, CJK wrapping, heading scaling). Recommended regression cases: (1) pure Chinese long text wrapping (verify CJK anywhere-break); (2) mixed Chinese-English text (verify Latin words don't split, CJK can); (3) H1-H6 six heading scale ratios (2.0x / 1.8x / 1.6x / 1.4x / 1.2x / 1.0x); (4) bold text double-strike rendering; (5) emoji characters (current font may not cover them, verify degradation behavior); (6) empty Markdown / overly long Markdown boundary cases. `test_parse_markdown` only verifies AST structure, not rendered pixels — pixel-level regression requires a fixed font + golden image comparison.
+Markdown → Image rendering is the most bug-prone part of the extension (font coverage, CJK wrapping, heading scaling). Recommended regression cases:
+
+1. pure Chinese long text wrapping (verify CJK anywhere-break)
+2. mixed Chinese-English text (verify Latin words don't split, CJK can)
+3. H1-H6 six heading scale ratios (2.0x / 1.8x / 1.6x / 1.4x / 1.2x / 1.0x)
+4. bold text double-strike rendering
+5. emoji characters (current font may not cover them, verify degradation behavior)
+6. empty Markdown / overly long Markdown boundary cases.
+
+`test_parse_markdown` only verifies AST structure, not rendered pixels — pixel-level regression requires a fixed font + golden image comparison.
 
 > Note: the source's `2.0f32.max(...)` clamps H2+ to 2.0x, so all heading levels render at the same size. This is a source bug (should be `.min`); the scaling table above reflects the comment's design intent, not runtime behavior.
 
 ### What "Production-Verified" Means Concretely
 
-This extension's "production verification" was not done in one pass, but through iterative verification across 6 versions (v2.7.0 → v2.7.6): (1) **Cross-version regression** — every version bump ([`24b47d2`](https://github.com/camthink-ai/NeoMind-Extensions/commit/24b47d2) v2.7.0, [`ff762aa`](https://github.com/camthink-ai/NeoMind-Extensions/commit/ff762aa) v2.7.1, [`cd075d5`](https://github.com/camthink-ai/NeoMind-Extensions/commit/cd075d5) v2.7.2, [`8e81400`](https://github.com/camthink-ai/NeoMind-Extensions/commit/8e81400) v2.7.4, [`d2db401`](https://github.com/camthink-ai/NeoMind-Extensions/commit/d2db401) v2.7.5, [`1e9a1f1`](https://github.com/camthink-ai/NeoMind-Extensions/commit/1e9a1f1) v2.7.6) runs the full unit test suite + manual E2E; (2) **Multi-region testing** — both cn.rms.uink.com and eu.rms.uink.com endpoints verified for JWT login + device list + image push full chain; (3) **Real device refresh testing** — Markdown pushed to UINK 7.5 (800x480) and UINK 2.13 (250x122) devices, confirming e-paper screens actually refresh and display correctly.
+This extension's "production verification" was not done in one pass, but through iterative verification across 6 versions (v2.7.0 → v2.7.6):
+
+1. **Cross-version regression** — every version bump ([`24b47d2`](https://github.com/camthink-ai/NeoMind-Extensions/commit/24b47d2) v2.7.0, [`ff762aa`](https://github.com/camthink-ai/NeoMind-Extensions/commit/ff762aa) v2.7.1, [`cd075d5`](https://github.com/camthink-ai/NeoMind-Extensions/commit/cd075d5) v2.7.2, [`8e81400`](https://github.com/camthink-ai/NeoMind-Extensions/commit/8e81400) v2.7.4, [`d2db401`](https://github.com/camthink-ai/NeoMind-Extensions/commit/d2db401) v2.7.5, [`1e9a1f1`](https://github.com/camthink-ai/NeoMind-Extensions/commit/1e9a1f1) v2.7.6) runs the full unit test suite + manual E2E
+2. **Multi-region testing** — both cn.rms.uink.com and eu.rms.uink.com endpoints verified for JWT login + device list + image push full chain
+3. **Real device refresh testing** — Markdown pushed to UINK 7.5 (800x480) and UINK 2.13 (250x122) devices, confirming e-paper screens actually refresh and display correctly.
 
 ### Manual E2E Flow
 
-The complete manual verification flow: (1) configure server_region + email + password; (2) call `sync_devices` and wait for device list to return; (3) call `list_devices` to confirm device registration succeeded; (4) call `push_content` to push a Markdown snippet (with heading + list + bold); (5) wait 5-30 seconds to observe e-paper screen refresh (LPWAN latency); (6) call `get_display` to pull preview_url confirming push succeeded; (7) unplug device power for 5 minutes, call `refresh_status` to confirm offline status is correctly reported.
+The complete manual verification flow:
+
+1. configure server_region + email + password
+2. call `sync_devices` and wait for device list to return
+3. call `list_devices` to confirm device registration succeeded
+4. call `push_content` to push a Markdown snippet (with heading + list + bold)
+5. wait 5-30 seconds to observe e-paper screen refresh (LPWAN latency)
+6. call `get_display` to pull preview_url confirming push succeeded
+7. unplug device power for 5 minutes, call `refresh_status` to confirm offline status is correctly reported.
 
 ---
 
@@ -665,7 +704,12 @@ uink-rms-bridge's `src/` directory contains **only `lib.rs`, totaling 2250 lines
 
 ### Bridge Strategy Decision Tree
 
-When you need to connect an external device / system to NeoMind, evaluate in this order: (1) **Does the device have a standard protocol?** (ONVIF / OPC-UA / Modbus / MQTT / BACnet) — if yes, prefer standard protocol bridging (like [Case #4](./4-onvif-bridge.md)), which is stable, multi-vendor, and cloud-independent. (2) **Only vendor-proprietary API available?** — assess the vendor API's stability and documentation quality, and plan for API version tracking. (3) **Does the vendor API require cloud relay?** — if so, assess cloud SLA and regional availability, and design for token refresh and backoff. (4) **Is frontend interaction needed?** — if users need to edit content and preview (like e-paper content editing), you need a frontend component (DisplayEditorCard pattern); if it's just data collection and control (like camera PTZ), pure backend suffices.
+When you need to connect an external device / system to NeoMind, evaluate in this order:
+
+1. **Does the device have a standard protocol?** (ONVIF / OPC-UA / Modbus / MQTT / BACnet) — if yes, prefer standard protocol bridging (like [Case #4](./4-onvif-bridge.md)), which is stable, multi-vendor, and cloud-independent.
+2. **Only vendor-proprietary API available?** — assess the vendor API's stability and documentation quality, and plan for API version tracking.
+3. **Does the vendor API require cloud relay?** — if so, assess cloud SLA and regional availability, and design for token refresh and backoff.
+4. **Is frontend interaction needed?** — if users need to edit content and preview (like e-paper content editing), you need a frontend component (DisplayEditorCard pattern); if it's just data collection and control (like camera PTZ), pure backend suffices.
 
 ### Recommended Reading Order
 
@@ -673,7 +717,14 @@ If you're new to NeoMind protocol bridging, read [Case 4 onvif-bridge](./4-onvif
 
 ### Summary
 
-uink-rms-bridge is the **only full-stack vendor-proprietary bridge extension** in the NeoMind ecosystem. Its engineering value: (1) it fully demonstrates the Rust implementation of the JWT auth chain (login → refresh → backoff); (2) it completes the Markdown → Image full pipeline rendering on the extension side (pulldown-cmark + ab_glyph + imageproc), a unique capability no other extension has; (3) it handles the vendor cloud's geographic partitioning through regional endpoint routing (cn / eu); (4) it provides a user-friendly content editing experience through the DisplayEditorCard frontend component. Its engineering lesson: 2250 lines in a single file is the boundary of readability, and if more RMS endpoints are added in the future (like alerts / logs), splitting should be considered.
+uink-rms-bridge is the **only full-stack vendor-proprietary bridge extension** in the NeoMind ecosystem. Its engineering value:
+
+1. it fully demonstrates the Rust implementation of the JWT auth chain (login → refresh → backoff)
+2. it completes the Markdown → Image full pipeline rendering on the extension side (pulldown-cmark + ab_glyph + imageproc), a unique capability no other extension has
+3. it handles the vendor cloud's geographic partitioning through regional endpoint routing (cn / eu)
+4. it provides a user-friendly content editing experience through the DisplayEditorCard frontend component.
+
+Its engineering lesson: 2250 lines in a single file is the boundary of readability, and if more RMS endpoints are added in the future (like alerts / logs), splitting should be considered.
 
 ---
 

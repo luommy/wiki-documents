@@ -62,7 +62,7 @@ This case is a direct continuation of [6 metric_card](../6-metric-card-component
 
 Reading all eight sections will give you five key capabilities:
 
-1. **The essential difference between device binding and data source** — why NE101 uses `has_device_binding: true` + `device_type_filter: ["ne101_camera"]` instead of `has_data_source: true`. This determines whether the dashboard editor shows a "bind device" panel and whether the component can invoke device commands like `trigger_capture`. See [1 Business Background](./1-background.md).
+1. **The essential difference between device binding and data source** — why NE101 uses `has_device_binding: true` + `device_type_filter: ["ne101_camera"]` instead of `has_data_source: true`. This determines whether the dashboard editor shows a "bind device" panel and whether the component receives device telemetry deltas (e.g. `image_url` change push). See [1 Business Background](./1-background.md).
 
 2. **How a 1972-line IIFE stays maintainable** — `bundle.js` has no build step at all; it is entirely hand-written IIFE. We break down its module layers (helper / template / sub-component / main / export) and explain why NeoMind chose this pattern over ESM. See [6 Component Build](./6-component-build.md) (v1.1).
 

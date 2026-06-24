@@ -24,7 +24,10 @@ sidebar_label: "4. onvif-bridge"
 1. ONVIF 协议栈复杂——SOAP 1.2 envelope + WS-Security UsernameToken Profile + WS-Discovery UDP 多播，现成的 Rust crate（如 `onvif-rs`）维护滞后且不覆盖 PTZ/事件订阅，缺失的功能只能自己补
 2. 厂商实现差异大——某些设备 Probe 响应的 XML 命名空间前缀不规范（`SOAP-ENV:` vs `s:` vs `soap:`），某些设备 SOAP Fault 格式不标准，解析逻辑必须容忍这些差异
 
-**目标读者**：(1) 要接入第三方 IP 摄像头的集成商——你会看到从设备发现到 PTZ 控制的完整命令链路；(2) 想理解 SOAP / WS-Discovery / WS-Security 在 Rust 中如何手写的协议开发者——本案例没有依赖任何 ONVIF/SOAP crate，全部手写，是纯协议工程的极佳参考。
+**目标读者**：
+
+1. 要接入第三方 IP 摄像头的集成商——你会看到从设备发现到 PTZ 控制的完整命令链路
+2. 想理解 SOAP / WS-Discovery / WS-Security 在 Rust 中如何手写的协议开发者——本案例没有依赖任何 ONVIF/SOAP crate，全部手写，是纯协议工程的极佳参考。
 
 **你将学到**：
 
@@ -418,19 +421,19 @@ sequenceDiagram
     participant CAM as ONVIF 摄像头
 
     Note over FE,EXT: 阶段 1：WS-Discovery 设备发现
-    FE->>NM: execute_command("discover", {timeout_ms: 5000})
+    FE->>NM: execute_command discover (timeout_ms 5000)
     NM->>EXT: cmd_discover()
     EXT->>EXT: find_local_ipv4() 检测本机 IP
     EXT->>+CAM: UDP Probe → 239.255.255.250:3702
     CAM-->>-EXT: UDP ProbeMatch（含 XAddrs）
     EXT->>EXT: parse_probe_matches() 去重
-    EXT-->>NM: {devices: [...], count: N}
+    EXT-->>NM: devices [...] count N
     NM-->>FE: 设备列表
 
     Note over FE,EXT: 阶段 2：SOAP 能力协商
-    FE->>NM: add_device({url, username, password})
+    FE->>NM: add_device url, username, password
     NM->>EXT: cmd_add_device()
-    FE->>NM: get_device({device_id})
+    FE->>NM: get_device device_id
     NM->>EXT: cmd_get_device()
     EXT->>+CAM: SOAP GetDeviceInformation
     CAM-->>-EXT: Manufacturer / Model / Firmware
@@ -440,19 +443,19 @@ sequenceDiagram
     NM-->>FE: 设备信息卡片
 
     Note over FE,EXT: 阶段 3：获取 RTSP 流
-    FE->>NM: get_stream_uri({device_id, profile_token})
+    FE->>NM: get_stream_uri device_id, profile_token
     NM->>EXT: cmd_get_stream_uri()
     EXT->>+CAM: SOAP GetStreamUri
     CAM-->>-EXT: rtsp://192.168.1.100:554/...
-    EXT-->>NM: {stream_uri: "rtsp://..."}
+    EXT-->>NM: stream_uri rtsp://...
     NM-->>FE: RTSP URL（交给 video 组件拉流）
 
     Note over FE,EXT: 阶段 4（可选）：PTZ 控制
-    FE->>NM: ptz_move({device_id, profile_token, pan, tilt, zoom})
+    FE->>NM: ptz_move device_id, profile_token, pan, tilt, zoom
     NM->>EXT: cmd_ptz_move()
     EXT->>+CAM: SOAP ContinuousMove
     CAM-->>-EXT: OK
-    EXT-->>NM: {success: true}
+    EXT-->>NM: success true
     NM-->>FE: PTZ 命令已执行
 ```
 
@@ -482,7 +485,13 @@ sequenceDiagram
 
 **替代方案**：使用 `PasswordText` 模式——直接在 SOAP header 中放明文密码（`<wsse:Password>明文密码</wsse:Password>`）。
 
-**理由**：(1) ONVIF 设备的 SOAP 通信**经常走 HTTP 而非 HTTPS**——大量摄像头出厂配置不启用 TLS，PasswordText 模式下抓包即可获取管理员密码；(2) PasswordDigest 的 SHA-1 哈希虽然不是密码学安全的（SHA-1 已被证明有碰撞攻击），但在 ONVIF 场景下它配合 nonce + timestamp 提供了**重放攻击防护**——攻击者即使抓到 digest，也无法在 created timestamp 过期后重放；(3) 某些厂商设备强制要求 PasswordDigest 模式（如海康固件默认配置），PasswordText 直接被拒绝并返回 `ter:NotAuthorized` SOAP Fault。权衡的代价是每次 SOAP 请求都要计算 SHA-1 哈希，但这个开销在微秒级别，完全可以忽略。
+**理由**：
+
+1. ONVIF 设备的 SOAP 通信**经常走 HTTP 而非 HTTPS**——大量摄像头出厂配置不启用 TLS，PasswordText 模式下抓包即可获取管理员密码
+2. PasswordDigest 的 SHA-1 哈希虽然不是密码学安全的（SHA-1 已被证明有碰撞攻击），但在 ONVIF 场景下它配合 nonce + timestamp 提供了**重放攻击防护**——攻击者即使抓到 digest，也无法在 created timestamp 过期后重放
+3. 某些厂商设备强制要求 PasswordDigest 模式（如海康固件默认配置），PasswordText 直接被拒绝并返回 `ter:NotAuthorized` SOAP Fault。
+
+权衡的代价是每次 SOAP 请求都要计算 SHA-1 哈希，但这个开销在微秒级别，完全可以忽略。
 
 ### 决策 3：ureq 同步 HTTP 而非 reqwest 异步
 
@@ -512,7 +521,13 @@ sequenceDiagram
 
 **替代方案**：在扩展内集成 `ffmpeg-next`，直接拉取 RTSP 流并解码为 JPEG 帧推送给前端。
 
-**理由**：(1) **职责分离**——协议桥接（SOAP/WS-Discovery）和视频处理（RTSP 拉流 / H.264 解码）是完全不同的工程领域，混在一个扩展里会导致代码量翻倍且难以独立测试；(2) **可组合性**——RTSP URL 返回给前端后，可以交给 [案例 3 yolo-video-v2](./3-yolo-video-v2.md) 跑实时 AI 检测，也可以交给前端 `<video>` 标签直接播放，或者交给第三方 NVR 录像——onvif-bridge 不应该限制流的消费方式；(3) **编译产物体积**——不引入 `ffmpeg-next` / `nokhwa`，`.nep` 包从约 15MB 降到约 3MB，对边缘部署（带宽受限场景）意义重大。权衡的代价是用户需要自行组合 onvif-bridge + yolo-video-v2 才能实现「摄像头发现 + AI 检测」端到端链路，但 NeoMind 的扩展组合机制正是为此设计的。
+**理由**：
+
+1. **职责分离**——协议桥接（SOAP/WS-Discovery）和视频处理（RTSP 拉流 / H.264 解码）是完全不同的工程领域，混在一个扩展里会导致代码量翻倍且难以独立测试
+2. **可组合性**——RTSP URL 返回给前端后，可以交给 [案例 3 yolo-video-v2](./3-yolo-video-v2.md) 跑实时 AI 检测，也可以交给前端 `<video>` 标签直接播放，或者交给第三方 NVR 录像——onvif-bridge 不应该限制流的消费方式
+3. **编译产物体积**——不引入 `ffmpeg-next` / `nokhwa`，`.nep` 包从约 15MB 降到约 3MB，对边缘部署（带宽受限场景）意义重大。
+
+权衡的代价是用户需要自行组合 onvif-bridge + yolo-video-v2 才能实现「摄像头发现 + AI 检测」端到端链路，但 NeoMind 的扩展组合机制正是为此设计的。
 
 ---
 
@@ -847,7 +862,12 @@ src/
   types.rs        (78 行)
 ```
 
-这与 [案例 2 yolo-device-inference](./2-yolo-device-inference.md)（`src/` 含 18 个备份文件）和 [案例 3 yolo-video-v2](./3-yolo-video-v2.md)（`src/` 含多个备份文件）形成了鲜明对比。onvif-bridge 之所以保持干净，可能是因为：(1) 作为较新开发的扩展（与 BACnet/OPC-UA 一同在 commit `422ba8d` 引入），尚未经历多轮迭代污染；(2) 协议桥接代码比 AI 推理代码更结构化——每个文件职责单一（SOAP / Discovery / PTZ / Types），重构时不容易产生临时副本。onvif-bridge 可以作为**源码治理的正例**——干净的 `src/` 目录让 `grep` / `rg` 的搜索结果不被噪音污染，让代码审查更聚焦。
+这与 [案例 2 yolo-device-inference](./2-yolo-device-inference.md)（`src/` 含 18 个备份文件）和 [案例 3 yolo-video-v2](./3-yolo-video-v2.md)（`src/` 含多个备份文件）形成了鲜明对比。onvif-bridge 之所以保持干净，可能是因为：
+
+1. 作为较新开发的扩展（与 BACnet/OPC-UA 一同在 commit `422ba8d` 引入），尚未经历多轮迭代污染
+2. 协议桥接代码比 AI 推理代码更结构化——每个文件职责单一（SOAP / Discovery / PTZ / Types），重构时不容易产生临时副本。
+
+onvif-bridge 可以作为**源码治理的正例**——干净的 `src/` 目录让 `grep` / `rg` 的搜索结果不被噪音污染，让代码审查更聚焦。
 
 ### 排障速查表
 
@@ -899,7 +919,11 @@ onvif-bridge 代表的**标准协议桥接**策略与 [5 uink-rms-bridge](./5-ui
 
 ### 小结
 
-onvif-bridge 在约 2700 行 Rust 代码中实现了完整的 ONVIF Profile S 核心能力——WS-Discovery 设备发现、SOAP/WS-Security 设备能力协商、PTZ 控制。它没有依赖任何 ONVIF/SOAP crate，全部手写，是纯协议工程的典范。作为 NeoMind 生态中的**标准协议桥接**案例，它展示了：(1) 开放标准如何降低集成成本——一套代码兼容所有 Profile S 设备；(2) 手写协议栈的工程权衡——可控性 vs 类型安全；(3) 纯后端扩展的架构模式——无 frontend、无 ONNX、同步 HTTP、职责单一。
+onvif-bridge 在约 2700 行 Rust 代码中实现了完整的 ONVIF Profile S 核心能力——WS-Discovery 设备发现、SOAP/WS-Security 设备能力协商、PTZ 控制。它没有依赖任何 ONVIF/SOAP crate，全部手写，是纯协议工程的典范。作为 NeoMind 生态中的**标准协议桥接**案例，它展示了：
+
+1. 开放标准如何降低集成成本——一套代码兼容所有 Profile S 设备
+2. 手写协议栈的工程权衡——可控性 vs 类型安全
+3. 纯后端扩展的架构模式——无 frontend、无 ONNX、同步 HTTP、职责单一。
 
 从源码治理角度看，onvif-bridge 的 `src/` 目录（5 个文件，零备份文件）是本系列中最干净的案例，可以作为代码卫生的正例参照。
 

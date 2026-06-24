@@ -15,7 +15,17 @@ sidebar_label: "8. Deep Dive"
 
 The source repo [`camthink-ai/NeoMind-Dashboard-Components`](https://github.com/camthink-ai/NeoMind-Dashboard-Components) has accumulated **133 git commits** under `components/ne101_camera/`, spanning roughly 7 major development phases. This commit count is **the absolute highest** among the 6 NeoMind marketplace components — the runner-up, metric_card, has only ~30 commits, and the other 4 average 10-20. The number 133 reflects ne101_camera's complexity: it is the only component that simultaneously involves real-time video streaming, AI inference, multi-extension contracts, geometric coordinate transforms, React hooks lifecycle, and dual-channel data merging — each dimension contributing 10-30 commits of iteration.
 
-Grouping the 133 commits by topic reveals 7 clear development phases: (1) **IIFE scaffold + image display** — establishing the `var React = window.React` injection pattern, `<img>` rendering, basic props parsing; (2) **Battery and metrics overlay** — visual design for small metrics like battery percentage, signal strength, temperature (badge styles, `formatValue` / `unitStr` helpers); (3) **AI processing pipeline + Transform integration** — the `generateTransformJsCode` template engine, `extensions.invoke` calls, detection result normalizers; (4) **ROI overlay** (the heaviest phase, 10+ commits) — center-point judgment → Sutherland-Hodgman clipping, fixed threshold → configurable threshold, ROI polygon editor, coordinate alignment fixes; (5) **OCR polygon support** — `ocr_text_blocks` responseType, conversion of object coordinates (x/y pair), polygon rendering + rectangle fallback; (6) **React hooks stabilization** — conditional useState causing #310 crash, two iterations of IME input freeze fix, ResizeObserver async mount fix; (7) **Per-class coloring + NMS tuning** — golden-angle HSV rotation for color allocation, `nms_iou_threshold` pass-through for locate-anything-v2. These 7 phases are not strictly linear — for example, ROI overlay (phase 4) and hooks stabilization (phase 6) overlap in time, but the gantt chart shows each phase's relative volume.
+Grouping the 133 commits by topic reveals 7 clear development phases:
+
+1. **IIFE scaffold + image display** — establishing the `var React = window.React` injection pattern, `<img>` rendering, basic props parsing
+2. **Battery and metrics overlay** — visual design for small metrics like battery percentage, signal strength, temperature (badge styles, `formatValue` / `unitStr` helpers)
+3. **AI processing pipeline + Transform integration** — the `generateTransformJsCode` template engine, `extensions.invoke` calls, detection result normalizers
+4. **ROI overlay** (the heaviest phase, 10+ commits) — center-point judgment → Sutherland-Hodgman clipping, fixed threshold → configurable threshold, ROI polygon editor, coordinate alignment fixes
+5. **OCR polygon support** — `ocr_text_blocks` responseType, conversion of object coordinates (x/y pair), polygon rendering + rectangle fallback
+6. **React hooks stabilization** — conditional useState causing #310 crash, two iterations of IME input freeze fix, ResizeObserver async mount fix
+7. **Per-class coloring + NMS tuning** — golden-angle HSV rotation for color allocation, `nms_iou_threshold` pass-through for locate-anything-v2.
+
+These 7 phases are not strictly linear — for example, ROI overlay (phase 4) and hooks stabilization (phase 6) overlap in time, but the gantt chart shows each phase's relative volume.
 
 ```mermaid
 gantt
@@ -411,7 +421,12 @@ components/ne101_camera/
 
 **Zero `.bak`, zero `.backup`, zero `.old`, zero commented-out dead code blocks, zero console.logs in the production bundle**. This is a positive case worth reviewing — under the pressure of 133 commits, the developer consistently maintained the discipline of "**every commit leaves the code cleaner than the last**". The most critical cleanup was commit [`00a59cc`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/00a59cc) (`chore(ne101): remove debug console.logs from Transform lifecycle`), which in a single pass deleted the 20+ console.logs accumulated across 4 debug commits, ensuring main's bundle.js had no debug residue.
 
-**Contrast with negative examples**: several other marketplace components have directories littered with `.bak`, `.backup`, `.old` files (like `bundle.js.bak`, `manifest.json.old`). These are usually "manual backups" the developer made before major changes — the intent is "if I break it, I can roll back". But git already provides complete version history (`git checkout HEAD~1 -- file` rolls back instantly); manual backups are redundant and cause two problems: (1) the platform's component loader, under some configurations, scans the entire directory and may erroneously load `.bak` files (especially when `.bak` is renamed to `.js`); (2) `.bak` files accumulate with directory "entropy growth", eventually becoming unmaintained dead files that increase the cognitive load on new developers. ne101_camera avoids both problems through strict "**3-file discipline**" — the directory has only `bundle.js` / `manifest.json` / `test_bundle.js`; any extra file is required to be deleted during PR review.
+**Contrast with negative examples**: several other marketplace components have directories littered with `.bak`, `.backup`, `.old` files (like `bundle.js.bak`, `manifest.json.old`). These are usually "manual backups" the developer made before major changes — the intent is "if I break it, I can roll back". But git already provides complete version history (`git checkout HEAD~1 -- file` rolls back instantly); manual backups are redundant and cause two problems:
+
+1. the platform's component loader, under some configurations, scans the entire directory and may erroneously load `.bak` files (especially when `.bak` is renamed to `.js`)
+2. `.bak` files accumulate with directory "entropy growth", eventually becoming unmaintained dead files that increase the cognitive load on new developers.
+
+ne101_camera avoids both problems through strict "**3-file discipline**" — the directory has only `bundle.js` / `manifest.json` / `test_bundle.js`; any extra file is required to be deleted during PR review.
 
 ```mermaid
 graph TB

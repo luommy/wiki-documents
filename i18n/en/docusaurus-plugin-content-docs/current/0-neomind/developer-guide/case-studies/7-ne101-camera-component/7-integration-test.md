@@ -108,8 +108,8 @@ sequenceDiagram
     participant V as Node.js vm sandbox
     participant W as sandbox.window
     T->>T: fs.readFile bundle.js
-    T->>V: vm.runInNewContext(source,<br/>{window:{}, console})
-    V->>W: evaluate IIFE<br/>window.NE101CameraPanel = {...}
+    T->>V: vm.runInNewContext source<br/>window, console
+    V->>W: evaluate IIFE<br/>window.NE101CameraPanel = ...
     T->>W: assert typeof window.NE101CameraPanel.default === 'function'
     T->>W: assert typeof window.NE101CameraPanel.NE101CameraPanel === 'function'
     T->>W: assert typeof window.NE101CameraPanel.ConfigPanel === 'function'
@@ -299,7 +299,13 @@ Source: [`bundle.js` L277-L278`](https://github.com/camthink-ai/NeoMind-Dashboar
 
 (c) the detection normalizer switches based on `responseType`: `boxes_x1y1x2y2` runs `[x1,y1,x2,y2]` to bbox object conversion, `objects_bbox` / `detections_bbox` already use the bbox object shape directly, and `ocr_text_blocks` additionally converts object coordinates to arrays and renders polygons (commits [`403c0f1`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/403c0f1) + [`b746c02`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/b746c02)).
 
-The test matrix covers the **directed complete graph** of the 4 extensions — every extension switches to every other extension (4×3 = 12 directed edges), plus 4 self-loops, totaling 16 switching paths. Each path verifies three assertions: (1) the new extension's mode list is loaded correctly (`availableModes.length > 0`); (2) the Transform is rebuilt (the `_configHash` change triggers a Tier 2/3 update); (3) feeding a mock response with the new extension's `responseType` produces a normalized detection array with the correct structure. The most critical regression assertion was introduced by commit [`8656148`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/8656148): **only `locate-anything-v2` hardcodes `nms_iou_threshold: 0.5` in the Transform JS** ([L282](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L282-L282)); the other three extensions do not pass this parameter.
+The test matrix covers the **directed complete graph** of the 4 extensions — every extension switches to every other extension (4×3 = 12 directed edges), plus 4 self-loops, totaling 16 switching paths. Each path verifies three assertions:
+
+1. the new extension's mode list is loaded correctly (`availableModes.length > 0`)
+2. the Transform is rebuilt (the `_configHash` change triggers a Tier 2/3 update)
+3. feeding a mock response with the new extension's `responseType` produces a normalized detection array with the correct structure.
+
+The most critical regression assertion was introduced by commit [`8656148`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/8656148): **only `locate-anything-v2` hardcodes `nms_iou_threshold: 0.5` in the Transform JS** ([L282](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L282-L282)); the other three extensions do not pass this parameter.
 
 ```js
     // Pass NMS threshold to locate-anything-v2 — extension postprocess_args reads it from args
@@ -368,7 +374,11 @@ if (Array.isArray(vDet) && vDet.length > 0 && tsMatch) {
   detections = lastDetsRef.current;
 }
 ```
-[Source: bundle.js L858-L874](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L858-L874) (1) **match** — `String(vSourceTs) === String(imgTsVal)`, the detection array is immediately assigned to `detections` and also written to the `lastDetsRef.current` / `lastDetsTsRef.current` dual cache (L862-L865); (2) **stale** — `vSourceTs` exists but does not equal `imgTsVal`, detections are **cached but not displayed** (L866-L869), and the user sees a "clean" current frame without detection boxes, avoiding ghosts; (3) **cache replay** — no new detection in virtual data (`vDet` is empty), but the cached `lastDetsTsRef.current` matches the current `imgTsVal`, so the cache is restored to display (L870-L873), handling the intermediate state "WS pushed a new frame but virtual data hasn't arrived due to inference latency".
+[Source: bundle.js L858-L874](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L858-L874)
+
+1. **match** — `String(vSourceTs) === String(imgTsVal)`, the detection array is immediately assigned to `detections` and also written to the `lastDetsRef.current` / `lastDetsTsRef.current` dual cache (L862-L865)
+2. **stale** — `vSourceTs` exists but does not equal `imgTsVal`, detections are **cached but not displayed** (L866-L869), and the user sees a "clean" current frame without detection boxes, avoiding ghosts
+3. **cache replay** — no new detection in virtual data (`vDet` is empty), but the cached `lastDetsTsRef.current` matches the current `imgTsVal`, so the cache is restored to display (L870-L873), handling the intermediate state "WS pushed a new frame but virtual data hasn't arrived due to inference latency".
 
 The test matrix covers these three states and their transitions: (a) fresh capture + matching source_ts → detections render; (b) inference result is one frame behind the image (stale) → cache but don't display; (c) cache hit (cache replay) → display from cache; (d) cache miss + no new detection → don't display. Case (b) is the easiest to get wrong — the intuitive implementation is "always show the most recent detection", but that is exactly the source of ghosts. Strict source_ts matching yields priority to "correctness" over "the most recent data", preferring a brief absence of detection boxes over showing misaligned detections. The side effect of this mechanism is "detection box flicker" (show-hide-show) when inference latency exceeds one frame interval, but this is the inevitable cost of correctness-first design. Commit [`e3a70be`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/e3a70be) also fixed a related pit: the backend serializes detection results as JSON strings, so the frontend must `JSON.parse` before comparing (L856-L857), otherwise `typeof vDet === 'string'` never equals `imgTsVal` (a number).
 

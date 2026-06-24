@@ -422,7 +422,7 @@ sequenceDiagram
     participant N as NeoMind
     D->>N: POST /api/devices/xxx/webhook
     Note over N: Parse JSON → write to Telemetry
-    N-->>D: {"success": true}
+    N-->>D: success true
     Note over N: Trigger dashboard update + rule check
 ```
 

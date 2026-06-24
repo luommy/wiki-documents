@@ -15,7 +15,17 @@ sidebar_label: "8. Deep Dive"
 
 ne101_camera 的源码仓库 [`camthink-ai/NeoMind-Dashboard-Components`](https://github.com/camthink-ai/NeoMind-Dashboard-Components) 在 `components/ne101_camera/` 路径下累计了 **133 个 git commits**，跨越约 7 个主要开发阶段。这个 commit 数量在 NeoMind 市场的 6 个组件里是**绝对的第一名**——第二名的 metric_card 只有约 30 个 commits，其它 4 个组件平均在 10-20 个之间。133 这个数字背后反映的是 ne101_camera 的复杂度：它是唯一一个同时涉及实时视频流、AI 推理、多扩展契约、几何坐标变换、React hooks 生命周期、双通道数据合并的组件，每一个维度都贡献了 10-30 个 commits 的迭代量。
 
-把 133 个 commits 按主题归类后，能识别出 7 个清晰的开发阶段：(1) **IIFE scaffold + 图像显示**——建立 `var React = window.React` 注入范式、`<img>` 标签渲染、基础 props 解析；(2) **电池与指标 overlay**——电池百分比、信号强度、温度等小指标的视觉设计（badge 样式、`formatValue` / `unitStr` 辅助函数）；(3) **AI 处理流水线 + Transform 集成**——`generateTransformJsCode` 模板引擎、`extensions.invoke` 调用、检测结果的归一化器；(4) **ROI 叠加**（最重的阶段，10+ commits）——从中心点判定到 Sutherland-Hodgman 裁剪、从固定阈值到可配置阈值、ROI 多边形编辑器、坐标对齐修复；(5) **OCR 多边形支持**——`ocr_text_blocks` responseType、对象坐标（x/y pair）的转换、多边形渲染 + 矩形回退；(6) **React hooks 稳定化**——条件 useState 导致的 #310 崩溃、IME 输入冻结的两次迭代、ResizeObserver 异步挂载修复；(7) **每类检测着色 + NMS 调优**——golden-angle HSV 旋转的颜色分配、locate-anything-v2 的 `nms_iou_threshold` 透传。这 7 个阶段不是严格线性的——例如 ROI 叠加（阶段 4）和 hooks 稳定化（阶段 6）在时间上有重叠，但用 gantt 图能看出每个阶段的相对体量。
+把 133 个 commits 按主题归类后，能识别出 7 个清晰的开发阶段：
+
+1. **IIFE scaffold + 图像显示**——建立 `var React = window.React` 注入范式、`<img>` 标签渲染、基础 props 解析
+2. **电池与指标 overlay**——电池百分比、信号强度、温度等小指标的视觉设计（badge 样式、`formatValue` / `unitStr` 辅助函数）
+3. **AI 处理流水线 + Transform 集成**——`generateTransformJsCode` 模板引擎、`extensions.invoke` 调用、检测结果的归一化器
+4. **ROI 叠加**（最重的阶段，10+ commits）——从中心点判定到 Sutherland-Hodgman 裁剪、从固定阈值到可配置阈值、ROI 多边形编辑器、坐标对齐修复
+5. **OCR 多边形支持**——`ocr_text_blocks` responseType、对象坐标（x/y pair）的转换、多边形渲染 + 矩形回退
+6. **React hooks 稳定化**——条件 useState 导致的 #310 崩溃、IME 输入冻结的两次迭代、ResizeObserver 异步挂载修复
+7. **每类检测着色 + NMS 调优**——golden-angle HSV 旋转的颜色分配、locate-anything-v2 的 `nms_iou_threshold` 透传。
+
+这 7 个阶段不是严格线性的——例如 ROI 叠加（阶段 4）和 hooks 稳定化（阶段 6）在时间上有重叠，但用 gantt 图能看出每个阶段的相对体量。
 
 ```mermaid
 gantt
@@ -411,7 +421,12 @@ components/ne101_camera/
 
 **零 `.bak`、零 `.backup`、零 `.old`、零注释掉的死代码块、零生产 bundle 里的 console.log**。这是一个值得正面复盘的工程纪律案例——在 133 个 commits 的迭代压力下，开发者始终保持着「**每次提交都让代码比上次更干净**」的卫生习惯。最关键的清理动作是 commit [`00a59cc`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/00a59cc)（`chore(ne101): remove debug console.logs from Transform lifecycle`），它在合并前一次性删除了 4 个 debug commit 累积的 20+ 条 console.log，确保 main 分支的 bundle.js 没有任何调试残留。
 
-**对比负面案例**：其它某些市场组件的目录里散布着 `.bak`、`.backup`、`.old` 文件（如 `bundle.js.bak`、`manifest.json.old`），这些文件通常是开发者在做重大修改前的「手动备份」——意图是「如果改坏了可以回滚」。但 git 已经提供了完整的版本历史（`git checkout HEAD~1 -- file` 就能回滚），手动备份是冗余的，且会带来两个问题：(1) 平台的组件加载器在某些配置下会扫描整个目录，可能错误地加载 `.bak` 文件（尤其是把 `.bak` 改名为 `.js` 时）；(2) `.bak` 文件会随着目录的「熵增」越积越多，最终变成无人维护的死文件，增加新开发者的认知负担。ne101_camera 通过严格的「**3 文件纪律**」避免了这两个问题——目录里只有 `bundle.js` / `manifest.json` / `test_bundle.js`，任何多余文件都在 PR review 阶段被要求删除。
+**对比负面案例**：其它某些市场组件的目录里散布着 `.bak`、`.backup`、`.old` 文件（如 `bundle.js.bak`、`manifest.json.old`），这些文件通常是开发者在做重大修改前的「手动备份」——意图是「如果改坏了可以回滚」。但 git 已经提供了完整的版本历史（`git checkout HEAD~1 -- file` 就能回滚），手动备份是冗余的，且会带来两个问题：
+
+1. 平台的组件加载器在某些配置下会扫描整个目录，可能错误地加载 `.bak` 文件（尤其是把 `.bak` 改名为 `.js` 时）
+2. `.bak` 文件会随着目录的「熵增」越积越多，最终变成无人维护的死文件，增加新开发者的认知负担。
+
+ne101_camera 通过严格的「**3 文件纪律**」避免了这两个问题——目录里只有 `bundle.js` / `manifest.json` / `test_bundle.js`，任何多余文件都在 PR review 阶段被要求删除。
 
 ```mermaid
 graph TB
