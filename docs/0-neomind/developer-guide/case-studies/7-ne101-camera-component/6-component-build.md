@@ -2,16 +2,16 @@
 description: "ne101_camera 组件构建：IIFE 注入范式（window.React + jsxRuntime）、命名导出对象、五层模块结构、React hooks 在 IIFE 中的三大陷阱（#310 hooks 顺序、frozen input、conditional useState）、ConfigPanel/AdvancedPanel/ExtDropdown 子组件、shadcn CSS 类复刻"
 keywords: [ne101_camera, IIFE, React-in-IIFE, 命名导出, hooks 陷阱, shadcn, ConfigPanel]
 tags: [NeoMind, 案例, MVP]
-sidebar_label: "6. Component Build"
+sidebar_label: "Component Build"
 ---
 
-# 6 组件构建：从 IIFE 注入到 shadcn 复刻的工程范式
+# 组件构建：从 IIFE 注入到 shadcn 复刻的工程范式
 
 > 本节是 ne101_camera MVP 阶段的**组件构建参考页**（MVP 核心三页收尾），覆盖 IIFE 注入范式、四键命名导出、五层模块结构、React hooks 在 IIFE 中的三大陷阱以及 shadcn CSS 类复刻策略。
 
 ---
 
-## 6.1 IIFE 注入范式
+## IIFE 注入范式
 
 ne101_camera 的 `bundle.js` 第一行不是 `import` 语句，而是一个 IIFE（立即调用函数表达式）的入口。查看源码：[`bundle.js` L1-L5](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1-L5)。
 
@@ -48,7 +48,7 @@ Source: [`bundle.js` L1971-L1972](https://github.com/camthink-ai/NeoMind-Dashboa
 
 ---
 
-## 6.2 命名导出对象
+## 命名导出对象
 
 IIFE 的 `return` 语句返回的是一个**多键对象**，不是单个函数。查看源码：[`bundle.js` L1971](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1971-L1971)。
 
@@ -110,7 +110,7 @@ graph LR
 
 ---
 
-## 6.3 五层模块结构
+## 五层模块结构
 
 1972 行的 IIFE 不是一坨平铺代码，而是按职责分成了五层。这一节的分层与 [2.2](./2-architecture.md) 的五层架构概述互补（视角不同：2 聚焦架构分层，6 聚焦构建操作），但这里聚焦**构建视角**——为什么这种分层能在没有打包器的情况下工作，以及每一层的构建特征。五层的行号边界如下：
 
@@ -257,7 +257,7 @@ graph TB
 
 ---
 
-## 6.4 React Hooks 在 IIFE 中的陷阱 1：Hooks 顺序
+## React Hooks 在 IIFE 中的陷阱 1：Hooks 顺序
 
 React 的 Rules of Hooks 规定：**hooks 必须在组件函数的顶层调用，不能放在条件语句、循环、嵌套函数里**。这条规则的本质是 React 内部用「调用顺序索引」来追踪每个 hook 的状态——如果某次渲染调用了 3 个 hooks、下次渲染调用了 4 个，索引就会错位，React 报错 #310（"Rendered more hooks than during the previous render"）或更隐晦的 state 错乱。
 
@@ -294,7 +294,7 @@ var setEditingIdx = editingIdxState[1];
 
 ---
 
-## 6.5 React Hooks 在 IIFE 中的陷阱 2：Frozen Input
+## React Hooks 在 IIFE 中的陷阱 2：Frozen Input
 
 第二个 hooks 陷阱比第一个更隐蔽——它不会让 React 崩溃，而是让**输入框看起来冻结了**（用户打字但框里不显示）。这个 bug 的修复经历了两次迭代，涉及两个 commit：[`44f1fa5`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/44f1fa5)（`fix(ne101_camera): input fields frozen — use local state instead of shared composingRef`）和 [`b060a25`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/b060a25)（`fix(ne101_camera): React error #310 — use defaultValue instead of hooks in imeInput`）。
 
@@ -356,7 +356,7 @@ graph LR
 
 ---
 
-## 6.6 ConfigPanel 与 AdvancedPanel 分工
+## ConfigPanel 与 AdvancedPanel 分工
 
 NeoMind 平台的 ComponentConfigDialog 约定两个 tab：**Display**（用户可见的显示配置）和 **Advanced**（面向 power user 的高级配置）。ne101_camera 用 `ConfigPanel` 和 `AdvancedPanel` 两个导出函数分别填充这两个 tab，两者在代码量和复杂度上形成了鲜明的反差。
 
@@ -424,7 +424,7 @@ Source: [`bundle.js` L1363-L1448](https://github.com/camthink-ai/NeoMind-Dashboa
 
 ---
 
-## 6.7 shadcn CSS 类复刻策略
+## shadcn CSS 类复刻策略
 
 NeoMind Dashboard 的 UI 使用 [shadcn/ui](https://ui.shadcn.com/) 组件库构建。shadcn/ui 的特点不是「安装一个 npm 包」，而是**把组件源码复制到项目的 `components/ui/` 目录**——这意味着平台页面上已经加载了 shadcn 的 Tailwind CSS 类定义（如 `bg-background` / `text-muted-foreground` / `data-[state=checked]:bg-primary`）。ne101_camera 的组件**无法 import 这些 shadcn 组件**（IIFE 没有模块解析），但它可以**复刻 shadcn 组件的 className 字符串**，让 Tailwind 的 JIT 编译器（已经在平台上运行）把同样的样式应用到组件的 DOM 元素上。
 
@@ -501,7 +501,7 @@ Source: [`bundle.js` L1371-L1446](https://github.com/camthink-ai/NeoMind-Dashboa
 
 ---
 
-## 6.8 设计决策汇总
+## 设计决策汇总
 
 本页涉及的 7 个设计决策汇总如下，每个都包含「选择 / 备选 / 理由」三段式。
 

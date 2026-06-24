@@ -2,16 +2,16 @@
 description: "ne101_camera 集成测试：端到端测试矩阵（test_bundle.js 35KB）、ROI 叠加验证（Sutherland-Hodgman 裁剪 + object-cover 映射）、多扩展切换测试（locate-anything-v2 / image-analyzer-v2 / yolo-device-inference / ocr-device-inference）、source_ts 对齐验证、WS+REST 双通道测试"
 keywords: [ne101_camera, 集成测试, test_bundle.js, ROI 验证, 多扩展切换, 测试矩阵]
 tags: [NeoMind, 案例]
-sidebar_label: "7. Integration Test"
+sidebar_label: "Integration Test"
 ---
 
-# 7 集成测试：从沙箱执行到双通道对齐的验证矩阵
+# 集成测试：从沙箱执行到双通道对齐的验证矩阵
 
 > 本节是 ne101_camera 案例的**集成测试参考页**，覆盖纯函数单测（沙箱提取范式）、ROI 双坐标变换验证矩阵、多扩展切换测试、`source_ts` 对齐三态机以及 WS+REST 双通道合并测试。
 
 ---
 
-## 7.1 测试策略总览
+## 测试策略总览
 
 ne101_camera 的 `components/ne101_camera/` 目录里**同时**发布两份 JS：业务代码 `bundle.js`（1972 行 / 95353 字节）和测试代码 `test_bundle.js`（960 行 / 35021 字节）。测试文件不是事后补的脚手架，而是与组件一起在 manifest 中登记的可执行制品——平台运营方和二次开发者都能直接 `node components/ne101_camera/test_bundle.js` 在本地复现完整的纯函数回归。这种「**组件自带测试**」的纪律是 NeoMind 市场对上架组件的软性要求，也是 ne101_camera 区别于其它 5 个案例的显著特征。
 
@@ -85,7 +85,7 @@ graph TB
 
 ---
 
-## 7.2 导出对象契约测试
+## 导出对象契约测试
 
 IIFE 的最后一行 `return` 语句是组件与平台加载器之间的** ABI（应用二进制接口）契约**——任何加载器版本的破坏性变更都会让组件在网格里白屏。`test_bundle.js` 用一条契约断言守住这层契约：IIFE 求值后挂到 `window.NE101CameraPanel` 上的对象必须**至少**包含 `default` / `NE101CameraPanel` / `ConfigPanel` / `AdvancedPanel` 四个键，且每个键的值是 `function` 类型。查看源码 [`bundle.js` L1971](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1971-L1971)。
 
@@ -126,7 +126,7 @@ sequenceDiagram
 
 ---
 
-## 7.3 ROI 叠加验证矩阵
+## ROI 叠加验证矩阵
 
 ROI（Region of Interest）是 ne101_camera 最复杂的子模块，因为它在**两个独立的坐标系**里做几何运算，且两者的结果必须一致才能让用户在画面上看到正确的检测框。第一个坐标系是 **Transform JS 内部的「检测 vs ROI 多边形」裁剪**，由 `generateTransformJsCode` 生成的 Sutherland-Hodgman 多边形裁剪算法实现（[`bundle.js` L342-L372](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L342-L372)），它决定哪些检测「属于 ROI 内」:
 
@@ -238,7 +238,7 @@ graph LR
 
 ---
 
-## 7.4 多扩展切换测试
+## 多扩展切换测试
 
 `AI_EXT_IDS`（[`bundle.js` L144`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L144-L144)）硬编码了 4 个白名单扩展，每个扩展有不同的 `responseType` 契约——也就是 AI 推理结果的 JSON 形状不同。
 
@@ -342,7 +342,7 @@ stateDiagram-v2
 
 ---
 
-## 7.5 source_ts 对齐验证
+## source_ts 对齐验证
 
 `source_ts`（source timestamp）是 ne101_camera 防「ghost detections」的核心机制。摄像头每秒推 2-5 帧新图，AI 推理需要 200-800ms，这意味着**当推理结果返回时，画面上显示的可能已经是下一帧了**——如果把上一帧的检测结果直接画在当前帧上，就会出现「人已经走出了画面，但检测框还停在原位」的鬼影。`source_ts` 解决方案：Transform JS 在生成检测结果时同时输出 `source_ts`（取自输入图像的 `ts` / `timestamp` 字段，[`bundle.js` L436`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L436-L436)），主组件在收到 virtual data 时严格比对 `source_ts` 与当前图像的 `imgTs`，只有匹配才显示。
 
@@ -405,7 +405,7 @@ stateDiagram-v2
 
 ---
 
-## 7.6 WS+REST 双通道测试
+## WS+REST 双通道测试
 
 NeoMind 平台为每个设备组件提供两条数据通道：
 
@@ -469,7 +469,7 @@ graph LR
 
 ---
 
-## 7.7 设计决策汇总
+## 设计决策汇总
 
 本页涉及的 6 个设计决策汇总如下，每个都包含「选择 / 备选 / 理由」三段式。
 

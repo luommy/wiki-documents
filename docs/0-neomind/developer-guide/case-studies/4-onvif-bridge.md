@@ -2,12 +2,12 @@
 description: "NeoMind 标准协议桥接案例：手写 WS-Discovery 多播发现、SOAP/WS-Security PasswordDigest 客户端、PTZ 控制的完整工程剖析——无 onvif-rs 依赖、纯 Rust ~2700 行覆盖 ONVIF Profile S 核心能力"
 keywords: [NeoMind, onvif-bridge, ONVIF, WS-Discovery, SOAP, 协议桥接]
 tags: [NeoMind, 案例, 协议桥接]
-sidebar_label: "4. onvif-bridge"
+sidebar_label: "onvif-bridge"
 ---
 
-# 4 onvif-bridge：标准协议桥接
+# onvif-bridge：标准协议桥接
 
-## 1 案例背景
+## 案例背景
 
 **onvif-bridge** 是 NeoMind 生态中的**标准协议桥接**案例。ONVIF（Open Network Video Interface Forum）是网络视频设备的开放标准，定义了设备发现（WS-Discovery）、媒体流协商（RTSP URL 获取）、PTZ 控制、事件订阅等接口规范。覆盖 Profile S（流媒体）、Profile T（高级流媒体）、Profile G（视频存储）等多个 profile。任何符合 ONVIF Profile S 的 IP 摄像头——海康、大华、安讯威、Tiandy——都可以通过 onvif-bridge 接入 NeoMind，无需厂商私有 SDK，无需适配层。
 
@@ -38,7 +38,7 @@ sidebar_label: "4. onvif-bridge"
 
 ---
 
-## 2 架构总览
+## 架构总览
 
 onvif-bridge 是一个**纯后端协议桥接扩展**——没有 frontend 组件、没有 ONNX 模型、没有视频解码逻辑。它的职责是：用标准协议（WS-Discovery + SOAP）与 ONVIF 摄像头通信，把结果转化为 NeoMind 的命令返回值和虚拟指标。扩展进程内通过 `parking_lot::RwLock` 管理 `HashMap<String, OnvifDevice>` 设备注册表，所有命令操作都围绕这个注册表展开。
 
@@ -91,7 +91,7 @@ graph TB
     HTTP --> CAM3
 ```
 
-### 5 模块职责拆分
+### 模块职责拆分
 
 | 模块 | 文件 | 行数 | 职责 |
 |------|------|------|------|
@@ -118,9 +118,9 @@ graph TB
 
 ---
 
-## 3 核心实现剖析
+## 核心实现剖析
 
-### 3.1 WS-Discovery 多播发现（discovery.rs）
+### WS-Discovery 多播发现（discovery.rs）
 
 WS-Discovery 是 OASIS 标准的局域网设备发现协议，ONVIF 使用其 UDP 多播模式。onvif-bridge 在 [`src/discovery.rs`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/discovery.rs#L1-L211) 手写了完整的多播发现逻辑。
 
@@ -217,7 +217,7 @@ fn find_local_ipv4() -> Option<Ipv4Addr> {
 
 *Source: [`src/discovery.rs` L119-L131](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/discovery.rs#L119-L131)*
 
-### 3.2 SOAP 客户端与 WS-Security（soap_client.rs）
+### SOAP 客户端与 WS-Security（soap_client.rs）
 
 ONVIF 的所有控制接口都走 SOAP 1.2 over HTTP。onvif-bridge 在 [`src/soap_client.rs`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/soap_client.rs#L1-L516) 手写了完整的 SOAP 客户端，**没有依赖任何 SOAP/ONVIF crate**。
 
@@ -287,7 +287,7 @@ pub fn soap_request_raw(url: &str, action: &str, body: &str,
 
 *Source: [`src/soap_client.rs` L68-L124](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/soap_client.rs#L68-L124)*
 
-### 3.3 设备能力协商
+### 设备能力协商
 
 onvif-bridge 实现了 ONVIF Core 和 Media 规范中的核心协商函数：
 
@@ -338,7 +338,7 @@ pub fn resolve_service_url(device_url: &str, service: &str) -> String {
 
 *Source: [`src/soap_client.rs` L390-L407](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/soap_client.rs#L390-L407)*
 
-### 3.4 PTZ 控制（ptz.rs）
+### PTZ 控制（ptz.rs）
 
 [`src/ptz.rs`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/ptz.rs#L1-L214) 封装了六个 PTZ 命令，全部基于 `soap_client::soap_request_raw` 构建 SOAP body：
 
@@ -379,7 +379,7 @@ pub fn ptz_relative_move(device: &OnvifDevice, profile_token: &str,
 
 *Source: [`src/ptz.rs` L5-L42](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/ptz.rs#L5-L42)*
 
-### 3.5 命令分发（lib.rs execute_command）
+### 命令分发（lib.rs execute_command）
 
 [`src/lib.rs` L696-L717](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/lib.rs#L696-L717) 是扩展的核心入口——一个 `match` 把字符串命令路由到对应的处理函数：
 
@@ -409,7 +409,7 @@ async fn execute_command(&self, command: &str, args: &serde_json::Value) -> Resu
 
 共 14 个命令覆盖了 ONVIF 设备管理的完整生命周期：发现（`discover`）、手动添加（`add_device`）、列表（`list_devices`）、详情（`get_device`）、取流（`get_stream_uri`）、抓拍（`get_snapshot`）、PTZ 控制（6 个命令）、状态查询（`get_status`）、移除（`remove_device`）、配置（`configure`）。
 
-### 3.6 发现到取流的完整时序
+### 发现到取流的完整时序
 
 下图展示前端发起 `discover` 命令后，到拿到 RTSP 流地址的完整协议交互过程（可选 PTZ 控制在最后）：
 
@@ -463,7 +463,7 @@ sequenceDiagram
 
 ---
 
-## 4 关键设计决策（含权衡与替代方案）
+## 关键设计决策（含权衡与替代方案）
 
 ### 决策 1：手写 SOAP 客户端而非使用 onvif-rs crate
 
@@ -531,7 +531,7 @@ sequenceDiagram
 
 ---
 
-## 5 与 NeoMind 主体的集成
+## 与 NeoMind 主体的集成
 
 onvif-bridge 通过 NeoMind Extension SDK 的标准接口与主体集成，不依赖任何私有 API 或 hack。集成体现在三个层面：命令系统、指标产出、跨扩展协作。
 
@@ -647,7 +647,7 @@ Agent 调用 yolo-video-v2.start_stream(source_url="rtsp://192.168.1.100:554/...
 
 ---
 
-## 6 测试与验证策略
+## 测试与验证策略
 
 onvif-bridge 的测试分为三层：SOAP 客户端单元测试、扩展逻辑单元测试、跨平台端到端验证。
 
@@ -755,9 +755,9 @@ WS-Discovery 的 UDP 多播行为在不同操作系统上差异显著，无法�
 
 ---
 
-## 7 部署运维与排障（含源码卫生反例）
+## 部署运维与排障（含源码卫生反例）
 
-### 5 平台 .nep 分发
+### 平台 .nep 分发
 
 [`metadata.json`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/metadata.json#L11) 的 `builds` 字段声明了 5 个构建目标：
 
@@ -882,7 +882,7 @@ onvif-bridge 可以作为**源码治理的正例**——干净的 `src/` 目录�
 
 ---
 
-## 8 延伸阅读与小结
+## 延伸阅读与小结
 
 ### 演进里程碑
 

@@ -2,16 +2,16 @@
 description: "ne101_camera frontend consumption: detections fetching, JSON string parsing, per-class coloring (golden-angle HSV), SVG overlay rendering (polygon + rect fallback), object-cover coordinate transform, ResizeObserver callback-ref pattern, Transform tiered lifecycle"
 keywords: [ne101_camera, frontend rendering, classColor, golden-angle, ResizeObserver, object-cover, SVG overlay]
 tags: [NeoMind, case study, MVP]
-sidebar_label: "5. Frontend Consume"
+sidebar_label: "Frontend Consume"
 ---
 
-# 5 Frontend Consume: From detections to SVG overlay rendering pipeline
+# Frontend Consume: From detections to SVG overlay rendering pipeline
 
 > This page is the **frontend rendering reference** for the ne101_camera MVP, covering the effect-driven rendering pipeline, per-class coloring (golden-angle HSV), SVG overlay rendering, object-cover coordinate transform, and the ResizeObserver callback-ref pattern.
 
 ---
 
-## 5.1 Rendering Pipeline Overview
+## Rendering Pipeline Overview
 
 The ne101_camera rendering path is not a one-shot JSX template but a **state pipeline** driven by multiple effects. The pipeline starts from platform-injected props (`device` / `deviceImageSrc` / `virtualMetrics` / `config` / `onConfigChange`) and ends at the SVG overlay layer mounted on the media `<div>`. In between it passes through five state nodes:
 
@@ -69,7 +69,7 @@ Source: [`bundle.js` L704-L714](https://github.com/camthink-ai/NeoMind-Dashboard
 
 ---
 
-## 5.2 Per-Class Coloring: Golden-Angle HSV
+## Per-Class Coloring: Golden-Angle HSV
 
 Detection-box color is not fixed; it is determined by the class label (`det.label`). Commit [`c276c23`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/c276c23) (`feat(ne101): per-class detection colors via golden-angle HSV rotation`) introduced the `classColor(label)` function at [`bundle.js` L55-L72](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L55-L72):
 
@@ -114,7 +114,7 @@ Before `c276c23`, detection-box color went through two iterations. The earliest 
 
 ---
 
-## 5.3 SVG Overlay: Polygon + Rect Fallback
+## SVG Overlay: Polygon + Rect Fallback
 
 Detection boxes are not drawn on a Canvas but overlaid on the `<img>` via an SVG layer. The rendering logic for this SVG layer lives at [`bundle.js` L1210-L1272](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1210-L1272); its core is a `detections.map(...)` call that produces one `<g>` element per detection, containing a shape (polygon or rect) plus a label text node.
 
@@ -186,7 +186,7 @@ Commit [`b746c02`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/c
 
 ---
 
-## 5.4 The object-cover Coordinate Transform
+## The object-cover Coordinate Transform
 
 Detection-box coordinates are **normalized to image space** (0-1 means the ratio relative to the original image width/height), but the image is rendered in the DOM with `object-cover` — the image is scaled to completely cover the container, with excess cropped. This means only a subset of the original image is visible in the container, and detection-box coordinates must pass through a transform to overlay correctly on the visible region. This transform is `ovTf`, computed at [`bundle.js` L879-L899](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L879-L899):
 
@@ -270,7 +270,7 @@ graph LR
 
 ---
 
-## 5.5 The ResizeObserver Callback-Ref Pattern
+## The ResizeObserver Callback-Ref Pattern
 
 The `ovTf` computation depends on two pieces of state: the image's natural dimensions (`imgNatState`) and the container dimensions (`ctrSizeState`). The image dimensions are written via the `<img onLoad>` callback ([L1165-L1168](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1165-L1168)):
 
@@ -350,7 +350,7 @@ Commit [`7c92a19`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/c
 
 ---
 
-## 5.6 Detection Summary Badges
+## Detection Summary Badges
 
 The bottom overlay bar ([`bundle.js` L1067-L1145](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1067-L1145)) renders a set of detection summary badges that let users quickly grasp "what was detected in this frame" without inspecting detection-box details. The design principle for these badges is **metric-driven** — the data source is the virtual metrics already computed by the Transform, not re-aggregated inside the component from the detections array.
 
@@ -410,7 +410,7 @@ The rendering condition is `hasAnySummary` (L1063), meaning at least `total_coun
 
 ---
 
-## 5.7 Transform Tiered Lifecycle
+## Transform Tiered Lifecycle
 
 The Transform's create/update/delete logic lives at [`bundle.js` L661-L824](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L661-L824) inside a `React.useEffect` whose dependency array is `[device.id, processingEnabled, _configHash, _storedTid, _storedHash]` (L824). Inside the effect, dispatching follows three tiers:
 
@@ -521,7 +521,7 @@ stateDiagram-v2
 
 ---
 
-## 5.8 Design Decisions Summary
+## Design Decisions Summary
 
 The 6 design decisions covered on this page are consolidated below, each following the "choice / alternative / rationale" triad.
 

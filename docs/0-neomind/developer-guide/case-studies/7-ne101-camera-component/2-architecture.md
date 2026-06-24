@@ -2,16 +2,16 @@
 description: "ne101_camera 组件架构剖析：1972 行 IIFE 的 5 层拆解（helper / template / sub-component / main / export）、3 个对外组件（NE101CameraPanel / ConfigPanel / AdvancedPanel）、数据流（WebSocket 优先 + REST 回退）、ROI 叠加管线、与 metric_card 的架构对比"
 keywords: [NeoMind, ne101_camera, IIFE 架构, React-in-IIFE, 设备绑定组件]
 tags: [NeoMind, 案例, 架构]
-sidebar_label: "2. Architecture"
+sidebar_label: "Architecture"
 ---
 
-# 2 架构总览
+# 架构总览
 
 > 本节把 1972 行手写 IIFE 的 [`bundle.js`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js) 「拆开看」，覆盖五层架构（helper / template / sub-component / main / export）、三对外组件的组件树、双通道数据流，以及与 metric_card 的架构代差对比。
 
 ---
 
-## 2.1 IIFE 顶层结构
+## IIFE 顶层结构
 
 ne101_camera 的 `bundle.js` 第一行不是 import，而是一句对 `window` 的契约声明。查看源码：
 
@@ -82,7 +82,7 @@ graph TB
 
 ---
 
-## 2.2 五层架构拆解
+## 五层架构拆解
 
 ne101_camera 的 1972 行 IIFE 按职责可以切成五层。这一节给每层一个 2-3 句的职责说明，并标出关键行号深链，方便后续章节交叉引用。
 
@@ -367,7 +367,7 @@ Source: [`bundle.js` L472-L1332](https://github.com/camthink-ai/NeoMind-Dashboar
 
 ---
 
-## 2.3 组件树（NE101CameraPanel / ConfigPanel / AdvancedPanel）
+## 组件树（NE101CameraPanel / ConfigPanel / AdvancedPanel）
 
 NeoMind Dashboard 对一个「设备绑定组件」的对外契约是：**主组件 + 可选的 Display tab 配置面板 + 可选的 Advanced tab 配置面板**。ne101_camera 把这三个角色都填满了，构成了一个三对外组件的组件树。
 
@@ -455,7 +455,7 @@ Source: [`bundle.js` L484-L524](https://github.com/camthink-ai/NeoMind-Dashboard
 
 ---
 
-## 2.4 数据流：WebSocket 优先 + REST 回退
+## 数据流：WebSocket 优先 + REST 回退
 
 ne101_camera 的数据流是它和 metric_card 差异最大的地方。metric_card 用 `fetchData` prop 做轮询拉取，而 ne101_camera 走的是 **WebSocket 推送（增量）+ REST 拉取（全量回退）** 的双通道。
 
@@ -571,7 +571,7 @@ Source: [`bundle.js` L1613-L1628](https://github.com/camthink-ai/NeoMind-Dashboa
 
 ---
 
-## 2.5 关键设计决策（≥4，含权衡与替代方案）
+## 关键设计决策（≥4，含权衡与替代方案）
 
 本节列出 5 个塑造 ne101_camera 当前形态的架构决策。每个决策给出「我们选 X / 替代方案 Y / 理由 Z」三段式，以及付出的代价。
 
@@ -670,7 +670,7 @@ Source: [`bundle.js` L523-L524](https://github.com/camthink-ai/NeoMind-Dashboard
 
 ---
 
-## 2.6 与 6 metric_card 的架构对比
+## 与 6 metric_card 的架构对比
 
 下表把 ne101_camera 和 [6 metric_card](../6-metric-card-component.md) 在 6 个维度上做对照，帮助读者建立「显示型组件 vs 设备绑定组件」的架构代差认知。metric_card 的相关字段可以参考它的 [3.1 manifest 契约](../6-metric-card-component.md)。
 
@@ -715,7 +715,7 @@ Source: [manifest.json L18-L37](https://github.com/camthink-ai/NeoMind-Dashboard
 
 ---
 
-## 2.7 小结
+## 小结
 
 本节拆解了 ne101_camera 的五层 IIFE 架构、三对外组件的组件树、WebSocket 优先 + REST 回退的双通道数据流，以及 5 个关键设计决策。核心结论三条：
 

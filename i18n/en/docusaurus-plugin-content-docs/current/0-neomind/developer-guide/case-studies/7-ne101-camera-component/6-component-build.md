@@ -2,16 +2,16 @@
 description: "ne101_camera component build: IIFE injection pattern (window.React + jsxRuntime), named export object, five-layer module structure, three React-in-IIFE pitfalls (#310 hook order, frozen input, conditional useState), ConfigPanel/AdvancedPanel/ExtDropdown sub-components, shadcn CSS class replica"
 keywords: [ne101_camera, IIFE, React-in-IIFE, named export, hooks pitfalls, shadcn, ConfigPanel]
 tags: [NeoMind, case study, MVP]
-sidebar_label: "6. Component Build"
+sidebar_label: "Component Build"
 ---
 
-# 6 Component Build: From IIFE Injection to shadcn Replica
+# Component Build: From IIFE Injection to shadcn Replica
 
 > This page is the **component build reference** for the ne101_camera MVP phase (final page of the MVP core trio), covering the IIFE injection pattern, four-key named export, five-layer module structure, three React-in-IIFE hooks pitfalls, and the shadcn CSS class replica strategy.
 
 ---
 
-## 6.1 The IIFE Injection Pattern
+## The IIFE Injection Pattern
 
 The first line of ne101_camera's `bundle.js` is not an `import` statement — it is the entry of an IIFE (Immediately Invoked Function Expression). See source: [`bundle.js` L1-L5](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1-L5).
 
@@ -48,7 +48,7 @@ Source: [`bundle.js` L1971-L1972](https://github.com/camthink-ai/NeoMind-Dashboa
 
 ---
 
-## 6.2 The Named Export Object
+## The Named Export Object
 
 The IIFE's `return` statement returns a **multi-key object**, not a single function. See source: [`bundle.js` L1971](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1971-L1971).
 
@@ -110,7 +110,7 @@ graph LR
 
 ---
 
-## 6.3 The Five-Layer Module Structure
+## The Five-Layer Module Structure
 
 The 1972-line IIFE is not a flat slab of code — it is organized into five layers by responsibility. The layering here complements 2.2's five-layer architecture overview (different perspective: 2 on architecture, 6 on build operations), but this section focuses on the **build perspective** — why this layering works without a bundler, and what the build characteristics of each layer are. The five layer boundaries are:
 
@@ -257,7 +257,7 @@ The dashed lines in the diagram represent "called by" direction: upper layers (s
 
 ---
 
-## 6.4 React-in-IIFE Pitfall 1: Hook Order
+## React-in-IIFE Pitfall 1: Hook Order
 
 React's Rules of Hooks mandates: **hooks must be called at the top level of the component function, never inside conditionals, loops, or nested functions**. The essence of this rule is that React internally tracks each hook's state by "call order index" — if one render calls 3 hooks and the next calls 4, the indices shift, and React throws error #310 ("Rendered more hooks than during the previous render") or worse, silent state corruption.
 
@@ -294,7 +294,7 @@ The comment `// ROI hooks — MUST be called unconditionally, before any conditi
 
 ---
 
-## 6.5 React-in-IIFE Pitfall 2: Frozen Input
+## React-in-IIFE Pitfall 2: Frozen Input
 
 The second hooks pitfall is more insidious than the first — it does not crash React, but makes **input fields appear frozen** (the user types but nothing shows in the box). The fix for this bug went through two iterations, involving two commits: [`44f1fa5`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/44f1fa5) (`fix(ne101_camera): input fields frozen — use local state instead of shared composingRef`) and [`b060a25`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/b060a25) (`fix(ne101_camera): React error #310 — use defaultValue instead of hooks in imeInput`).
 
@@ -356,7 +356,7 @@ graph LR
 
 ---
 
-## 6.6 ConfigPanel vs AdvancedPanel Division
+## ConfigPanel vs AdvancedPanel Division
 
 The NeoMind platform's ComponentConfigDialog convention specifies two tabs: **Display** (user-visible display configuration) and **Advanced** (power-user-oriented advanced configuration). ne101_camera fills these two tabs with two exported functions — `ConfigPanel` and `AdvancedPanel` — which form a stark contrast in code volume and complexity.
 
@@ -424,7 +424,7 @@ Source: [`bundle.js` L1363-L1448](https://github.com/camthink-ai/NeoMind-Dashboa
 
 ---
 
-## 6.7 The shadcn CSS Class Replica Strategy
+## The shadcn CSS Class Replica Strategy
 
 The NeoMind Dashboard UI is built with the [shadcn/ui](https://ui.shadcn.com/) component library. The defining characteristic of shadcn/ui is not "install an npm package" but **copy component source code into the project's `components/ui/` directory** — meaning the platform page already has shadcn's Tailwind CSS class definitions loaded (e.g., `bg-background` / `text-muted-foreground` / `data-[state=checked]:bg-primary`). ne101_camera's component **cannot import these shadcn components** (IIFE has no module resolution), but it can **replicate the className strings** of shadcn components, letting Tailwind's JIT compiler (already running on the platform) apply the same styles to the component's DOM elements.
 
@@ -501,7 +501,7 @@ Source: [`bundle.js` L1371-L1446](https://github.com/camthink-ai/NeoMind-Dashboa
 
 ---
 
-## 6.8 Design Decisions Summary
+## Design Decisions Summary
 
 The 7 design decisions from this page are consolidated below, each with "choice / alternative / rationale."
 

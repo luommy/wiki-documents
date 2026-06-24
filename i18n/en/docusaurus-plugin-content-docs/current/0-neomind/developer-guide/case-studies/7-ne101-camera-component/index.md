@@ -13,7 +13,7 @@ This is the "flagship deep-dive case" of the NeoMind component marketplace. The 
 
 ---
 
-## 0 Recommended Reading Path
+## Recommended Reading Path
 
 The flagship case has eight subpages organized by dependency. Read them in the order below; pages marked ★ are MVP core (required reading for the v1 release), the rest are v1.1 increments.
 
@@ -25,7 +25,7 @@ If you are short on time and only want to understand "how this component works",
 
 ---
 
-## 1 Eight-Subpage Index
+## Eight-Subpage Index
 
 | # | Title | Role | Status |
 |---|-------|------|--------|
@@ -40,7 +40,7 @@ If you are short on time and only want to understand "how this component works",
 
 ---
 
-## 2 Relationship to 6 metric_card: From Starter to Flagship
+## Relationship to 6 metric_card: From Starter to Flagship
 
 This case is a direct continuation of [6 metric_card](../6-metric-card-component.md), but **an order of magnitude more complex**. The table below maps the two cases so you can build a "starter → flagship" cognitive ladder.
 
@@ -58,7 +58,7 @@ This case is a direct continuation of [6 metric_card](../6-metric-card-component
 
 ---
 
-## 3 What You Will Learn
+## What You Will Learn
 
 Reading all eight sections will give you five key capabilities:
 
@@ -74,7 +74,7 @@ Reading all eight sections will give you five key capabilities:
 
 ---
 
-## 4 Reading Dependency Graph
+## Reading Dependency Graph
 
 The diagram below shows the knowledge dependencies among the eight subpages. Solid arrows mean "must read prerequisite first"; dashed arrows mean "recommended but skippable". ★ marks MVP core (required for v1).
 
@@ -111,7 +111,7 @@ graph LR
 
 ---
 
-## 5 Case Info Card
+## Case Info Card
 
 | Field | Value |
 |-------|-------|
@@ -127,7 +127,7 @@ graph LR
 
 ---
 
-## 6 Next
+## Next
 
 - Want to understand "why NE101 needs a dedicated component" → [1 Business Background](./1-background.md)
 - Want to jump straight to code structure → 2 Architecture (v1.1)

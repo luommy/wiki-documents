@@ -2,16 +2,16 @@
 description: "ne101_camera 数据契约：MQTT 设备遥测、扩展响应归一化（boxes_x1y1x2y2 / objects_bbox / detections_bbox / ocr_text_blocks）、JSON string detections 解析、ROI Sutherland-Hodgman 裁剪算法、virtual 指标输出前缀映射"
 keywords: [ne101_camera, 数据契约, processingExtensionId, detections, ROI overlap, virtual metrics]
 tags: [NeoMind, 案例, MVP]
-sidebar_label: "4. Data Contract"
+sidebar_label: "Data Contract"
 ---
 
-# 4 数据契约：从 MQTT 遥测到 virtual 指标的全链路 schema
+# 数据契约：从 MQTT 遥测到 virtual 指标的全链路 schema
 
 > 本节是 ne101_camera 案例 MVP 阶段的**契约参考页**，覆盖三层契约（设备遥测 → 扩展响应 → virtual 指标）、四种 responseType 归一化、JSON string 解析坑点以及 ROI 重叠判定算法。
 
 ---
 
-## 4.1 数据契约三层模型
+## 数据契约三层模型
 
 ne101_camera 的数据契约不是一张扁平的 schema 表，而是一条**三层流水线**：第一层是 NE101 设备通过 MQTT 推送的原始遥测（图像 URL/base64 + 电池 + 时间戳等标量）；第二层是 AI 扩展返回的推理响应（四种 `responseType` 之一，字段结构各不相同）；第三层是组件 Transform 生成的 synthetic virtual 指标（带 `virtual.<ext_id>.` 前缀，由主控写回设备指标存储，组件再读取渲染）。这三层之间存在两个「形状转换边界」：边界 A（设备遥测 → 扩展输入）由组件的 `generateTransformJsCode` 用 `input_raw` 桥接；边界 B（扩展响应 → virtual 指标）由同一个代码生成器内部的归一化逻辑完成。把它们拆成三层而不是合成一张大表的根本原因是**解耦**——设备协议（MQTT 主题名、字段命名）可能随固件升级变化，AI 扩展的响应格式由扩展作者决定，而 virtual 指标的 schema 由组件自己掌控。三层分离后，任何一层的变化都不会穿透到另外两层。
 
@@ -57,7 +57,7 @@ if (Array.isArray(vDet) && vDet.length > 0 && tsMatch) {
 
 ---
 
-## 4.2 设备遥测：MQTT 主题与 WebSocket 消息
+## 设备遥测：MQTT 主题与 WebSocket 消息
 
 NE101 设备的遥测通过 MQTT 上报到 `devices/{device_id}/telemetry` 主题，NeoMind 主控订阅后将增量通过 WebSocket 推给前端组件的 `wsValues` state。组件消费的关键设备指标集中在 [`bundle.js` L830-L842](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L830-L842)：
 
@@ -115,7 +115,7 @@ if (!rawImageSrc) {
 
 ---
 
-## 4.3 扩展响应的四种归一化
+## 扩展响应的四种归一化
 
 AI 扩展的响应格式由扩展作者决定，ne101_camera 不能控制。为了在组件内部统一处理，`generateTransformJsCode` 在生成 Transform 代码时把四种 `responseType` 都归一化成同一个内部形状：`{bbox: [x1, y1, x2, y2], label, confidence}`（坐标归一化到 0-1）。这四种 responseType 的分发逻辑在 [`bundle.js` L288-L329](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L288-L329)：
 
@@ -227,7 +227,7 @@ return {
 
 ---
 
-## 4.4 Virtual 指标输出契约
+## Virtual 指标输出契约
 
 Transform 生成的 synthetic 指标遵循一个严格的命名约定：**前缀 `virtual.<ext_id_normalized>.` + 字段名**。`ext_id_normalized` 是把扩展 ID 里的连字符替换成下划线（例如 `yolo-device-inference` → `yolo_device_inference`），因为指标名里不允许出现连字符（会与某些后端的 key parser 冲突）。这个归一化在 [`bundle.js` L854](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L854-L854) 完成：`var pfx = 'virtual.' + processingExtId.replace(/-/g, '_') + '.';`：
 
@@ -317,7 +317,7 @@ if (Array.isArray(vDet) && vDet.length > 0 && tsMatch) {
 
 ---
 
-## 4.5 JSON String 解析坑点
+## JSON String 解析坑点
 
 virtual 指标在经过后端存储序列化/反序列化后，`detections` 字段可能变成 **JSON 字符串**而不是数组对象。这是一个非常容易踩的契约模糊地带，commit `e3a70be`（`fix(ne101): parse JSON string detections from backend virtual metrics`）就是专门修这个问题的。
 
@@ -343,7 +343,7 @@ if (typeof vDet === 'string') { try { vDet = JSON.parse(vDet); } catch(e) { vDet
 
 ---
 
-## 4.6 ROI 重叠判定算法
+## ROI 重叠判定算法
 
 ROI（Region of Interest）判定决定了「一个检测框算不算落在某个用户画的感兴趣区域内」。这个判定算法经历了两次重大演进：
 
@@ -463,7 +463,7 @@ graph TB
 
 ---
 
-## 4.7 WS 优先 + REST 回填双通道
+## WS 优先 + REST 回填双通道
 
 ne101_camera 的数据接入采用**双通道策略**：WebSocket 推送（实时增量）为主，REST 拉取（全量回退）为辅。这个策略的注释明确写在 [`bundle.js` L1601-L1602](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1601-L1602)：
 
@@ -516,7 +516,7 @@ var _vals = Object.assign({}, wsValues, imageData || {}, virtualDataState[0] || 
 
 ---
 
-## 4.8 设计决策汇总
+## 设计决策汇总
 
 本页涉及的 5 个设计决策汇总如下，每个都包含「选择 / 备选 / 理由」三段式。
 

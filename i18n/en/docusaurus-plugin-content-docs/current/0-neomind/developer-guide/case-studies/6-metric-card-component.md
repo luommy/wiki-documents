@@ -2,12 +2,12 @@
 description: Write your first NeoMind dashboard component — a complete engineering walkthrough of metric_card (IIFE injection + OKLCH glass + multi-format normalization)
 keywords: [NeoMind, metric_card, dashboard component, engineering case study]
 tags: [NeoMind, case study, component]
-sidebar_label: "6. metric_card"
+sidebar_label: "metric_card"
 ---
 
-# 6 metric_card: Introductory Dashboard Component
+# metric_card: Introductory Dashboard Component
 
-## 1 Case Background
+## Case Background
 
 **metric_card** is the simplest "meaningful component" in the NeoMind dashboard component marketplace. It renders one or more numeric values (temperature, battery level, inference latency, detected object count) as a frosted-glass card with labels, units, and decimal precision. The entire component is 352 lines of hand-written IIFE JavaScript with zero build step — the shortest path for a newcomer to understand "what makes up a NeoMind component."
 
@@ -21,7 +21,7 @@ sidebar_label: "6. metric_card"
 
 ---
 
-## 2 Architecture Overview
+## Architecture Overview
 
 metric_card is a collaboration between three parts: the component bundle (IIFE, self-registering to `window.NeoMind_MetricCard`), the NeoMind dashboard runtime (host page providing React/jsxRuntime + `fetchData` injection + grid container), and data sources (device telemetry / extension metrics / system metrics). The diagram below shows the load sequence and dependency injection boundaries.
 
@@ -62,7 +62,7 @@ graph TB
     GLASS -.->|"references var(--border) etc."| CSSVAR
 ```
 
-### 3 Core Abstractions
+### Core Abstractions
 
 | Abstraction | Location | Purpose |
 |-------------|----------|---------|
@@ -72,9 +72,9 @@ graph TB
 
 ---
 
-## 3 Implementation Walkthrough
+## Implementation Walkthrough
 
-### 3.1 Directory Structure & Manifest Contract
+### Directory Structure & Manifest Contract
 
 ```
 components/metric_card/
@@ -130,7 +130,7 @@ View full manifest: [`manifest.json`](https://github.com/camthink-ai/NeoMind-Das
 - `has_device_binding: false` — metric_card does not bind to a specific device type; it can consume any data source (device telemetry, extension metrics, system metrics all work). If set to `true`, the runtime requires the user to first select a device instance and additionally injects a `deviceContext` prop.
 - `config_schema` — A JSON Schema that the runtime uses to auto-generate the configuration form. Each item in the `metrics` array has `label` / `unit` / `decimalPlaces`, corresponding one-to-one with the `config.metrics[i]` reads in `bundle.js`.
 
-### 3.2 IIFE Injection Pattern (Critical Design)
+### IIFE Injection Pattern (Critical Design)
 
 View source: [`bundle.js`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/metric_card/bundle.js#L1-L4) L1-4
 
@@ -164,7 +164,7 @@ The core constraint of the NeoMind component marketplace is: **components are di
 
 `window.jsxRuntime` is React 17+'s "automatic JSX runtime." The traditional approach requires `import React from 'react'` to use JSX; the automatic runtime exposes `jsx()` / `jsxs()` as standalone functions, so the component only needs `var jsx = window.jsxRuntime.jsx` to render, further reducing dependence on the React namespace.
 
-### 3.3 Glass Container Design (OKLCH + CSS Variables)
+### Glass Container Design (OKLCH + CSS Variables)
 
 View source: [`bundle.js`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/metric_card/bundle.js#L9-L18) L9-18
 
@@ -195,7 +195,7 @@ var glassContainer = {
 
 metric_card has no build step (see 3.2), so it cannot use Tailwind classes (requires PostCSS compilation) or CSS-in-JS (requires a runtime library). Inline style objects are the zero-dependency solution. The trade-off is that dynamic values (like `opacity` percentages) cannot use Tailwind's `/10` syntax and must be written as `'oklch(1 0 0 / 10%)'`. STYLE_GUIDE 1 explicitly warns about this.
 
-### 3.4 `extractValue()` — Multi-Format Data Normalization (Core Engineering Insight)
+### `extractValue()` — Multi-Format Data Normalization (Core Engineering Insight)
 
 View source: [`bundle.js`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/metric_card/bundle.js#L40-L60) L40-60
 
@@ -245,7 +245,7 @@ As a general-purpose component, metric_card **must tolerate all of these formats
 
 **Design principle of `extractValue`: progressive degradation.** It checks formats in order from "most specific" to "most general": first `.value` (standard format), then `.series` (timeseries format), finally falling back to "raw scalar." This guarantees forward compatibility with future formats — if NeoMind adds a `{data: ...}` format, only a new branch in `extractValue` is needed; old components will not crash.
 
-### 3.5 Render & Props Contract
+### Render & Props Contract
 
 View source: [`bundle.js`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/metric_card/bundle.js#L130-L148) L130-148 (state), [L156-176](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/metric_card/bundle.js#L156-L176) (doFetch), [L288-322](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/metric_card/bundle.js#L288-L322) (renderCell)
 
@@ -351,7 +351,7 @@ The `doFetch()` function (L156-176) is the core of data retrieval. It does three
 2. **Normalizes results to array** — `Array.isArray(result) ? result : [result]`, so single-source and multi-source share the same rendering path.
 3. **Runs `extractValue` on each result** — Stores normalized scalars into `values[]`; `renderCell` then formats based on `config.metrics[i]`.
 
-### 3.6 Data Flow Sequence Diagram
+### Data Flow Sequence Diagram
 
 The diagram below shows the complete lifecycle of metric_card in the dashboard: from mount to 30-second polling updates.
 
@@ -399,7 +399,7 @@ sequenceDiagram
 
 ---
 
-## 4 Design Trade-offs
+## Design Trade-offs
 
 ### Decision 1: IIFE + `window.*` Injection vs ESM Bundling
 
@@ -448,7 +448,7 @@ sequenceDiagram
 
 ---
 
-## 5 Tech Stack Breakdown
+## Tech Stack Breakdown
 
 | Component | Choice | Why |
 |-----------|--------|-----|
@@ -464,7 +464,7 @@ sequenceDiagram
 
 ---
 
-## 6 Standards in Practice
+## Standards in Practice
 
 This section shows how metric_card implements the rules from the [Engineering Standards Appendix](./appendix-standards.md) and [STYLE_GUIDE](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/STYLE_GUIDE.md).
 
@@ -536,7 +536,7 @@ jsx('span', {
 
 ---
 
-## 7 Common Pitfalls & Best Practices
+## Common Pitfalls & Best Practices
 
 ### Engineering Evolution: Two Refactors of `extractValue`
 
@@ -574,7 +574,7 @@ metric_card's git history records the evolution of `extractValue` from "numbers 
 
 ---
 
-## 8 Further Reading
+## Further Reading
 
 - [Engineering Standards Appendix](./appendix-standards.md) — Central reference for manifest schema, size constraints, and STYLE_GUIDE rules.
 - [Case Study Overview](./0-overview.md) — Version alignment table and reading paths for all 7 cases.

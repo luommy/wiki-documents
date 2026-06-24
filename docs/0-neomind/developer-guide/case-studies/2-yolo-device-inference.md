@@ -2,12 +2,12 @@
 description: 把 YOLOv8 目标检测部署到边缘设备的第一个 AI 推理扩展——模型懒加载、ONNX Runtime 动态库治理、能力化设备取流的完整工程剖析
 keywords: [NeoMind, yolo-device-inference, AI 推理, 模型懒加载]
 tags: [NeoMind, 案例, AI 推理]
-sidebar_label: "2. yolo-device-inference"
+sidebar_label: "yolo-device-inference"
 ---
 
-# 2 yolo-device-inference：AI 推理扩展
+# yolo-device-inference：AI 推理扩展
 
-## 1 案例背景
+## 案例背景
 
 **yolo-device-inference** 是 NeoMind 生态中第一个「AI 推理扩展」——它把 Ultralytics YOLOv8 目标检测模型部署到边缘节点，自动消费绑定设备的图像指标流（snapshot / image / frame），将检测框、类别、置信度作为虚拟指标写回设备，并可选地产出带标注的 JPEG 缩略图供仪表板展示。
 
@@ -35,7 +35,7 @@ yolo-device-inference 就是这条数据链的「中间件」。
 
 ---
 
-## 2 架构总览
+## 架构总览
 
 yolo-device-inference 由四层组成：NeoMind Runtime（事件调度）、Extension（YOLODetector + 绑定状态）、ONNX Runtime（原生推理后端）、Device Capability Bridge（设备取流 / 指标回写）。下图展示了数据流向和关键状态机。
 
@@ -105,11 +105,11 @@ graph TB
 
 ---
 
-## 3 实现剖析
+## 实现剖析
 
 本节按 `src/lib.rs` 的物理顺序逐段剖析，所有代码片段均附 GitHub 深链。源文件 1945 行，是本系列单文件最长的扩展之一。
 
-### 3.1 平台条件编译与硬件探测
+### 平台条件编译与硬件探测
 
 扩展通过 `cfg(not(target_arch = "wasm32"))` 把所有 AI 相关代码隔离在 native target——WASM 下扩展退化为「只暴露状态、不执行推理」的占位实现。这是 NeoMind 扩展的通用模式：让同一个 crate 在 WASM 沙箱里能编译通过（用于元数据 / 命令发现），但把重计算推迟到 native。
 
@@ -135,7 +135,7 @@ fn with_device_fallback<M, F>(try_build: F) -> std::result::Result<M, String> {
 
 `with_device_fallback` 是一个高阶函数——接收一个 `Fn(Device) -> Result`，先尝试自动探测的设备，失败则回退 CPU。这种模式让单个调用点 `YOLO::new(cfg)` 自动获得「硬件自适应」能力，调用方不需要写平台分支。
 
-### 3.2 数据结构：Detection / BoundingBox / InferenceResult
+### 数据结构：Detection / BoundingBox / InferenceResult
 
 这三个结构体是扩展对外暴露的数据契约，前端 React 组件和后续的虚拟指标写入都依赖它们的字段名。
 
@@ -165,7 +165,7 @@ pub struct Detection {
 
 `usls` 返回的 `hbbs` 给的是 `xmin/ymin/xmax/ymax`，扩展在 L832-L837 做了一次显式转换。
 
-### 3.3 懒加载模型包装器（核心工程亮点）
+### 懒加载模型包装器（核心工程亮点）
 
 这是本案例最关键的工程模式。`YOLODetector` 把「模型加载」从「扩展构造」中解耦——构造时只记录参数，真正的 ONNX Runtime 初始化推迟到首次推理。
 
@@ -210,7 +210,7 @@ impl YOLODetector {
 
 **为什么不用 `OnceLock<YOLO>`？** 本案例的 `YOLODetector` 没有用 `std::sync::OnceLock`，而是用 `Option<YOLO> + bool` 手动管理。原因是 `OnceLock` 要求内部值 `Send + Sync` 且初始化后不可变——但 `YOLO::forward(&mut self)` 需要可变引用，且扩展支持 `reload_model()`（L638-L667）在运行时替换模型。`Mutex<YOLODetector>` + `Option<YOLO>` 的组合更灵活，允许「重置 + 重新加载」语义。
 
-### 3.4 ONNX Runtime 动态库路径治理（跨平台痛点）
+### ONNX Runtime 动态库路径治理（跨平台痛点）
 
 这是本案例第二个核心工程难点，对应 git log 中三个连续修复提交（`73f5943` / `61c4bdf` / `1fe9d3b`）。问题根源：`ort` crate 的 `load-dynamic` feature 不绑定库路径，依赖操作系统的动态加载器查找——而三平台的查找机制完全不同。
 
@@ -255,7 +255,7 @@ fn setup_native_lib_paths() {
 
 这套逻辑在 commit `73f5943`（Linux 符号链接）、`61c4bdf`（`ORT_DYLIB_PATH`）、`1fe9d3b`（Windows `cfg(unix)` 守卫）中分三次迭代完成——是典型的「跨平台库加载需要逐步踩坑」的工程演化案例（详见 7）。
 
-### 3.5 能力化设备取流（同步桥接）
+### 能力化设备取流（同步桥接）
 
 扩展通过 `invoke_capability_sync()` 调用 NeoMind 的能力系统读写设备指标。这个方法是「异步 runtime 中同步调用」的关键适配点。
 
@@ -281,7 +281,7 @@ fn invoke_capability_sync(&self, capability_name: &str, params: &serde_json::Val
 
 **虚拟指标命名约定**（见 L1120-L1124 注释）：必须以 `transform.` / `virtual.` / `computed.` / `derived.` / `aggregated.` 开头，否则能力桥会拒绝写入。这是 NeoMind 区分「真实传感器指标」和「扩展计算指标」的命名空间隔离。
 
-### 3.6 图像标注绘制
+### 图像标注绘制
 
 检测结果可视化由 `draw_detections_on_image()` 完成（L192-L292），使用 `image` + `imageproc` + `ab_glyph` 三个 crate 组合。这个函数在 commit `f8478a8` 中被统一为「所有推理扩展共享的标注风格」——带填充背景的标签框 + 白色文字。
 
@@ -297,7 +297,7 @@ let font = FONT_RESULT.get_or_init(|| FontRef::try_from_slice(include_bytes!("..
 
 注意字体文件通过 `include_bytes!` 编译进 cdylib——这会让 `.nep` 包体积增加约 300KB，但避免了运行时文件路径依赖。`NotoSans-Regular.ttf` 的选择是为了支持中日韩字符（边缘设备场景常见中文标签）。
 
-### 3.7 检测结果到指标的映射
+### 检测结果到指标的映射
 
 `write_inference_results()` (L1101-L1196) 把一次 `InferenceResult` 拆成四条虚拟指标写入。每条指标独立调用 `device_metrics_write`——为什么不在一次调用里写全部？因为能力桥的 API 签名是 `{ device_id, metric, value, timestamp }`，每次只写一条。批量写入需要扩展自己循环。
 
@@ -316,7 +316,7 @@ if let Some(img) = &result.annotated_image_base64 {
 }
 ```
 
-### 3.8 命令时序图（懒加载分支）
+### 命令时序图（懒加载分支）
 
 下图展示一次 `device.image.updated` 事件触发后的完整时序，重点高亮懒加载分支（仅在首次推理时执行）。
 
@@ -358,7 +358,7 @@ sequenceDiagram
 
 ---
 
-## 4 设计权衡
+## 设计权衡
 
 本案例在工程演化中做了若干关键决策，每个决策都至少考虑过 2-3 个备选方案。以下逐一剖析。
 
@@ -403,7 +403,7 @@ sequenceDiagram
 
 ---
 
-## 5 技术栈拆解
+## 技术栈拆解
 
 | 组件 | 选择 | 理由 |
 |------|------|------|
@@ -421,7 +421,7 @@ sequenceDiagram
 
 ---
 
-## 6 标准落地
+## 标准落地
 
 ### metadata.json 字段走查
 
@@ -474,7 +474,7 @@ CI 流水线必须在每个目标平台上原生构建（不能用 cross-compile
 
 ---
 
-## 7 常见坑与最佳实践
+## 常见坑与最佳实践
 
 ### 工程演化 1：懒加载的引入（commit `e8a8f28`）
 
@@ -528,7 +528,7 @@ CI 流水线必须在每个目标平台上原生构建（不能用 cross-compile
 
 ---
 
-## 8 延伸阅读
+## 延伸阅读
 
 - [案例总览](./0-overview.md)——本案例在 NeoMind 扩展生态中的定位
 - [扩展标准附录](./appendix-standards.md)——metadata.json 字段规范、能力声明清单

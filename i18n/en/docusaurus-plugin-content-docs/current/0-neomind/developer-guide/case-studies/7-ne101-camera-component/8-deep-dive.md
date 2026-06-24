@@ -2,16 +2,16 @@
 description: "ne101_camera deep dive: 133-commit version evolution, the rise and fall of Transform lifecycle debug traces (4 debug commits finally cleaned up by 00a59cc), the Boa engine console.log crash incident, the _configHash performance optimization, source hygiene recap (3 files, zero backups)"
 keywords: [ne101_camera, deep dive, version evolution, debug trace, Boa engine, _configHash, source hygiene]
 tags: [NeoMind, Case Study]
-sidebar_label: "8. Deep Dive"
+sidebar_label: "Deep Dive"
 ---
 
-# 8 Deep Dive: Version Evolution and Engineering Retrospective Across 133 Commits
+# Deep Dive: Version Evolution and Engineering Retrospective Across 133 Commits
 
 > This page is the **closing deep-dive retrospective** for the ne101_camera case, looking back at the component's evolution from the 133-commit historical perspective, covering the version evolution timeline, the rise and fall of debug traces, the Boa engine crash incident, the `_configHash` performance optimization, and source hygiene recap.
 
 ---
 
-## 8.1 Version Evolution Timeline
+## Version Evolution Timeline
 
 The source repo [`camthink-ai/NeoMind-Dashboard-Components`](https://github.com/camthink-ai/NeoMind-Dashboard-Components) has accumulated **133 git commits** under `components/ne101_camera/`, spanning roughly 7 major development phases. This commit count is **the absolute highest** among the 6 NeoMind marketplace components — the runner-up, metric_card, has only ~30 commits, and the other 4 average 10-20. The number 133 reflects ne101_camera's complexity: it is the only component that simultaneously involves real-time video streaming, AI inference, multi-extension contracts, geometric coordinate transforms, React hooks lifecycle, and dual-channel data merging — each dimension contributing 10-30 commits of iteration.
 
@@ -64,7 +64,7 @@ Phase 4 (ROI overlay) is the most commit-heavy phase because it does geometry in
 
 ---
 
-## 8.2 The Rise and Fall of Transform Lifecycle Debug Traces
+## The Rise and Fall of Transform Lifecycle Debug Traces
 
 ne101_camera's Transform three-tier lifecycle (detailed in [5.7](./5-frontend-consume.md): Tier 1 = ID + hash match fast-path, Tier 2 = ID exists but hash changed → update, Tier 3 = no ID → create) is the subsystem most prone to bugs. React StrictMode's double mounting, frequent config changes, concurrent effect races, and a host of other factors made the Transform "create-update-delete" state machine produce over a dozen bugs in real-world runs. The diagnostic process for those bugs gave rise to a unique "debug trace rise and fall" cycle in ne101_camera's history.
 
@@ -137,7 +137,7 @@ React.useEffect(function () {
 
 ---
 
-## 8.3 The Boa Engine console.log Crash Incident
+## The Boa Engine console.log Crash Incident
 
 Commit [`c16d803`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/c16d803) (`fix(ne101): remove console.log from Transform JS that crashes Boa engine`) is one of the most unusual fixes in ne101_camera's history — it doesn't fix business logic, it fixes a crash caused by a **runtime environment mismatch**. The root cause: ne101_camera's Transform JS is a **generated JS string** (assembled by `generateTransformJsCode`, [`bundle.js` L239-L456`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L239-L456)), and that string does not run in the browser or in Node.js — it runs in the platform's **Boa engine**, a Rust-based JS interpreter used to sandbox user-submitted Transform code (preventing malicious code from reaching the main process).
 
@@ -197,7 +197,7 @@ graph TB
 
 ---
 
-## 8.4 The `_configHash` Performance Optimization
+## The `_configHash` Performance Optimization
 
 `_configHash` ([`bundle.js` L655-L659`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L655-L659)) is the **Tier 1 fast-path predicate** for ne101_camera's Transform three-tier lifecycle — a string concatenation of all processing-related config fields, serving as a digest of "has the config changed". On every React render, the component recomputes the current `_configHash` and compares it against the stored `_storedHash` (`config._transformHash`, [L660](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L660-L660)). If equal, the Tier 1 fast-path fires ([L723-L742](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L723-L742)): the component skips all Transform create/update/delete API calls:
 
@@ -276,7 +276,7 @@ graph TB
 
 ---
 
-## 8.5 The ROI Iteration History: Center Point to IoU Threshold
+## The ROI Iteration History: Center Point to IoU Threshold
 
 The ROI (Region of Interest) detection algorithm is the submodule in ne101_camera that has undergone the **most generational replacements** — it evolved from the initial "center-point judgment" to the current "configurable threshold area-overlap judgment", each generation fixing a real user complaint. The current judgment logic lives in [`bundle.js` L365-L372`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L365-L372) (the generated code for the `detOverlapsRoi` function):
 
@@ -368,7 +368,7 @@ graph LR
 
 ---
 
-## 8.6 The IME Input Three-Iteration Saga
+## The IME Input Three-Iteration Saga
 
 6.5 covered the technical details of the IME (Input Method Editor) input freeze bug; this section reviews the three iterations from the **engineering process** perspective, extracting reusable lessons. The bug's lifecycle spanned two commits: [`44f1fa5`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/44f1fa5) (`fix(ne101_camera): input fields frozen — use local state instead of shared composingRef`) and [`b060a25`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/b060a25) (`fix(ne101_camera): React error #310 — use defaultValue instead of hooks in imeInput`).
 
@@ -408,7 +408,7 @@ function imeInput(key, value, placeholder) {
 
 ---
 
-## 8.7 Source Hygiene Recap
+## Source Hygiene Recap
 
 The `components/ne101_camera/` directory maintains the **cleanest source hygiene record** among the 6 NeoMind marketplace components. The directory has only 3 files:
 
@@ -469,7 +469,7 @@ graph TB
 
 ---
 
-## 8.8 Design Decisions Summary
+## Design Decisions Summary
 
 The 6 design decisions on this page are summarized below, each with the "choice / alternative / rationale" triad.
 

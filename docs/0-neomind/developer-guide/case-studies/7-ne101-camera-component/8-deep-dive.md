@@ -2,16 +2,16 @@
 description: "ne101_camera 深度复盘：133 commits 版本演进、Transform 生命周期调试 trace 兴衰（4 个 debug commit 最终被 00a59cc 清除）、Boa 引擎 console.log 崩溃事件、_configHash 性能优化、源码卫生复盘（3 文件零备份）"
 keywords: [ne101_camera, 深度复盘, 版本演进, debug trace, Boa 引擎, _configHash, 源码卫生]
 tags: [NeoMind, 案例]
-sidebar_label: "8. Deep Dive"
+sidebar_label: "Deep Dive"
 ---
 
-# 8 深度复盘：133 commits 的版本演进与工程复盘
+# 深度复盘：133 commits 的版本演进与工程复盘
 
 > 本节是 ne101_camera 案例的**收尾深度复盘页**，从 133 个 git commits 的历史视角回看整个组件的演进轨迹，覆盖版本演进时间轴、调试 trace 兴衰、Boa 引擎崩溃事件、`_configHash` 性能优化和源码卫生复盘。
 
 ---
 
-## 8.1 版本演进时间轴
+## 版本演进时间轴
 
 ne101_camera 的源码仓库 [`camthink-ai/NeoMind-Dashboard-Components`](https://github.com/camthink-ai/NeoMind-Dashboard-Components) 在 `components/ne101_camera/` 路径下累计了 **133 个 git commits**，跨越约 7 个主要开发阶段。这个 commit 数量在 NeoMind 市场的 6 个组件里是**绝对的第一名**——第二名的 metric_card 只有约 30 个 commits，其它 4 个组件平均在 10-20 个之间。133 这个数字背后反映的是 ne101_camera 的复杂度：它是唯一一个同时涉及实时视频流、AI 推理、多扩展契约、几何坐标变换、React hooks 生命周期、双通道数据合并的组件，每一个维度都贡献了 10-30 个 commits 的迭代量。
 
@@ -64,7 +64,7 @@ gantt
 
 ---
 
-## 8.2 Transform 生命周期调试 trace 兴衰
+## Transform 生命周期调试 trace 兴衰
 
 ne101_camera 的 Transform 三层生命周期（[5.7](./5-frontend-consume.md) 详述：Tier 1 = ID + hash 匹配 fast-path、Tier 2 = ID 存在但 hash 变化 → update、Tier 3 = 无 ID → create）是这个组件最容易出 bug 的子系统。React StrictMode 的双重挂载、配置频繁变更、并发 effect 竞争等一系列因素让 Transform 的「创建-更新-删除」状态机在实际运行时产生过十几个 bug，这些 bug 的诊断过程催生了 ne101_camera 历史上一段独特的「调试 trace 兴衰」周期。
 
@@ -137,7 +137,7 @@ React.useEffect(function () {
 
 ---
 
-## 8.3 Boa 引擎 console.log 崩溃事件
+## Boa 引擎 console.log 崩溃事件
 
 commit [`c16d803`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/c16d803)（`fix(ne101): remove console.log from Transform JS that crashes Boa engine`）是 ne101_camera 历史上最特殊的修复之一——它不是修业务逻辑，而是修一个**运行时环境差异**导致的崩溃。这个 bug 的根因在于：ne101_camera 的 Transform JS 是一份**生成的 JS 字符串**（由 `generateTransformJsCode` 拼接出来，[`bundle.js` L239-L456`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L239-L456)），这份字符串不跑在浏览器里，也不跑在 Node.js 里，而是跑在平台的 **Boa 引擎**里——一个 Rust 实现的 JS 解释器，用于沙箱化执行用户提交的 Transform 代码（防止恶意代码访问主进程）。
 
@@ -197,7 +197,7 @@ graph TB
 
 ---
 
-## 8.4 `_configHash` 性能优化
+## `_configHash` 性能优化
 
 `_configHash`（[`bundle.js` L655-L659`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L655-L659)）是 ne101_camera Transform 三层生命周期的 **Tier 1 fast-path 判据**——它是一个把所有 processing 相关 config 字段拼接成的字符串，作为「配置是否变化」的摘要。每次 React 渲染时，组件重新计算当前的 `_configHash`，与存储在 config 里的 `_storedHash`（`config._transformHash`，[L660](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L660-L660)）比对。如果两者相等，Tier 1 fast-path 触发（[L723-L742](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L723-L742)）：组件跳过 Transform 的 create/update/delete API 调用:
 
@@ -276,7 +276,7 @@ graph TB
 
 ---
 
-## 8.5 ROI 迭代史：从中心点到 IoU 阈值
+## ROI 迭代史：从中心点到 IoU 阈值
 
 ROI（Region of Interest）检测算法是 ne101_camera 经历**最多代际更替**的子模块——它从最初的「中心点判定」演化到当前的「基于面积重叠的可配置阈值判定」，每一代都修了一个真实的用户投诉。当前版本的判定逻辑在 [`bundle.js` L365-L372`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L365-L372)（`detOverlapsRoi` 函数的生成代码）:
 
@@ -368,7 +368,7 @@ graph LR
 
 ---
 
-## 8.6 IME 输入三次迭代
+## IME 输入三次迭代
 
 6.5 已经详述了 IME（输入法）输入冻结 bug 的技术细节，本节从**工程过程**的视角复盘这三次迭代，提炼出可复用的工程教训。这个 bug 的生命周期跨越两个 commit：[`44f1fa5`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/44f1fa5)（`fix(ne101_camera): input fields frozen — use local state instead of shared composingRef`）和 [`b060a25`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/b060a25)（`fix(ne101_camera): React error #310 — use defaultValue instead of hooks in imeInput`）。
 
@@ -408,7 +408,7 @@ function imeInput(key, value, placeholder) {
 
 ---
 
-## 8.7 源码卫生复盘
+## 源码卫生复盘
 
 `components/ne101_camera/` 目录至今保持着 NeoMind 市场 6 个组件中**最干净的源码卫生记录**。目录里只有 3 个文件：
 
@@ -469,7 +469,7 @@ graph TB
 
 ---
 
-## 8.8 设计决策汇总
+## 设计决策汇总
 
 本页涉及的 6 个设计决策汇总如下，每个都包含「选择 / 备选 / 理由」三段式。
 

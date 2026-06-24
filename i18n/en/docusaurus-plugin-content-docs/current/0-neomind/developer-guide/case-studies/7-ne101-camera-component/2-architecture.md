@@ -2,16 +2,16 @@
 description: "ne101_camera component architecture deep-dive: 5-layer decomposition of the 1972-line IIFE (helper / template / sub-component / main / export), 3 exported components (NE101CameraPanel / ConfigPanel / AdvancedPanel), the WebSocket-priority + REST-fallback data flow, the ROI overlay pipeline, and an architectural comparison with metric_card"
 keywords: [NeoMind, ne101_camera, IIFE architecture, React-in-IIFE, device-bound component]
 tags: [NeoMind, case study, architecture]
-sidebar_label: "2. Architecture"
+sidebar_label: "Architecture"
 ---
 
-# 2 Architecture Overview
+# Architecture Overview
 
 > This section cracks open the 1972-line hand-written IIFE [`bundle.js`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js), covering the five-layer architecture (helper / template / sub-component / main / export), the three exported components, the dual-channel data flow, and the architectural gulf versus metric_card.
 
 ---
 
-## 2.1 IIFE Top-Level Structure
+## IIFE Top-Level Structure
 
 The first line of ne101_camera's `bundle.js` is not an import — it is a contract declaration against `window`. See source:
 
@@ -82,7 +82,7 @@ Solid arrows are load/inject direction; dotted arrows are read direction. The fi
 
 ---
 
-## 2.2 Five-Layer Architecture Decomposition
+## Five-Layer Architecture Decomposition
 
 The 1972 lines of ne101_camera's IIFE can be sliced into five layers by responsibility. This section gives each layer a 2-3 sentence responsibility statement and marks key line numbers for deep links, making cross-references in later sections easier.
 
@@ -365,7 +365,7 @@ A single line: `return { default: NE101CameraPanel, NE101CameraPanel: NE101Camer
 
 ---
 
-## 2.3 Component Tree (NE101CameraPanel / ConfigPanel / AdvancedPanel)
+## Component Tree (NE101CameraPanel / ConfigPanel / AdvancedPanel)
 
 The NeoMind Dashboard contract for a "device-bound component" is: **main component + optional Display tab config panel + optional Advanced tab config panel**. ne101_camera fills all three roles, producing a three-export component tree.
 
@@ -453,7 +453,7 @@ This group of hooks reveals the three axes of ne101_camera's state machine: **th
 
 ---
 
-## 2.4 Data Flow: WebSocket Priority + REST Fallback
+## Data Flow: WebSocket Priority + REST Fallback
 
 ne101_camera's data flow is where it diverges most from metric_card. metric_card uses a `fetchData` prop for polled pulling, while ne101_camera runs a dual-channel strategy: **WebSocket push (incremental) + REST pull (full fallback)**.
 
@@ -567,7 +567,7 @@ This fix comes from commit [`e3a70be`](https://github.com/camthink-ai/NeoMind-Da
 
 ---
 
-## 2.5 Key Design Decisions (>=4, with trade-offs and alternatives)
+## Key Design Decisions (>=4, with trade-offs and alternatives)
 
 This section lists five architectural decisions that shape ne101_camera's current form. Each decision uses a three-part "we chose X / alternative Y / rationale Z" framing, plus the cost paid.
 
@@ -666,7 +666,7 @@ Source: [`bundle.js` L523-L524](https://github.com/camthink-ai/NeoMind-Dashboard
 
 ---
 
-## 2.6 Architectural Comparison with 6 metric_card
+## Architectural Comparison with 6 metric_card
 
 The table below compares ne101_camera and [6 metric_card](../6-metric-card-component.md) across six dimensions, to help readers build a mental model of the architectural gulf between "display component" and "device-bound component". For metric_card's relevant fields, see its [3.1 manifest contract](../6-metric-card-component.md).
 
@@ -711,7 +711,7 @@ Source: [manifest.json L18-L37](https://github.com/camthink-ai/NeoMind-Dashboard
 
 ---
 
-## 2.7 Summary
+## Summary
 
 This section decomposed ne101_camera's five-layer IIFE architecture, the three-export component tree, the WebSocket-priority + REST-fallback dual-channel data flow, and five key design decisions. Three core takeaways:
 

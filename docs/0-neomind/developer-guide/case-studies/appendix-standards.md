@@ -11,7 +11,7 @@ sidebar_label: Engineering Standards
 
 > 阅读顺序提示：新读者建议先浏览本附录建立全局认知，再进入具体案例。已经有经验的读者可以按需跳转。
 
-## 1. metadata.json / manifest.json Schema
+## metadata.json / manifest.json Schema
 
 NeoMind 生态有两类可发布工件——**扩展**（Rust cdylib + 可选 React 前端）与**仪表板组件**（纯 React，以 `bundle.js` 形式分发）。两类工件的元数据文件名不同：
 
@@ -20,7 +20,7 @@ NeoMind 生态有两类可发布工件——**扩展**（Rust cdylib + 可选 Re
 
 两份 schema 字段重合度很高，但**扩展独有 `builds` / `frontend` / `type`**，**组件独有 `size_constraints` / `has_*` 系列 / `default_config`**。下表合并展示，分组说明，每个字段标注来源。
 
-### 1.1 基础信息
+### 基础信息
 
 | 字段 | 类型 | 必填 | 说明 | 示例 |
 |------|------|------|------|------|
@@ -33,7 +33,7 @@ NeoMind 生态有两类可发布工件——**扩展**（Rust cdylib + 可选 Re
 | `homepage` | string (URL) | 否 | 源码或文档地址 | `"https://github.com/camthink-ai/NeoMind-Extensions/tree/main/extensions/weather-forecast-v2"` |
 | `icon` | string | 否（组件常用） | 图标标识，对应 NeoMind 图标库 | `"Camera"` |
 
-### 1.2 类型与分类
+### 类型与分类
 
 | 字段 | 类型 | 必填 | 说明 | 示例 |
 |------|------|------|------|------|
@@ -41,7 +41,7 @@ NeoMind 生态有两类可发布工件——**扩展**（Rust cdylib + 可选 Re
 | `categories` | string[] | 扩展可选 | 市场分类标签数组 | `["weather"]` |
 | `category` | string | 组件可选 | 单一分类，组件用 | `"device"` |
 
-### 1.3 构建产物（扩展独有）
+### 构建产物（扩展独有）
 
 `builds` 字段是**扩展独有**的，列出 5 个跨平台构建产物的下载 URL。每个 key 对应一个 [Rust target triple](https://doc.rust-lang.org/rustc/platform-support.html)，URL 指向 GitHub Release 资产。
 
@@ -57,9 +57,9 @@ NeoMind 生态有两类可发布工件——**扩展**（Rust cdylib + 可选 Re
 }
 ```
 
-完整的 5 个 target 说明见 [4 跨平台构建目标矩阵](#4-跨平台构建目标矩阵)。
+完整的 5 个 target 说明见 [跨平台构建目标矩阵](#跨平台构建目标矩阵)。
 
-### 1.4 前端声明（扩展独有）
+### 前端声明（扩展独有）
 
 扩展如带 React 前端，必须声明 `frontend` 对象：
 
@@ -70,7 +70,7 @@ NeoMind 生态有两类可发布工件——**扩展**（Rust cdylib + 可选 Re
 
 > 常见错误：把 `components` 写成对象数组 `[{ "name": "WeatherCard", ... }]`。市场解析器会拒绝。
 
-### 1.5 组件专用字段（manifest.json 独有）
+### 组件专用字段（manifest.json 独有）
 
 | 字段 | 类型 | 必填 | 说明 | 示例 |
 |------|------|------|------|------|
@@ -101,11 +101,11 @@ NeoMind 生态有两类可发布工件——**扩展**（Rust cdylib + 可选 Re
 }
 ```
 
-## 2. Capability 类目
+## Capability 类目
 
 NeoMind 通过**显式 capability 申请**实现扩展对平台能力的细粒度访问控制。扩展在代码中通过 `CapabilityContext::invoke_capability(name, params)` 调用平台能力；运行时会校验调用的 capability 是否在扩展声明的白名单内，未声明直接调用会 panic（非降级，强制开发者显式申请）。
 
-### 2.1 完整 Capability 枚举
+### 完整 Capability 枚举
 
 下表为 SDK `ExtensionCapability` 全部变体（来源：`neomind-extension-sdk`）：
 
@@ -127,7 +127,7 @@ NeoMind 通过**显式 capability 申请**实现扩展对平台能力的细粒�
 | `device_unregister` | 注销设备实例 | bridge 扩展清理逻辑 |
 | `Custom(String)` | 自定义 capability | 项目定制场景 |
 
-### 2.2 实际代码中的使用模式
+### 实际代码中的使用模式
 
 通过 grep 仓库源码统计，最常用的 capability 是 `device_metrics_write`（几乎所有 bridge 扩展都用来上报遥测）和 `device_register` / `device_template_register`（bridge 扩展注册外部设备到 NeoMind 设备模型）。典型调用模式：
 
@@ -149,12 +149,12 @@ let result = ctx.invoke_capability("device_template_register", &template_json);
 let result = ctx.invoke_capability("device_register", &device_json);
 ```
 
-### 2.3 同步 vs 异步调用
+### 同步 vs 异步调用
 
 - **异步上下文**（如 `execute_command`）：使用 `ctx.invoke_capability(name, params).await`
 - **同步上下文**（如 `produce_metrics` / `handle_event`）：扩展内部封装 `invoke_capability_sync()` 方法，通过 `CapabilityContext::default()` 桥接
 
-## 3. 版本号三段一致性
+## 版本号三段一致性
 
 NeoMind-Extensions 仓库有**三个层级的版本号**，发布时**必须全部一致**（除非有明确理由保持不同）：
 
@@ -165,7 +165,7 @@ NeoMind-Extensions 仓库有**三个层级的版本号**，发布时**必须全�
 | `extensions/*/Cargo.toml` → `version` | 每个扩展自身版本（影响包文件名） | `2.7.0` |
 | `extensions/*/metadata.json` → `version` | 自动从 `Cargo.toml` 读取，不手写 | `2.7.0` |
 
-### 3.1 常见错误
+### 常见错误
 
 **只更新了 `VERSION` 和 `index.json`，但忘了更新各扩展的 `Cargo.toml`**。后果：
 
@@ -174,7 +174,7 @@ NeoMind-Extensions 仓库有**三个层级的版本号**，发布时**必须全�
 - `index.json` 的 `builds` URL 指向 `2.7.0` 的资产名，但实际文件名是 `2.6.0` → 404
 - 用户体验混乱，市场无法安装
 
-### 3.2 正确流程
+### 正确流程
 
 使用 `./scripts/update-versions.sh` 一键同步：
 
@@ -186,7 +186,7 @@ NeoMind-Extensions 仓库有**三个层级的版本号**，发布时**必须全�
 ./scripts/update-versions.sh 2.7.0 --check
 ```
 
-## 4. 跨平台构建目标矩阵
+## 跨平台构建目标矩阵
 
 NeoMind 扩展支持 **5 个** target（不是 6 个，没有 `windows-aarch64`）：
 
@@ -198,7 +198,7 @@ NeoMind 扩展支持 **5 个** target（不是 6 个，没有 `windows-aarch64`�
 | `linux-aarch64` | `aarch64-unknown-linux-gnu` | `.so` | ARM Linux（树莓派 4/5、ARM 服务器） |
 | `windows-x86_64` | `x86_64-pc-windows-msvc` | `.dll` | Windows 10/11 |
 
-### 4.1 构建命令
+### 构建命令
 
 ```bash
 # 一次性构建全部 5 个 target 的 .nep 包
@@ -210,7 +210,7 @@ NeoMind 扩展支持 **5 个** target（不是 6 个，没有 `windows-aarch64`�
 
 `build.sh` 内部使用 [cross](https://github.com/cross-rs/cross)（基于 Docker）或本地工具链交叉编译。开发者本地如已安装对应 target 的 Rust 工具链，可跳过 Docker 直接编译。
 
-### 4.2 .nep 包结构
+### .nep 包结构
 
 ```
 weather-forecast-v2-2.7.6-darwin_aarch64.nep   (ZIP 格式)
@@ -224,11 +224,11 @@ weather-forecast-v2-2.7.6-darwin_aarch64.nep   (ZIP 格式)
     └── model.onnx
 ```
 
-## 5. 测试覆盖率与质量要求
+## 测试覆盖率与质量要求
 
 NeoMind 生态对测试有明确要求，**不达标的扩展不予发布**。
 
-### 5.1 扩展测试（Rust）
+### 扩展测试（Rust）
 
 | 测试类型 | 位置 | 要求 | 参考 |
 |---------|------|------|------|
@@ -254,7 +254,7 @@ mod tests {
 }
 ```
 
-### 5.2 组件测试（JavaScript）
+### 组件测试（JavaScript）
 
 NeoMind-Dashboard-Components 采用手写 IIFE 作为分发格式，测试通过 mock `window` 全局验证 IIFE 导出：
 
@@ -283,13 +283,13 @@ if (typeof Component !== 'function') {
 console.log('✓ bundle.js 导出测试通过');
 ```
 
-### 5.3 CI 要求
+### CI 要求
 
 - 扩展仓库：`cargo test --workspace` 全绿才能发布
 - 组件仓库：每个组件的 `test_bundle.js` 必须通过 `node` 执行
 - 两个仓库都有 GitHub Actions 在 PR 时自动运行测试
 
-## 6. 发布 Checklist
+## 发布 Checklist
 
 发布新版本前**必须逐项确认**：
 
@@ -303,7 +303,7 @@ console.log('✓ bundle.js 导出测试通过');
 - [ ] GitHub Release 创建，5 个 `.nep` 上传到 release assets
 - [ ] 案例集 `0-overview.md` 的 [版本对齐表](./0-overview.md#版本对齐表) audit 日期更新
 
-### 6.1 完整发布流程
+### 完整发布流程
 
 ```bash
 VERSION=2.7.0
@@ -329,11 +329,11 @@ git push origin main --tags
 gh release create v$VERSION ./dist/*.nep --title "v$VERSION"
 ```
 
-## 7. 安全要求
+## 安全要求
 
 NeoMind 对扩展和组件的安全有严格约束，违反任意一条都会被代码审查拒绝。
 
-### 7.1 unsafe Rust
+### unsafe Rust
 
 - **尽量避免** `unsafe` 块
 - 若必须使用（如 FFI 绑定、性能关键路径），需在 PR 描述中明确说明：
@@ -341,7 +341,7 @@ NeoMind 对扩展和组件的安全有严格约束，违反任意一条都会被
   - 如何保证内存安全
   - 是否有 safe wrapper
 
-### 7.2 Capability 显式申请
+### Capability 显式申请
 
 扩展在 `metadata.json` 中声明所需 capability，运行时强制校验：
 
@@ -349,7 +349,7 @@ NeoMind 对扩展和组件的安全有严格约束，违反任意一条都会被
 - 这是有意设计：强制开发者显式申请权限，避免「静默失败」
 - 桥接类扩展启动时需要 `device_template_register` + `device_register` + `device_metrics_write` 三个 capability
 
-### 7.3 进程隔离
+### 进程隔离
 
 所有扩展运行在**独立进程**中：
 
@@ -378,7 +378,7 @@ NeoMind 对扩展和组件的安全有严格约束，违反任意一条都会被
 - **资源限制**：可对单扩展限制 CPU / 内存
 - **独立生命周期**：扩展可单独重启
 
-### 7.4 前端组件沙箱
+### 前端组件沙箱
 
 Dashboard 组件的 `bundle.js` 通过 `window` 注入运行时依赖，**不直接访问**：
 
@@ -395,7 +395,7 @@ var jsxs = window.jsxRuntime.jsxs;
 
 这保证了组件可在任何 Host 环境运行（Tauri 桌面端、Web 浏览器、嵌入式 WebView），由 Host 决定暴露哪些能力。
 
-### 7.5 Panic 配置
+### Panic 配置
 
 扩展的 `Cargo.toml` **必须**设置：
 

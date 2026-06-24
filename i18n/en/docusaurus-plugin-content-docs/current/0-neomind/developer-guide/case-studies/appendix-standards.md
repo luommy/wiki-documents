@@ -11,7 +11,7 @@ This appendix is the **centralized reference** for the engineering standards tha
 
 > Reading order tip: new readers should skim this appendix first to build global mental model, then dive into specific cases. Experienced readers can jump in as needed.
 
-## 1. metadata.json / manifest.json Schema
+## metadata.json / manifest.json Schema
 
 The NeoMind ecosystem has two types of publishable artifacts — **extensions** (Rust cdylib + optional React frontend) and **dashboard components** (pure React, distributed as `bundle.js`). The two metadata filenames differ:
 
@@ -20,7 +20,7 @@ The NeoMind ecosystem has two types of publishable artifacts — **extensions** 
 
 The two schemas overlap heavily, but **extensions uniquely have `builds` / `frontend` / `type`** and **components uniquely have `size_constraints` / `has_*` family / `default_config`**. The tables below merge them, grouped by purpose, with each field annotated by source.
 
-### 1.1 Basic Information
+### Basic Information
 
 | Field | Type | Required | Description | Example |
 |-------|------|----------|-------------|---------|
@@ -33,7 +33,7 @@ The two schemas overlap heavily, but **extensions uniquely have `builds` / `fron
 | `homepage` | string (URL) | no | Source code or documentation URL | `"https://github.com/camthink-ai/NeoMind-Extensions/tree/main/extensions/weather-forecast-v2"` |
 | `icon` | string | no (common in components) | Icon identifier, maps to NeoMind icon library | `"Camera"` |
 
-### 1.2 Type & Categorization
+### Type & Categorization
 
 | Field | Type | Required | Description | Example |
 |-------|------|----------|-------------|---------|
@@ -41,7 +41,7 @@ The two schemas overlap heavily, but **extensions uniquely have `builds` / `fron
 | `categories` | string[] | ext optional | Marketplace category tags array | `["weather"]` |
 | `category` | string | component optional | Single category, used by components | `"device"` |
 
-### 1.3 Build Artifacts (Extension-only)
+### Build Artifacts (Extension-only)
 
 The `builds` field is **extension-only** and lists download URLs for 5 cross-platform build artifacts. Each key corresponds to a [Rust target triple](https://doc.rust-lang.org/rustc/platform-support.html), and the URL points to a GitHub Release asset.
 
@@ -57,9 +57,9 @@ The `builds` field is **extension-only** and lists download URLs for 5 cross-pla
 }
 ```
 
-The full list of 5 targets is described in [4 Cross-Platform Build Target Matrix](#4-cross-platform-build-target-matrix).
+The full list of 5 targets is described in [Cross-Platform Build Target Matrix](#cross-platform-build-target-matrix).
 
-### 1.4 Frontend Declaration (Extension-only)
+### Frontend Declaration (Extension-only)
 
 Extensions with React frontend must declare the `frontend` object:
 
@@ -70,7 +70,7 @@ Extensions with React frontend must declare the `frontend` object:
 
 > Common mistake: writing `components` as an object array `[{ "name": "WeatherCard", ... }]`. The marketplace parser will reject it.
 
-### 1.5 Component-only Fields (manifest.json exclusive)
+### Component-only Fields (manifest.json exclusive)
 
 | Field | Type | Required | Description | Example |
 |-------|------|----------|-------------|---------|
@@ -101,11 +101,11 @@ Extensions with React frontend must declare the `frontend` object:
 }
 ```
 
-## 2. Capability Categories
+## Capability Categories
 
 NeoMind implements fine-grained access control for extensions to platform features through **explicit capability declaration**. Extensions call platform capabilities via `CapabilityContext::invoke_capability(name, params)` in code; the runtime validates whether the called capability is within the extension's declared whitelist — undeclared direct calls will panic (not degrade gracefully, forcing developers to explicitly request permissions).
 
-### 2.1 Complete Capability Enumeration
+### Complete Capability Enumeration
 
 The table below lists all variants of SDK `ExtensionCapability` (source: `neomind-extension-sdk`):
 
@@ -127,7 +127,7 @@ The table below lists all variants of SDK `ExtensionCapability` (source: `neomin
 | `device_unregister` | Unregister device instances | Bridge extension cleanup logic |
 | `Custom(String)` | Custom capability | Project-specific scenarios |
 
-### 2.2 Real-world Usage Patterns
+### Real-world Usage Patterns
 
 Based on grepping the repository source code, the most commonly used capabilities are `device_metrics_write` (used by nearly all bridge extensions to report telemetry) and `device_register` / `device_template_register` (bridge extensions registering external devices into the NeoMind device model). Typical invocation pattern:
 
@@ -149,12 +149,12 @@ let result = ctx.invoke_capability("device_template_register", &template_json);
 let result = ctx.invoke_capability("device_register", &device_json);
 ```
 
-### 2.3 Sync vs Async Invocation
+### Sync vs Async Invocation
 
 - **Async context** (e.g., `execute_command`): use `ctx.invoke_capability(name, params).await`
 - **Sync context** (e.g., `produce_metrics` / `handle_event`): extensions internally wrap an `invoke_capability_sync()` method, bridged via `CapabilityContext::default()`
 
-## 3. Three-Segment Version Consistency
+## Three-Segment Version Consistency
 
 The NeoMind-Extensions repository has **three tiers of version numbers** that **must all agree** at release time (unless there is an explicit reason to differ):
 
@@ -165,7 +165,7 @@ The NeoMind-Extensions repository has **three tiers of version numbers** that **
 | `extensions/*/Cargo.toml` → `version` | Per-extension version (affects package filename) | `2.7.0` |
 | `extensions/*/metadata.json` → `version` | Auto-read from `Cargo.toml`, never hand-written | `2.7.0` |
 
-### 3.1 Common Mistake
+### Common Mistake
 
 **Only updating `VERSION` and `index.json`, but forgetting to update each extension's `Cargo.toml`.** Consequences:
 
@@ -174,7 +174,7 @@ The NeoMind-Extensions repository has **three tiers of version numbers** that **
 - `index.json` `builds` URLs point to `2.7.0` asset names, but actual filenames are `2.6.0` → 404
 - User experience confusion, marketplace install failure
 
-### 3.2 Correct Workflow
+### Correct Workflow
 
 Use `./scripts/update-versions.sh` to sync in one step:
 
@@ -186,7 +186,7 @@ Use `./scripts/update-versions.sh` to sync in one step:
 ./scripts/update-versions.sh 2.7.0 --check
 ```
 
-## 4. Cross-Platform Build Target Matrix
+## Cross-Platform Build Target Matrix
 
 NeoMind extensions support **5** targets (not 6 — there is no `windows-aarch64`):
 
@@ -198,7 +198,7 @@ NeoMind extensions support **5** targets (not 6 — there is no `windows-aarch64
 | `linux-aarch64` | `aarch64-unknown-linux-gnu` | `.so` | ARM Linux (Raspberry Pi 4/5, ARM servers) |
 | `windows-x86_64` | `x86_64-pc-windows-msvc` | `.dll` | Windows 10/11 |
 
-### 4.1 Build Command
+### Build Command
 
 ```bash
 # Build .nep packages for all 5 targets in one shot
@@ -210,7 +210,7 @@ NeoMind extensions support **5** targets (not 6 — there is no `windows-aarch64
 
 `build.sh` internally uses [cross](https://github.com/cross-rs/cross) (Docker-based) or the local toolchain for cross-compilation. Developers who have the corresponding Rust target toolchains installed locally can skip Docker and compile directly.
 
-### 4.2 .nep Package Structure
+### .nep Package Structure
 
 ```
 weather-forecast-v2-2.7.6-darwin_aarch64.nep   (ZIP format)
@@ -224,11 +224,11 @@ weather-forecast-v2-2.7.6-darwin_aarch64.nep   (ZIP format)
     └── model.onnx
 ```
 
-## 5. Test Coverage & Quality Requirements
+## Test Coverage & Quality Requirements
 
 The NeoMind ecosystem has explicit testing requirements — **extensions that fail are not released**.
 
-### 5.1 Extension Tests (Rust)
+### Extension Tests (Rust)
 
 | Test Type | Location | Requirement | Reference |
 |-----------|----------|-------------|-----------|
@@ -254,7 +254,7 @@ mod tests {
 }
 ```
 
-### 5.2 Component Tests (JavaScript)
+### Component Tests (JavaScript)
 
 NeoMind-Dashboard-Components uses hand-written IIFE as the distribution format; tests verify the IIFE export by mocking the `window` global:
 
@@ -283,13 +283,13 @@ if (typeof Component !== 'function') {
 console.log('✓ bundle.js export test passed');
 ```
 
-### 5.3 CI Requirements
+### CI Requirements
 
 - Extensions repo: `cargo test --workspace` must be green to release
 - Components repo: every component's `test_bundle.js` must pass when run with `node`
 - Both repos have GitHub Actions that automatically run tests on PRs
 
-## 6. Release Checklist
+## Release Checklist
 
 Before releasing a new version, **confirm each item**:
 
@@ -303,7 +303,7 @@ Before releasing a new version, **confirm each item**:
 - [ ] GitHub Release created, 5 `.nep` files uploaded to release assets
 - [ ] Case studies `0-overview.md` [version alignment table](./0-overview.md#version-alignment-table) audit date updated
 
-### 6.1 Full Release Workflow
+### Full Release Workflow
 
 ```bash
 VERSION=2.7.0
@@ -329,11 +329,11 @@ git push origin main --tags
 gh release create v$VERSION ./dist/*.nep --title "v$VERSION"
 ```
 
-## 7. Security Requirements
+## Security Requirements
 
 NeoMind enforces strict security constraints on extensions and components. Violating any item will be rejected in code review.
 
-### 7.1 unsafe Rust
+### unsafe Rust
 
 - **Avoid** `unsafe` blocks whenever possible
 - If unavoidable (e.g., FFI bindings, performance-critical paths), the PR description must explicitly state:
@@ -341,7 +341,7 @@ NeoMind enforces strict security constraints on extensions and components. Viola
   - How memory safety is guaranteed
   - Whether a safe wrapper is provided
 
-### 7.2 Explicit Capability Declaration
+### Explicit Capability Declaration
 
 Extensions declare required capabilities in `metadata.json`; runtime enforces validation:
 
@@ -349,7 +349,7 @@ Extensions declare required capabilities in `metadata.json`; runtime enforces va
 - This is intentional: forces developers to explicitly request permissions, avoiding "silent failure"
 - Bridge extensions need `device_template_register` + `device_register` + `device_metrics_write` at startup
 
-### 7.3 Process Isolation
+### Process Isolation
 
 All extensions run in **separate processes**:
 
@@ -379,7 +379,7 @@ Benefits:
 - **Resource limits**: CPU / memory can be capped per extension
 - **Independent lifecycle**: extensions can be restarted individually
 
-### 7.4 Frontend Component Sandbox
+### Frontend Component Sandbox
 
 A dashboard component's `bundle.js` gets runtime dependencies injected via `window` and **does not directly access**:
 
@@ -396,7 +396,7 @@ var jsxs = window.jsxRuntime.jsxs;
 
 This ensures components can run on any Host environment (Tauri desktop, web browser, embedded WebView), with the Host deciding which capabilities to expose.
 
-### 7.5 Panic Configuration
+### Panic Configuration
 
 Extension `Cargo.toml` **must** set:
 

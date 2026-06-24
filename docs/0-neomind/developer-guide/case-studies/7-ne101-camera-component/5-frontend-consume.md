@@ -2,16 +2,16 @@
 description: "ne101_camera 前端消费：detections 拉取、JSON string 解析、按类别上色（golden-angle HSV）、SVG 叠加渲染（polygon + rect fallback）、object-cover 坐标变换、ResizeObserver 回调 ref 模式、Transform 三级生命周期"
 keywords: [ne101_camera, 前端渲染, classColor, golden-angle, ResizeObserver, object-cover, SVG overlay]
 tags: [NeoMind, 案例, MVP]
-sidebar_label: "5. Frontend Consume"
+sidebar_label: "Frontend Consume"
 ---
 
-# 5 前端消费：从 detections 到 SVG 叠加的渲染全链路
+# 前端消费：从 detections 到 SVG 叠加的渲染全链路
 
 > 本节是 ne101_camera MVP 阶段的**前端渲染参考页**，覆盖 effect-driven 渲染管线、按类别上色（golden-angle HSV）、SVG 叠加渲染、object-cover 坐标变换以及 ResizeObserver callback ref 模式。
 
 ---
 
-## 5.1 渲染管线总览
+## 渲染管线总览
 
 ne101_camera 的渲染不是一次性的 JSX 模板，而是一条由多个 effect 驱动的**状态管线**。这条管线的起点是平台注入的 props（`device` / `deviceImageSrc` / `virtualMetrics` / `config` / `onConfigChange`），终点是挂载在媒体 `<div>` 上的 SVG 叠加层。中间穿过五个状态节点：
 
@@ -68,7 +68,7 @@ Source: [`bundle.js` L704-L714](https://github.com/camthink-ai/NeoMind-Dashboard
 
 ---
 
-## 5.2 按类别上色：Golden-Angle HSV
+## 按类别上色：Golden-Angle HSV
 
 检测框的颜色不是固定的，而是由类别标签（`det.label`）决定的。commit [`c276c23`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/c276c23)（`feat(ne101): per-class detection colors via golden-angle HSV rotation`）引入了 `classColor(label)` 函数，位于 [`bundle.js` L55-L72](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L55-L72)。这个函数做了三件事：
 
@@ -110,7 +110,7 @@ Source: [`bundle.js` L55-L72](https://github.com/camthink-ai/NeoMind-Dashboard-C
 
 ---
 
-## 5.3 SVG 叠加渲染：Polygon + Rect Fallback
+## SVG 叠加渲染：Polygon + Rect Fallback
 
 检测框的渲染不是画在 Canvas 上，而是用一层 SVG 叠加在 `<img>` 之上。这层 SVG 的渲染逻辑在 [`bundle.js` L1210-L1272](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1210-L1272)，核心是一个 `detections.map(...)` 调用，每个 detection 生成一个 `<g>` 元素，内含形状（polygon 或 rect）+ 标签文字。
 
@@ -182,7 +182,7 @@ commit [`b746c02`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/c
 
 ---
 
-## 5.4 object-cover 坐标变换
+## object-cover 坐标变换
 
 检测框的坐标是**归一化到图像空间的**（0-1 表示相对于原始图像宽高的比例），但图像在 DOM 里是用 `object-cover` 渲染的——图像会被缩放以完全覆盖容器，多余的部分被裁剪。这意味着图像的可见区域只是原始图像的一个子集，检测框坐标必须经过一个变换才能正确叠加在可见区域上。这个变换就是 `ovTf`，计算逻辑在 [`bundle.js` L879-L899](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L879-L899)。
 
@@ -265,7 +265,7 @@ graph LR
 
 ---
 
-## 5.5 ResizeObserver 回调 Ref 模式
+## ResizeObserver 回调 Ref 模式
 
 `ovTf` 的计算依赖两个状态：图像原始尺寸（`imgNatState`）和容器尺寸（`ctrSizeState`）。图像尺寸通过 `<img onLoad>` 回调写入（[L1165-L1168](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1165-L1168)）：
 
@@ -345,7 +345,7 @@ commit [`7c92a19`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/c
 
 ---
 
-## 5.6 检测摘要徽章
+## 检测摘要徽章
 
 图像底部的叠加栏（[`bundle.js` L1067-L1145](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L1067-L1145)）渲染一组检测摘要徽章，让用户在不看检测框细节的情况下也能快速掌握「这一帧检测到了什么」。这组徽章的设计原则是 **metric-driven**——数据来源是 Transform 已经计算好的 virtual 指标，而不是在组件里重新从 detections 数组聚合。
 
@@ -405,7 +405,7 @@ Source: [`bundle.js` L1067-L1145](https://github.com/camthink-ai/NeoMind-Dashboa
 
 ---
 
-## 5.7 Transform 三级生命周期
+## Transform 三级生命周期
 
 Transform 的 create/update/delete 逻辑在 [`bundle.js` L661-L824](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L661-L824)，是一个 `React.useEffect`，依赖数组是 `[device.id, processingEnabled, _configHash, _storedTid, _storedHash]`（L824）。这个 effect 内部按三级分发：
 
@@ -516,7 +516,7 @@ stateDiagram-v2
 
 ---
 
-## 5.8 设计决策汇总
+## 设计决策汇总
 
 本页涉及的 6 个设计决策汇总如下，每个都包含「选择 / 备选 / 理由」三段式。
 

@@ -2,16 +2,16 @@
 description: "ne101_camera 扩展侧契约：processingExtensionId 通用 AI 处理范式、AI_EXT_IDS 白名单、EXT_MODES 模式目录（imageArg/responseType/command 三元组）、__imageData 注入机制、locate-anything-v2 NMS 阈值特例、扩展降级 fallback"
 keywords: [ne101_camera, processingExtensionId, 扩展契约, EXT_MODES, imageArg, responseType, locate-anything-v2]
 tags: [NeoMind, 案例]
-sidebar_label: "3. Extension Side"
+sidebar_label: "Extension Side"
 ---
 
-# 3 扩展侧：processingExtensionId 通用 AI 处理契约
+# 扩展侧：processingExtensionId 通用 AI 处理契约
 
 > 本节是 ne101_camera 案例的**扩展侧契约参考页**，覆盖 `processingExtensionId` 通用 AI 处理契约：白名单校验（`AI_EXT_IDS`）、模式映射（`EXT_MODES`）、`__imageData` 注入机制和降级策略。
 
 ---
 
-## 3.1 processingExtensionId 通用契约
+## processingExtensionId 通用契约
 
 ne101_camera 组件最容易被误解的一点是：它看起来在做「AI 物体检测」，但翻遍 1972 行 `bundle.js`，你找不到一行 YOLO 推理、一行 ONNX runtime、一行模型权重加载。组件本身**不做任何 AI**。所有 AI 推理都被外包给了用户通过 `processingExtensionId` 配置字段指定的扩展。这个字段位于 [`manifest.json` L23-L24](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L23-L24) 的 `default_config` 块里：
 
@@ -60,7 +60,7 @@ graph LR
 
 ---
 
-## 3.2 AI_EXT_IDS 白名单
+## AI_EXT_IDS 白名单
 
 平台上有许多扩展（天气、ONVIF 桥接、各种 AI 推理），但 ne101_camera 只关心**能消费图像输入并返回检测结果**的 AI 扩展。组件用一个硬编码的白名单来过滤，定义在 [`bundle.js` L144](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L144-L144)：
 
@@ -99,7 +99,7 @@ for (var i = 0; i < arr.length; i++) {
 
 ---
 
-## 3.3 EXT_MODES 模式目录
+## EXT_MODES 模式目录
 
 每个扩展不只有一种调用方式——`locate-anything-v2` 既能做按类别的目标检测，也能做按自由文本的 grounding，还能做 OCR。组件用一个**模式目录** `EXT_MODES` 来描述「这个扩展支持哪几种调用模式，每种模式的参数和响应格式是什么」。这个目录位于 [`bundle.js` L154-L171](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L154-L171)，结构是一个以扩展 ID 为键的对象，值是该扩展支持的模式数组。每个模式是一个对象，包含 `id` / `command` / `imageArg` / `responseType` / `label` / `desc` / `icon` / `args` 八个字段。
 
@@ -159,7 +159,7 @@ for (var i = 0; i < arr.length; i++) {
 
 ---
 
-## 3.4 imageArg 与 responseType 三元组
+## imageArg 与 responseType 三元组
 
 每个模式对象里最关键的两个字段是 `imageArg` 和 `responseType`——它们定义了组件与扩展之间的**接口契约**。`imageArg` 描述「组件用什么参数名把图像传给扩展」，`responseType` 描述「扩展返回什么形状的数据」。这两个字段的含义在源码注释里写得很清楚，位于 [`bundle.js` L146-L153](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L146-L153)：
 
@@ -272,7 +272,7 @@ graph LR
 
 ---
 
-## 3.5 locate-anything-v2 的 NMS 阈值特例
+## locate-anything-v2 的 NMS 阈值特例
 
 在所有扩展里，`locate-anything-v2` 享受一个特殊待遇：组件在生成调用代码时，会额外给它透传一个 `nms_iou_threshold: 0.5` 参数。这个特例由 commit [`8656148`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/8656148)（`feat(ne101): pass NMS IoU threshold 0.5 to locate-anything-v2`）引入，代码位于 [`bundle.js` L281-L282](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L281-L282)：
 
@@ -297,7 +297,7 @@ if (extensionId === 'locate-anything-v2') L.push(',  nms_iou_threshold: 0.5');
 
 ---
 
-## 3.6 __imageData 注入机制
+## __imageData 注入机制
 
 Transform 生成的代码在主控沙箱里执行时，需要拿到设备的最新抓拍图像作为 AI 推理的输入。这个图像的获取方式是整个扩展侧契约里最精妙的部分——组件**不自己在 Transform 代码里拉图像**，而是依赖平台在执行 Transform 时**注入**一个名为 `__imageData` 的变量。查看生成的 Transform 代码起始处，[`bundle.js` L266-L272](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L266-L272)：
 
@@ -340,7 +340,7 @@ var H = (imageMeta && imageMeta.height) || 1;
 
 ---
 
-## 3.7 扩展降级 Fallback
+## 扩展降级 Fallback
 
 NeoMind 的 AI 扩展生态会持续增长——未来可能出现「分割扩展」「姿态估计扩展」「深度估计扩展」。ne101_camera 的 `EXT_MODES` 目录（3.3）只列了当前已知的 4 个扩展，那如果用户安装了一个 `EXT_MODES` 里没有的新扩展，会发生什么？答案是：**宽容降级**，而不是报错拒绝。这个回退逻辑在 [`bundle.js` L181-L193](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L181-L193) 的 `getExtMode()` 函数里：
 
@@ -386,7 +386,7 @@ function getExtMode(extensionId, templateName) {
 
 ---
 
-## 3.8 设计决策汇总
+## 设计决策汇总
 
 本页涉及的 7 个设计决策汇总如下，每个都包含「选择 / 备选 / 理由」三段式。这些决策有一个共同主题：**在「组件 ↔ 扩展」契约的模糊地带选择宽容和适配，而不是严格和强制**——组件不要求扩展遵循统一 API，而是通过模式目录（`EXT_MODES`）和参数归一化（`imageArg`）去适配每个扩展的既有约定；面对未知扩展选择默认回退而非报错拒绝；面对专家级参数（NMS 阈值）选择硬编码安全默认而非暴露给用户。
 

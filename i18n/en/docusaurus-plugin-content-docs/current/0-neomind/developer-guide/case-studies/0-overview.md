@@ -21,7 +21,7 @@ This series is distinct from the [Extension API reference](../7-extension-develo
 | 6 | metric_card | Dashboard component | Beginner | ~400 LOC | Component template (value card + threshold / trend / unit) |
 | 7 | ne101_camera | Extension + component interop | Flagship | ~2500-3500 LOC (8 sub-pages) | End-to-end deep tutorial |
 
-## 4 Reading Paths
+## Reading Paths
 
 Pick the shortest path for your role and goal:
 

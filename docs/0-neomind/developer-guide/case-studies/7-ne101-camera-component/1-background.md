@@ -2,16 +2,16 @@
 description: "CamThink NE101 感知摄像头的产品能力、为什么需要专门组件、在 NeoMind 生态中的设备绑定定位、与 metric_card 的递进关系"
 keywords: [NeoMind, NE101, CamThink, 设备绑定, business background]
 tags: [NeoMind, 案例, 业务背景]
-sidebar_label: "1. Background"
+sidebar_label: "Background"
 ---
 
-# 1 业务背景：为什么 NeoMind 需要 ne101_camera 组件
+# 业务背景：为什么 NeoMind 需要 ne101_camera 组件
 
 > 本节回答三个问题：**NE101 是什么硬件**、**为什么不能用通用 metric_card 凑合**、**ne101_camera 在 NeoMind 生态中处于什么位置**——覆盖硬件能力、组件定位和 manifest 设备绑定签名。
 
 ---
 
-## 1.1 NE101 设备：CamThink 感知摄像头
+## NE101 设备：CamThink 感知摄像头
 
 **CamThink NE101** 是一款电池供电的边缘 AI 感知摄像头，由 CamThink 团队（也是 NeoMind Dashboard 的维护方）设计。它的核心能力是「按需抓拍 + 边缘指标上报」：不像传统 IPC 摄像头持续推流，NE101 大部分时间处于低功耗休眠状态，只有在特定触发条件下才醒来抓拍一张 JPEG 静图（定时唤醒或外部系统通过 MQTT 下发指令）。
 
@@ -34,7 +34,7 @@ NE101 设备本身的抓拍触发由设备固件管理（定时器或外部 MQTT
 
 ---
 
-## 1.2 为什么不能拿 metric_card 凑合
+## 为什么不能拿 metric_card 凑合
 
 读者第一反应可能是：「NE101 不就是上报电池、信号、温度几个数值吗？拿 [6 metric_card](../6-metric-card-component.md) 绑个数据源不就行了？」答案是不行，原因有三：
 
@@ -48,7 +48,7 @@ NE101 设备本身的抓拍触发由设备固件管理（定时器或外部 MQTT
 
 ---
 
-## 1.3 在 NeoMind 生态中的定位：设备绑定组件
+## 在 NeoMind 生态中的定位：设备绑定组件
 
 NeoMind 组件市场按 `category` 字段分四大类：`display`（显示型，如 metric_card）、`device`（设备绑定型，如 ne101_camera）、`extension`（扩展驱动型）、`bridge`（协议桥接型，如 onvif-bridge）。ne101_camera 是 `device` 类型的旗舰样本，也是当前组件市场唯一一个 `device` 类型的组件。
 
@@ -103,7 +103,7 @@ graph TB
 
 ---
 
-## 1.4 manifest.json 关键字段深度分析
+## manifest.json 关键字段深度分析
 
 ne101_camera 的 manifest 只有 40 行，但信息密度极高。除了 1.3 讲的两个绑定字段，还有三个字段是本案例的核心创新点，后续章节会反复引用：
 
@@ -117,7 +117,7 @@ ne101_camera 的 manifest 只有 40 行，但信息密度极高。除了 1.3 讲
 
 ---
 
-## 1.5 组件出现之前的用户痛点
+## 组件出现之前的用户痛点
 
 在 ne101_camera 组件被开发出来之前，用户要在 NeoMind 上监控一台 NE101 摄像头需要「拼装」至少三个组件 + 手动 REST 调用：
 
@@ -144,7 +144,7 @@ ne101_camera 的 manifest 只有 40 行，但信息密度极高。除了 1.3 讲
 
 ---
 
-## 1.6 关键设计决策（含备选方案）
+## 关键设计决策（含备选方案）
 
 本节列出 4 个关键设计决策及其被否决的备选方案。这些决策塑造了 ne101_camera 现在的形态，理解它们有助于你在二次开发时避免走弯路。
 
@@ -199,7 +199,7 @@ ne101_camera 的 manifest 只有 40 行，但信息密度极高。除了 1.3 讲
 
 ---
 
-## 1.7 端到端数据流
+## 端到端数据流
 
 下图展示从 NE101 设备抓拍到用户看到带检测框图像的完整链路。这条链路涉及 5 个角色：NE101 设备、MQTT Broker、NeoMind 主控、AI 扩展、ne101_camera 组件。
 
@@ -236,7 +236,7 @@ sequenceDiagram
 
 ---
 
-## 1.8 目标读者
+## 目标读者
 
 本案例面向两类读者：
 
@@ -248,7 +248,7 @@ sequenceDiagram
 
 ---
 
-## 1.9 后续章节预告
+## 后续章节预告
 
 - **2 架构总览（v1.1）**：拆解 1972 行 IIFE 的模块分层，画出组件树和数据流图。
 - **3 扩展侧（v1.1）**：深入 `processingExtensionId` 契约，讲解扩展如何消费图像、如何回写检测结果。
@@ -260,7 +260,7 @@ sequenceDiagram
 
 ---
 
-## 1.10 关键 commit 索引
+## 关键 commit 索引
 
 本案例后续章节会引用以下 commit，这里统一列出方便查阅。完整的 commit 历史可以用 `git log --oneline -- components/ne101_camera/` 在 [源码仓库](https://github.com/camthink-ai/NeoMind-Dashboard-Components) 查看。
 

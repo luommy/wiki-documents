@@ -2,16 +2,16 @@
 description: "CamThink NE101 sensing camera product capabilities, why a dedicated component is needed, its device-bound positioning in the NeoMind ecosystem, and the progression from metric_card"
 keywords: [NeoMind, NE101, CamThink, device binding, business background]
 tags: [NeoMind, case, business background]
-sidebar_label: "1. Business Background"
+sidebar_label: "Business Background"
 ---
 
-# 1 Business Background: Why NeoMind Needs the ne101_camera Component
+# Business Background: Why NeoMind Needs the ne101_camera Component
 
 > This section answers three questions: **what is the NE101 hardware**, **why the generic metric_card cannot do the job**, and **where ne101_camera sits in the NeoMind ecosystem** — covering hardware capabilities, component positioning, and the manifest device-binding signature.
 
 ---
 
-## 1.1 The NE101 Device: CamThink Sensing Camera
+## The NE101 Device: CamThink Sensing Camera
 
 **CamThink NE101** is a battery-powered edge-AI sensing camera designed by the CamThink team (which also maintains the NeoMind Dashboard). Its core capability is "on-demand capture + edge metric reporting": unlike a traditional IPC camera that streams continuously, NE101 spends most of its time in low-power sleep and wakes up to capture a single JPEG still only under specific trigger conditions (scheduled wake-up or external commands via MQTT).
 
@@ -34,7 +34,7 @@ The NE101 device's capture triggering is managed by the device firmware (built-i
 
 ---
 
-## 1.2 Why metric_card Cannot Fill In
+## Why metric_card Cannot Fill In
 
 A natural first reaction is: "NE101 just reports battery, signal, and temperature numbers — can't I bind a data source to [6 metric_card](../6-metric-card-component.md) and be done?" The answer is no, for three reasons:
 
@@ -48,7 +48,7 @@ In short, NE101 needs a **dedicated device-bound component** that bundles "image
 
 ---
 
-## 1.3 Position in the NeoMind Ecosystem: A Device-Bound Component
+## Position in the NeoMind Ecosystem: A Device-Bound Component
 
 The NeoMind component marketplace has four `category` values: `display` (e.g. metric_card), `device` (e.g. ne101_camera), `extension` (extension drivers), and `bridge` (protocol bridges like onvif-bridge). ne101_camera is the flagship sample of the `device` category and currently the only `device`-category component in the marketplace.
 
@@ -103,7 +103,7 @@ The dashed arrow is the most important cross-category relationship in this case:
 
 ---
 
-## 1.4 Deep Analysis of Key manifest.json Fields
+## Deep Analysis of Key manifest.json Fields
 
 ne101_camera's manifest is only 40 lines but extremely dense. Beyond the two binding fields covered in 1.3, three fields are the core innovations of this case and will be referenced repeatedly in later sections:
 
@@ -117,7 +117,7 @@ This contract means ne101_camera is not hard-wired to any specific AI capability
 
 ---
 
-## 1.5 User Pain Points Before the Component Existed
+## User Pain Points Before the Component Existed
 
 Before ne101_camera was built, monitoring an NE101 camera on NeoMind required "assembling" at least three components plus manual REST calls:
 
@@ -144,7 +144,7 @@ This contrast also explains why ne101_camera's `bundle.js` is 1972 lines while m
 
 ---
 
-## 1.6 Key Design Decisions (with Alternatives)
+## Key Design Decisions (with Alternatives)
 
 This section lists 4 key design decisions and the alternatives that were rejected. These decisions shaped ne101_camera into its current form; understanding them helps you avoid detours when forking the component.
 
@@ -196,7 +196,7 @@ These four decisions share a common theme: **push complexity to the edges and ke
 
 ---
 
-## 1.7 End-to-End Data Flow
+## End-to-End Data Flow
 
 The diagram below shows the complete chain from NE101 device capture to the user seeing an annotated image. This chain involves five roles: the NE101 device, the MQTT broker, the NeoMind controller, the AI extension, and the ne101_camera component.
 
@@ -233,7 +233,7 @@ sequenceDiagram
 
 ---
 
-## 1.8 Target Readers
+## Target Readers
 
 This case targets two audiences:
 
@@ -245,7 +245,7 @@ Both audiences should first read 1-3 of the [6 metric_card](../6-metric-card-com
 
 ---
 
-## 1.9 What Comes Next
+## What Comes Next
 
 - **2 Architecture (v1.1)**: breaks down the 1972-line IIFE into module layers and draws the component tree and data flow.
 - **3 Extension Side (v1.1)**: dives into the `processingExtensionId` contract — how extensions consume images and write detections back.
@@ -257,7 +257,7 @@ Both audiences should first read 1-3 of the [6 metric_card](../6-metric-card-com
 
 ---
 
-## 1.10 Key Commit Index
+## Key Commit Index
 
 Later sections reference the commits below; they are listed here for convenience. For the full history, run `git log --oneline -- components/ne101_camera/` in the [source repo](https://github.com/camthink-ai/NeoMind-Dashboard-Components).
 

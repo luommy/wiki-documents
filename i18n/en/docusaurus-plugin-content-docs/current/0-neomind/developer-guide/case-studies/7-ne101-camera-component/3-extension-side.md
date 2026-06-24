@@ -2,16 +2,16 @@
 description: "ne101_camera extension-side contract: the processingExtensionId generic AI processing paradigm, the AI_EXT_IDS whitelist, the EXT_MODES mode catalog (imageArg/responseType/command triple), the __imageData injection mechanism, the locate-anything-v2 NMS threshold special-case, and the extension degradation fallback"
 keywords: [ne101_camera, processingExtensionId, extension contract, EXT_MODES, imageArg, responseType, locate-anything-v2]
 tags: [NeoMind, Case Study]
-sidebar_label: "3. Extension Side"
+sidebar_label: "Extension Side"
 ---
 
-# 3 Extension Side: The processingExtensionId Generic AI Contract
+# Extension Side: The processingExtensionId Generic AI Contract
 
 > This page is the **extension-side contract reference** for the ne101_camera case study, covering the `processingExtensionId` generic AI processing contract: whitelist validation (`AI_EXT_IDS`), mode mapping (`EXT_MODES`), the `__imageData` injection mechanism, and the degradation fallback strategy.
 
 ---
 
-## 3.1 The processingExtensionId Generic Contract
+## The processingExtensionId Generic Contract
 
 The most easily misunderstood fact about ne101_camera is this: although it looks like it is doing "AI object detection", a full read of the 1972-line `bundle.js` will find zero lines of YOLO inference, zero references to an ONNX runtime, zero model-weight loads. The component itself **does no AI whatsoever**. All inference is outsourced to whichever extension the user picks via the `processingExtensionId` config field. This field lives in the `default_config` block of [`manifest.json` L23-L24](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/manifest.json#L23-L24):
 
@@ -60,7 +60,7 @@ graph LR
 
 ---
 
-## 3.2 The AI_EXT_IDS Whitelist
+## The AI_EXT_IDS Whitelist
 
 The platform hosts many extensions (weather, ONVIF bridge, various AI inference engines), but ne101_camera only cares about **AI extensions that can consume an image input and return detections**. The component filters with a hardcoded whitelist defined at [`bundle.js` L144](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L144-L144):
 
@@ -99,7 +99,7 @@ Only the filtered `filtered` array is handed to `ExtDropdown` to render as dropd
 
 ---
 
-## 3.3 The EXT_MODES Mode Catalog
+## The EXT_MODES Mode Catalog
 
 Each extension does not have just one invocation mode — `locate-anything-v2` can do category-based detection, phrase-based grounding, and OCR. The component uses a **mode catalog** `EXT_MODES` to describe "which modes this extension supports, and what each mode's parameters and response shape are". The catalog lives at [`bundle.js` L154-L171](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L154-L171). Its structure is an object keyed by extension id; each value is an array of modes supported by that extension. Each mode is an object with eight fields: `id` / `command` / `imageArg` / `responseType` / `label` / `desc` / `icon` / `args`.
 
@@ -159,7 +159,7 @@ The mode distribution across the four extensions is:
 
 ---
 
-## 3.4 The imageArg + responseType Contract
+## The imageArg + responseType Contract
 
 The two most critical fields in each mode object are `imageArg` and `responseType` — together they define the **interface contract** between component and extension. `imageArg` describes "what parameter name the component uses to pass the image to the extension"; `responseType` describes "what shape of data the extension returns". The meaning of both fields is clearly documented in source comments at [`bundle.js` L146-L153](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L146-L153):
 
@@ -272,7 +272,7 @@ graph LR
 
 ---
 
-## 3.5 The locate-anything-v2 NMS Threshold Special-Case
+## The locate-anything-v2 NMS Threshold Special-Case
 
 Among all extensions, `locate-anything-v2` enjoys a special privilege: when generating the invocation code, the component appends an extra `nms_iou_threshold: 0.5` argument for it. This special-case was introduced by commit [`8656148`](https://github.com/camthink-ai/NeoMind-Dashboard-Components/commit/8656148) (`feat(ne101): pass NMS IoU threshold 0.5 to locate-anything-v2`) and lives at [`bundle.js` L281-L282](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L281-L282):
 
@@ -297,7 +297,7 @@ if (extensionId === 'locate-anything-v2') L.push(',  nms_iou_threshold: 0.5');
 
 ---
 
-## 3.6 The __imageData Injection Mechanism
+## The __imageData Injection Mechanism
 
 When the generated Transform code runs in the controller sandbox, it needs the device's latest captured image as input for AI inference. How that image is obtained is the most subtle part of the entire extension-side contract — the component **does not fetch the image inside the Transform code itself**; instead it relies on the platform to **inject** a variable named `__imageData` at execution time. Look at the start of the generated Transform code, at [`bundle.js` L266-L272](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L266-L272):
 
@@ -340,7 +340,7 @@ var H = (imageMeta && imageMeta.height) || 1;
 
 ---
 
-## 3.7 The Extension Degradation Fallback
+## The Extension Degradation Fallback
 
 The NeoMind AI-extension ecosystem will keep growing — future additions may include a "segmentation extension", a "pose-estimation extension", or a "depth-estimation extension". ne101_camera's `EXT_MODES` catalog (3.3) lists only the four extensions known today; what happens if the user installs a new extension that is not in `EXT_MODES`? The answer is: **lenient fallback**, not a rejection error. This fallback logic lives in the `getExtMode()` function at [`bundle.js` L181-L193](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L181-L193):
 
@@ -386,7 +386,7 @@ A similar fallback appears in `getExtModes(extensionId)` at [`bundle.js` L196-L1
 
 ---
 
-## 3.8 Design Decisions Summary
+## Design Decisions Summary
 
 The seven design decisions on this page are consolidated below, each with the choice / alternative / rationale triple. They share a common theme: **in the fuzzy zones of the "component ↔ extension" contract, choose leniency and adaptation over strictness and coercion** — the component does not demand that extensions follow a unified API, but instead adapts to each extension's existing conventions via the mode catalog (`EXT_MODES`) and parameter normalization (`imageArg`); unknown extensions get a default fallback rather than a rejection; expert parameters (NMS threshold) get a hardcoded safe default rather than UI exposure.
 
