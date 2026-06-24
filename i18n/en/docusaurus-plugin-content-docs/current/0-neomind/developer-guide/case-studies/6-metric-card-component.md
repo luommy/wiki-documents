@@ -5,7 +5,7 @@ tags: [NeoMind, case study, component]
 sidebar_label: "metric_card"
 ---
 
-# metric_card: Introductory Dashboard Component
+# metric card: Introductory Dashboard Component
 
 ## Case Background
 
@@ -489,7 +489,7 @@ The four values in `size_constraints` (`min_w/h`, `default_w/h`, `max_w/h`) dire
 - **`default_w: 3, default_h: 2`** — The initial size when dragged from the component library. 3×2 is enough to show 3 slots (one row) or 1 large slot.
 - **`max_w: 6, max_h: 4`** — Caps maximum size. At 6 columns, `getLayout()` returns `{cols: 6}` for 12 slots, each using `text-lg`; beyond this size the value diminishes.
 
-### STYLE_GUIDE Adherence in Practice
+### `STYLE_GUIDE` Adherence in Practice
 
 metric_card's `renderCell` function strictly follows the STYLE_GUIDE patterns:
 

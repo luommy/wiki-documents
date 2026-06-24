@@ -155,7 +155,7 @@ fn stream_capability(&self) -> Option<StreamCapability> {
 
 The semantics of `StreamMode::Push` are: **the extension produces data proactively** and the SDK does not poll. The corresponding `Pull` mode has the SDK request data actively (suitable for low-frequency metrics), and `Stateless` mode is a stateless request-response (suitable for command-style APIs). A video stream produces 25-30 frames per second; only Push mode can guarantee no frame loss. `max_concurrent_sessions: 4` caps the number of simultaneous video streams per extension instance — this is an empirically-validated ceiling based on ONNX Runtime memory and CPU inference throughput. `direction: Bidirectional` is required because the front end both receives frames (Push output) and sends base64 frames (`process_session_chunk`).
 
-### init_session: session initialization
+### `init_session`: session initialization
 
 `init_session` is called back after the SDK establishes a WebSocket session. It constructs the `ActiveStream` state and inserts it into the global registry. See [`src/lib.rs` L1290-L1360](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/yolo-video-v2/src/lib.rs#L1290-L1360).
 
@@ -203,7 +203,7 @@ Key logic:
 
 Note that `init_session` itself **does not start the frame loop** — the loop starts in `start_push`, so the SDK has a chance to bind the output sender before frames begin flowing.
 
-### execute_command: start_stream / stop_stream dispatch
+### `execute_command`: start_stream / stop_stream dispatch
 
 The extension exposes five commands: `start_stream` / `stop_stream` / `get_stream_stats` / `gc_memory` / `update_stream_config`. See [`src/lib.rs` L1114-L1215](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/yolo-video-v2/src/lib.rs#L1114-L1215):
 
@@ -286,7 +286,7 @@ pub fn stop_stream(&self, stream_id: &str) -> Result<()> {
 ```
 [Source: lib.rs L813-L822](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/yolo-video-v2/src/lib.rs#L813-L822)
 
-### Frame loop: decode → detect → ROI/line → JPEG → send_push_output
+### Frame loop: decode → detect → ROI/line → JPEG → `send_push_output`
 
 The network-stream frame loop lives inside the `std::thread::spawn` closure in `start_push`: [`src/lib.rs` L1427-L1650](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/yolo-video-v2/src/lib.rs#L1427-L1650). The per-frame pipeline:
 
@@ -573,7 +573,7 @@ ExtensionCommand {
 },
 ```
 
-### StreamCapability + send_push_output
+### StreamCapability + `send_push_output`
 
 The push channel provided by the SDK is the core integration point. After `stream_capability()` declares the capability, the SDK calls `init_session` when a WebSocket session is established, and `start_push` once the session is ready. The frame loop pushes data into the SDK output channel via the `send_push_output(&PushOutputMessage::image_jpeg(...))` FFI; the SDK then relays to the front-end WebSocket. `set_output_sender` is a no-op ([`src/lib.rs` L1362-L1364](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/yolo-video-v2/src/lib.rs#L1362-L1364)) because Push mode uses the FFI directly rather than a tokio mpsc channel — a point of confusion: only Pull mode needs `set_output_sender`.
 
@@ -841,7 +841,7 @@ If this is your first encounter with NeoMind streaming extensions, read in this 
 
 If you only care about the SDK's StreamCapability interface design, jump straight to 3.1.
 
-### Bridge to ne101_camera
+### Bridge to NE101 Camera
 
 Case 7 ne101_camera (the flagship case) shows how a real camera product simultaneously uses 2 (device-bound inference) and 3 (RTSP streaming analysis).
 

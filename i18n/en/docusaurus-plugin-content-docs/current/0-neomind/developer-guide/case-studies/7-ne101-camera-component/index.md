@@ -5,7 +5,7 @@ tags: [NeoMind, case, flagship]
 sidebar_label: "ne101_camera Flagship"
 ---
 
-# ne101_camera: The Most Complex Device-Bound Component in the NeoMind Ecosystem
+# NE101 Camera: The Most Complex Device-Bound Component in the NeoMind Ecosystem
 
 > **One-sentence positioning**: the flagship component that brings the CamThink NE101 sensing camera into the Dashboard — it is the first component in the NeoMind marketplace to combine device binding + image canvas + AI processing pipeline + ROI overlay in a single bundle, extending the entry-level metric_card "show a number" story into a full "device → inference → visual overlay" chain.
 
@@ -40,7 +40,7 @@ If you are short on time and only want to understand "how this component works",
 
 ---
 
-## Relationship to 6 metric_card: From Starter to Flagship
+## Relationship to 6 metric card: From Starter to Flagship
 
 This case is a direct continuation of [6 metric_card](../6-metric-card-component.md), but **an order of magnitude more complex**. The table below maps the two cases so you can build a "starter → flagship" cognitive ladder.
 

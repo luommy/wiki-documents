@@ -339,7 +339,7 @@ fn geocode_sync(&self, city: &str) -> std::result::Result<GeoLocation, String> {
 
 `Cargo.toml` line 21 has an explicit comment: `# Use sync HTTP client to avoid Tokio runtime issues in dynamic libraries`. This is the most critical design decision in this case — see 4.1.
 
-### Command Flow Sequence: get_weather End-to-End Call Chain
+### Command Flow Sequence: `get_weather` End-to-End Call Chain
 
 The sequence diagram below shows the complete call chain of the `get_weather` command, from runtime scheduling through metric production, noting where the cache read (RwLock) happens, where the two external HTTP requests fire (Geocoding → Forecast), and where the fixed-point encoding (×100 / ÷100) is applied. This is the smallest unit of behavior a contributor modifying this extension needs to understand — particularly the cache hit/miss branch points and the fixed-point encoding boundary.
 
@@ -395,7 +395,7 @@ Quantifying the blocking impact: under typical load (1 request / 30s collection 
 
 Even if multi-city parallel fetches were supported in the future, only a handful of high-concurrency scenarios would benefit from async — and the SDK's current synchronous `execute_command` contract moots that advantage. Once the host invokes `produce_metrics()` synchronously, no HTTP client — however fast — can shorten the overall call chain.
 
-### RwLock Wrapping default_city vs Mutex vs AtomicPtr
+### RwLock Wrapping `default_city` vs Mutex vs AtomicPtr
 
 **Decision**: `default_city: std::sync::RwLock<String>`.
 

@@ -5,7 +5,7 @@ tags: [NeoMind, case, business background]
 sidebar_label: "Business Background"
 ---
 
-# Business Background: Why NeoMind Needs the ne101_camera Component
+# Business Background: Why NeoMind Needs the NE101 Camera Component
 
 > This section answers three questions: **what is the NE101 hardware**, **why the generic metric_card cannot do the job**, and **where ne101_camera sits in the NeoMind ecosystem** — covering hardware capabilities, component positioning, and the manifest device-binding signature.
 
@@ -36,7 +36,7 @@ The NE101 device's capture triggering is managed by the device firmware (built-i
 
 ---
 
-## Why metric_card Cannot Fill In
+## Why metric card Cannot Fill In
 
 A natural first reaction is: "NE101 just reports battery, signal, and temperature numbers — can't I bind a data source to [6 metric_card](../6-metric-card-component.md) and be done?" The answer is no, for three reasons:
 

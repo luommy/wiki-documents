@@ -5,7 +5,7 @@ tags: [NeoMind, 案例, 旗舰]
 sidebar_label: "ne101_camera Flagship"
 ---
 
-# ne101_camera：NeoMind 生态最复杂的设备绑定组件
+# NE101 Camera：NeoMind 生态最复杂的设备绑定组件
 
 > **一句话定位**：把 CamThink NE101 感知摄像头接入 Dashboard 的旗舰组件——它是 NeoMind 组件市场里第一个「设备绑定 + 图像画布 + AI 处理流水线 + ROI 叠加」四合一的组件，把入门级 metric_card 的「数值展示」扩展到了「设备 → 推理 → 视觉叠加」全链路。
 
@@ -40,7 +40,7 @@ sidebar_label: "ne101_camera Flagship"
 
 ---
 
-## 与 6 metric_card 的关系：从入门到旗舰
+## 与 6 metric card 的关系：从入门到旗舰
 
 本案例是 [6 metric_card](../6-metric-card-component.md) 的直接延续，但**复杂度等级差了一个数量级**。下表是两个案例的对照，帮助你建立「从入门到旗舰」的认知阶梯。
 

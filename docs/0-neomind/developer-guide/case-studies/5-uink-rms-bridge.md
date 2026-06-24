@@ -180,7 +180,7 @@ fn ensure_token(&self) -> Result<()> {
 
 [Source: lib.rs L794-L823](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L794-L823)
 
-### 区域端点路由（UinkConfig::api_base_url）
+### 区域端点路由（`UinkConfig::api_base_url`）
 
 [`UinkConfig`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L685-L721) 是扩展的唯一配置结构，包含 `server_region: String`（枚举 China / Europe / Custom）、`custom_server_url: String`、`email`、`password`、`sync_interval_secs`（默认 300）、`poll_interval_secs`（默认 60）。
 
@@ -219,7 +219,7 @@ impl Default for UinkConfig {
 
 [Source: lib.rs L685-L721](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L685-L721)
 
-### Markdown → Image 渲染管线（pulldown-cmark + ab_glyph + imageproc）
+### Markdown → Image 渲染管线（pulldown-cmark + `ab_glyph` + imageproc）
 
 这是本扩展最复杂的部分，约 400 行代码（L230-L640）。管线分四步：
 
@@ -306,7 +306,7 @@ fn render_markdown_to_image(
 
 `wrap_line` 做 CJK + Latin 混排自动换行（CJK 字符可在任意位置断行，Latin 按词宽累加）。最终用 image crate 编码为 PNG 字节。
 
-### 图像推送（push_image_to_device）
+### 图像推送（`push_image_to_device`）
 
 渲染完的 PNG/JPEG 字节通过 [`push_image_to_device`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L1445-L1523) 以 `multipart/form-data` POST 到 `POST /api/v1/devices/{id}/image`：
 
@@ -339,7 +339,7 @@ async fn execute_command(&self, command: &str, args: &serde_json::Value) -> Resu
 
 若用户传了 `dither_algorithm` / `resize_mode` / `padding_color` 参数，走处理端点；否则走 raw 端点直接推原图。支持的抖动算法有 8 种（ordered / floyd-steinberg / atkinson / burkes / sierra / stucki / jarvis-judice-ninke / threshold），resize 模式有 fit / cover / fill 三种。图像大小限制 10MB。
 
-### 设备注册与 ID 映射（uink_epaper device template）
+### 设备注册与 ID 映射（`uink_epaper` device template）
 
 扩展首次 sync 时通过 `device_template_register` capability 注册 `uink_epaper` 设备模板（含 battery / temperature / signal_strength / refresh_count / online_status / sn / model 等 14 个指标）。
 

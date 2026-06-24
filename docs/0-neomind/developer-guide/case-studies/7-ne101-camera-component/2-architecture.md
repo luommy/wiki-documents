@@ -686,7 +686,7 @@ Source: [`bundle.js` L523-L524](https://github.com/camthink-ai/NeoMind-Dashboard
 
 ---
 
-## 与 6 metric_card 的架构对比
+## 与 6 metric card 的架构对比
 
 下表把 ne101_camera 和 [6 metric_card](../6-metric-card-component.md) 在 6 个维度上做对照，帮助读者建立「显示型组件 vs 设备绑定组件」的架构代差认知。metric_card 的相关字段可以参考它的 [3.1 manifest 契约](../6-metric-card-component.md)。
 

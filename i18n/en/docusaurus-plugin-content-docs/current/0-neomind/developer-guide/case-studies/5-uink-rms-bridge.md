@@ -171,7 +171,7 @@ fn ensure_token(&self) -> Result<()> {
 
 [Source: lib.rs L794-L823](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L794-L823)
 
-### Regional Endpoint Routing (UinkConfig::api_base_url)
+### Regional Endpoint Routing (`UinkConfig::api_base_url`)
 
 [`UinkConfig`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L685-L721) is the extension's sole configuration struct, containing `server_region: String` (enum China / Europe / Custom), `custom_server_url: String`, `email`, `password`, `sync_interval_secs` (default 300), and `poll_interval_secs` (default 60). The `api_base_url()` method does a simple match: `"China" => "https://cn.rms.uink.com"`, `"Europe" => "https://eu.rms.uink.com"`, otherwise uses `custom_server_url`. This bakes the regional selection into config, so users just pick from a dropdown in the UI to switch. The default region is China (see `impl Default`):
 
@@ -208,7 +208,7 @@ impl Default for UinkConfig {
 
 [Source: lib.rs L685-L721](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L685-L721)
 
-### Markdown → Image Rendering Pipeline (pulldown-cmark + ab_glyph + imageproc)
+### Markdown → Image Rendering Pipeline (pulldown-cmark + `ab_glyph` + imageproc)
 
 This is the most complex part of the extension, about 400 lines of code (L230-L640). The pipeline has four steps: (1) [`parse_markdown`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L248-L376) uses pulldown-cmark 0.12 to parse Markdown into `Vec<TextBlock>` (Heading / Paragraph blocks, with Paragraph containing Plain / Bold / Code inline parts):
 
@@ -285,7 +285,7 @@ fn render_markdown_to_image(
 
 [Source: lib.rs L475-L640](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L475-L640) — the heading scale rule is documented at [L504 comment](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L504): "H1 = 2.0x base, decreasing by 0.2 per level" (H1=2.0x, H2=1.8x, H3=1.6x...); (4) `wrap_line` does CJK + Latin mixed auto-wrapping (CJK characters can break anywhere, Latin accumulates by word width). The final result is encoded as PNG bytes using the image crate.
 
-### Image Push (push_image_to_device)
+### Image Push (`push_image_to_device`)
 
 The rendered PNG/JPEG bytes are POSTed via [`push_image_to_device`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L1445-L1523) as `multipart/form-data` to `POST /api/v1/devices/{id}/image`:
 
@@ -316,7 +316,7 @@ async fn execute_command(&self, command: &str, args: &serde_json::Value) -> Resu
 
 [Source: lib.rs L1445-L1523](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L1445-L1523) If the user passes `dither_algorithm` / `resize_mode` / `padding_color` parameters, it goes through the processing endpoint; otherwise it uses the raw endpoint to push the original image directly. Supported dithering algorithms include 8 options (ordered / floyd-steinberg / atkinson / burkes / sierra / stucki / jarvis-judice-ninke / threshold), and resize modes include fit / cover / fill. The image size limit is 10MB.
 
-### Device Registration and ID Mapping (uink_epaper device template)
+### Device Registration and ID Mapping (`uink_epaper` device template)
 
 On first sync, the extension registers the `uink_epaper` device template via the `device_template_register` capability (including 14 metrics: battery / temperature / signal_strength / refresh_count / online_status / sn / model, etc.). Then [`fetch_rms_devices`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L877) paginates the RMS device list, and for each device generates `neo_device_id = format!("uink-{}", device.device_id)` and calls `device_register`. The key ID mapping is stored in `neo_to_rms_id: RwLock<HashMap<String, String>>` ([L730](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/uink-rms-bridge/src/lib.rs#L730)) — all push commands first translate the NeoMind device_id back to the RMS device_id via `resolve_rms_id()`.
 

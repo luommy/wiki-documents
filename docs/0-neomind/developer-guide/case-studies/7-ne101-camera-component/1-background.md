@@ -5,7 +5,7 @@ tags: [NeoMind, 案例, 业务背景]
 sidebar_label: "Background"
 ---
 
-# 业务背景：为什么 NeoMind 需要 ne101_camera 组件
+# 业务背景：为什么 NeoMind 需要 NE101 Camera 组件
 
 > 本节回答三个问题：**NE101 是什么硬件**、**为什么不能用通用 metric_card 凑合**、**ne101_camera 在 NeoMind 生态中处于什么位置**——覆盖硬件能力、组件定位和 manifest 设备绑定签名。
 
@@ -38,7 +38,7 @@ NE101 设备本身的抓拍触发由设备固件管理（定时器或外部 MQTT
 
 ---
 
-## 为什么不能拿 metric_card 凑合
+## 为什么不能拿 metric card 凑合
 
 读者第一反应可能是：「NE101 不就是上报电池、信号、温度几个数值吗？拿 [6 metric_card](../6-metric-card-component.md) 绑个数据源不就行了？」答案是不行，原因有三：
 

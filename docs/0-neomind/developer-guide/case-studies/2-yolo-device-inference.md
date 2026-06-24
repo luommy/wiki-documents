@@ -382,7 +382,7 @@ sequenceDiagram
 
 **选择捆绑的理由**：commit `e8a8f28` 明确引入了 "bundled ONNX Runtime support"。边缘设备的用户通常不是开发者，要求他们 `apt install libonnxruntime` 会极大提高部署门槛。捆绑的代价是 `.nep` 包体积增大（每个平台约 150MB），以及 3.4 描述的 dylib 路径治理复杂度——但这是一次性工程成本，换来的是「零依赖部署」的用户体验。
 
-### 决策 3：同步能力 API + block_in_place vs 异步能力 API
+### 决策 3：同步能力 API + `block_in_place` vs 异步能力 API
 
 | 方案 | 可预测性 | 性能 | runtime 兼容性 |
 |------|----------|------|----------------|

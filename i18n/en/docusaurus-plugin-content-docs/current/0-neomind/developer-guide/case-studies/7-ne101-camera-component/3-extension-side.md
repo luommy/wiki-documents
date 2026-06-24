@@ -66,7 +66,7 @@ graph LR
 
 ---
 
-## The AI_EXT_IDS Whitelist
+## The `AI_EXT_IDS` Whitelist
 
 The platform hosts many extensions (weather, ONVIF bridge, various AI inference engines), but ne101_camera only cares about **AI extensions that can consume an image input and return detections**. The component filters with a hardcoded whitelist defined at [`bundle.js` L144](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L144-L144):
 
@@ -105,7 +105,7 @@ Only the filtered `filtered` array is handed to `ExtDropdown` to render as dropd
 
 ---
 
-## The EXT_MODES Mode Catalog
+## The `EXT_MODES` Mode Catalog
 
 Each extension does not have just one invocation mode — `locate-anything-v2` can do category-based detection, phrase-based grounding, and OCR. The component uses a **mode catalog** `EXT_MODES` to describe "which modes this extension supports, and what each mode's parameters and response shape are". The catalog lives at [`bundle.js` L154-L171](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L154-L171). Its structure is an object keyed by extension id; each value is an array of modes supported by that extension. Each mode is an object with eight fields: `id` / `command` / `imageArg` / `responseType` / `label` / `desc` / `icon` / `args`.
 
@@ -303,7 +303,7 @@ if (extensionId === 'locate-anything-v2') L.push(',  nms_iou_threshold: 0.5');
 
 ---
 
-## The __imageData Injection Mechanism
+## The `__imageData` Injection Mechanism
 
 When the generated Transform code runs in the controller sandbox, it needs the device's latest captured image as input for AI inference. How that image is obtained is the most subtle part of the entire extension-side contract — the component **does not fetch the image inside the Transform code itself**; instead it relies on the platform to **inject** a variable named `__imageData` at execution time. Look at the start of the generated Transform code, at [`bundle.js` L266-L272](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L266-L272):
 

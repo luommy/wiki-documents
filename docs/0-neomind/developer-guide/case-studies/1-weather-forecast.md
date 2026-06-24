@@ -339,7 +339,7 @@ fn geocode_sync(&self, city: &str) -> std::result::Result<GeoLocation, String> {
 
 `Cargo.toml` 第 21 行有明确注释：`# Use sync HTTP client to avoid Tokio runtime issues in dynamic libraries`。这是整个案例最关键的设计决策，详见 4.1。
 
-### 命令流时序：get_weather 端到端调用链
+### 命令流时序：`get_weather` 端到端调用链
 
 下方的时序图展示了 `get_weather` 命令从运行时调度到指标产出的完整调用链，标注了缓存读取（RwLock）、两次外部 HTTP 请求（Geocoding → Forecast）、以及定点数编码（×100 / ÷100）发生的时机。这是贡献者修改本扩展时需要理解的最小行为单元——尤其是缓存命中/未命中的分支位置和定点编码的边界。
 
@@ -395,7 +395,7 @@ sequenceDiagram
 
 即使未来支持多城市并行拉取，受益于异步并发的也只是少数高并发场景，而 SDK 当前同步的 `execute_command` 契约让异步化收益被抹平——一旦宿主以同步方式调用 `produce_metrics()`，再快的 HTTP 客户端也无法缩短整体调用链。
 
-### RwLock 包装 default_city vs Mutex vs AtomicPtr
+### RwLock 包装 `default_city` vs Mutex vs AtomicPtr
 
 **决策**：`default_city: std::sync::RwLock<String>`。
 

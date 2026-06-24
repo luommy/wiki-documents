@@ -218,7 +218,7 @@ fn find_local_ipv4() -> Option<Ipv4Addr> {
 
 *Source: [`src/discovery.rs` L119-L131](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/discovery.rs#L119-L131)*
 
-### SOAP Client and WS-Security (soap_client.rs)
+### SOAP Client and WS-Security (`soap_client.rs`)
 
 All ONVIF control interfaces use SOAP 1.2 over HTTP. onvif-bridge implements a complete SOAP client by hand in [`src/soap_client.rs`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/soap_client.rs#L1-L516), **with zero dependencies on any SOAP/ONVIF crate**.
 
@@ -380,7 +380,7 @@ pub fn ptz_relative_move(device: &OnvifDevice, profile_token: &str,
 
 *Source: [`src/ptz.rs` L5-L42](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/ptz.rs#L5-L42)*
 
-### Command Dispatch (lib.rs execute_command)
+### Command Dispatch (`lib.rs` `execute_command`)
 
 [`src/lib.rs` L696-L717](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/lib.rs#L696-L717) is the extension's core entry point — a `match` that routes string commands to corresponding handler functions:
 
@@ -508,7 +508,7 @@ The tradeoff is that each SOAP request must compute a SHA-1 hash, but this overh
 
 The tradeoff is the inability to make parallel requests to multiple devices, but `execute_command` itself is async, so the NeoMind host process can call different commands in parallel across multiple devices.
 
-### Decision 4: find_local_ipv4 instead of bind 0.0.0.0
+### Decision 4: `find_local_ipv4` instead of bind 0.0.0.0
 
 **Our choice**: Before sending the WS-Discovery Probe, detect the machine's real egress IP by connecting to `8.8.8.8:80` and reading `local_addr`, then bind the UDP socket to that IP ([`src/discovery.rs` L119-L131](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/discovery.rs#L119-L131)).
 

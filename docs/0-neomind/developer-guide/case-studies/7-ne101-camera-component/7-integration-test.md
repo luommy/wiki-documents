@@ -384,7 +384,7 @@ stateDiagram-v2
 
 ---
 
-## source_ts 对齐验证
+## `source_ts` 对齐验证
 
 **`source_ts`（source timestamp）是 ne101_camera 防「ghost detections」的核心机制**。摄像头每秒推 2-5 帧新图，AI 推理需要 200-800ms，这意味着**当推理结果返回时，画面上显示的可能已经是下一帧了**——如果把上一帧的检测结果直接画在当前帧上，就会出现「人已经走出了画面，但检测框还停在原位」的鬼影。
 

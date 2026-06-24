@@ -382,7 +382,7 @@ This case made several key decisions during engineering evolution; each consider
 
 **Why bundled**: Commit `e8a8f28` explicitly introduced "bundled ONNX Runtime support." Edge device users are typically not developers; requiring `apt install libonnxruntime` would dramatically raise the deployment barrier. The cost of bundling is larger `.nep` packages (~150MB per platform) and the dylib path governance complexity described in 3.4 — but this is a one-time engineering cost traded for a "zero-dependency deployment" user experience.
 
-### Decision 3: Sync Capability API + block_in_place vs Async Capability API
+### Decision 3: Sync Capability API + `block_in_place` vs Async Capability API
 
 | Option | Predictability | Performance | Runtime compatibility |
 |------|----------|----------|----------|

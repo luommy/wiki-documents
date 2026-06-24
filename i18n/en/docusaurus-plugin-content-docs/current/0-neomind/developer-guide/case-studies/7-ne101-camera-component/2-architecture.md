@@ -674,7 +674,7 @@ Source: [`bundle.js` L523-L524](https://github.com/camthink-ai/NeoMind-Dashboard
 
 ---
 
-## Architectural Comparison with 6 metric_card
+## Architectural Comparison with 6 metric card
 
 The table below compares ne101_camera and [6 metric_card](../6-metric-card-component.md) across six dimensions, to help readers build a mental model of the architectural gulf between "display component" and "device-bound component". For metric_card's relevant fields, see its [3.1 manifest contract](../6-metric-card-component.md).
 

@@ -166,7 +166,7 @@ fn stream_capability(&self) -> Option<StreamCapability> {
 
 `direction: Bidirectional` 是因为前端既要接收帧（Push output），也要发送 base64 帧（`process_session_chunk`）。
 
-### init_session：会话初始化
+### `init_session`：会话初始化
 
 `init_session` 在 SDK 建立 WebSocket 会话后回调，负责构造 `ActiveStream` 状态并插入全局 registry。查看实现：[`src/lib.rs` L1290-L1360](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/yolo-video-v2/src/lib.rs#L1290-L1360)
 
@@ -214,7 +214,7 @@ async fn init_session(&self, session: &StreamSession) -> Result<()> {
 
 注意 `init_session` 本身**不启动帧循环**——帧循环在 `start_push` 中启动。这样设计是为了让 SDK 有机会在帧循环开始前完成 output sender 的绑定。
 
-### execute_command：start_stream / stop_stream 调度
+### `execute_command`：start_stream / stop_stream 调度
 
 扩展暴露了 `start_stream` / `stop_stream` / `get_stream_stats` / `gc_memory` / `update_stream_config` 五个命令。查看调度实现：[`src/lib.rs` L1114-L1215](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/yolo-video-v2/src/lib.rs#L1114-L1215)
 
@@ -301,7 +301,7 @@ pub fn stop_stream(&self, stream_id: &str) -> Result<()> {
 ```
 [Source: lib.rs L813-L822](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/yolo-video-v2/src/lib.rs#L813-L822)
 
-### 帧循环：decode → detect → ROI/line → JPEG → send_push_output
+### 帧循环：decode → detect → ROI/line → JPEG → `send_push_output`
 
 网络流的帧循环在 `start_push` 内的 `std::thread::spawn` 闭包中：[`src/lib.rs` L1427-L1650](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/yolo-video-v2/src/lib.rs#L1427-L1650)。每帧的处理流水线：
 
@@ -614,7 +614,7 @@ ExtensionCommand {
 },
 ```
 
-### StreamCapability + send_push_output
+### StreamCapability + `send_push_output`
 
 **SDK 提供的 push 通道是核心集成点**。`stream_capability()` 声明能力后，SDK 会在 WebSocket 会话建立时回调 `init_session`，在会话就绪后回调 `start_push`。
 
@@ -912,7 +912,7 @@ commit `f8f75b1` 则在 CI 层面 pin 了 FFmpeg 7.x，避免 macOS/Windows CI r
 
 如果你只关心 SDK 的 StreamCapability 接口设计，可以直接从 3.1 开始读。
 
-### 延伸到 ne101_camera
+### 延伸到 NE101 Camera
 
 案例 7 ne101_camera（旗舰案例，即将发布）会展示一个真实的摄像头产品如何同时使用 #2（设备绑定推理）和 #3（RTSP 流式分析）。
 

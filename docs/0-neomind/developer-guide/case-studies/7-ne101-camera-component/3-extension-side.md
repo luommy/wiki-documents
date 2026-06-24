@@ -70,7 +70,7 @@ graph LR
 
 ---
 
-## AI_EXT_IDS 白名单
+## `AI_EXT_IDS` 白名单
 
 平台上有许多扩展（天气、ONVIF 桥接、各种 AI 推理），但 ne101_camera 只关心**能消费图像输入并返回检测结果**的 AI 扩展。组件用一个硬编码的白名单来过滤，定义在 [`bundle.js` L144](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L144-L144)：
 
@@ -109,7 +109,7 @@ for (var i = 0; i < arr.length; i++) {
 
 ---
 
-## EXT_MODES 模式目录
+## `EXT_MODES` 模式目录
 
 每个扩展不只有一种调用方式——`locate-anything-v2` 既能做按类别的目标检测，也能做按自由文本的 grounding，还能做 OCR。组件用一个**模式目录** `EXT_MODES` 来描述「这个扩展支持哪几种调用模式，每种模式的参数和响应格式是什么」。这个目录位于 [`bundle.js` L154-L171](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L154-L171)，结构是一个以扩展 ID 为键的对象，值是该扩展支持的模式数组。每个模式是一个对象，包含 `id` / `command` / `imageArg` / `responseType` / `label` / `desc` / `icon` / `args` 八个字段。
 
@@ -309,7 +309,7 @@ if (extensionId === 'locate-anything-v2') L.push(',  nms_iou_threshold: 0.5');
 
 ---
 
-## __imageData 注入机制
+## `__imageData` 注入机制
 
 Transform 生成的代码在主控沙箱里执行时，需要拿到设备的最新抓拍图像作为 AI 推理的输入。这个图像的获取方式是整个扩展侧契约里最精妙的部分——组件**不自己在 Transform 代码里拉图像**，而是依赖平台在执行 Transform 时**注入**一个名为 `__imageData` 的变量。查看生成的 Transform 代码起始处，[`bundle.js` L266-L272](https://github.com/camthink-ai/NeoMind-Dashboard-Components/blob/main/components/ne101_camera/bundle.js#L266-L272)：
 

@@ -364,7 +364,7 @@ stateDiagram-v2
 
 ---
 
-## source_ts Alignment Verification
+## `source_ts` Alignment Verification
 
 **`source_ts` (source timestamp) is ne101_camera's core mechanism for preventing "ghost detections"**. Cameras push 2-5 new frames per second, AI inference takes 200-800ms, which means **by the time the inference result returns, the displayed frame may already be the next one** — if you just draw the previous frame's detections on the current frame, you get a ghost: "the person has already walked out of frame, but the detection box stays in place".
 

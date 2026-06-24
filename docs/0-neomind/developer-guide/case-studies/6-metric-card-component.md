@@ -5,7 +5,7 @@ tags: [NeoMind, 案例, 组件]
 sidebar_label: "metric_card"
 ---
 
-# metric_card：入门仪表板组件
+# metric card：入门仪表板组件
 
 ## 案例背景
 
@@ -489,7 +489,7 @@ metric_card 的 manifest 完整遵循附录 1 的 schema。关键字段对照：
 - **`default_w: 3, default_h: 2`** — 用户从组件库拖出来时的初始尺寸。3×2 足够显示 3 个 slot（一行排开）或 1 个大 slot。
 - **`max_w: 6, max_h: 4`** — 限制最大尺寸。6 列时 `getLayout()` 在 12 个 slot 下返回 `{cols: 6}`，每个 slot 用 `text-lg`；超过这个尺寸价值递减。
 
-### STYLE_GUIDE 遵循实践
+### `STYLE_GUIDE` 遵循实践
 
 metric_card 的 `renderCell` 函数严格遵循 STYLE_GUIDE 的模式：
 

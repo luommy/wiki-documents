@@ -229,7 +229,7 @@ fn find_local_ipv4() -> Option<Ipv4Addr> {
 
 *Source: [`src/discovery.rs` L119-L131](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/discovery.rs#L119-L131)*
 
-### SOAP 客户端与 WS-Security（soap_client.rs）
+### SOAP 客户端与 WS-Security（`soap_client.rs`）
 
 ONVIF 的所有控制接口都走 SOAP 1.2 over HTTP。onvif-bridge 在 [`src/soap_client.rs`](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/soap_client.rs#L1-L516) 手写了完整的 SOAP 客户端，**没有依赖任何 SOAP/ONVIF crate**。
 
@@ -393,7 +393,7 @@ pub fn ptz_relative_move(device: &OnvifDevice, profile_token: &str,
 
 *Source: [`src/ptz.rs` L5-L42](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/ptz.rs#L5-L42)*
 
-### 命令分发（lib.rs execute_command）
+### 命令分发（`lib.rs` `execute_command`）
 
 [`src/lib.rs` L696-L717](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/lib.rs#L696-L717) 是扩展的核心入口——一个 `match` 把字符串命令路由到对应的处理函数：
 
@@ -523,7 +523,7 @@ sequenceDiagram
 
 权衡的代价是无法并行请求多台设备，但 `execute_command` 本身是 async 的，NeoMind 主进程可以在多设备场景下并行调用不同命令。
 
-### 决策 4：find_local_ipv4 而非 bind 0.0.0.0
+### 决策 4：`find_local_ipv4` 而非 bind 0.0.0.0
 
 **我们的选择**：发送 WS-Discovery Probe 前，先通过「连接 8.8.8.8:80 读取 local_addr」的方式检测本机真实出口 IP，然后绑定 UDP socket 到该 IP（[`src/discovery.rs` L119-L131](https://github.com/camthink-ai/NeoMind-Extensions/blob/main/extensions/onvif-bridge/src/discovery.rs#L119-L131)）。
 
