@@ -2,7 +2,7 @@
 description: Write your first NeoMind dashboard component — a complete engineering walkthrough of metric_card (IIFE injection + OKLCH glass + multi-format normalization)
 keywords: [NeoMind, metric_card, dashboard component, engineering case study]
 tags: [NeoMind, case study, component]
-sidebar_label: "metric_card"
+sidebar_label: "metric card"
 ---
 
 # metric card: Introductory Dashboard Component

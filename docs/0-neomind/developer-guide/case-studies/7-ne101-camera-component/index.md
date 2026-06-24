@@ -2,7 +2,7 @@
 description: "NeoMind Dashboard 最复杂的设备绑定组件 ne101_camera 旗舰案例：8 子页面拆解从 NE101 设备能力到 processingExtensionId 通用 AI 处理契约、ROI 叠加渲染、React-in-IIFE 工程范式"
 keywords: [NeoMind, ne101_camera, NE101, 设备绑定组件, 旗舰案例]
 tags: [NeoMind, 案例, 旗舰]
-sidebar_label: "ne101_camera Flagship"
+sidebar_label: "NE101 Camera Flagship"
 ---
 
 # NE101 Camera：NeoMind 生态最复杂的设备绑定组件

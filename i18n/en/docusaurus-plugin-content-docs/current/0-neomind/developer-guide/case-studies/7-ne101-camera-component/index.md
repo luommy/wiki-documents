@@ -2,7 +2,7 @@
 description: "NeoMind Dashboard's most complex device-bound component, the ne101_camera flagship case: 8 subpages covering everything from NE101 device capabilities to the processingExtensionId generic AI processing contract, ROI overlay rendering, and the React-in-IIFE engineering pattern"
 keywords: [NeoMind, ne101_camera, NE101, device-bound component, flagship case]
 tags: [NeoMind, case, flagship]
-sidebar_label: "ne101_camera Flagship"
+sidebar_label: "NE101 Camera Flagship"
 ---
 
 # NE101 Camera: The Most Complex Device-Bound Component in the NeoMind Ecosystem

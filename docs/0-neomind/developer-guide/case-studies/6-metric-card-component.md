@@ -2,7 +2,7 @@
 description: 从零编写第一个 NeoMind 仪表板组件——metric_card 完整工程剖析（IIFE 注入 + OKLCH 毛玻璃 + 多格式数据归一化）
 keywords: [NeoMind, metric_card, 仪表板组件, 工程案例]
 tags: [NeoMind, 案例, 组件]
-sidebar_label: "metric_card"
+sidebar_label: "metric card"
 ---
 
 # metric card：入门仪表板组件
