@@ -24,7 +24,7 @@ NeoMind 生态有两类可发布工件——**扩展**（Rust cdylib + 可选 Re
 
 | 字段 | 类型 | 必填 | 说明 | 示例 |
 |------|------|------|------|------|
-| `id` | string | 是 | 工件唯一标识，全生态唯一，小写字母 + 下划线（snake_case），如 ne101_camera、metric_card | `weather-forecast-v2` / `ne101_camera` |
+| `id` | string | 是 | 工件唯一标识，全生态唯一。**扩展用 kebab-case**（中划线，如 `weather-forecast-v2`），**组件用 snake_case**（下划线，如 `ne101_camera`） | `weather-forecast-v2` / `ne101_camera` |
 | `name` | string \| object | 是 | 展示名。组件支持 `{ "en": "...", "zh": "..." }` 多语言对象 | `"weather forecast"` / `{ "en": "NE101 Camera Panel", "zh": "NE101 感知摄像头面板" }` |
 | `version` | string (semver) | 是 | 三段语义化版本。扩展从 `Cargo.toml` 自动读取；组件手写 | `"2.7.6"` / `"2.14.9"` |
 | `description` | string \| object | 是 | 一句话描述，组件支持多语言 | `"Real-time weather forecast..."` |
