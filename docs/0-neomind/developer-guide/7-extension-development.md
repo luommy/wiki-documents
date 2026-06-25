@@ -494,6 +494,17 @@ runner 加载时会根据当前平台自动选择对应的二进制路径。
 - Dashboard 组件开发（如果想让扩展带可视化）→ [Dashboard 组件开发](./8-dashboard-component-dev.md)
 - 设备指标作为扩展数据源 → [设备类型开发](./6-device-type-development.md)
 
+## 实战参考
+
+本篇是 API 通用参考。如果你想看**真实工程里怎么用、为什么这么设计**，阅读：
+
+- [工程实践案例集 · 总览](./case-studies/0-overview.md)
+- [#1 weather-forecast-v2](./case-studies/1-weather-forecast.md) — 入门型数据扩展
+- [#2 yolo-device-inference](./case-studies/2-yolo-device-inference.md) — AI 推理扩展
+- [#3 yolo-video-v2](./case-studies/3-yolo-video-v2.md) — 流式扩展
+- [#4 onvif-bridge](./case-studies/4-onvif-bridge.md) — 标准协议桥接
+- [#5 uink-rms-bridge](./case-studies/5-uink-rms-bridge.md) — 生产验证桥接
+
 ---
 
 *最后更新: 2026-06-15*

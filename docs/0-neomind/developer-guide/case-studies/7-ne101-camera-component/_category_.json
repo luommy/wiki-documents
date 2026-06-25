@@ -1,0 +1,8 @@
+{
+  "label": "NE101 Camera Flagship",
+  "position": 7,
+  "link": {
+    "type": "doc",
+    "id": "neomind/developer-guide/case-studies/ne101-camera-component/index"
+  }
+}

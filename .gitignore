@@ -33,3 +33,7 @@ CLAUDE.md
 
 # Jest coverage
 .image-upload/coverage/
+
+# Local tooling artifacts (not for repo)
+.serena/
+.superpowers-archive/

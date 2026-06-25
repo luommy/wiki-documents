@@ -423,7 +423,7 @@ sequenceDiagram
     participant N as NeoMind
     D->>N: POST /api/devices/xxx/webhook
     Note over N: 解析 JSON → 写入 Telemetry
-    N-->>D: {"success": true}
+    N-->>D: success true
     Note over N: 触发仪表板更新 + 规则检查
 ```
 
