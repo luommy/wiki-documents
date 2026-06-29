@@ -14,7 +14,7 @@ tags: [应用开发, NE503, AI 辅助开发, skill]
 演示应用为 **停留告警**（Loitering Detection）：检测到人员连续停留 10 秒即触发告警，人员离开后重置。
 
 :::tip 直接体验成品
-想跳过开发过程、直接部署成品？下载本次演示产出的预编译镜像 [occupancy-monitor.tar](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/app-development/ai-assisted-dev/occupancy-monitor.tar)（即 `image.tar`），配合 `app.yaml`（由 `ne503-dev` skill 生成）即可部署。
+想跳过开发过程、直接部署成品？下载本次演示产出的预编译包 [occupancy-monitor.tar](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/app-development/ai-assisted-dev/occupancy-monitor.tar)，解压即得 `app.yaml` 与 `image.tar`，按 [Hello World](./1-hello-world.md) §4 的步骤部署到设备即可。
 :::
 
 ## 1. 前置准备

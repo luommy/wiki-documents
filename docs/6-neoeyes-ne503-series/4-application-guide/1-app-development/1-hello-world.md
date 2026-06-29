@@ -14,7 +14,7 @@ tags: [应用开发, NE503, 教程, 入门]
 Hello World 不依赖 AI SDK，在一个循环中持续打印计数，用于验证开发环境与部署流程是否打通。
 
 :::tip 跳过构建，直接体验
-不想自己 build 镜像？下载预编译镜像 [hello-world.tar](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/app-development/hello-world/hello-world.tar)（即 `image.tar`），配合 §2 的 `app.yaml`，按 §4 部署到设备即可。
+不想自己 build 镜像？下载预编译包 [hello-world.tar](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/app-development/hello-world/hello-world.tar)，解压即得 `app.yaml` 与 `image.tar`，按 §4 部署到设备即可。
 :::
 
 ## 1. 前置条件
