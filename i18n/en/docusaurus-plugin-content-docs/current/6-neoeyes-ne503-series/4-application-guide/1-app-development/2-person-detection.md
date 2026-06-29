@@ -11,6 +11,10 @@ tags: [application development, NE503, tutorial, AI inference, SDK]
 
 This tutorial deploys a **real AI inference application** Person Detection, demonstrating the complete workflow: subscribing to video stream inference results via the Python SDK, discovering models and streams on the device, configuring application permissions, and verifying a complete application that publishes detection events and triggers the device light control.
 
+:::tip Skip the build, try it directly
+Don't want to build the image yourself? Download the prebuilt package [person-detection.tar](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/app-development/person-detection/person-detection.tar), unzip it to get `app.yaml` and `image.tar`, and follow §5 to deploy to the device.
+:::
+
 ## 1. Overview
 
 Person Detection subscribes to the camera video stream and runs AI detection model inference frame by frame. When a person appears in the frame:

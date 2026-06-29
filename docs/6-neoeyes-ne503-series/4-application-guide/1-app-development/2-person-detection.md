@@ -11,6 +11,10 @@ tags: [应用开发, NE503, 教程, AI 推理, SDK]
 
 本教程部署一个**真实的 AI 推理应用** Person Detection，完整演示：通过 Python SDK 订阅视频流推理结果、发现设备上的模型与流、配置应用权限，并验收一个会发布检测事件、联动设备灯控的完整应用。
 
+:::tip 跳过构建，直接体验
+不想自己 build 镜像？下载预编译包 [person-detection.tar](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/app-development/person-detection/person-detection.tar)，解压即得 `app.yaml` 与 `image.tar`，按 §5 部署到设备即可。
+:::
+
 ## 1. 功能概述
 
 Person Detection 订阅摄像头视频流，用 AI 检测模型逐帧推理，当画面中出现人时：
