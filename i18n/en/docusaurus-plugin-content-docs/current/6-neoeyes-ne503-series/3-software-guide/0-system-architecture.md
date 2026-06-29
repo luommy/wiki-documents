@@ -213,5 +213,4 @@ Installation path: `/opt/aipc/` (binaries in `bin/`, configuration in `etc/`).
 
 - [Application Development Guide](../4-application-guide/1-app-development/reference/1-app-reference.md) — How to write and deploy container applications
 - [Python SDK Reference](../4-application-guide/1-app-development/reference/2-sdk-reference.md) — SDK API signatures and usage examples
-- [RESTful API Reference](../4-application-guide/2-3rd-party-integration/0-restful-api.md) — Complete HTTP API endpoint reference
 - [Platform Services Overview](./4-reference/0-platform-services.md) — Service responsibilities, collaboration, and source pointers

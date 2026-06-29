@@ -67,7 +67,7 @@ aipc-cli app info <app-id>
 
 ### 2.1 WebSocket 断连
 
-WebSocket 断连常见于客户端超时、服务端报错或网络波动；接入侧（含推荐的重连策略）见 [视频集成](../../2-3rd-party-integration/1-video-integration.md)。
+WebSocket 断连常见于客户端超时、服务端报错或网络波动；接入侧（含推荐的重连策略）见「视频集成」（即将发布）。
 
 **诊断命令：**
 
@@ -222,6 +222,4 @@ ssh root@$IP "journalctl -u camera-daemon -n 20 --no-pager"             # 摄像
 ## 相关文档
 
 - [应用参考](./1-app-reference.md) — 应用配置和部署流程
-- [Video Integration](../../2-3rd-party-integration/1-video-integration.md) — 视频流接入指南
-- [Event Integration](../../2-3rd-party-integration/2-event-integration.md) — 事件总线接入指南
 - [Platform Troubleshooting](../../../3-software-guide/4-reference/1-troubleshooting.md) — 平台服务故障排查

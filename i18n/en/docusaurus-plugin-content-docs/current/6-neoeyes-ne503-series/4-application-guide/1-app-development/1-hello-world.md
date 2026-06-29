@@ -13,10 +13,6 @@ This tutorial uses a minimal Hello World application to demonstrate the **comple
 
 Hello World does not depend on the AI SDK — it prints a counter in a loop, used to verify that the development environment and deployment pipeline work end to end.
 
-:::tip Skip the build, try it directly
-Don't want to build the image yourself? Download the prebuilt package [hello-world.tar](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/app-development/hello-world/hello-world.tar), unzip it to get `app.yaml` and `image.tar`, and follow §4 to deploy to the device.
-:::
-
 ## 1. Prerequisites
 
 | Condition | Verification |
