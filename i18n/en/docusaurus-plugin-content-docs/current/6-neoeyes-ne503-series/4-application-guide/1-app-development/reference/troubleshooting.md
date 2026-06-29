@@ -64,7 +64,7 @@ aipc-cli app info <app-id>
 
 ### 2.1 WebSocket Disconnection
 
-WebSocket disconnection is usually client timeout, a server-side error, or network fluctuation; for the integration side (including the recommended reconnection strategy), see [Video Integration](../../2-3rd-party-integration/1-video-integration.md).
+WebSocket disconnection is usually client timeout, a server-side error, or network fluctuation; for the integration side (including the recommended reconnection strategy), see Video Integration (coming soon).
 
 **Diagnostic commands:**
 
@@ -219,6 +219,4 @@ ssh root@$IP "journalctl -u camera-daemon -n 20 --no-pager"             # camera
 ## Related Documentation
 
 - [App Reference](./1-app-reference.md) — App configuration and deployment workflow
-- [Video Integration](../../2-3rd-party-integration/1-video-integration.md) — Video stream integration guide
-- [Event Integration](../../2-3rd-party-integration/2-event-integration.md) — Event bus integration guide
 - [Platform Troubleshooting](../../../3-software-guide/4-reference/1-troubleshooting.md) — Platform service troubleshooting

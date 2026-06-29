@@ -283,7 +283,7 @@ class EncodedStreamClient:
     def close() -> None
 ```
 
-`FdMediaClient.get_encoded_stream(stream_id="main")` conveniently returns a connected `EncodedStreamClient`. For video stream integration (RTSP/WebSocket), see [Video Integration](../../2-3rd-party-integration/1-video-integration.md).
+`FdMediaClient.get_encoded_stream(stream_id="main")` conveniently returns a connected `EncodedStreamClient`. For video stream integration (RTSP/WebSocket), see Video Integration (coming soon).
 
 ---
 
