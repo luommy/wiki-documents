@@ -19,10 +19,11 @@ This document covers the initial flashing and subsequent upgrades of the system 
 
 Choose a path based on the current state of the device:
 
-- **Initial deployment / full flash** (new board, or bootloader corrupted): [§1 Prerequisites](#1-prerequisites) → [§2 Flash Boot Chain](#2-flash-boot-chain) → [§3 Flash System Image](#3-flash-system-image) → [§4 System Login](#4-system-login) → [§6 Verification](#6-verification)
-- **Upgrade system image only** (device already boots normally): [§1.3 TFTP](#13-tftp-server) → [§5.1 Upgrade](#51-u-boot-tftp-upgrade) → [§6 Verification](#6-verification)
+- **Initial deployment / full flash** (new board, or bootloader corrupted): [§1 Prerequisites](#1-prerequisites) → [§2 Flash Boot Chain](#2-flash-boot-chain) → [§3 Flash System Image](#3-flash-system-image) → [§4 Interface Board MCU Firmware](#4-interface-board-mcu-firmware) → [§5 System Login](#5-system-login) → [§7 Verification](#7-verification)
+- **Upgrade system image only** (device already boots normally): [§1.3 TFTP](#13-tftp-server) → [§6.1 Upgrade](#61-u-boot-tftp-upgrade) → [§7 Verification](#7-verification)
 
-> **When to skip §2:** if the device can reach the U-Boot menu or already boots into Linux, the boot chain is intact — go straight to §3 or §5. You only need §2 for a brand-new board or a corrupted bootloader (no U-Boot output on power-up).
+> **When to skip §2:** if the device can reach the U-Boot menu or already boots into Linux, the boot chain is intact — go straight to §3 or §6. You only need §2 for a brand-new board or a corrupted bootloader (no U-Boot output on power-up).
+> **Interface board MCU firmware ([§4](#4-interface-board-mcu-firmware)) is separate from the SoC system image** — the `meta-hailo-os` package does not include MCU firmware; it must be flashed separately via ST-LINK/SWD during initial deployment (see §4), otherwise peripherals (lens, light, IR, PTZ) will not work.
 
 ## 1. Prerequisites
 
@@ -44,13 +45,21 @@ Download the firmware package from the open-source repository [camthink-ai/meta-
 | `customer_certificate.bin` | Customer certificate |
 | `u-boot-tfa.itb` | U-Boot TF-A image |
 
-**System image (used by [§3](#3-flash-system-image) / [§5](#5-system-upgrade), 3 files)**
+**System image (used by [§3](#3-flash-system-image) / [§6](#6-system-upgrade), 3 files)**
 
 | File | Purpose |
 |------|---------|
 | `fitImage` | Linux kernel image |
 | `swupdate-image-hailo15-ne503.ext4.gz` | System root filesystem |
 | `hailo-update-image-hailo15-ne503.swu` | SWUpdate upgrade package |
+
+**Interface board MCU firmware (used by [§4](#4-interface-board-mcu-firmware), 1 file)**
+
+> Separate from the `meta-hailo-os` package; provided by CamThink.
+
+| File | Purpose |
+| ---- | ------- |
+| `ne503_mcu.elf` | Interface board MCU (STM32G0B0RET6) firmware |
 
 ### 1.2 Host Tools
 
@@ -90,9 +99,13 @@ python3 -m venv hailo-venv
 
 > **Serial device node:** Ubuntu is typically `/dev/ttyACM0`; macOS is typically `/dev/cu.usbserial-*` or `/dev/tty.usbserial-*`. Pass your actual node to `--serial-device-name` (see [§1.4 Hardware Connection](#14-hardware-connection) for how to find it).
 
+#### Interface Board MCU Flashing (required by [§4](#4-interface-board-mcu-firmware))
+
+Also requires an **ST-LINK debugger** (V2/V3) and [STM32CubeProgrammer](https://www.st.com/en/development-tools/stm32cubeprog.html) (validated version 2.19.0; uses the `STM32_Programmer_CLI` tool). Download and install from [st.com](https://www.st.com/en/development-tools/stm32cubeprog.html); on macOS the CLI is typically at `/Applications/STMicroelectronics/STM32Cube/STM32CubeProgrammer/STM32CubeProgrammer.app/Contents/MacOs/bin/STM32_Programmer_CLI`.
+
 ### 1.3 TFTP Server
 
-> Required for [§3 Flash System Image](#3-flash-system-image) / [§5 System Upgrade](#5-system-upgrade); skip this section if you only do §2 boot-chain flashing.
+> Required for [§3 Flash System Image](#3-flash-system-image) / [§6 System Upgrade](#6-system-upgrade); skip this section if you only do §2 boot-chain flashing.
 
 System images are large (100MB+) and must be transferred to the device via TFTP.
 
@@ -401,7 +414,63 @@ Return to the U-Boot menu and select **eMMC Board Init**. The device will automa
 
 The device reboots into Linux after flashing completes.
 
-## 4. System Login
+## 4. Interface Board MCU Firmware
+
+The interface board has a dedicated MCU (STM32G0B0RET6, Cortex-M0+) that manages all peripherals — lens, light, IR-CUT, PTZ, RS-485, alarm — and communicates with the core board over UART0. **This MCU firmware is separate from the hailo-os system image**: the `meta-hailo-os` package does not include MCU firmware and it must be flashed independently.
+
+> **If you skip this:** all peripherals fail — `camera-daemon`'s lens bridge keeps reporting `lens_state_get failed: -2810`, `device-control`'s MCU query times out, and `GET /api/v1/device/status` returns 500 (the Web console shows "internal server error").
+
+> **When required:** mandatory for initial deployment; the same flow applies to MCU firmware upgrades. This step is independent of the SoC flashing in [§2 Flash Boot Chain](#2-flash-boot-chain) / [§3 Flash System Image](#3-flash-system-image) — order does not matter, but both must be done before [§7 Verification](#7-verification).
+
+### 4.1 Prerequisites
+
+- **Hardware**: an ST-LINK debugger (V2/V3) connected to the interface board's SWD port (PA13/SWDIO, PA14/SWDCLK·BOOT0, NRST, GND, 3V3 VREF). Pinout in [AIPC Board Connection](../2-hardware-guide/2-aipc-board-connection.md).
+- **Power**: the device must be powered (PoE) — ST-LINK does not power the board; the MCU is powered by the device supply. After SWD hookup, VREF should read ~3.2V.
+- **Host tool**: STM32CubeProgrammer (see [§1.2](#12-host-tools)); uses the `STM32_Programmer_CLI` tool.
+- **Firmware**: `ne503_mcu.elf` (see [§1.1 Firmware Package](#11-firmware-package)).
+
+> BOOT0 does not need to be set — SWD works in normal boot mode (PA14 is the shared SWDCLK/BOOT0 pin). The SoC can only reset the MCU via `H_GPIO_18`, not control BOOT0, so MCU firmware must be flashed via ST-LINK/SWD and cannot be done from the SoC alone.
+
+### 4.2 Verify the SWD Connection
+
+```bash
+STM32_Programmer_CLI -c port=swd
+```
+
+Expected output (confirming the STM32G0B0 is reached):
+
+```plaintext
+Device name : STM32G0B0xx/B1xx/C1xx
+Flash size  : 512 KBytes
+Device CPU  : Cortex-M0+
+Voltage     : 3.22V
+```
+
+If it reports `No STM32 device found`: check the SWD wiring (SWDIO/SWDCLK/NRST/GND), confirm the device is powered, and confirm the host sees the ST-LINK (`STM32_Programmer_CLI -l` should list the probe).
+
+### 4.3 Flash
+
+```bash
+STM32_Programmer_CLI -c port=swd -e all -w ./ne503_mcu.elf -v -rst
+```
+
+This performs: connect SWD → mass erase → write `ne503_mcu.elf` → verify → reset & run. Success is `Mass erase successfully achieved`, `File download complete`, `Application is running`, exit code 0.
+
+### 4.4 Verify
+
+If platform software is already deployed on the SoC, after the device boots:
+
+```bash
+curl -s -H "Authorization: Bearer <token>" http://<device-ip>:8080/api/v1/device/status
+# returns 200; data.mcu_version / mcu_temp_c / light_sensor etc. have values
+```
+
+- `camera-daemon` no longer reports `lens_state_get failed: -2810`.
+- The Web console Device Status panel shows MCU temperature, light sensor, IR-CUT, PTZ data.
+
+> The MCU firmware version is independent of the platform software version (e.g. platform v1.2.0 ↔ MCU firmware `0.1.0.0`); each is upgraded separately. Disconnecting the ST-LINK after flashing does not affect operation.
+
+## 5. System Login
 
 After flashing, the device reboots automatically. Log in via serial console or SSH:
 
@@ -410,13 +479,13 @@ After flashing, the device reboots automatically. Log in via serial console or S
 
 ![System login](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/software-guide/system-flashing/sys-24-linux-login.png)
 
-> For system checks after logging in, see [§6 Verification](#6-verification).
+> For system checks after logging in, see [§7 Verification](#7-verification).
 
-## 5. System Upgrade
+## 6. System Upgrade
 
 This section covers system image upgrades, performed in-place via the SWUpdate mechanism using `.swu` packages.
 
-### 5.1 U-Boot TFTP Upgrade
+### 6.1 U-Boot TFTP Upgrade
 
 A full system-image upgrade reuses the same flow from [§3.3](#33-execute-flashing) (U-Boot menu → eMMC Board Init → TFTP → SWUpdate writes eMMC); the only difference is replacing the `.swu` package in the TFTP directory with the new version. **No need to redo §2 boot chain.**
 
@@ -433,13 +502,13 @@ hailo-update-image-h   9% |***                      | 72.1M  0:03:49 ETA
 
 > The `.swu` package is large (~100MB+). Over 100Mbps Ethernet the full upgrade takes about 5-10 minutes. **Do not power off or disconnect during the upgrade.**
 
-### 5.2 Runtime Firmware Update
+### 6.2 Runtime Firmware Update
 
 > Steps for online system-image upgrades via the SWUpdate CLI from within a running Linux system are pending and will be provided by the engineering team. For runtime deployment of platform software (ai-runtime, Web console, etc.), see [Software Deployment](./3-software-deployment.md).
 
 <!-- TODO: Engineering team to provide runtime swupdate CLI upgrade steps -->
 
-## 6. Verification
+## 7. Verification
 
 After flashing or upgrading, verify the following:
 
@@ -465,11 +534,11 @@ systemctl status ai-runtime camera-daemon app-manager event-bus device-control p
 
 > Device nodes: the system image lives on eMMC (`/dev/mmcblk1`) and the boot chain on SPI Flash (`/dev/mtdblock0`). The Hailo NPU is provided by the `hailo_integrated_nnc` kernel driver and is not necessarily exposed as a `/dev/hailo*` device node — use `lsmod | grep hailo` to verify the driver is loaded.
 
-## 7. Troubleshooting
+## 8. Troubleshooting
 
-Common issues are listed in operational order (§2 boot chain → §3 system image → §5 upgrade). Each follows the pattern: Symptom → Cause → Resolution.
+Common issues are listed in operational order (§2 boot chain → §3 system image → §6 upgrade). Each follows the pattern: Symptom → Cause → Resolution.
 
-### 7.1 Boot-Chain Flashing Issues
+### 8.1 Boot-Chain Flashing Issues
 
 **Symptom: `uart_boot_fw_loader` or `hailo15_spi_flash_program` is unresponsive / reports a serial error**
 
@@ -488,7 +557,7 @@ Common issues are listed in operational order (§2 boot chain → §3 system ima
   3. Run `uart_boot_fw_loader` + `hailo15_spi_flash_program` back-to-back in a single recovery session, without leaving a long gap between them.
 - A corrupted boot chain is always recoverable: UART recovery runs from the SoC's masked ROM and is independent of SPI Flash contents.
 
-### 7.2 TFTP & Network Issues
+### 8.2 TFTP & Network Issues
 
 **Symptom: U-Boot reports `TFTP error: 'Access violation' (2)` or download times out**
 
@@ -517,7 +586,7 @@ Common issues are listed in operational order (§2 boot chain → §3 system ima
 - **Cause:** The host and device are on different subnets, or the host IP is not the address pointed to by the device's `serverip`.
 - **Resolution:** Check [§3.2 Configure Network](#32-configure-network) — set the host to `10.0.0.2` and leave the device at its default `10.0.0.1`; or test connectivity manually from the U-Boot console with `tftp 0x80800000 fitImage`.
 
-### 7.3 eMMC Flashing Issues
+### 8.3 eMMC Flashing Issues
 
 **Symptom: Selecting eMMC Board Init fails or hangs**
 
@@ -527,7 +596,7 @@ Common issues are listed in operational order (§2 boot chain → §3 system ima
   - Confirm the files in the TFTP directory are complete and not truncated;
   - Re-download the firmware package from the open-source repository to overwrite any corrupted files.
 
-### 7.4 Upgrade Interruption Recovery
+### 8.4 Upgrade Interruption Recovery
 
 **Symptom: Power loss during upgrade leaves the device unbootable**
 
@@ -536,7 +605,7 @@ Common issues are listed in operational order (§2 boot chain → §3 system ima
   1. If the boot chain is corrupted (no U-Boot menu), re-execute [§2 Flash Boot Chain](#2-flash-boot-chain);
   2. Re-execute [§3 Flash System Image](#3-flash-system-image) to write a complete image.
 
-### 7.5 U-Boot Fails to Boot
+### 8.5 U-Boot Fails to Boot
 
 **Symptom: No U-Boot menu output on the serial terminal after power-on**
 
@@ -545,7 +614,19 @@ Common issues are listed in operational order (§2 boot chain → §3 system ima
   - Confirm the DIP switches are in normal mode (BOOT0 OFF, BOOT1 OFF);
   - If there is still no output, re-execute [§2 Flash Boot Chain](#2-flash-boot-chain).
 
-## 8. Related Documentation
+### 8.6 Interface Board MCU Issues
+
+**Symptom: the Web console shows "internal server error"; `GET /api/v1/device/status` returns 500 and takes ~5s; `camera-daemon` logs `lens_state_get failed: -2810` repeatedly**
+
+- **Cause:** the interface board MCU firmware is not flashed (or is corrupted), so the MCU does not respond on UART0 and `device-control`'s query times out.
+- **Resolution:** flash `ne503_mcu.elf` via ST-LINK/SWD per [§4](#4-interface-board-mcu-firmware). After flashing, `device/status` should return 200 with `mcu_version` and other fields.
+
+**Symptom: `STM32_Programmer_CLI -c port=swd` reports `No STM32 device found`**
+
+- **Cause:** wrong SWD wiring, device not powered, or the host does not see the ST-LINK.
+- **Resolution:** verify the SWD wiring (SWDIO/SWDCLK/NRST/GND/VREF); confirm the device is powered via PoE (VREF≈3.2V); `STM32_Programmer_CLI -l` should list the ST-LINK probe.
+
+## 9. Related Documentation
 
 - [System Architecture](./0-system-architecture.md) — Four-layer architecture and core services
 - [Software Deployment](./3-software-deployment.md) — Platform software deployment and iterative development
