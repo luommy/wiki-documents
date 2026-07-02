@@ -19,10 +19,11 @@ NE503 整机软件分为两层：
 
 根据设备当前状态选择路径：
 
-- **首次部署 / 全量烧录**（全新板或引导损坏）：[§1 准备](#1-准备工作) → [§2 烧引导链](#2-烧录引导链) → [§3 烧系统镜像](#3-烧录系统镜像) → [§4 登录](#4-系统登录) → [§6 验证](#6-验证)
-- **仅升级系统镜像**（设备已能正常启动）：[§1.3 TFTP](#13-tftp-服务器) → [§5.1 升级](#51-通过-u-boot-tftp-升级) → [§6 验证](#6-验证)
+- **首次部署 / 全量烧录**（全新板或引导损坏）：[§1 准备](#1-准备工作) → [§2 烧引导链](#2-烧录引导链) → [§3 烧系统镜像](#3-烧录系统镜像) → [§4 接口板 MCU 固件](#4-接口板-mcu-固件烧录) → [§5 登录](#5-系统登录) → [§7 验证](#7-验证)
+- **仅升级系统镜像**（设备已能正常启动）：[§1.3 TFTP](#13-tftp-服务器) → [§6.1 升级](#61-通过-u-boot-tftp-升级) → [§7 验证](#7-验证)
 
-> **何时跳过 §2：** 设备能进入 U-Boot 菜单或已能正常启动到 Linux，说明引导链完好，直接做 §3 或 §5。只有引导损坏（上电无 U-Boot 输出）或全新板才需要 §2。
+> **何时跳过 §2：** 设备能进入 U-Boot 菜单或已能正常启动到 Linux，说明引导链完好，直接做 §3 或 §6。只有引导损坏（上电无 U-Boot 输出）或全新板才需要 §2。
+> **接口板 MCU 固件（[§4](#4-接口板-mcu-固件烧录)）独立于 SoC 系统镜像**——`meta-hailo-os` 包不含 MCU 固件，首次部署必须用 ST-LINK/SWD 单独烧录（详见 §4），否则镜头、补光灯、IR-CUT、PTZ 等外设全部失灵。
 
 ## 1. 准备工作
 
@@ -44,13 +45,21 @@ NE503 整机软件分为两层：
 | `customer_certificate.bin`     | 客户证书           |
 | `u-boot-tfa.itb`               | U-Boot TF-A 镜像 |
 
-**系统镜像（[§3](#3-烧录系统镜像) / [§5](#5-系统升级) 使用，共 3 个）**
+**系统镜像（[§3](#3-烧录系统镜像) / [§6](#6-系统升级) 使用，共 3 个）**
 
 | 文件                                     | 用途           |
 | -------------------------------------- | ------------ |
 | `fitImage`                             | Linux 内核镜像   |
 | `swupdate-image-hailo15-ne503.ext4.gz` | 系统根文件系统      |
 | `hailo-update-image-hailo15-ne503.swu` | SWUpdate 升级包 |
+
+**接口板 MCU 固件（[§4](#4-接口板-mcu-固件烧录) 使用，1 个）**
+
+> 独立于 `meta-hailo-os` 固件包，由 CamThink 单独提供。
+
+| 文件 | 用途 |
+| ---- | ---- |
+| `ne503_mcu.elf` | 接口板 MCU（STM32G0B0RET6）固件 |
 
 ### 1.2 主机工具
 
@@ -90,9 +99,13 @@ python3 -m venv hailo-venv
 
 > **串口设备节点：** Ubuntu 一般为 `/dev/ttyACM0`；macOS 一般为 `/dev/cu.usbserial-*` 或 `/dev/tty.usbserial-*`。传入 `--serial-device-name` 时用本机实际节点（确认方法见 [§1.4 硬件连接](#14-硬件连接)）。
 
+#### 接口板 MCU 烧录（[§4](#4-接口板-mcu-固件烧录) 需要）
+
+额外需要 **ST-LINK 调试器**（V2/V3）和 [STM32CubeProgrammer](https://www.st.com/en/development-tools/stm32cubeprog.html)（验证版本 2.19.0，使用其 CLI `STM32_Programmer_CLI`）。从 [st.com](https://www.st.com/en/development-tools/stm32cubeprog.html) 下载安装；macOS 安装后 CLI 通常位于 `/Applications/STMicroelectronics/STM32Cube/STM32CubeProgrammer/STM32CubeProgrammer.app/Contents/MacOs/bin/STM32_Programmer_CLI`。
+
 ### 1.3 TFTP 服务器
 
-> [§3 烧录系统镜像](#3-烧录系统镜像) / [§5 系统升级](#5-系统升级) 需要；只做 §2 引导链烧录的可跳过本节。
+> [§3 烧录系统镜像](#3-烧录系统镜像) / [§6 系统升级](#6-系统升级) 需要；只做 §2 引导链烧录的可跳过本节。
 
 系统镜像较大（100MB+），通过 TFTP 网络协议传输到设备。
 
@@ -400,7 +413,63 @@ reset
 
 烧录完成后设备自动重启进入 Linux 系统。
 
-## 4. 系统登录
+## 4. 接口板 MCU 固件烧录
+
+接口板上的独立 MCU（STM32G0B0RET6，Cortex-M0+）管理镜头、补光灯、IR-CUT、PTZ、RS-485、报警等全部外设，经 UART0 与核心处理板通信。**该 MCU 固件独立于 hailo-os 系统镜像**——`meta-hailo-os` 固件包不含 MCU 固件，必须单独烧录。
+
+> **不烧会怎样：** 外设全部失灵——`camera-daemon` 镜头桥持续报 `lens_state_get failed: -2810`、`device-control` 查询 MCU 超时、`GET /api/v1/device/status` 返回 500（Web 控制台显示 "internal server error"）。
+
+> **何时需要：** 首次部署必须烧录；MCU 固件升级同样用本流程。本步独立于 [§2 烧录引导链](#2-烧录引导链) / [§3 烧录系统镜像](#3-烧录系统镜像) 的 SoC 烧录，顺序不限，但都需在 [§7 验证](#7-验证) 前完成。
+
+### 4.1 准备
+
+- **硬件**：ST-LINK 调试器（V2/V3），接到接口板的 SWD 调试口（PA13/SWDIO、PA14/SWDCLK·BOOT0、NRST、GND、3V3 VREF）。引脚定义见 [AIPC Board Connection](../2-hardware-guide/2-aipc-board-connection.md)。
+- **供电**：设备需上电（PoE）——ST-LINK 不给板子供电，MCU 由设备电源供电；SWD 连上后 VREF 应读到约 3.2V。
+- **主机工具**：STM32CubeProgrammer（见 [§1.2](#12-主机工具)），使用 CLI `STM32_Programmer_CLI`。
+- **固件**：`ne503_mcu.elf`（见 [§1.1 固件包](#11-固件包)）。
+
+> BOOT0 无需设置——SWD 在正常启动模式下即可编程（PA14 为 SWDCLK/BOOT0 复用引脚）。SoC 只能经 `H_GPIO_18` 复位 MCU、不能控制 BOOT0，因此 MCU 固件必须用 ST-LINK/SWD 烧录，无法仅从 SoC 侧完成。
+
+### 4.2 确认 SWD 连接
+
+```bash
+STM32_Programmer_CLI -c port=swd
+```
+
+预期输出（确认读到 STM32G0B0）：
+
+```plaintext
+Device name : STM32G0B0xx/B1xx/C1xx
+Flash size  : 512 KBytes
+Device CPU  : Cortex-M0+
+Voltage     : 3.22V
+```
+
+若报 `No STM32 device found`：检查 SWD 线序（SWDIO/SWDCLK/NRST/GND）、确认设备已上电、确认主机识别到 ST-LINK（`STM32_Programmer_CLI -l` 应列出 probe）。
+
+### 4.3 烧录
+
+```bash
+STM32_Programmer_CLI -c port=swd -e all -w ./ne503_mcu.elf -v -rst
+```
+
+依次完成：连接 SWD → 全片擦除 → 写入 `ne503_mcu.elf` → 校验 → 复位运行。以 `Mass erase successfully achieved`、`File download complete`、`Application is running`、退出码 0 为成功。
+
+### 4.4 验证
+
+若 SoC 已部署平台软件，设备启动后：
+
+```bash
+curl -s -H "Authorization: Bearer <token>" http://<device-ip>:8080/api/v1/device/status
+# 返回 200，data.mcu_version / mcu_temp_c / light_sensor 等字段有值
+```
+
+- `camera-daemon` 不再报 `lens_state_get failed: -2810`。
+- Web 控制台 Device Status 面板显示 MCU 温度、光感、IR-CUT、PTZ 数据。
+
+> MCU 固件版本独立于平台软件版本（如平台 v1.2.0 对应 MCU 固件 `0.1.0.0`），二者各自升级。烧录完成后断开 ST-LINK 不影响运行。
+
+## 5. 系统登录
 
 烧录完成后设备自动重启，通过串口或 SSH 登录系统：
 
@@ -409,13 +478,13 @@ reset
 
 ![系统登录](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/software-guide/system-flashing/sys-24-linux-login.png)
 
-> 登录后的系统检查见 [§6 验证](#6-验证)。
+> 登录后的系统检查见 [§7 验证](#7-验证)。
 
-## 5. 系统升级
+## 6. 系统升级
 
 本节说明系统镜像的升级，通过 SWUpdate 机制使用 `.swu` 升级包完成在线更新。
 
-### 5.1 通过 U-Boot TFTP 升级
+### 6.1 通过 U-Boot TFTP 升级
 
 系统镜像的完整升级复用 [§3.3](#33-执行烧录) 的同一套流程（U-Boot 菜单 → eMMC Board Init → TFTP → SWUpdate 写入 eMMC），区别只是把 TFTP 目录里的 `.swu` 包换成新版，**无需重做 §2 引导链**。
 
@@ -432,13 +501,13 @@ hailo-update-image-h   9% |***                      | 72.1M  0:03:49 ETA
 
 > `.swu` 包较大（约 100MB+），100Mbps 网络下整个升级过程约需 5-10 分钟。升级过程中**不要断电或断网**。
 
-### 5.2 运行时固件更新
+### 6.2 运行时固件更新
 
 > 在已启动的 Linux 内通过 SWUpdate 命令行在线升级系统镜像的步骤待工程团队补充。平台软件（ai-runtime、Web 控制台等）的运行时部署见 [Software Deployment](./3-software-deployment.md)。
 
 <!-- TODO: Engineering team to provide runtime swupdate CLI upgrade steps -->
 
-## 6. 验证
+## 7. 验证
 
 烧录或升级完成后，检查以下项目：
 
@@ -464,11 +533,11 @@ systemctl status ai-runtime camera-daemon app-manager event-bus device-control p
 
 > 设备节点说明：系统镜像存储在 eMMC（`/dev/mmcblk1`），引导链存储在 SPI Flash（`/dev/mtdblock0`）。Hailo NPU 通过内核驱动 `hailo_integrated_nnc` 提供，不一定暴露为 `/dev/hailo*` 设备节点，用 `lsmod | grep hailo` 验证驱动加载即可。
 
-## 7. 故障排查
+## 8. 故障排查
 
-按烧录流程顺序（§2 引导链 → §3 系统镜像 → §5 升级）列出常见问题，每项遵循「现象 → 原因 → 解决」。
+按烧录流程顺序（§2 引导链 → §3 系统镜像 → §6 升级）列出常见问题，每项遵循「现象 → 原因 → 解决」。
 
-### 7.1 引导链烧录问题
+### 8.1 引导链烧录问题
 
 **现象：`uart_boot_fw_loader` 或 `hailo15_spi_flash_program` 无响应 / 报串口错误**
 
@@ -487,7 +556,7 @@ systemctl status ai-runtime camera-daemon app-manager event-bus device-control p
   3. 在同一次恢复会话里连续执行 `uart_boot_fw_loader` + `hailo15_spi_flash_program`，不要在两者之间留长间隔。
 - 即便引导链已损坏也可恢复：UART 恢复走 SoC 内 masked ROM，与 SPI Flash 内容无关。
 
-### 7.2 TFTP 与网络问题
+### 8.2 TFTP 与网络问题
 
 **现象：U-Boot 报 `TFTP error: 'Access violation' (2)` 或下载超时**
 
@@ -516,7 +585,7 @@ systemctl status ai-runtime camera-daemon app-manager event-bus device-control p
 - **原因：** 主机与设备不在同一网段，或主机 IP 不是设备 `serverip` 所指地址。
 - **解决：** 按 [§3.2 配置网络](#32-配置网络) 检查——主机设为 `10.0.0.2`、设备默认 `10.0.0.1`；或在 U-Boot console 中用 `tftp 0x80800000 fitImage` 手动测试连通性。
 
-### 7.3 eMMC 烧录问题
+### 8.3 eMMC 烧录问题
 
 **现象：选择 eMMC Board Init 后烧录失败或卡住**
 
@@ -526,7 +595,7 @@ systemctl status ai-runtime camera-daemon app-manager event-bus device-control p
   - 确认 TFTP 目录文件完整且未被截断；
   - 重新从开源仓库下载固件包，覆盖可能损坏的文件。
 
-### 7.4 升级中断恢复
+### 8.4 升级中断恢复
 
 **现象：升级过程中断电，重启后设备无法启动**
 
@@ -535,7 +604,7 @@ systemctl status ai-runtime camera-daemon app-manager event-bus device-control p
   1. 若引导链损坏（无 U-Boot 菜单），重新执行 [§2 烧录引导链](#2-烧录引导链)；
   2. 重新执行 [§3 烧录系统镜像](#3-烧录系统镜像) 完整写入。
 
-### 7.5 U-Boot 无法启动
+### 8.5 U-Boot 无法启动
 
 **现象：上电后串口无 U-Boot 菜单输出**
 
@@ -544,7 +613,19 @@ systemctl status ai-runtime camera-daemon app-manager event-bus device-control p
   - 确认拨码开关为正常模式（BOOT0 OFF, BOOT1 OFF）；
   - 仍无输出则重新执行 [§2 烧录引导链](#2-烧录引导链)。
 
-## 8. 相关文档
+### 8.6 接口板 MCU 问题
+
+**现象：Web 控制台 "internal server error"；`GET /api/v1/device/status` 返回 500、耗时约 5s；`camera-daemon` 日志持续 `lens_state_get failed: -2810`**
+
+- **原因：** 接口板 MCU 固件未烧录（或已损坏），MCU 不响应 UART0，`device-control` 查询超时。
+- **解决：** 按 [§4](#4-接口板-mcu-固件烧录) 用 ST-LINK/SWD 烧录 `ne503_mcu.elf`。烧录后 `device/status` 应返回 200 并带 `mcu_version` 等字段。
+
+**现象：`STM32_Programmer_CLI -c port=swd` 报 `No STM32 device found`**
+
+- **原因：** SWD 线序不对、设备未上电、或主机未识别 ST-LINK。
+- **解决：** 核对 SWD 接线（SWDIO/SWDCLK/NRST/GND/VREF）；确认设备已 PoE 上电（VREF≈3.2V）；`STM32_Programmer_CLI -l` 应列出 ST-LINK probe。
+
+## 9. 相关文档
 
 - [System Architecture](./0-system-architecture.md) — 四层架构和核心服务
 - [Software Deployment](./3-software-deployment.md) — 平台软件部署和迭代开发
