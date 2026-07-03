@@ -10,9 +10,9 @@ tags: [NE503, 硬件规格, 芯片参数, 硬件参考]
 
 NE503 采用核心处理板（Hailo15H SoC）与接口板（STM32G0B0RET6 MCU）双板架构，详见 [Core Board](./1-core-board-connection.md) 和 [Interface Board](./2-aipc-board-connection.md)。
 
-| 产品型号 | 型号描述 |
+| 型号 | 型号描述 |
 |:---|:---|
-| NE5038-PX4 | Hailo15H + eMMC 64GB + LPDDR4 8GB，AF 4x 变焦 |
+| NE503 | Hailo15H + eMMC 64GB + LPDDR4 8GB，AF 4x 变焦 |
 
 ## 模组级规格参数
 

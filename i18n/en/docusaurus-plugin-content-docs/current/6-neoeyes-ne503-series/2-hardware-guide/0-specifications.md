@@ -10,9 +10,9 @@ tags: [NE503, hardware specifications, chip parameters, hardware reference]
 
 NE503 features a dual-board architecture with a core processing board (Hailo15H SoC) and an interface board (STM32G0B0RET6 MCU). For details, see [Core Board](./1-core-board-connection.md) and [Interface Board](./2-aipc-board-connection.md).
 
-| Product Model | Description |
+| Model | Description |
 |:---|:---|
-| NE5038-PX4 | Hailo15H + eMMC 64GB + LPDDR4 8GB, AF 4x zoom |
+| NE503 | Hailo15H + eMMC 64GB + LPDDR4 8GB, AF 4x zoom |
 
 ## Module-Level Specifications
 
