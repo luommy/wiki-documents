@@ -514,8 +514,8 @@ NeoEyes NE301 delivers on-device AI while maintaining ultra-low power consumptio
   - Hardware Guide:
     - [Components Overview](./2-NE300-MB01-development-board/1-hardware-guide/0-components-overview.md)
     - [Hardware Connection](./2-NE300-MB01-development-board/1-hardware-guide/1-hardware-connection.md)
-    - NE301 Schematic [「Download」](https://resources.camthink.ai/wiki/doc/NE301-Schematic-Open.pdf)
-    - NE301 PCB File [「Download」](https://resources.camthink.ai/wiki/doc/NE301-PCB-Open.pdf)
+    - NE301 Schematic [「Download」](https://resources.camthink.ai/wiki/doc/ne301-schematic-open.pdf)
+    - NE301 PCB File [「Download」](https://resources.camthink.ai/wiki/doc/ne301-pcb-open.pdf)
   - Software Guide:
     - [Development Environment Setup](./2-NE300-MB01-development-board/2-software-guide/0-development-environment-setup.md)
     - [System Flashing And Initialization](./2-NE300-MB01-development-board/2-software-guide/1-system-flashing-and-initialization.md)
