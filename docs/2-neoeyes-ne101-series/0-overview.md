@@ -533,9 +533,9 @@ NE101整机产品规格如下：
 
 关于NE101系列产品的应用场景与指南可见[「应用指南」](./3-application-guide/0-low-power-image-acquisition.md)
 
-NE101原理图[「下载」](https://resources.camthink.ai/wiki/doc/NE101-Schematic-Open.pdf)
+NE101原理图[「下载」](https://resources.camthink.ai/wiki/doc/ne101-schematic-open.pdf)
 
-NE101PCB文件[「下载」](https://resources.camthink.ai/wiki/doc/Ne101-PCB-Open.pdf)
+NE101PCB文件[「下载」](https://resources.camthink.ai/wiki/doc/ne101-pcb-open.pdf)
 
 
 <!-- ### 产品资源
