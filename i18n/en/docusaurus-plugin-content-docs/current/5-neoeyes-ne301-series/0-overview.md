@@ -514,8 +514,8 @@ NeoEyes NE301 delivers on-device AI while maintaining ultra-low power consumptio
   - Hardware Guide:
     - [Components Overview](./2-NE300-MB01-development-board/1-hardware-guide/0-components-overview.md)
     - [Hardware Connection](./2-NE300-MB01-development-board/1-hardware-guide/1-hardware-connection.md)
-    - NE301 Schematic [「Download」](https://resources.camthink.ai/wiki/doc/ne301-schematic-open.pdf?_gl=1*wj62ex*_gcl_au*NzQ0NTgzNzY2LjE3ODMzOTU2MjQ.*_ga*MTk5MDkwODE4My4xNzgzMzk1NjI0*_ga_XBWTN65KKB*czE3ODMzOTU2MjQkbzEkZzEkdDE3ODM0ODg5MzEkajE0JGwwJGgw)
-    - NE301 PCB File [「Download」](https://resources.camthink.ai/wiki/doc/ne301-pcb-open.pdf?_gl=1*1bbzhsj*_gcl_au*NzQ0NTgzNzY2LjE3ODMzOTU2MjQ.*_ga*MTk5MDkwODE4My4xNzgzMzk1NjI0*_ga_XBWTN65KKB*czE3ODMzOTU2MjQkbzEkZzEkdDE3ODM0ODkzMSQ)
+    - NE301 Schematic [「Download」](https://resources.camthink.ai/wiki/doc/ne301-schematic-open.pdf)
+    - NE301 PCB File [「Download」](https://resources.camthink.ai/wiki/doc/ne301-pcb-open.pdf)
   - Software Guide:
     - [Development Environment Setup](./2-NE300-MB01-development-board/2-software-guide/0-development-environment-setup.md)
     - [System Flashing And Initialization](./2-NE300-MB01-development-board/2-software-guide/1-system-flashing-and-initialization.md)
