@@ -425,6 +425,9 @@ The interface board has a dedicated MCU (STM32G0B0RET6, Cortex-M0+) that manages
 ### 4.1 Prerequisites
 
 - **Hardware**: an ST-LINK debugger (V2/V3) connected to the interface board's SWD port (PA13/SWDIO, PA14/SWDCLK·BOOT0, NRST, GND, 3V3 VREF). Pinout in [AIPC Board Connection](../2-hardware-guide/2-aipc-board-connection.md).
+
+![ST-LINK (SWD debug port) location on the interface board](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/software-guide/system-flashing/sys-25-mcu-swd-port.png)
+
 - **Power**: the device must be powered (PoE) — ST-LINK does not power the board; the MCU is powered by the device supply. After SWD hookup, VREF should read ~3.2V.
 - **Host tool**: STM32CubeProgrammer (see [§1.2](#12-host-tools)); uses the `STM32_Programmer_CLI` tool.
 - **Firmware**: `ne503_mcu.elf` (see [§1.1 Firmware Package](#11-firmware-package)).

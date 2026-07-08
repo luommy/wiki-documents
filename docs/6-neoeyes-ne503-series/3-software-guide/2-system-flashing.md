@@ -424,6 +424,9 @@ reset
 ### 4.1 准备
 
 - **硬件**：ST-LINK 调试器（V2/V3），接到接口板的 SWD 调试口（PA13/SWDIO、PA14/SWDCLK·BOOT0、NRST、GND、3V3 VREF）。引脚定义见 [AIPC Board Connection](../2-hardware-guide/2-aipc-board-connection.md)。
+
+![接口板 ST-LINK（SWD 调试口）接入位置](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/software-guide/system-flashing/sys-25-mcu-swd-port.png)
+
 - **供电**：设备需上电（PoE）——ST-LINK 不给板子供电，MCU 由设备电源供电；SWD 连上后 VREF 应读到约 3.2V。
 - **主机工具**：STM32CubeProgrammer（见 [§1.2](#12-主机工具)），使用 CLI `STM32_Programmer_CLI`。
 - **固件**：`ne503_mcu.elf`（见 [§1.1 固件包](#11-固件包)）。
