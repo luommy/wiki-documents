@@ -1,6 +1,5 @@
 ---
 id: troubleshooting
-title: 应用故障排查
 sidebar_position: 4
 description: NE503 应用开发故障排查，涵盖容器应用安装/启动/健康检查、视频流 WebSocket 集成、事件总线发布/订阅问题，帮助应用开发者快速定位常见问题。
 keywords: [NE503 应用排查, 容器启动失败, 健康检查, WebSocket 断连, 事件总线, SDK 排错]
