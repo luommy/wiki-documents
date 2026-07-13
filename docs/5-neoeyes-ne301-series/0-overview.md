@@ -265,7 +265,7 @@ NE301 采用前/中/后分离的模块化布局，各功能模块均可独立更
 - **显示屏**：OLED / TFT 显示屏，支持本地信息展示与人机交互。
 - **麦克风**：音频输入，支持语音采集与声学触发。
 
-> 传感器扩展板详细规格与驱动开发请参见[「Sensor 扩展板指南」](./2-NE300-MB01-development-board/1-hardware-guide/2-sensor-extension-board.md)。
+> 传感器扩展板详细规格与驱动开发请参见[「Sensor 扩展板指南」](../3-hardware-dev-resources/23-sensor-extension-board.md)。
 
 ## 产品配件
 

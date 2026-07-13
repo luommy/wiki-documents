@@ -59,6 +59,8 @@ Alarm input/output on the device enclosure.
 | PA8 | Alarm_OUT0 | Alarm output 0 (level output) |
 | PA9 | Alarm_OUT1 | Alarm output 1 (multiplexed with USART1_TX) |
 
+> **Note**: The MCU exposes 2 Alarm IN pins (PB13/PB14), but the product enclosure connector only routes out **1 Alarm IN**.
+
 ### RS-485
 
 RS-485 serial communication on the device enclosure.

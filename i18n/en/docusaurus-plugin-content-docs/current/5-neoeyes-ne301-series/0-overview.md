@@ -265,7 +265,7 @@ Connect the Sensor expansion board via the main board expansion header to interf
 - **Displays**: OLED / TFT displays for local information display and human-machine interaction.
 - **Microphones**: Audio input for voice capture and acoustic triggering.
 
-> For detailed specifications and driver development, see the [Sensor Expansion Board Guide](./2-NE300-MB01-development-board/1-hardware-guide/2-sensor-extension-board.md).
+> For detailed specifications and driver development, see the [Sensor Expansion Board Guide](../3-hardware-dev-resources/23-sensor-extension-board.md).
 
 ## Product Accessories
 
