@@ -6,6 +6,11 @@ All notable changes to the CamThink Wiki documentation will be documented in thi
 
 > This changelog reflects updates starting from **2025-12-23**. Major changes prior to this date are not recorded.
 
+## [2026-07-13]
+
+### Added
+- **NeoEyes NE503 Third-Party Integration Guide**: A new "Third-Party Integration" sub-section under the application guide, with 3 developer-facing docs for integrating external systems — a complete RESTful API reference (145 endpoints, rebuilt from the device's live OpenAPI spec), practical RTSP video stream integration (FFmpeg / GStreamer / NVR), and Event Bus integration (topic protocol, MQTT bridging, real-time WebSocket subscription). All content was verified end-to-end against a real device (curl on every endpoint + ffprobe on the three streams + SSH event-frame capture + the pulled OpenAPI spec), correcting divergences in the default auth setting, the error response shape, the device-event enum, and stream parameters (full bilingual support).
+
 ## [2026-06-22]
 
 ### Added
