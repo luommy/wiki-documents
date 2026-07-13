@@ -23,7 +23,7 @@ NeoEyes NE503 is an edge AI smart camera based on the **Hailo-15H SoC**, featuri
 
 - **4K Professional Imaging System**: Sony IMX678 (1/1.8") + Hailo Gen2 AI-ISP + AF auto-zoom lens (F1.6), supporting 4K@30fps H.265 encoding and &lt;0.01 LUX full-color night vision. Maintains image quality under HDR, low-light, and concurrent inference workloads, balancing wide-angle coverage and long-range recognition.
 
-- **Containerized Application Platform**: Built on containerd runtime with OCI image deployment and sandbox isolation. Models and applications can be independently deployed and upgraded. Algorithm vendors, integrators, and OEMs build industry solutions on a unified platform, avoiding vendor lock-in.
+- **Containerized Application Platform**: Built on containerd runtime with OCI image deployment and sandbox isolation. Models and applications can be independently deployed and upgraded. Algorithm vendors, integrators, OEMs, and operations teams build industry solutions on a unified platform, avoiding vendor lock-in.
 
 - **Industrial-Grade All-in-One Delivery**: Imaging, inference, alarm linkage, protocol output, and operations management integrated in a single device. IP67 protection + PoE 802.3AT power + Web console, supporting the full lifecycle from development validation to commercial deployment.
 
@@ -58,7 +58,7 @@ NE503 core specifications are as follows:
     </tr>
     <tr>
       <td>NPU</td>
-      <td>Hailo NPU, 20 TOPS @ INT8</td>
+      <td>Hailo NPU, 20 TOPS @ INT8, supports 4-bit quantization</td>
     </tr>
     <tr>
       <td>Memory / Storage</td>
@@ -79,16 +79,16 @@ NE503 core specifications are as follows:
     </tr>
     <tr>
       <td>Lens Module</td>
-      <td>AF auto-zoom 8–32mm, F1.6</td>
+      <td>AF auto-zoom 8–32mm, F1.6–F1.7</td>
     </tr>
     <tr>
       <td>ISP</td>
       <td>Hailo Gen2 AI-ISP, &lt;0.01 LUX full-color night vision</td>
     </tr>
     <tr>
-      <td rowSpan="3">Network &amp; Protocols</td>
+      <td rowSpan="4">Network &amp; Protocols</td>
       <td>Ethernet</td>
-      <td>100M LAN, supports PoE 802.3AT</td>
+      <td>10/100M LAN, supports PoE 802.3AT</td>
     </tr>
     <tr>
       <td>Video Protocol</td>
@@ -99,35 +99,59 @@ NE503 core specifications are as follows:
       <td>MQTT / Event Bus / RTMP (planned)</td>
     </tr>
     <tr>
-      <td rowSpan="3">Deployment Environment</td>
+      <td>Service Access</td>
+      <td>Engineering and maintenance access for integration and support</td>
+    </tr>
+    <tr>
+      <td rowSpan="5">Deployment Environment</td>
       <td>Power Supply</td>
       <td>DC 12V or PoE 802.3AT</td>
     </tr>
     <tr>
       <td>Protection Rating</td>
-      <td>IP67</td>
+      <td>IP67 (dust/waterproof) / IK10 (impact resistance)</td>
     </tr>
     <tr>
-      <td>Operating Temperature</td>
-      <td>-40°C to +60°C</td>
+      <td>Operating Temp. / Humidity</td>
+      <td>-40°C to +60°C / 0–95% RH (non-condensing)</td>
     </tr>
     <tr>
-      <td rowSpan="2">External Interfaces</td>
+      <td>Certifications</td>
+      <td>CE / FCC</td>
+    </tr>
+    <tr>
+      <td>Dimensions / Weight</td>
+      <td>320 × 134 × 126 mm / 2.5 kg</td>
+    </tr>
+    <tr>
+      <td rowSpan="3">External Interfaces</td>
       <td>Alarm IO</td>
-      <td>Alarm IN × 2 + Alarm OUT × 2 (relay + level)</td>
+      <td>Alarm IN × 1 + Wiegand output × 2 (relay + level)</td>
+    </tr>
+    <tr>
+      <td>Audio</td>
+      <td>Line-In / Line-Out, supports voice and on-site interaction</td>
     </tr>
     <tr>
       <td>Expansion Interfaces</td>
       <td>RS-485 (fill light connector is an internal module, not a user-facing external interface)</td>
     </tr>
     <tr>
-      <td rowSpan="2">Software Platform</td>
+      <td rowSpan="4">Software Platform</td>
       <td>Operating System</td>
       <td>Embedded Linux (Yocto build), containerd container runtime</td>
     </tr>
     <tr>
       <td>Management</td>
       <td>Web console + SSH + REST API + aipc-cli</td>
+    </tr>
+    <tr>
+      <td>Device Discovery</td>
+      <td>Supports device discovery and onboarding</td>
+    </tr>
+    <tr>
+      <td>Security</td>
+      <td>Application sandbox isolation, permission control, managed runtime resources</td>
     </tr>
   </tbody>
 </table>
@@ -147,7 +171,7 @@ NE503 is powered by the Hailo-15H SoC with an integrated Hailo NPU delivering 20
 | Inference Latency Target | &lt; 50ms |
 | Concurrent Inference | Supports multi-model simultaneous execution |
 | Data Transfer | Zero-copy Pipeline (DMA/SHM direct) |
-| Supported Tasks | Detection / OCR / Face Detection &amp; Recognition / ReID / Pose Estimation / Behavior Analysis / Attribute Recognition, etc. |
+| Supported Tasks | Detection / OCR / Face Detection &amp; Recognition / ReID / Pose Estimation / Behavior Analysis / Visual Search, etc. |
 | Pre-installed Models | Person Detection (YOLOv8n), Face Landmarks, CLIP Image Encoder |
 | Event Output | Structured inference results + event messages + device status data |
 
@@ -175,14 +199,16 @@ AI-ISP delivers clear color images even in extremely low-light environments, wit
   <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/overview/imaging-module.jpg" alt="Imaging Module" width="60%" />
 </div>
 
-The NE503 imaging system pairs a Sony IMX678 (1/1.8") image sensor with an AF auto-zoom lens. The sensor and lens share a matched 1/1.8" target surface, minimizing edge sharpness falloff. The lens covers 8mm (H 45.1°) to 32mm (H 14.7°), enabling a single unit to handle both wide-area surveillance and distant detail identification, with AF auto-zoom for on-site adjustment. The F1.6 wide aperture, combined with AI-ISP low-light enhancement, maintains image quality in dark and backlit conditions.
+The NE503 imaging system pairs a Sony IMX678 (1/1.8") image sensor with an AF auto-zoom lens. The sensor and lens share a matched 1/1.8" target surface, minimizing edge sharpness falloff. The lens covers 8mm (H 44.5°) to 32mm (H 14.5°), enabling a single unit to handle both wide-area surveillance and distant detail identification, with AF auto-zoom for on-site adjustment. The F1.6 wide aperture, combined with AI-ISP low-light enhancement, maintains image quality in dark and backlit conditions.
 
 ### Sensor
 
 | Parameter | Specification |
 |------|------|
 | Sensor | Sony IMX678, 1/1.8" CMOS |
-| Effective Pixels | 3840 × 2160 (4K UHD) |
+| Effective Pixels | 3856(H) × 2180(V) (native, approx. 8.4 MP), 4K UHD output 3840 × 2160 |
+| Pixel Size | 2.0 µm × 2.0 µm |
+| Sensor Interface | MIPI CSI-2, RAW10 / RAW12 |
 | HDR | Digital Overlap / Dual Gain HDR |
 
 ### Lens
@@ -200,16 +226,16 @@ The NE503 imaging system pairs a Sony IMX678 (1/1.8") image sensor with an AF au
       <td>8mm (wide) – 32mm (telephoto)</td>
     </tr>
     <tr>
-      <td>Max Aperture</td>
-      <td>F1.6</td>
+      <td>Aperture</td>
+      <td>F1.6 (wide) – F1.7 (telephoto), DC-Iris auto aperture</td>
     </tr>
     <tr>
       <td>Field of View</td>
-      <td>Horizontal 45.1° (W) / 14.7° (T); Diagonal 52.8° (W) / 16.8° (T); Vertical 24.6° (W) / 8.4° (T)</td>
+      <td>Horizontal 44.5° (W) / 14.5° (T); Diagonal 52° (W) / 16.6° (T); Vertical 24.6° (W) / 8.4° (T)</td>
     </tr>
     <tr>
       <td>Electromechanical</td>
-      <td>AF autofocus and auto-zoom, IR-Cut electromagnetic switching</td>
+      <td>AF autofocus and auto-zoom, DC-Iris auto aperture, IR-Cut electromagnetic switching</td>
     </tr>
   </tbody>
 </table>
@@ -233,7 +259,7 @@ The Processor Board integrates the SoC, NPU, memory, storage, and camera interfa
 | Item | Specification |
 |------|---------------|
 | SoC | Hailo-15H, Cortex-A53 × 4 @ 1.3 GHz |
-| NPU | Hailo NPU, 20 TOPS @ INT8 |
+| NPU | Hailo NPU, 20 TOPS @ INT8, supports 4-bit quantization |
 | DSP | 350 GOPS |
 | Memory | 8 GB LPDDR4 |
 | Storage | 64 GB eMMC |
@@ -247,11 +273,12 @@ The interface board manages all peripherals and communication interfaces through
 
 | Item | Specification |
 |------|---------------|
-| Alarm I/O | Alarm input × 2 + Alarm output × 2 (relay + level) |
+| Alarm I/O | Alarm input × 1 + Wiegand output × 2 (relay + level) |
+| Audio | Line-In / Line-Out, supports voice and on-site interaction |
 | RS-485 | Serial communication bus |
-| Ethernet | 100M LAN, supports PoE 802.3AT power supply |
+| Ethernet | 10/100M LAN, supports PoE 802.3AT power supply |
 | TF Card | Supports UHS-I high-speed storage cards |
-| Fill Light Interface | Supports IR fill light (supported), White fill light (reserved) |
+| Fill Light Interface | IR fill light (supported, 80m IR distance), White fill light (reserved) |
 
 #### MCU Management
 
@@ -317,7 +344,7 @@ With 20 TOPS local computing power, containerized microservice architecture, and
 
 <div className="scenario-overview" style={{ display: "flex", gap: "16px", alignItems: "center", marginBottom: "20px", flexWrap: "wrap" }}>
   <p style={{ flex: "1", margin: 0, lineHeight: 1.6 }}>
-    NE503 supports 24/7 all-weather complex security tasks. AI-ISP delivers clear color images in extremely low-light conditions, while multi-model concurrent inference enables person detection, license plate recognition, and perimeter intrusion detection. The event bus links hardware alarms (fill light, focus, Alarm output) and supports GenAI natural language retrieval of non-predefined targets.
+    NE503 supports 24/7 all-weather complex security tasks. AI-ISP delivers clear color images in extremely low-light conditions, while multi-model concurrent inference enables person detection, license plate recognition, and perimeter intrusion detection. The event bus links hardware alarms (fill light, focus, alarm output) and supports GenAI natural language retrieval of non-predefined targets.
   </p>
 </div>
 
@@ -368,7 +395,7 @@ With 20 TOPS local computing power, containerized microservice architecture, and
       items: [
         {
           title: "Safety Equipment Detection",
-          description: "Real-time detection of whether workers are wearing hard hats, protective clothing, reflective vests, etc. Violations immediately trigger Alarm output warning signals.",
+          description: "Real-time detection of whether workers are wearing hard hats, protective clothing, reflective vests, etc. Violations immediately trigger alarm output.",
           image: "https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/overview/app-safety.png",
           imageAlt: "Safety Equipment Detection"
         },
@@ -452,6 +479,7 @@ With 20 TOPS local computing power, containerized microservice architecture, and
 ### Developer Resources
 
 - Python SDK (MediaClient, InferenceClient, DeviceClient)
+- C++ SDK / Go SDK (planned, on the way)
 - aipc-cli command-line management tool
 - RESTful API (Bearer Token authentication)
 - Hailo Dataflow Compiler model compilation tool

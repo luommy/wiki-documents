@@ -37,7 +37,7 @@ The following items must be provided by the user:
 
 The NE503 serves as both a smart IPC and an edge computing platform. Consider both surveillance coverage and AI inference performance when choosing the installation spot:
 
-- **Surveillance coverage**: Select a position that covers the target area. Note the lens field of view (wide-angle: 45.1° horizontal, telephoto: 14.7°)
+- **Surveillance coverage**: Select a position that covers the target area. Note the lens field of view (wide-angle: 44.5° horizontal, telephoto: 14.5°)
 - **Environmental requirements**: IP67 rated, supports -40°C to +60°C operating temperature, suitable for outdoor installation
 - **Cable planning**: Ensure the Ethernet cable from the PoE switch or router reaches the installation location
 
