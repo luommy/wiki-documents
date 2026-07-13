@@ -59,6 +59,8 @@ tags: [NE503, 接口板, IO配置, STM32G0B0]
 | PA8 | Alarm_OUT0 | 报警输出 0（电平输出） |
 | PA9 | Alarm_OUT1 | 报警输出 1（与 USART1_TX 复用） |
 
+> **注**：MCU 提供 2 路 Alarm IN 引脚（PB13/PB14），但产品对外座子仅引出 **1 路 Alarm IN**。
+
 ### RS-485
 
 设备外壳 RS-485 串行通信接口。
