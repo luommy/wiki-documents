@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLocation } from '@docusaurus/router';
 import posthog from 'posthog-js';
-import { hasConsent, getConsent } from '../analytics/posthog-consent';
+import { hasConsent } from '../analytics/posthog-consent';
 
 const POSTHOG_KEY = 'phc_REPLACE_WITH_A3_KEY';
 const POSTHOG_URL = 'https://wiki-data.camthink.ai';
