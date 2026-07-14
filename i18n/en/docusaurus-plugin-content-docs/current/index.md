@@ -35,8 +35,15 @@ import VideoCarousel from '@site/src/components/VideoCarousel';
   {/* ================= Latest Updates ================= */}
   <h2 className="docs-section-title">Latest Docs</h2>
   <div className="latest-docs-grid">
-    <Link to="/docs/neoeyes-ne503-series/application-guide/app-development/ai-assisted-dev" className="update-card">
+    <Link to="/docs/neoeyes-ne503-series/application-guide/2-3rd-party-integration/restful-api" className="update-card">
       <span className="update-badge">NEW</span>
+      <div className="update-title">NE503 Third-Party Integration</div>
+      <div className="update-meta">
+        <span>New Doc</span>
+        <span>• 2026-07-13</span>
+      </div>
+    </Link>
+    <Link to="/docs/neoeyes-ne503-series/application-guide/app-development/ai-assisted-dev" className="update-card">
       <div className="update-title">NE503 AI-Assisted Development</div>
       <div className="update-meta">
         <span>New Doc</span>
@@ -54,13 +61,6 @@ import VideoCarousel from '@site/src/components/VideoCarousel';
       <div className="update-title">NE503 Hardware Guide</div>
       <div className="update-meta">
         <span>New Doc</span>
-        <span>• 2026-05-28</span>
-      </div>
-    </Link>
-    <Link to="/docs/neoeyes-ne301-series/application-guide/verified-models" className="update-card">
-      <div className="update-title">NE301 Verified Models</div>
-      <div className="update-meta">
-        <span>Updated</span>
         <span>• 2026-05-28</span>
       </div>
     </Link>
