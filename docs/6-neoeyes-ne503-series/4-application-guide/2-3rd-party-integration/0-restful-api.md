@@ -150,7 +150,7 @@ curl -X POST http://<设备IP>:8080/api/login \
 
 | 方法 | 路径 | 说明 |
 | --- | --- | --- |
-| POST | `/login` | 提交用户名密码换取 访问令牌（Token）；真实地址为 `POST /api/login`（独立于 `/api/v1` 前缀），公开端点，无需鉴权 |
+| POST | `/login` | 提交用户名密码换取访问令牌（Token）；真实地址为 `POST /api/login`（独立于 `/api/v1` 前缀），公开端点，无需鉴权 |
 | GET | `/system/health` | 健康检查，公开端点，无需鉴权，常用于存活探测 |
 | GET | `/system/info` | 获取设备系统信息（型号、版本、硬件等） |
 | GET | `/system/stats` | 获取系统运行统计（CPU、内存、磁盘等资源占用） |
@@ -486,11 +486,9 @@ curl -X POST http://<设备IP>:8080/api/login \
 | GET | `/storage/disks` | 列出当前可用磁盘及其分区信息 |
 | POST | `/storage/mount` | 将块设备挂载到指定目录 |
 | POST | `/storage/unmount` | 卸载此前已挂载的磁盘 |
-| POST | `/storage/format` | 按指定文件系统格式化磁盘 |
 
 - 挂载（`/storage/mount`）：需提供 `device`（如 `/dev/sda1`）与挂载目标 `target`（如 `/mnt/sda1`）；`device` 为必填。
 - 卸载（`/storage/unmount`）：仅需提供此前挂载的 `target` 路径。
-- 格式化（`/storage/format`）：需提供 `device`，并通过 `fstype` 指定文件系统类型（支持 `ext4`、`vfat`、`fat32`）。**该操作会清除目标设备上的全部数据，务必先确认设备路径。**
 
 ### 10.3 网络配置
 
@@ -499,88 +497,42 @@ curl -X POST http://<设备IP>:8080/api/login \
 | 方法 | 路径 | 说明 |
 |------|------|------|
 | GET | `/network/config` | 获取当前网络配置（IP、子网掩码、网关、DNS 等） |
-| POST | `/network/config` | 更新网络配置（切换 DHCP/静态 IP、设置 IP 与网关等） |
 | GET | `/network/interfaces` | 列出所有网络接口 |
 
-`/network/config` 的请求体以 `NetworkConfig` 结构描述一套完整配置，关键字段：`interface`（接口名，如 `eth0`）、`mode`（`dhcp` 或 `static`）、静态模式下的 `ip_address`、`subnet_mask`、`gateway`、`dns1`/`dns2`；其中 `mac_address` 为只读字段，仅由查询接口返回。
-
-> 注意：切换网络模式或修改 IP/网关可能导致设备短暂失联，调用前请确认配置正确，并预留重连或现场恢复方案。
+> 网络配置写入（DHCP/静态切换、改 IP）属设备初始部署操作，第三方集成一般只读 `GET /network/config` 与 `/network/interfaces` 做监控；如需改配请走设备运维流程，避免改错子网导致设备失联。
 
 ---
 
-## 11. 文件、日志与进程
+## 11. 内部与调试端点
 
-这组接口构成设备内置的 Web 运维工作台，面向开发与排障场景，提供对设备文件系统的读写管理、运行进程的查看与控制、系统日志的检索下载，以及一个基于 WebSocket 的网页终端。整体属于内部/调试用途，第三方业务集成一般用不到，仅在远程排查问题、采集诊断信息时才会涉及；其中文件删除、进程信号、终端等操作具备较高权限，使用时请格外谨慎。
+以下端点面向设备运维与排障，**不属于第三方集成 API**，集成方一般无需调用（应用日志可通过 `/apps/{app_id}/logs` 获取）。完整定义见 Swagger（`/swagger/`）：
 
-### 11.1 进程管理
+| 类别 | 端点 | 说明 |
+|:---|:---|:---|
+| 文件系统 | `/files/*` | 任意文件读写、上传/下载、删除、批量操作 |
+| 进程 | `/processes/*` | 列出进程、向进程发送信号（`kill`） |
+| 系统日志 | `/logs/*` | systemd 服务日志查看与下载 |
+| 调试日志 | `/debug-logs/*` | 打包导出服务与日志文件（tar.gz） |
+| Web 终端 | `/terminal/ws` | root 级交互式 shell（WebSocket） |
+| 开发工作台 | `/dev/*` | Web IDE 项目与构建流水线 |
 
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| GET | `/processes` | 列出设备当前运行进程，支持按 CPU、内存或 PID 排序，可限制返回条数（内部/调试） |
-| GET | `/processes/{pid}` | 查询指定进程的详细信息（内部/调试） |
-| POST | `/processes/{pid}/kill` | 向指定进程发送信号，支持 `SIGTERM`/`SIGKILL`/`SIGINT`/`SIGHUP`，默认 `SIGTERM`（内部/调试） |
-
-`kill` 接口的信号通过查询参数 `signal` 指定，PID 为路径参数；调用前请确认目标进程，`SIGKILL` 会强制终止且不可恢复。
-
-### 11.2 文件管理
-
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| GET | `/files` | 列出指定目录的内容，默认路径为 `/data/aipc`（内部/调试） |
-| DELETE | `/files` | 删除指定的文件或目录，`path` 为必填查询参数（内部/调试） |
-| GET | `/files/content` | 读取指定文件的内容（内部/调试） |
-| POST | `/files/content` | 写入文本内容到指定文件，请求体含 `path` 与 `content`（内部/调试） |
-| POST | `/files/upload` | 上传文件到设备（内部/调试） |
-| GET | `/files/download` | 下载设备上的指定文件（内部/调试） |
-| POST | `/files/mkdir` | 新建目录，请求体含 `path`（内部/调试） |
-| POST | `/files/rename` | 重命名或移动文件/目录，请求体含 `old_path` 与 `new_path`（内部/调试） |
-| POST | `/files/batch-download` | 将多个文件打包成 ZIP 批量下载，请求体为文件列表（内部/调试） |
-| POST | `/files/batch-delete` | 批量删除文件，请求体为文件列表（内部/调试） |
-
-写操作类接口（写入内容、上传、重命名、批量删除等）均通过 JSON 请求体传参；其中删除与批量删除不可恢复，调用前务必核对路径。
-
-### 11.3 日志
-
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| GET | `/logs/services` | 返回可查询日志的系统服务列表（内部/调试） |
-| GET | `/logs/files` | 返回设备上可读的日志文件清单（内部/调试） |
-| GET | `/logs/content` | 读取日志内容，按 `type`（`service` 或 `file`）与 `target` 定位，默认返回近 500 行（内部/调试） |
-| GET | `/logs/download` | 下载完整的日志文件或某个服务的 journal（内部/调试） |
-| GET | `/logs/stream/ws` | 实时推送日志流（WebSocket），需在查询参数中带 `token` 鉴权（内部/调试） |
-
-`type=service` 时 `target` 取服务名（配合 `/logs/services`），`type=file` 时 `target` 取文件路径（配合 `/logs/files`）。
-
-### 11.4 网页终端
-
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| GET | `/terminal/ws` | 网页终端会话，通过 WebSocket 收发命令，等同在设备上开一个 shell（WebSocket，内部/调试） |
-
-该端点提供完整的命令行交互能力，权限等同于 root shell，仅限受信任的调试场景使用。
+> 这些端点权限高（含任意文件操作、进程信号、root shell），第三方集成不应依赖。生产部署建议通过防火墙或额外鉴权收敛暴露面。
 
 ---
 
-## 12. SSH、设置与调试日志
+## 12. SSH 与系统设置
 
-本组面向设备运维与排障场景：远程管理 SSH 服务、读写自定义键值配置、以及按需导出系统与服务日志，供运维人员或第三方集成平台做安全加固、参数调整和故障定位。
+SSH 服务状态查询（只读）与自定义键值配置（key-value），供运维监控或集成方持久化业务参数。
 
-### 12.1 SSH 管理
+### 12.1 SSH 状态
 
 | 方法 | 路径 | 说明 |
-|------|------|------|
-| GET | `/ssh/config` | 查询当前 SSH 服务配置（端口、认证方式等）。 |
-| POST | `/ssh/config` | 更新 SSH 配置（端口、是否允许 root 登录、密码/密钥认证开关等）。 |
-| GET | `/ssh/status` | 查看 SSH 服务运行状态。 |
-| GET | `/ssh/logs` | 获取 SSH 登录记录，用于安全审计。 |
+|:---|:---|:---|
+| GET | `/ssh/config` | 查询当前 SSH 服务配置（端口、认证方式等） |
+| GET | `/ssh/status` | 查看 SSH 服务运行状态 |
+| GET | `/ssh/logs` | 获取 SSH 登录记录，用于安全审计 |
 
-更新配置时（POST /ssh/config）请求体为对象，主要字段：
-
-- `port`：SSH 监听端口（字符串，如 `"22"`）。
-- `permit_root_login`：是否允许 root 登录，可选 `yes`、`no`、`prohibit-password`。
-- `password_authentication` / `pubkey_authentication`：密码认证与密钥认证开关，取值 `yes` / `no`。
-- `max_auth_tries`：最大认证尝试次数（字符串，如 `"3"`）。
-- `restart_service`：是否在保存后自动重启 SSH 服务使配置生效，默认 `false`；改为 `true` 会短暂中断现有连接，调用前请确认。
+> SSH 配置的写入（改端口、root 登录开关等）属设备安全加固操作，不纳入集成 API；如需调整请通过设备运维流程。
 
 ### 12.2 系统设置
 
@@ -594,49 +546,7 @@ curl -X POST http://<设备IP>:8080/api/login \
 
 写入时请求体为对象，包含 `key`（必填，设置名）与 `value`（字符串形式的值），例如 `{"key":"detection_threshold","value":"0.75"}`。
 
-### 12.3 调试日志
-
-用于排障：先查询可用的 systemd 服务与日志文件清单，再按需打包导出为 tar.gz 供分析。（内部/调试）
-
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| GET | `/debug-logs/services` | 列出可导出日志的 systemd 服务。 （内部/调试） |
-| GET | `/debug-logs/files` | 列出可选的日志文件。 （内部/调试） |
-| POST | `/debug-logs/export` | 按所选服务与文件打包导出日志（tar.gz）。 （内部/调试） |
-
-导出时请求体（DebugLogExportRequest）要点：
-
-- `services`：要包含的 systemd 服务名数组。
-- `files`：要包含的日志文件路径数组。
-- `lines`：每个服务日志截取的行数，1～50000，默认 10000。
-
----
-
-## 13. 开发工作台
-
-这组端点服务于设备内置的在线开发工作台（Web IDE），用于在设备上创建项目、上传源码、编辑文件并触发构建。属于内部/调试用途，第三方业务集成通常不会用到，一般仅由设备自带的开发控制台前端调用。
-
-| 方法 | 路径 | 说明 |
-| --- | --- | --- |
-| GET | `/dev/base-images` | 列出可用的开发基础镜像（内部/调试） |
-| GET | `/dev/projects` | 列出全部开发项目（内部/调试） |
-| POST | `/dev/projects` | 新建一个开发项目（内部/调试） |
-| GET | `/dev/projects/{id}` | 获取指定项目的详情（内部/调试） |
-| PUT | `/dev/projects/{id}` | 更新指定项目的配置（内部/调试） |
-| DELETE | `/dev/projects/{id}` | 删除指定项目（内部/调试） |
-| POST | `/dev/projects/{id}/upload` | 向项目上传单个文件（内部/调试） |
-| POST | `/dev/projects/{id}/source` | 上传源码压缩包并导入项目（内部/调试） |
-| GET | `/dev/projects/{id}/files` | 列出项目内指定路径下的文件树（内部/调试） |
-| GET | `/dev/projects/{id}/file` | 读取项目内某个文件的内容（内部/调试） |
-| POST | `/dev/projects/{id}/file` | 保存（写入）项目内文件的内容（内部/调试） |
-| GET | `/dev/projects/{id}/builds` | 列出该项目的历史构建记录（内部/调试） |
-| POST | `/dev/projects/{id}/build` | 为该项目发起新一次构建（内部/调试） |
-
-> 说明：以上端点均为开发工作台前端服务的内部接口，行为与可用性可能随固件版本变化，不建议在第三方集成或生产流程中直接调用；如需在设备上部署或更新应用，请优先使用本指南「应用管理」「AI 模型与推理」等章节描述的正式接口。
-
----
-
-## 14. 响应格式
+## 13. 响应格式
 
 所有 API 响应使用统一的 JSON 信封。
 
@@ -676,7 +586,7 @@ curl -X POST http://<设备IP>:8080/api/login \
 
 ---
 
-## 15. WebSocket 接口
+## 14. WebSocket 接口
 
 所有 WebSocket 端点通过 `?token=<token>` 传递认证 Token。
 
@@ -691,28 +601,7 @@ curl -X POST http://<设备IP>:8080/api/login \
 
 ---
 
-## 16. 服务配置
-
-<!-- 已核对：来自真机 /data/aipc/etc/platform-api.yaml -->
-
-| 配置项 | 实际值 | 说明 |
-|:---|:---|:---|
-| `service.http_addr` | `:8080` | HTTP 监听地址 |
-| `service.log_level` | `debug` | 日志级别 |
-| `auth.enabled` | `true` | 认证默认开启 |
-| `auth.username` / `auth.password` | `admin` / `password` | 默认登录凭据（生产务必修改） |
-| `web.enable_cors` | `true` | 启用 CORS |
-| `stream.rtsp_base_url` | `rtsp://localhost:8554` | RTSP 流基址 |
-| `stream.encoded_pub_dir` | `/run/aipc/encoded` | H.264 编码帧发布目录 |
-| `storage.root_path` | `/data/aipc` | 平台根目录 |
-| `storage.model_blob_path` | `/data/aipc/models/blobs` | 模型文件存储路径 |
-| `database.path` | `/data/aipc/data/platform.db` | SQLite 数据库路径 |
-
-后端 gRPC 服务通过 Unix Domain Socket 连接，Socket 文件位于 `/run/aipc/` 目录下（实测包含 `ai-runtime.sock`、`app-manager.sock`、`camera.sock`、`camera-control.sock`、`device-control.sock`、`device-discovery.sock`、`event-bus.sock`），连接池支持自动重连和资源回收。
-
----
-
-## 17. 相关文档
+## 15. 相关文档
 
 - [平台架构](../../3-software-guide/0-system-architecture.md) — NE503 四层架构与服务依赖关系
 - [应用开发](../1-app-development/reference/1-app-reference.md) — 容器应用开发参考

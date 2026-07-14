@@ -54,7 +54,7 @@ The Event Bus uses `/`-separated hierarchical Topics and supports three wildcard
 | `timestamp_ns` | uint64 | Nanosecond timestamp |
 | `source` | string | Source (service name or app_id) |
 | `event_id` | string | Auto-generated unique ID |
-| `payload` | bytes | JSON-encoded event payload (transmitted as a JSON string on the wire) |
+| `payload` | bytes / dict | On the wire this is JSON-encoded bytes; the Python SDK (`hailo_ipc_sdk`) already deserializes it into a dict, so the examples can call `event.payload.get(...)` directly |
 | `metadata` | map | Optional key-value metadata (not carried by most events) |
 
 ## 2. MQTT Bridge Configuration
@@ -220,16 +220,6 @@ ws.onmessage = (e) => {
 };
 ```
 
-### 5.3 Application Management API
-
-| Operation | Method | Path |
-|:---|:---|:---|
-| List applications | GET | `/api/v1/apps` |
-| Start application | POST | `/api/v1/apps/{id}/start` |
-| Stop application | POST | `/api/v1/apps/{id}/stop` |
-| Uninstall application | DELETE | `/api/v1/apps/{id}` |
-| View logs | GET | `/api/v1/apps/{id}/logs` |
-
 ## 6. Business System Integration Patterns
 
 ### 6.1 Single-Device Direct Connection
@@ -254,56 +244,15 @@ When bridging, use `f"ne503/{DEVICE_ID}/{event.topic}"` as the MQTT Topic.
 
 ### 6.3 Webhook Forwarding
 
-The bridge program runs on the device itself (or accesses the loopback endpoint via an SSH tunnel):
-
-Forward events to an external endpoint via HTTP POST:
+Same pattern as MQTT bridging (§2) -- subscribe to events and forward them to an external business endpoint via HTTP POST:
 
 ```python
 import requests
-from hailo_ipc_sdk.events import EventClient
-
-WEBHOOK_URL = "https://api.example.com/ne503/events"
-event_client = EventClient()  # Connects via the TCP endpoint
-
 for event in event_client.subscribe("inference/**"):
-    try:
-        requests.post(WEBHOOK_URL, json={
-            "device_id": "ne503-001",
-            "topic": event.topic,
-            "timestamp_ns": event.timestamp_ns,
-            "payload": event.payload,
-        }, timeout=5)
-    except requests.RequestException as e:
-        print(f"Webhook delivery failed: {e}")
+    requests.post(WEBHOOK_URL, json={"topic": event.topic, "payload": event.payload}, timeout=5)
 ```
 
-### 6.4 Database Persistence
-
-The bridge program runs on the device itself (or accesses the loopback endpoint via an SSH tunnel):
-
-Write inference results to a database for subsequent analysis:
-
-```python
-import sqlite3
-from datetime import datetime
-from hailo_ipc_sdk.events import EventClient
-
-db = sqlite3.connect("inference_log.db")
-db.execute("""CREATE TABLE IF NOT EXISTS detections (
-    event_id TEXT PRIMARY KEY, model_id TEXT, stream_id TEXT,
-    object_count INTEGER, infer_time_us INTEGER, timestamp TEXT)""")
-
-event_client = EventClient()  # Connects via the TCP endpoint
-for event in event_client.subscribe("inference/**"):
-    model_id = event.topic.split("/")[-2]  # Three-segment topic
-    ts = datetime.fromtimestamp(event.timestamp_ns / 1e9).isoformat()
-    db.execute("INSERT OR IGNORE INTO detections VALUES (?,?,?,?,?,?)",
-               (event.event_id, model_id,
-                event.payload.get("stream_id", ""),
-                len(event.payload.get("objects", [])),
-                event.payload.get("infer_time_us", 0), ts))
-    db.commit()
-```
+The bridge program must likewise run on the device itself (50053 is loopback-only).
 
 ## 7. Related Documentation
 

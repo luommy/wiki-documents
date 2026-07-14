@@ -1,5 +1,5 @@
 ---
-description: NE503 RTSP 视频流对接实战指南，涵盖 FFmpeg 拉流录制/转码、GStreamer 集成与 VMS/NVR 对接方案。
+description: NE503 RTSP 视频流对接实战指南，涵盖 FFmpeg 拉流录制/转码与 VMS/NVR 对接方案。
 keywords: [NE503, RTSP, FFmpeg, GStreamer, 视频流, VMS, 对接]
 tags: [系统集成, NE503, 视频流, RTSP]
 ---
@@ -99,91 +99,11 @@ ffmpeg -rtsp_transport tcp -i "rtsp://192.168.1.100:8554/main" \
   -map 2:v -c copy recording_third.mp4
 ```
 
-### 2.6 转 HLS 用于 Web 播放
+> **其他拉流工具**：除 FFmpeg 外，GStreamer（`rtspsrc protocols=tcp latency=0`）、VLC、OpenCV 等任何支持 RTSP over TCP 的工具均可拉取 NE503 码流，命令与上述等价，本文不再赘述。
 
-```bash
-# 将 RTSP 转为 HLS 分片，适合 Web 前端播放
-ffmpeg -rtsp_transport tcp -i "rtsp://192.168.1.100:8554/sub" \
-  -c:v libx264 -preset veryfast -tune zerolatency \
-  -hls_time 2 -hls_list_size 3 -hls_flags delete_segments \
-  -f hls stream.m3u8
-```
+## 3. VMS 集成
 
-## 3. GStreamer Pipeline
-
-### 3.1 基本拉流管道
-
-```bash
-# 拉取主码流并显示
-gst-launch-1.0 rtspsrc location=rtsp://192.168.1.100:8554/main \
-  protocols=tcp latency=0 ! \
-  rtph264depay ! h264parse ! avdec_h264 ! autovideosink
-
-# 拉取子码流并保存为 MP4
-gst-launch-1.0 rtspsrc location=rtsp://192.168.1.100:8554/sub \
-  protocols=tcp latency=0 ! \
-  rtph264depay ! h264parse ! mp4mux ! filesink location=output.mp4
-```
-
-### 3.2 硬件加速转码（x86 服务器）
-
-在搭载 NVIDIA GPU 的服务器上，可利用 NVDEC 硬件解码：
-
-```bash
-# NVIDIA 硬件解码 + 转码输出
-gst-launch-1.0 rtspsrc location=rtsp://192.168.1.100:8554/main \
-  protocols=tcp latency=0 ! \
-  rtph264depay ! nvh264dec ! \
-  videoconvert ! x264enc tune=zerolatency ! \
-  mp4mux ! filesink location=output_hw.mp4
-```
-
-> ARM 平台请使用对应的硬件解码插件（如 `v4l2h264dec`），具体取决于目标平台的多媒体框架。
-
-### 3.3 取帧送 AI 推理
-
-```python
-import gi
-gi.require_version('Gst', '1.0')
-from gi.repository import Gst, GLib
-
-Gst.init(None)
-
-PIPELINE = (
-    "rtspsrc location=rtsp://192.168.1.100:8554/third protocols=tcp latency=0 ! "
-    "rtph264depay ! decodebin ! videoconvert ! video/x-raw,format=RGB ! "
-    "appsink name=sink emit-signals=True max-buffers=2 drop=True"
-)
-
-def on_new_sample(sink):
-    sample = sink.emit("pull-sample")
-    buffer = sample.get_buffer()
-    caps = sample.get_caps()
-    w = caps.get_structure(0).get_int("width")[1]
-    h = caps.get_structure(0).get_int("height")[1]
-    success, info = buffer.map(Gst.MapFlags.READ)
-    if success:
-        import numpy as np
-        frame = np.frombuffer(info.data, dtype=np.uint8).reshape(h, w, 3)
-        # 在此处执行 AI 推理
-        buffer.unmap(info)
-    return Gst.FlowReturn.OK
-
-pipeline = Gst.parse_launch(PIPELINE)
-sink = pipeline.get_by_name("sink")
-sink.connect("new-sample", on_new_sample)
-pipeline.set_state(Gst.State.PLAYING)
-
-loop = GLib.MainLoop()
-try:
-    loop.run()
-except KeyboardInterrupt:
-    pipeline.set_state(Gst.State.NULL)
-```
-
-## 4. VMS 集成
-
-### 4.1 通用 NVR / ONVIF 接入
+### 3.1 通用 NVR / ONVIF 接入
 
 NE503 当前版本以 RTSP 对接为主，不提供 ONVIF 设备发现服务。通用 NVR 对接步骤：
 
@@ -192,46 +112,13 @@ NE503 当前版本以 RTSP 对接为主，不提供 ONVIF 设备发现服务。�
 3. 传输协议选择 **TCP**
 4. 按需选择码流：NVR 录像用 `main`，多画面预览用 `sub`
 
-## 5. 多客户端并发与带宽规划
+## 4. 并发与带宽规划
 
-### 5.1 并发限制
+NE503 的 RTSP 服务支持多客户端同时拉取，并发上限取决于设备负载与码流组合，建议按实际部署实测确认。常见做法是主码流录像、子码流多画面预览、三码流做 AI 分析，分别独立拉取即可。
 
-NE503 RTSP 服务最多支持 **8 个并发客户端**（所有码流共享）。每路码流可独立被多个客户端同时拉取。
+RTSP over TCP 交织传输的网络开销约 10–25%，带宽规划时按 §1.1 的码率预留余量。
 
-| 场景 | 建议码流 | 并发数 | 说明 |
-|------|---------|--------|------|
-| NVR 录像 + 实时预览 | main + sub | 2 | 录像用主码流，预览用子码流 |
-| 多画面监控墙 | sub 或 third | 按画面数 | 4 画面以下用 sub，更多用 third |
-| AI 分析 + 录像 | third + main | 2 | 分析用三码流节省带宽 |
-| 移动端远程查看 | third | 1 | 低码率适合蜂窝网络 |
-
-### 5.2 带宽估算
-
-| 码流 | 码率 | 单路带宽 | 4 路同时拉取 |
-|------|------|---------|------------|
-| main | 4 Mbps | ~5 Mbps（含开销） | ~20 Mbps |
-| sub | 2 Mbps | ~2.5 Mbps | ~10 Mbps |
-| third | 512 Kbps | ~700 Kbps | ~2.8 Mbps |
-
-> RTSP over TCP 交织传输的开销约 10-25%，实际带宽需求高于编码码率。
-
-### 5.3 码流选择建议
-
-```mermaid
-flowchart TD
-    A[选择码流] --> B{需要高清录像?}
-    B -->|是| C[main — 1080p 4Mbps]
-    B -->|否| D{带宽受限?}
-    D -->|是| E[third — 640x384 512Kbps]
-    D -->|否| F{需要多路并发?}
-    F -->|是| E
-    F -->|否| G[sub — 720p 2Mbps]
-    C --> H[带宽需求: ~5 Mbps/路]
-    E --> I[带宽需求: ~0.7 Mbps/路]
-    G --> J[带宽需求: ~2.5 Mbps/路]
-```
-
-## 6. 相关文档
+## 5. 相关文档
 
 - [快速入门](../../1-quick-start.md) — RTSP 码流验证与 VLC 播放
 - [RESTful API](../../4-application-guide/2-3rd-party-integration/0-restful-api.md) — 媒体流 API 端点（码流启停、参数调整）

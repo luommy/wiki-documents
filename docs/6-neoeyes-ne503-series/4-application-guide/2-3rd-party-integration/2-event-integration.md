@@ -54,7 +54,7 @@ Event Bus 使用 `/` 分隔的层级式 Topic，支持三种通配符：`*`（�
 | `timestamp_ns` | uint64 | 纳秒级时间戳 |
 | `source` | string | 来源（服务名或 app_id） |
 | `event_id` | string | 自动生成的唯一 ID |
-| `payload` | bytes | JSON 编码的事件载荷（线上以 JSON 字符串形式传输） |
+| `payload` | bytes / dict | 线上为 JSON 编码的 bytes；Python SDK（`hailo_ipc_sdk`）已自动反序列化为 dict，故示例中可直接 `event.payload.get(...)` |
 | `metadata` | map | 可选键值对元数据（多数事件不携带） |
 
 ## 2. MQTT 桥接配置
@@ -220,16 +220,6 @@ ws.onmessage = (e) => {
 };
 ```
 
-### 5.3 应用管理 API
-
-| 操作 | 方法 | 路径 |
-|:---|:---|:---|
-| 列出应用 | GET | `/api/v1/apps` |
-| 启动应用 | POST | `/api/v1/apps/{id}/start` |
-| 停止应用 | POST | `/api/v1/apps/{id}/stop` |
-| 卸载应用 | DELETE | `/api/v1/apps/{id}` |
-| 查看日志 | GET | `/api/v1/apps/{id}/logs` |
-
 ## 6. 业务系统集成模式
 
 ### 6.1 单设备直连
@@ -254,56 +244,15 @@ NE503 #3 ─┘
 
 ### 6.3 Webhook 转发
 
-桥接程序运行在设备本机（或通过 SSH 隧道访问 loopback 端点）：
-
-将事件通过 HTTP POST 转发到外部端点：
+与 MQTT 桥接（§2）同模式——订阅事件后通过 HTTP POST 转发到外部业务端点：
 
 ```python
 import requests
-from hailo_ipc_sdk.events import EventClient
-
-WEBHOOK_URL = "https://api.example.com/ne503/events"
-event_client = EventClient()  # 通过 TCP 端点连接
-
 for event in event_client.subscribe("inference/**"):
-    try:
-        requests.post(WEBHOOK_URL, json={
-            "device_id": "ne503-001",
-            "topic": event.topic,
-            "timestamp_ns": event.timestamp_ns,
-            "payload": event.payload,
-        }, timeout=5)
-    except requests.RequestException as e:
-        print(f"Webhook 投递失败: {e}")
+    requests.post(WEBHOOK_URL, json={"topic": event.topic, "payload": event.payload}, timeout=5)
 ```
 
-### 6.4 数据库持久化
-
-桥接程序运行在设备本机（或通过 SSH 隧道访问 loopback 端点）：
-
-将推理结果写入数据库供后续分析：
-
-```python
-import sqlite3
-from datetime import datetime
-from hailo_ipc_sdk.events import EventClient
-
-db = sqlite3.connect("inference_log.db")
-db.execute("""CREATE TABLE IF NOT EXISTS detections (
-    event_id TEXT PRIMARY KEY, model_id TEXT, stream_id TEXT,
-    object_count INTEGER, infer_time_us INTEGER, timestamp TEXT)""")
-
-event_client = EventClient()  # 通过 TCP 端点连接
-for event in event_client.subscribe("inference/**"):
-    model_id = event.topic.split("/")[-2]  # 三段式 topic
-    ts = datetime.fromtimestamp(event.timestamp_ns / 1e9).isoformat()
-    db.execute("INSERT OR IGNORE INTO detections VALUES (?,?,?,?,?,?)",
-               (event.event_id, model_id,
-                event.payload.get("stream_id", ""),
-                len(event.payload.get("objects", [])),
-                event.payload.get("infer_time_us", 0), ts))
-    db.commit()
-```
+桥接程序同样需运行在设备本机（50053 仅 loopback）。
 
 ## 7. 相关文档
 
