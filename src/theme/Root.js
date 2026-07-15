@@ -1,41 +1,44 @@
 import React from 'react';
 import { useLocation } from '@docusaurus/router';
-import posthog from 'posthog-js';
-import { hasConsent } from '../analytics/posthog-consent';
+import { hasConsent } from '../analytics/consent';
 
-const POSTHOG_KEY = 'phc_REPLACE_WITH_A3_KEY';
-const POSTHOG_URL = 'https://wiki-data.camthink.ai';
+const UMAMI_SCRIPT_URL = 'https://wiki-data.camthink.ai/script.js';
+const UMAMI_WEBSITE_ID = 'REPLACE_WITH_UMAMI_WEBSITE_ID';
 const isProd = process.env.NODE_ENV === 'production';
 
+const KNOWN_LOCALES = ['zh-Hans', 'en'];
+
+// Umami 脚本动态注入（consent-gated，仅 production）。
+// 脚本加载后自动追踪 pageview（含 SPA 路由变化），无需手动 capture。
+function injectUmami() {
+  if (typeof document === 'undefined') return;
+  if (document.querySelector('script[data-umami]')) return;
+  const s = document.createElement('script');
+  s.async = true;
+  s.defer = true;
+  s.src = UMAMI_SCRIPT_URL;
+  s.setAttribute('data-website-id', UMAMI_WEBSITE_ID);
+  s.setAttribute('data-umami', '');
+  document.head.appendChild(s);
+}
+
+// 安全上报：window.umami 在脚本加载前不存在，optional check 静默跳过。
+function track(eventName, props) {
+  if (typeof window !== 'undefined' && window.umami) {
+    window.umami.track(eventName, props);
+  }
+}
+
 if (isProd && typeof window !== 'undefined') {
-  posthog.init(POSTHOG_KEY, {
-    api_url: POSTHOG_URL,
-    autocapture: false,                 // 关自动捕获（spec §7.1）
-    capture_pageview: false,            // 关自动 pageview（手动 useEffect 捕获，避免双计）
-    disable_session_recording: true,    // 关录屏（spec §7.1）
-    persistence: hasConsent() ? 'localStorage+cookie' : 'memory',
-    opt_out_capturing_by_default: !hasConsent(),
-    loaded: (p) => { if (hasConsent()) p.opt_in_capturing(); },
-  });
-  // consent 变化时切换 persistence（横幅未来接入点）
+  if (hasConsent()) injectUmami();
+  // consent 变化时注入（横幅未来接入点）
   window.addEventListener('consent-change', () => {
-    if (hasConsent()) {
-      posthog.set_config({ persistence: 'localStorage+cookie' });
-      posthog.opt_in_capturing();
-    } else {
-      posthog.set_config({ persistence: 'memory' });
-      posthog.opt_out_capturing();
-    }
+    if (hasConsent()) injectUmami();
   });
 }
 
 export default function Root({ children }) {
   const location = useLocation();
-  React.useEffect(() => {
-    if (isProd && typeof window !== 'undefined') {
-      posthog.capture('$pageview', { path: location.pathname });
-    }
-  }, [location]);
 
   // --- B3：核心事件埋点（external_link_click / code_copy / search）---
   React.useEffect(() => {
@@ -54,14 +57,14 @@ export default function Root({ children }) {
       // 排除自身采集域名
       if (url.hostname === 'wiki-data.camthink.ai') return;
       // --- B4 download：外链子集（特定后缀），附加捕获（不 short-circuit，
-      // 让 external_link_click 与 download 同时记录 —— 二者维度不同，spec §11 允许）。
+      // 让 external_link_click 与 download 同时记录 —— 二者维度不同）。
       if (/\.(pdf|zip|bin|hex|tar\.gz|dmg|exe)$/i.test(url.pathname)) {
-        posthog.capture('download', {
+        track('download', {
           file: url.pathname.split('/').pop(),
           doc_path: window.location.pathname,
         });
       }
-      posthog.capture('external_link_click', {
+      track('external_link_click', {
         url: a.href,
         text: (a.textContent || '').trim().slice(0, 80),
         location: a.closest('header, footer, nav') ? 'navbar/footer' : 'content',
@@ -84,7 +87,7 @@ export default function Root({ children }) {
         btn === buttonGroup.lastElementChild;
       if (!isCopyButton) return;
       const langMatch = codeBlock.className.match(/language-([\w-]+)/);
-      posthog.capture('code_copy', {
+      track('code_copy', {
         code_language: langMatch ? langMatch[1] : 'unknown',
         doc_path: window.location.pathname,
       });
@@ -99,7 +102,7 @@ export default function Root({ children }) {
         'input[class*="search" i], input[aria-label*="search" i]',
       );
       if (!input) return;
-      posthog.capture('search', {
+      track('search', {
         query: (input.value || '').trim().slice(0, 100),
         results_count: document.querySelectorAll(
           '[class*="search-result-item" i]',
@@ -119,8 +122,6 @@ export default function Root({ children }) {
   }, []);
 
   // --- B4 scroll_depth：滚动到 25/50/75/100% 各报一次，换页重置 lastDepth。
-  // 使用 ref 保存 lastDepth；换页时由下方 location-keyed useEffect 重置为 0。
-  // 滚动监听独立 useEffect（空依赖 —— 一次性挂载），cleanup 必须 removeEventListener。
   const lastDepthRef = React.useRef(0);
   React.useEffect(() => {
     if (!isProd || typeof window === 'undefined') return;
@@ -133,7 +134,7 @@ export default function Root({ children }) {
       const hit = marks.find((m) => depth >= m && lastDepthRef.current < m);
       if (hit !== undefined) {
         lastDepthRef.current = hit;
-        posthog.capture('scroll_depth', {
+        track('scroll_depth', {
           depth: hit,
           doc_path: window.location.pathname,
         });
@@ -151,14 +152,13 @@ export default function Root({ children }) {
   // --- B4 language_switch：locale 前缀变化检测。
   // Docusaurus 默认 locale（en）无 URL 前缀；非默认（zh-Hans）以 /zh-Hans/ 前缀。
   // 用已知 locale 列表做显式判断，避免把 /docs 误判为 locale。
-  const KNOWN_LOCALES = ['zh-Hans', 'en'];
   const lastLocaleRef = React.useRef(null);
   React.useEffect(() => {
     if (!isProd || typeof window === 'undefined') return;
     const seg = window.location.pathname.split('/')[1];
     const cur = KNOWN_LOCALES.includes(seg) ? seg : 'en';
     if (lastLocaleRef.current && lastLocaleRef.current !== cur) {
-      posthog.capture('language_switch', {
+      track('language_switch', {
         from: lastLocaleRef.current,
         to: cur,
       });

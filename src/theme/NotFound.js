@@ -2,15 +2,15 @@
 // 关键：必须 wrap @theme-original/NotFound —— 原 NotFound 承载 404 页面 UI，不能丢。
 import React from 'react';
 import NotFound from '@theme-original/NotFound';
-import posthog from 'posthog-js';
 
 export default function NotFoundWrapper(props) {
   React.useEffect(() => {
     if (
       process.env.NODE_ENV === 'production' &&
-      typeof window !== 'undefined'
+      typeof window !== 'undefined' &&
+      window.umami
     ) {
-      posthog.capture('404_view', {
+      window.umami.track('404_view', {
         path: window.location.pathname,
         referrer: document.referrer,
       });
