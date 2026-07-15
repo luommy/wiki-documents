@@ -11,6 +11,7 @@ if (isProd && typeof window !== 'undefined') {
   posthog.init(POSTHOG_KEY, {
     api_url: POSTHOG_URL,
     autocapture: false,                 // 关自动捕获（spec §7.1）
+    capture_pageview: false,            // 关自动 pageview（手动 useEffect 捕获，避免双计）
     disable_session_recording: true,    // 关录屏（spec §7.1）
     persistence: hasConsent() ? 'localStorage+cookie' : 'memory',
     opt_out_capturing_by_default: !hasConsent(),

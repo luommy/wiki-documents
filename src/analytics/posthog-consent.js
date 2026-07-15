@@ -5,12 +5,20 @@ const DEFAULT = 'accepted'; // 'accepted' | 'rejected' | null
 
 export function getConsent() {
   if (typeof window === 'undefined') return DEFAULT;
-  return window.localStorage.getItem(STORAGE_KEY) ?? DEFAULT;
+  try {
+    return window.localStorage.getItem(STORAGE_KEY) ?? DEFAULT;
+  } catch {
+    return DEFAULT; // 隐私模式（Safari Private Browsing 等）localStorage 不可用
+  }
 }
 
 export function setConsent(value) {
   if (typeof window === 'undefined') return;
-  window.localStorage.setItem(STORAGE_KEY, value);
+  try {
+    window.localStorage.setItem(STORAGE_KEY, value);
+  } catch {
+    // 隐私模式写入失败 —— 仅当前会话生效
+  }
   window.dispatchEvent(new CustomEvent('consent-change', { detail: value }));
 }
 
