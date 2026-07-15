@@ -52,6 +52,14 @@ export default function Root({ children }) {
       }
       // 排除自身采集域名
       if (url.hostname === 'wiki-data.camthink.ai') return;
+      // --- B4 download：外链子集（特定后缀），附加捕获（不 short-circuit，
+      // 让 external_link_click 与 download 同时记录 —— 二者维度不同，spec §11 允许）。
+      if (/\.(pdf|zip|bin|hex|tar\.gz|dmg|exe)$/i.test(url.pathname)) {
+        posthog.capture('download', {
+          file: url.pathname.split('/').pop(),
+          doc_path: window.location.pathname,
+        });
+      }
       posthog.capture('external_link_click', {
         url: a.href,
         text: (a.textContent || '').trim().slice(0, 80),
@@ -108,6 +116,54 @@ export default function Root({ children }) {
       document.removeEventListener('keydown', onSearchKey, true);
     };
   }, []);
+
+  // --- B4 scroll_depth：滚动到 25/50/75/100% 各报一次，换页重置 lastDepth。
+  // 使用 ref 保存 lastDepth；换页时由下方 location-keyed useEffect 重置为 0。
+  // 滚动监听独立 useEffect（空依赖 —— 一次性挂载），cleanup 必须 removeEventListener。
+  const lastDepthRef = React.useRef(0);
+  React.useEffect(() => {
+    if (!isProd || typeof window === 'undefined') return;
+    const onScroll = () => {
+      const scrollTop = window.scrollY;
+      const docH =
+        document.documentElement.scrollHeight - window.innerHeight;
+      const depth = docH > 0 ? Math.round((scrollTop / docH) * 100) : 100;
+      const marks = [25, 50, 75, 100];
+      const hit = marks.find((m) => depth >= m && lastDepthRef.current < m);
+      if (hit !== undefined) {
+        lastDepthRef.current = hit;
+        posthog.capture('scroll_depth', {
+          depth: hit,
+          doc_path: window.location.pathname,
+        });
+      }
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  // location 变化时重置 lastDepth（否则换页后不再报 25/50/75/100）。
+  React.useEffect(() => {
+    lastDepthRef.current = 0;
+  }, [location]);
+
+  // --- B4 language_switch：locale 前缀变化检测。
+  // Docusaurus 默认 locale（en）无 URL 前缀；非默认（zh-Hans）以 /zh-Hans/ 前缀。
+  // 用已知 locale 列表做显式判断，避免把 /docs 误判为 locale。
+  const KNOWN_LOCALES = ['zh-Hans', 'en'];
+  const lastLocaleRef = React.useRef(null);
+  React.useEffect(() => {
+    if (!isProd || typeof window === 'undefined') return;
+    const seg = window.location.pathname.split('/')[1];
+    const cur = KNOWN_LOCALES.includes(seg) ? seg : 'en';
+    if (lastLocaleRef.current && lastLocaleRef.current !== cur) {
+      posthog.capture('language_switch', {
+        from: lastLocaleRef.current,
+        to: cur,
+      });
+    }
+    lastLocaleRef.current = cur;
+  }, [location]);
 
   return <>{children}</>;
 }
