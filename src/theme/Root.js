@@ -3,7 +3,7 @@ import { useLocation } from '@docusaurus/router';
 import { hasConsent } from '../analytics/consent';
 
 const UMAMI_SCRIPT_URL = 'https://wiki-data.camthink.ai/script.js';
-const UMAMI_WEBSITE_ID = 'REPLACE_WITH_UMAMI_WEBSITE_ID';
+const UMAMI_WEBSITE_ID = '3ca6071b-afef-4f95-b095-88ef20bfb2a6';
 const isProd = process.env.NODE_ENV === 'production';
 
 const KNOWN_LOCALES = ['zh-Hans', 'en'];
