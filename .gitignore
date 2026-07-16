@@ -37,3 +37,5 @@ CLAUDE.md
 # Local tooling artifacts (not for repo)
 .serena/
 .superpowers-archive/
+AGENTS.md
+docs/superpowers/
