@@ -1,6 +1,7 @@
 import React from 'react';
 import { useLocation } from '@docusaurus/router';
 import { hasConsent } from '../analytics/consent';
+import { track, flushQueue } from '../analytics/track';
 
 const UMAMI_SCRIPT_URL = 'https://wiki-data.camthink.ai/script.js';
 const UMAMI_WEBSITE_ID = '3ca6071b-afef-4f95-b095-88ef20bfb2a6';
@@ -19,14 +20,8 @@ function injectUmami() {
   s.src = UMAMI_SCRIPT_URL;
   s.setAttribute('data-website-id', UMAMI_WEBSITE_ID);
   s.setAttribute('data-umami', '');
+  s.onload = flushQueue;
   document.head.appendChild(s);
-}
-
-// 安全上报：window.umami 在脚本加载前不存在，optional check 静默跳过。
-function track(eventName, props) {
-  if (typeof window !== 'undefined' && window.umami) {
-    window.umami.track(eventName, props);
-  }
 }
 
 if (isProd && typeof window !== 'undefined') {
@@ -54,8 +49,8 @@ export default function Root({ children }) {
       } catch {
         return;
       }
-      // 排除自身采集域名
-      if (url.hostname === 'wiki-data.camthink.ai') return;
+      // 排除站点自身域名及采集域名
+      if (url.hostname === window.location.hostname || url.hostname === 'wiki-data.camthink.ai') return;
       // --- B4 download：外链子集（特定后缀），附加捕获（不 short-circuit，
       // 让 external_link_click 与 download 同时记录 —— 二者维度不同）。
       if (/\.(pdf|zip|bin|hex|tar\.gz|dmg|exe)$/i.test(url.pathname)) {
@@ -94,20 +89,23 @@ export default function Root({ children }) {
     };
 
     // 处理器 3：search —— 在搜索输入框中按回车键。
-    // 注意：@easyops-cn/docusaurus-search-local 异步渲染结果，
-    // 因此 results_count 可能为 0；query 本身可靠。
+    // @easyops-cn/docusaurus-search-local 异步渲染结果，Enter 触发时 DOM 尚未更新，
+    // 延迟 300ms 等结果渲染后再读 results_count（query 同步捕获保证可靠）。
     const onSearchKey = (e) => {
       if (e.key !== 'Enter') return;
       const input = e.target.closest(
         'input[class*="search" i], input[aria-label*="search" i]',
       );
       if (!input) return;
-      track('search', {
-        query: (input.value || '').trim().slice(0, 100),
-        results_count: document.querySelectorAll(
-          '[class*="search-result-item" i]',
-        ).length,
-      });
+      const query = (input.value || '').trim().slice(0, 100);
+      setTimeout(() => {
+        track('search', {
+          query,
+          results_count: document.querySelectorAll(
+            '[class*="search-result-item" i]',
+          ).length,
+        });
+      }, 300);
     };
 
     document.addEventListener('click', onExternalLinkClick, true);
@@ -125,20 +123,26 @@ export default function Root({ children }) {
   const lastDepthRef = React.useRef(0);
   React.useEffect(() => {
     if (!isProd || typeof window === 'undefined') return;
+    let ticking = false;
     const onScroll = () => {
-      const scrollTop = window.scrollY;
-      const docH =
-        document.documentElement.scrollHeight - window.innerHeight;
-      const depth = docH > 0 ? Math.round((scrollTop / docH) * 100) : 100;
-      const marks = [25, 50, 75, 100];
-      const hit = marks.find((m) => depth >= m && lastDepthRef.current < m);
-      if (hit !== undefined) {
-        lastDepthRef.current = hit;
-        track('scroll_depth', {
-          depth: hit,
-          doc_path: window.location.pathname,
-        });
-      }
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(() => {
+        const scrollTop = window.scrollY;
+        const docH =
+          document.documentElement.scrollHeight - window.innerHeight;
+        const depth = docH > 0 ? Math.round((scrollTop / docH) * 100) : 100;
+        const marks = [25, 50, 75, 100];
+        const hit = marks.find((m) => depth >= m && lastDepthRef.current < m);
+        if (hit !== undefined) {
+          lastDepthRef.current = hit;
+          track('scroll_depth', {
+            depth: hit,
+            doc_path: window.location.pathname,
+          });
+        }
+        ticking = false;
+      });
     };
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
