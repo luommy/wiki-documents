@@ -6,6 +6,11 @@ All notable changes to the CamThink Wiki documentation will be documented in thi
 
 > This changelog reflects updates starting from **2025-12-23**. Major changes prior to this date are not recorded.
 
+## [2026-07-16]
+
+### Added
+- **NeoEyes NE503 Verified Apps**: A new "Verified Apps" page in the application guide, showcasing container app use cases verified on actual hardware (Hello World, Person Detection, Lingering Detection). Each app includes an effect preview, verification details (firmware version, inference model, detection threshold, test results), and a direct download link to a precompiled package ready for deployment — letting users preview results before downloading and get the app package deployed to the device in one step (full bilingual support).
+
 ## [2026-07-13]
 
 ### Added
