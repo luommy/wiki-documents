@@ -6,6 +6,12 @@
 
 > 本更新日志自 **2025-12-23** 起开始记录，此前的历史变更未作追溯。
 
+## [2026-07-21]
+
+### 新增 (Added)
+- **NeoEyes NE503 模型训练与 HEF 转换教程**: 应用开发系列新增一篇——在 NVIDIA CUDA 环境下从零训练 YOLOv8n 检测模型并编译为 Hailo HEF 部署到 NE503 的完整教程。覆盖 Roboflow 数据集准备、Hailo-15H 反向约束（640×384 锁定/NMS-baked/校准集 ≥1024）、ultralytics 矩形训练、静态 shape ONNX 导出、Hailo DFC 三步编译（parser/optimize/compiler）与 FineTune 修 NMS 全零，安全帽检测为载体，val mAP50 ≈ 0.93（中英文完整支持）。
+- **NeoEyes NE503 Verified Apps 新增 Safety Helmet Detection**: 应用指南「已验证应用」页面新增安全帽合规检测应用一行——基于自训 `safety_helmet_yolov8n_384_640`（2 类 Helmet / No Helmet）HEF，实时识别画面中戴/未戴安全帽的人员并在未戴时告警，已在真机验证（9 人 = 6 戴帽 + 3 未戴）。同步更新模型预加载说明，区分出厂 yolov8n 与自训 HEF 两种模型导入路径，并补充两张真机效果预览图（中英文完整支持）。
+
 ## [2026-07-16]
 
 ### 新增 (Added)
