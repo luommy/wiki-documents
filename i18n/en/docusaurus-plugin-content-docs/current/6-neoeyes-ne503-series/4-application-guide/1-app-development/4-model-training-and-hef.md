@@ -56,7 +56,7 @@ The final artifact of this tutorial, `safety_helmet_yolov8n_384_640.hef`, has be
 | OS | Ubuntu 22.04 |
 | CUDA | 12.x |
 | Python | 3.10+ |
-| PyTorch | 2.x (tested 2.12.1+cu126) |
+| PyTorch | 2.x (CUDA 12.x compatible version) |
 | ultralytics | 8.4.75+ (older versions reject tuple `imgsz`, see §4) |
 | ONNX tools | onnx + onnxslim |
 
@@ -123,7 +123,7 @@ chmod -R a+rX ~/yolo-train/datasets/safety-helmet
 | Split | Images | Background images | Notes |
 |:---|---:|---:|:---|
 | train | 10500 | 15 | includes a few unlabeled background images |
-| valid | 1000 | 1 | used for training-time validation + quantization calibration |
+| valid | 1000 | 1 | used for training-time validation |
 | test | 500 | 2 | final evaluation |
 | **Total** | **12000** | 18 | |
 
@@ -320,19 +320,19 @@ flowchart LR
 
 ### 6.2 Prepare the calibration set
 
-Hailo quantization requires a calibration set. This tutorial uses **2048 images** from the valid set as the calibration set to ensure int8 quantization accuracy.
+Hailo quantization requires a calibration set. This tutorial uses **2048 images** from the train set as the calibration set to ensure int8 quantization accuracy.
 
 ```python
 # prepare_calib_npy.py — sample 2048 images from the valid set, export as NHWC float32 0-255 .npy
 import os, glob, numpy as np
 from PIL import Image
 
-VALID_DIR = "~/yolo-train/datasets/safety-helmet/valid/images"
+TRAIN_DIR = "~/yolo-train/datasets/safety-helmet/train/images"
 OUT = "/local/shared_with_docker/calib_2048.npy"
 TARGET_H, TARGET_W = 384, 640
 N = 2048
 
-imgs = sorted(glob.glob(os.path.join(VALID_DIR, "*.jpg")))[:N]
+imgs = sorted(glob.glob(os.path.join(TRAIN_DIR, "*.jpg")))[:N]
 arr = np.zeros((N, TARGET_H, TARGET_W, 3), dtype=np.float32)
 for i, p in enumerate(imgs):
     im = Image.open(p).convert("RGB").resize((TARGET_W, TARGET_H))
@@ -488,7 +488,7 @@ Lower `batch` (8 → 4 → 2), or use a GPU with more VRAM.
 Check the `imgsz` parameter. CLI uses `imgsz=384,640` (comma-separated); Python uses `imgsz=[384, 640]` (list). If the output channel count is wrong, check `data.yaml`'s `nc`.
 
 **Q4: 0 detections after deploying to Hailo?**
-Troubleshoot in the following order: ① verify FP ONNX training accuracy with `onnxruntime`; ② confirm the HEF contains `yolov8_nms_postprocess HAILO NMS BY CLASS, Classes: 2` via `hailo parse-hef xxx.hef`; ③ confirm the app has set `raw_output_only=True` per §7.4.
+Troubleshoot in the following order: ① verify FP ONNX training accuracy with `onnxruntime`; ② confirm the HEF contains `yolov8_nms_postprocess HAILO NMS BY CLASS, Classes: 2` via `hailo parse-hef xxx.hef`; ③ confirm the app has set `raw_output_only=True` per §7.3.
 
 **Q5: Big accuracy drop after quantization?**
 Confirm the calibration set is 2048 images (see §6.2) and that alls has `post_quantization_optimization(finetune, ...)` configured. FineTune recovers the post-quantization confidence toward the teacher distribution via unlabeled knowledge distillation.

@@ -56,7 +56,7 @@ flowchart LR
 | 操作系统 | Ubuntu 22.04 |
 | CUDA | 12.x |
 | Python | 3.10+ |
-| PyTorch | 2.x（实测 2.12.1+cu126） |
+| PyTorch | 2.x（CUDA 12.x 对应版本） |
 | ultralytics | 8.4.75+（旧版的 `imgsz` 不支持 tuple，见 §4） |
 | ONNX 工具 | onnx + onnxslim |
 
@@ -121,7 +121,7 @@ chmod -R a+rX ~/yolo-train/datasets/safety-helmet
 | Split | 图片数 | 含 background 图 | 备注 |
 |:---|---:|---:|:---|
 | train | 10500 | 15 | 含少量无标注背景图 |
-| valid | 1000 | 1 | 用于训练期验证 + 量化校准 |
+| valid | 1000 | 1 | 用于训练期验证 |
 | test | 500 | 2 | 最终评估 |
 | **合计** | **12000** | 18 | |
 
@@ -318,19 +318,19 @@ flowchart LR
 
 ### 6.2 准备校准集
 
-Hailo 量化需要校准集（calibration set）。本教程使用 **2048 张** valid 集图片作为校准集，以保证 int8 量化的精度。
+Hailo 量化需要校准集（calibration set）。本教程使用 **2048 张** train 集图片作为校准集，以保证 int8 量化的精度。
 
 ```python
 # prepare_calib_npy.py — 从 valid 集抽 2048 张，导出为 NHWC float32 0-255 的 .npy
 import os, glob, numpy as np
 from PIL import Image
 
-VALID_DIR = "~/yolo-train/datasets/safety-helmet/valid/images"
+TRAIN_DIR = "~/yolo-train/datasets/safety-helmet/train/images"
 OUT = "/local/shared_with_docker/calib_2048.npy"
 TARGET_H, TARGET_W = 384, 640
 N = 2048
 
-imgs = sorted(glob.glob(os.path.join(VALID_DIR, "*.jpg")))[:N]
+imgs = sorted(glob.glob(os.path.join(TRAIN_DIR, "*.jpg")))[:N]
 arr = np.zeros((N, TARGET_H, TARGET_W, 3), dtype=np.float32)
 for i, p in enumerate(imgs):
     im = Image.open(p).convert("RGB").resize((TARGET_W, TARGET_H))
@@ -449,14 +449,6 @@ md5sum safety_helmet_yolov8n_384_640.hef
 
 ![模型导入完成](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/app-development/model-training-and-hef/import-model-4.png)
 
-| 参数 | 值 |
-|:---|:---|
-| Model ID | `safety_helmet_yolov8n_384_640` |
-| Model Type | `hef` |
-| Threshold | `0.3`（检测置信度阈值） |
-
-导入后模型自动加载到 NPU，页面状态显示为 Loaded。
-
 ### 7.2 验证模型加载
 
 在 **AI Models** 页面确认 `safety_helmet_yolov8n_384_640` 出现在模型列表中且状态为 Loaded。点击模型卡片可查看详细信息（ID、版本、加载时间、模型路径）。
@@ -492,7 +484,7 @@ md5sum safety_helmet_yolov8n_384_640.hef
 检查 `imgsz` 参数。CLI 用 `imgsz=384,640`（逗号分隔），Python 用 `imgsz=[384, 640]`（list）。如果输出 channel 数不对，检查 `data.yaml` 的 `nc`。
 
 **Q4：部署到 Hailo 后无检测结果如何排查？**
-按以下顺序排查：① 用 `onnxruntime` 验证 FP ONNX 的训练精度；② 用 `hailo parse-hef xxx.hef` 确认 HEF 包含 `yolov8_nms_postprocess HAILO NMS BY CLASS, Classes: 2`；③ 确认 app 已按 §7.4 设置 `raw_output_only=True`。
+按以下顺序排查：① 用 `onnxruntime` 验证 FP ONNX 的训练精度；② 用 `hailo parse-hef xxx.hef` 确认 HEF 包含 `yolov8_nms_postprocess HAILO NMS BY CLASS, Classes: 2`；③ 确认 app 已按 §7.3 设置 `raw_output_only=True`。
 
 **Q5：量化后精度下降明显？**
 确认校准集为 2048 张（见 §6.2），且 alls 中已配置 `post_quantization_optimization(finetune, ...)`。FineTune 通过无标签知识蒸馏将量化后的置信度恢复至 teacher 分布。
