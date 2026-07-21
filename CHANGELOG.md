@@ -6,6 +6,12 @@ All notable changes to the CamThink Wiki documentation will be documented in thi
 
 > This changelog reflects updates starting from **2025-12-23**. Major changes prior to this date are not recorded.
 
+## [2026-07-21]
+
+### Added
+- **NeoEyes NE503 Model Training and HEF Conversion Tutorial**: A new entry in the app-development series — a complete tutorial for training a YOLOv8n detection model from scratch on NVIDIA CUDA and compiling it into a Hailo HEF for NE503 deployment. Covers Roboflow dataset preparation, Hailo-15H reverse constraints (640×384 lock / NMS-baked / calibration set ≥1024), ultralytics rectangular training, static-shape ONNX export, the three-step Hailo DFC compilation (parser/optimize/compiler), and FineTune fixing NMS all-zero, using safety-helmet detection as the carrier, val mAP50 ≈ 0.93 (full bilingual support).
+- **NeoEyes NE503 Verified Apps — Safety Helmet Detection added**: The "Verified Apps" page in the application guide gains a Safety Helmet Detection row — built on a custom-trained `safety_helmet_yolov8n_384_640` (2-class Helmet / No Helmet) HEF, it detects helmeted / unhelmeted persons in real time and alerts on violations, verified on real hardware (9 persons = 6 helmet + 3 no-helmet). The model-preload note was rewritten to distinguish the preinstalled yolov8n from a user-imported custom HEF, with two new on-device preview images added (full bilingual support).
+
 ## [2026-07-16]
 
 ### Added
