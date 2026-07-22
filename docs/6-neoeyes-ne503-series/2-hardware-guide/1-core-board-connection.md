@@ -6,9 +6,9 @@ tags: [NE503, 核心处理板, IO配置, Hailo15H]
 
 # Core Board
 
-![NE503 硬件设计框图](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/hardware-guide/specifications/hardware-block-diagram.png)
+核心处理板承载 Hailo15H SoC、NPU、内存、存储子系统，通过板对板连接器（Board-to-Board Connectors）与接口板互联，引出 SoC 原生高速接口和扩展引脚。本文档从 chip-level 视角描述核心板上的硬件资源及引脚定义。
 
-核心处理板承载 Hailo15H SoC、NPU、内存、存储子系统，通过板对板连接器向接口板暴露扩展接口。本文档从 chip-level 视角描述核心板上的硬件资源及引脚定义。
+<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/hardware-guide/core-board-connection/core-board-annotation.png" alt="NE503 核心处理板接口标注" style={{ width: '60%', height: 'auto' }} />
 
 ## 硬件资源概述
 
@@ -23,6 +23,8 @@ NE503 由以下物理模组组成：
 | 镜头模组 | AN41908A-VBA | AF 自动变焦与自动对焦镜头驱动 |
 
 核心板与接口板通过板对板连接器互联：核心板提供 SoC 原生引脚，接口板上的设备通过连接器挂接到这些引脚。
+
+[下载 NE503 硬件设计框图](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/hardware-guide/specifications/hardware-block-diagram.png)
 
 ## 功能总览
 

@@ -6,9 +6,9 @@ tags: [NE503, core processing board, IO configuration, Hailo15H]
 
 # Core Board
 
-![NE503 Hardware Block Diagram](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/hardware-guide/specifications/hardware-block-diagram.png)
+The core processing board hosts the Hailo15H SoC, NPU, memory, and storage subsystems. It connects to the interface board via Board-to-Board Connectors, exposing native SoC high-speed interfaces and expansion pins. This document describes the hardware resources and pin definitions from a chip-level perspective.
 
-The core processing board hosts the Hailo15H SoC, NPU, memory, and storage subsystems. It exposes expansion interfaces to the interface board via board-to-board connectors. This document describes the hardware resources and pin definitions from a chip-level perspective.
+<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/hardware-guide/core-board-connection/core-board-annotation.png" alt="NE503 Core Board Interface Annotation" style={{ width: '60%', height: 'auto' }} />
 
 ## Hardware Resource Overview
 
@@ -23,6 +23,8 @@ NE503 consists of the following physical modules:
 | Lens Module | AN41908A-VBA | AF auto-zoom and autofocus lens driver |
 
 The core board and interface board are interconnected via board-to-board connectors: the core board provides native SoC pins, and devices on the interface board are connected to these pins through the connectors.
+
+[Download NE503 Hardware Block Diagram](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/hardware-guide/specifications/hardware-block-diagram.png)
 
 ## Interface Overview
 
