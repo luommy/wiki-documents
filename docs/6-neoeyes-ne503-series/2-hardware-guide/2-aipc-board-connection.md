@@ -6,7 +6,19 @@ tags: [NE503, 接口板, IO配置, STM32G0B0]
 
 # Interface Board
 
-接口板通过独立 MCU（STM32G0B0RET6）管理外部 IO、电源及外设控制，通过 UART0 与核心处理板通信。
+接口板通过独立 MCU（STM32G0B0RET6）管理外部 IO、电源及外设控制，通过 UART0 与核心处理板通信。其关键接口分布在两侧，外部端子引出 PoE、Wiegand、报警、音频等对外接线。下图为实物标注：
+
+<div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'stretch' }}>
+  <div style={{ flex: '1', minWidth: '200px' }}>
+    <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/hardware-guide/aipc-board-connection/interface-board-annotation-1.png" alt="NE503 接口板接口标注（侧一）" style={{ width: '100%', height: 'auto' }} />
+  </div>
+  <div style={{ flex: '1', minWidth: '200px' }}>
+    <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/hardware-guide/aipc-board-connection/interface-board-annotation-2.png" alt="NE503 接口板接口标注（侧二）" style={{ width: '100%', height: 'auto' }} />
+  </div>
+  <div style={{ flex: '1', minWidth: '200px' }}>
+    <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/hardware-guide/aipc-board-connection/terminal-block-annotation.png" alt="NE503 外部端子标注" style={{ width: '100%', height: 'auto' }} />
+  </div>
+</div>
 
 ## 功能总览
 

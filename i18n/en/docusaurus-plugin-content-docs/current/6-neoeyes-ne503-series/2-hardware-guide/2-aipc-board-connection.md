@@ -6,7 +6,19 @@ tags: [NE503, interface board, IO configuration, STM32G0B0]
 
 # Interface Board
 
-The interface board uses an independent MCU (STM32G0B0RET6) to manage external IO, power, and peripheral control. It communicates with the core processing board via UART0.
+The interface board uses an independent MCU (STM32G0B0RET6) to manage external IO, power, and peripheral control, and communicates with the core processing board via UART0. Its key interfaces are distributed across two sides, with the external terminal block exposing PoE, Wiegand, alarm, and audio wiring. The annotated photos are shown below:
+
+<div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'stretch' }}>
+  <div style={{ flex: '1', minWidth: '200px' }}>
+    <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/hardware-guide/aipc-board-connection/interface-board-annotation-1.png" alt="NE503 Interface Board Annotation (Side 1)" style={{ width: '100%', height: 'auto' }} />
+  </div>
+  <div style={{ flex: '1', minWidth: '200px' }}>
+    <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/hardware-guide/aipc-board-connection/interface-board-annotation-2.png" alt="NE503 Interface Board Annotation (Side 2)" style={{ width: '100%', height: 'auto' }} />
+  </div>
+  <div style={{ flex: '1', minWidth: '200px' }}>
+    <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/hardware-guide/aipc-board-connection/terminal-block-annotation.png" alt="NE503 External Terminal Block Annotation" style={{ width: '100%', height: 'auto' }} />
+  </div>
+</div>
 
 ## Interface Overview
 
