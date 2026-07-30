@@ -143,8 +143,8 @@ echo 'export PATH="$PATH:$(go env GOPATH)/bin"' >> ~/.bashrc && source ~/.bashrc
 sudo add-apt-repository -y ppa:longsleep/golang-backports
 sudo apt-get update -qq && sudo apt-get install -y golang-go
 
-# Node.js 20+
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+# Node.js 22+
+curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
 sudo apt-get install -y nodejs && npm install -g pnpm
 
 # protoc + Go plugins
@@ -215,7 +215,7 @@ macOS cannot install the Hailo SDK natively (it is an x86_64 Linux-only cross-co
 | Tool | Minimum Version | Check Command | Layer |
 |------|----------------|---------------|-------|
 | Go | 1.25+ | `go version` | L1 |
-| Node.js | 20+ | `node --version` | L1 |
+| Node.js | 22+ | `node --version` | L1 |
 | pnpm | Latest | `pnpm --version` | L1 |
 | protoc | 3.12+ | `protoc --version` | L1 |
 | protoc-gen-go | Latest | `which protoc-gen-go` | L1 |
@@ -241,7 +241,7 @@ This command checks all three layers and reports status. Output when all three l
   OK: libprotoc 3.x.x
   OK: protoc-gen-go
   OK: protoc-gen-go-grpc
-  OK: Node.js v20.x.x
+  OK: Node.js v22.x.x
   OK: Python 3.x.x
   OK: pnpm x.x.x
 
