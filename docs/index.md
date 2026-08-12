@@ -35,8 +35,15 @@ import VideoCarousel from '@site/src/components/VideoCarousel';
   {/* ================= Latest Updates ================= */}
   <h2 className="docs-section-title">最新文档</h2>
 <div className="latest-docs-grid">
-    <Link to="/docs/neoeyes-ne503-series/application-guide/app-development/model-training-and-hef" className="update-card">
+    <Link to="/docs/neoeyes-ne503-series/user-guide/dashboard" className="update-card">
       <span className="update-badge">NEW</span>
+      <div className="update-title">NE503 用户手册</div>
+      <div className="update-meta">
+        <span>新增文档</span>
+        <span>• 2026-08-12</span>
+      </div>
+    </Link>
+    <Link to="/docs/neoeyes-ne503-series/application-guide/app-development/model-training-and-hef" className="update-card">
       <div className="update-title">NE503 模型训练与 HEF 转换</div>
       <div className="update-meta">
         <span>新增文档</span>
@@ -55,13 +62,6 @@ import VideoCarousel from '@site/src/components/VideoCarousel';
       <div className="update-meta">
         <span>新增文档</span>
         <span>• 2026-07-13</span>
-      </div>
-    </Link>
-    <Link to="/docs/neoeyes-ne503-series/application-guide/app-development/ai-assisted-dev" className="update-card">
-      <div className="update-title">NE503 AI 辅助开发</div>
-      <div className="update-meta">
-        <span>新增文档</span>
-        <span>• 2026-06-22</span>
       </div>
     </Link>
  </div>

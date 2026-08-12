@@ -40,3 +40,6 @@ CLAUDE.md
 .worktrees/
 AGENTS.md
 docs/superpowers/
+CHECKPOINT.md
+.playwright-mcp
+
