@@ -6,7 +6,7 @@ tags: [Quick Start, NE503, First Deployment]
 
 # Quick Start
 
-This guide walks you through the first deployment of the NE503: unbox → connect → log in & change password → verify the camera → experience AI → configure network and time zone. Once done, the device is ready to go live. For in-depth features, see the [User Guide](./2-user-guide/0-dashboard.md).
+This guide walks you through the first deployment of the NE503: unbox → connect → log in & change password → verify the camera → experience AI → configure network and time zone. Once done, the device is ready to go live. For more features, see the [User Guide](./2-user-guide/0-dashboard.md).
 
 <div align="center">
   <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/overview/ne503-main.png" alt="NeoEyes NE503" width="100%" />

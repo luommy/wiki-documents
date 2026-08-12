@@ -1,5 +1,5 @@
 ---
-description: "Overview of the NE503 Dashboard: the login entry point and how to read each panel — device status, resource monitoring, stream preview, applications, gyroscope, monitor, and device info."
+description: "Overview of the NE503 Dashboard: the login entry point and what each panel shows — device status, resource monitoring, stream preview, applications, gyroscope, monitor, and device info."
 keywords: [NE503 console, Dashboard, device status, resource monitoring, gyroscope, web management]
 tags: [User Guide, NE503, Console, Dashboard]
 ---
@@ -18,7 +18,7 @@ The Dashboard is the landing page after login — a single screen to gauge devic
 - **Row 2** — **Stream Preview**, **Applications**, and **Gyroscope Calibration**
 - **Row 3** — **Monitor** (resource trend chart) and **Device Info**
 
-The sections below explain how to read each panel and what to watch for.
+The sections below explain what each panel shows and what to watch for.
 
 ### Device Status
 

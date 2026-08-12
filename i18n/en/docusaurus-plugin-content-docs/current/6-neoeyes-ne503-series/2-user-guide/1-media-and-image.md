@@ -133,7 +133,7 @@ The two are independent: Privacy Mask blocks a **fixed position**, regardless of
 |------|--------|
 | **Zoom** | Zoom slider (shows the multiplier, e.g., 1.0x) |
 | **Focus** | Focus slider (shows the position percentage and zone, e.g., MID) |
-| **One-shot AF** | Click once to run a single autofocus at the current zoom |
+| **One-shot AF** | Click once to trigger a single autofocus at the current zoom |
 | **Reset to 1.0x** | Return to the minimum zoom |
 | **IR-Cut Filter** | Infrared cut filter toggle — on during the day for accurate color, off at night to let in infrared light (the status text indicates the current mode) |
 

@@ -6,7 +6,7 @@ tags: [用户指南, NE503, 应用, 模型, AI]
 
 # AI Apps and Models
 
-NE503 通过容器运行 AI 应用，平台内置模型管理。**AI 类应用必须声明依赖的模型**——应用勾选模型后，启动时自动加载；模型卡也会反向显示被哪些应用引用。非 AI 应用（如纯视频录像）无需配置模型权限。本章先讲应用、再讲模型。
+NE503 通过容器运行 AI 应用，平台内置模型管理。**AI 类应用必须声明依赖的模型**——应用勾选模型后，启动时自动加载；模型卡也会反向显示引用它的应用。非 AI 应用（如纯视频录像）无需配置模型权限。本章先讲应用、再讲模型。
 
 ## 应用管理
 
@@ -71,12 +71,12 @@ NE503 通过容器运行 AI 应用，平台内置模型管理。**AI 类应用�
 | **Max Inference QPS** | 限制应用每秒最大推理次数，防止抢占 NPU |
 | **Max Concurrent Inference** | 限制最大并发推理数 |
 | **Allow Dynamic Model Registration** | 允许应用运行时动态发现并注册模型 |
-| **Video Stream Permissions** | 勾选可消费的码流（main / sub / third，各带分辨率与帧率标注） |
+| **Video Stream Permissions** | 勾选应用可使用的码流（main / sub / third，各带分辨率与帧率标注） |
 | **Event Publish / Subscribe Topics** | Event Bus 发布 / 订阅主题（逗号分隔，如 `app/output`、`camera/*`） |
 | **Network Mode** | Isolated（隔离，无网络）/ Host（共享主机网络） |
 | **Device Control** | 硬件控制授权：**Light Control**（红外补光）、**IR Cut Filter**（红外滤光片）、**PTZ Control**、**Lens Control**（镜头） |
 
-> Device Control 授权后，应用可通过 SDK 程序化控制镜头与红外。
+> Device Control 授权后，应用可通过 SDK 调用镜头与红外接口。
 
 #### Step 5 · 高级
 
@@ -97,12 +97,12 @@ NE503 通过容器运行 AI 应用，平台内置模型管理。**AI 类应用�
 
 ### 模型列表
 
-每张模型卡显示：加载状态（**Loaded** / **Not Loaded**）、被多少应用引用（**X Apps**）、ID、类型、输入尺寸、文件大小、路径，以及 **Load / Unload / Detail / Delete** 操作。
+每张模型卡显示：加载状态（**Loaded** / **Not Loaded**）、有多少应用在引用（**X Apps**）、ID、类型、输入尺寸、文件大小、路径，以及 **Load / Unload / Detail / Delete** 操作。
 
 ### 扫描与导入
 
 - **Scan Models**：扫描 `/data/aipc/models/` 目录，自动注册新增的 `.hef` 模型。
-- **Import**：两步式导入——Step 1 上传 `.hef` 文件，Step 2 填写 Model ID / Model Type / Threshold 等配置。
+- **Import**：分两步导入——Step 1 上传 `.hef` 文件，Step 2 填写 Model ID / Model Type / Threshold 等配置。
 
 ### 加载与卸载
 
@@ -119,7 +119,7 @@ NE503 通过容器运行 AI 应用，平台内置模型管理。**AI 类应用�
 | 项 | 说明 |
 |----|------|
 | **Model ID / Type** | 标识与类型（detection / ocr / segmentation…） |
-| **Input Size** | 模型期望的输入分辨率。注意：平台前处理固定输出 **384×640 NV12**，模型输入尺寸不匹配会导致推理无结果 |
+| **Input Size** | 模型要求的输入分辨率。注意：平台前处理固定输出 **384×640 NV12**，模型输入尺寸不匹配会导致推理无结果 |
 | **File Size / Path** | `.hef` 文件大小与路径 |
 | **Threshold** | **推理阈值（可调）**——调高减少误检但可能漏检，调低相反 |
 | **Estimated TOPS / Memory** | 预估推理算力与显存占用 |

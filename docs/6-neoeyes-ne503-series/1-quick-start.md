@@ -6,7 +6,7 @@ tags: [快速入门, NE503, 首次部署]
 
 # Quick Start
 
-本指南带您完成 NE503 首次部署：开箱 → 连接 → 登录改密 → 验证画面 → 体验 AI → 配置网络与时区。走完后设备即可正式上线，深入功能见[用户指南](./2-user-guide/0-dashboard.md)。
+本指南带你完成 NE503 首次部署：开箱 → 连接 → 登录改密 → 验证画面 → 体验 AI → 配置网络与时区。走完后设备即可正式上线，更多功能见[用户指南](./2-user-guide/0-dashboard.md)。
 
 <div align="center">
   <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/overview/ne503-main.png" alt="NeoEyes NE503" width="100%" />

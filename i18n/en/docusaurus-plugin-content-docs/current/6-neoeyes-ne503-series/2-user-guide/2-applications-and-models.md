@@ -71,7 +71,7 @@ This is the most important step — it determines which platform capabilities th
 | **Max Inference QPS** | Cap the app's inferences per second to prevent NPU hogging |
 | **Max Concurrent Inference** | Cap the number of concurrent inferences |
 | **Allow Dynamic Model Registration** | Let the app discover and register models at runtime |
-| **Video Stream Permissions** | Check consumable streams (main / sub / third, each annotated with resolution and frame rate) |
+| **Video Stream Permissions** | Check the streams the app can use (main / sub / third, each annotated with resolution and frame rate) |
 | **Event Publish / Subscribe Topics** | Event Bus topics to publish / subscribe (comma-separated, e.g., `app/output`, `camera/*`) |
 | **Network Mode** | Isolated (no network) / Host (share host network) |
 | **Device Control** | Hardware control grants: **Light Control** (IR fill), **IR Cut Filter**, **PTZ Control**, **Lens Control** |
@@ -119,7 +119,7 @@ Click **Detail** to open the model detail dialog. Key fields:
 | Field | Description |
 |-------|-------------|
 | **Model ID / Type** | Identifier and type (detection / ocr / segmentation…) |
-| **Input Size** | The input resolution the model expects. Note: the platform preprocessing pipeline outputs a fixed **384×640 NV12** format — a mismatched input size produces no inference results |
+| **Input Size** | The input resolution the model requires. Note: the platform preprocessing pipeline outputs a fixed **384×640 NV12** format — a mismatched input size produces no inference results |
 | **File Size / Path** | Size and path of the `.hef` file |
 | **Threshold** | **Inference threshold (adjustable)** — raise it to reduce false positives (risk missing detections); lower it for the opposite |
 | **Estimated TOPS / Memory** | Estimated inference compute and memory footprint |

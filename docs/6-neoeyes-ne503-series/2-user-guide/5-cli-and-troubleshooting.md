@@ -1,12 +1,12 @@
 ---
-description: NE503 附录：aipc-cli 命令行速查（system / app / device / stream / model 各模块命令与输出格式）以及按症状组织的故障排查表。
+description: NE503 附录：aipc-cli 命令行速查（system / app / device / stream / model 各模块命令与输出格式）以及按现象归类的故障排查表。
 keywords: [NE503 aipc-cli, 命令行, CLI 速查, 故障排查, 排障, Troubleshooting, 症状]
 tags: [用户指南, NE503, CLI, 排障]
 ---
 
 # Troubleshooting
 
-通过 Web 终端（Maintenance → Terminal）或 SSH 登录设备后，可用 `aipc-cli` 统一管理应用、模型、设备、码流与系统。本附录给出命令速查与按症状组织的故障排查。
+通过 Web 终端（Maintenance → Terminal）或 SSH 登录设备后，可用 `aipc-cli` 统一管理应用、模型、设备、码流与系统。本附录给出命令速查与按现象归类的故障排查。
 
 ## aipc-cli 命令速查
 
@@ -39,7 +39,7 @@ aipc-cli model register <path>    # 注册新模型
 
 > CLI 覆盖了 Web 控制台的大部分管理操作，适合批量操作、自动化脚本与远程排障。
 
-## 症状化排障
+## 按现象排查
 
 按"现象"对号入座找排查路径。
 
