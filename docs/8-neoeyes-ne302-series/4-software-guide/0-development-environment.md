@@ -2,18 +2,18 @@
 id: ne302-development-environment
 title: Environment setup
 sidebar_position: 0
-description: Set up, configure and verify the NE302 source build environment before building or flashing firmware.
-keywords: [NE302, environment setup, ARM GCC, STM32CubeProgrammer, STM32CubeCLT, ST Edge AI, pnpm]
-tags: [NE302, software-guide, toolchain, build]
+description: 说明如何在构建或烧录固件前，为 NE302 源码准备、配置并验证工具链、环境变量和构建环境。
+keywords: [NE302, 环境配置, ARM GCC, STM32CubeProgrammer, STM32CubeCLT, ST Edge AI, pnpm]
+tags: [NE302, 软件指南, 工具链, 构建]
 ---
 
 # Environment setup
 
-本页用于准备 NE302 源码的开发环境。命令和工具以仓库 [SETUP.md](https://github.com/camthink-ai/ne302/blob/main/SETUP.md) 为准；完成本页后再进入 [Build, Flash and Update](./1-build-and-flash.md)。
+本页说明如何准备 NE302 源码开发环境。命令和工具以仓库 [SETUP.md](https://github.com/camthink-ai/ne302/blob/main/SETUP.md) 为准；完成本页后再进入[构建、烧录与更新](./1-build-and-flash.md)。
 
-## 1. Quick start
+## 1. 快速开始
 
-克隆源码后，先检查缺少什么：
+克隆源码后，先运行检查脚本，确认本机缺少哪些工具：
 
 ```bash
 git clone https://github.com/camthink-ai/ne302.git
@@ -21,7 +21,7 @@ cd ne302
 ./check_env.sh
 ```
 
-推荐先运行与系统对应的安装和检查脚本：
+建议先运行与操作系统对应的安装和检查脚本：
 
 ```bash
 # Linux / macOS / Git Bash
@@ -33,9 +33,9 @@ setup.bat
 check_env.bat
 ```
 
-安装脚本会生成项目根目录的 `.make.env`。安装完成不等于所有任务都可用；请以第 4 节的检查结果判断是否可以构建、烧录或重新生成模型。
+安装脚本会在项目根目录生成 `.make.env`。脚本执行完并不代表所有任务都已可用；请以第 4 节的检查结果判断能否构建、烧录或重新生成模型。
 
-## 2. Install tools by task
+## 2. 按任务安装工具
 
 | 任务 | 必需工具 | 何时需要 |
 | :--- | :--- | :--- |
@@ -84,7 +84,7 @@ npm install -g pnpm
 C:\Program Files\STMicroelectronics\STM32Cube\STM32CubeProgrammer\bin
 ```
 
-安装后将对应目录加入 `PATH`，再执行第 4 节的验证命令。
+安装后将对应目录加入 `PATH`，然后执行第 4 节的验证命令。
 
 ### ST Edge AI Core
 
@@ -102,9 +102,9 @@ export PATH="$STEDGEAI_CORE_DIR/Utilities/mac:$PATH"
 
 Windows 将 `stedgeai` 所在目录加入系统环境变量，并设置 `STEDGEAI_CORE_DIR` 为对应的 X-CUBE-AI 安装目录。使用的 ST Edge AI 变体必须与后续固件和模型构建的 `STEDGEAI_VARIANT` 一致。
 
-## 3. Configure `.make.env`
+## 3. 配置 `.make.env`
 
-安装脚本会在项目根目录生成 `.make.env`。打开该文件，将本机工具路径写入 `GCC_PATH`；需要重新生成模型时再设置 `STEDGEAI_CORE_DIR`。例如：
+安装脚本会在项目根目录生成 `.make.env`。打开该文件，将本机工具路径填入 `GCC_PATH`；只有需要重新生成模型时才设置 `STEDGEAI_CORE_DIR`。例如：
 
 ```makefile
 GCC_PATH = /path/to/arm-gnu-toolchain/bin
@@ -118,9 +118,9 @@ export STEDGEAI_CORE_DIR=/path/to/STEdgeAI
 make GCC_PATH=/path/to/toolchain/bin
 ```
 
-不要复制其它工程的 Flash 地址到 `.make.env`；烧录命令和地址由 NE302 根目录的 Makefile 管理。
+不要把其他工程的 Flash 地址复制到 `.make.env`；烧录命令和地址由 NE302 根目录的 Makefile 管理。
 
-## 4. Verify the environment
+## 4. 验证环境
 
 运行与系统对应的仓库检查脚本：
 
@@ -132,7 +132,7 @@ make GCC_PATH=/path/to/toolchain/bin
 check_env.bat
 ```
 
-基础构建环境完成时，输出末尾会显示以下其中之一：
+基础构建环境准备完成后，输出末尾会出现以下任一结果：
 
 ```text
 # Linux / macOS / Git Bash
@@ -142,7 +142,7 @@ Result: Essential tools complete! ✓
 Result: Essential tools complete! [OK]
 ```
 
-该结果表示以下基础工具检查已通过：
+这表示以下基础工具已通过检查：
 
 ```text
 ARM GCC Compiler
@@ -152,7 +152,7 @@ Node.js
 pnpm
 ```
 
-如果看到 `Result: <number> essential tool(s) missing`，请根据缺失项安装工具后重新执行相应系统的检查脚本。
+如果看到 `Result: <number> essential tool(s) missing`，请安装提示中缺失的工具，再重新执行对应系统的检查脚本。
 
 构建 FSBL、App 或 WakeCore 前，还要确认 `ARM Objcopy` 显示 `[OK]`。Linux/macOS 脚本会列出该项，但不会把它计入 `Essential tools complete` 的缺失计数。
 
@@ -164,20 +164,20 @@ pnpm
 | 通过 ST-LINK 烧录已有构建产物 | `STM32 Programmer` |
 | 重新生成模型 | `ST Edge AI`、`STEDGEAI_CORE_DIR` |
 
-`Note: <number> optional tool(s) missing` 表示可以进行基础构建，但不能执行缺少工具对应的操作。
+`Note: <number> optional tool(s) missing` 表示可以进行基础构建，但不能执行依赖缺失工具的操作。
 
-## 5. Check the build without flashing
+## 5. 不烧录时检查构建
 
 ```bash
 make info
 make -n
 ```
 
-`make info` 成功时会输出 `NE302 Version Information`，其中包含 FSBL、APP、WEB、MODEL、WAKECORE 版本以及当前 `STEdgeAI` 变体。`make -n` 只打印将执行的构建命令，不编译也不烧录设备。
+`make info` 成功时会输出 `NE302 Version Information`，其中包含 FSBL、APP、WEB、MODEL、WAKECORE 版本和当前 `STEdgeAI` 变体。`make -n` 只显示将执行的构建命令，不会编译，也不会烧录设备。
 
-两条命令均无错误后，即可开始构建。构建、打包和烧录命令见 [Build, Flash and Update](./1-build-and-flash.md)。
+两条命令均无报错后，即可开始构建。构建、打包和烧录命令见[构建、烧录与更新](./1-build-and-flash.md)。
 
-## 6. Common setup issues
+## 6. 常见环境问题
 
 | 现象 | 先检查 |
 | :--- | :--- |

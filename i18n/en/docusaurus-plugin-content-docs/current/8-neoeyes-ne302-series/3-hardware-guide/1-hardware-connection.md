@@ -34,7 +34,7 @@ The Interface Board provides **U6-UART** for the STM32N6 serial console. Use the
 
 ## Identify programming interfaces
 
-![NE302 Interface Board programming interface map](/img/neoeyes-ne302-series/hardware-guide/ne302-interface-board-programming-map.png)
+![NE302 Interface Board programming interface map](https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/hardware-guide/hardware-connection/ne302-interface-board-programming-map.png)
 
 | Board label | Physical target |
 | :--- | :--- |

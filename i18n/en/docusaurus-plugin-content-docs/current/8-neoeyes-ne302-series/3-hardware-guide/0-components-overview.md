@@ -13,7 +13,7 @@ NE302 is a two-board vision platform. The Main Board contains the image, compute
 
 ## Main Board component map
 
-![NE302 Main Board component map](/img/neoeyes-ne302-series/hardware-guide/ne302-main-board-chip-map.png)
+![NE302 Main Board component map](https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/hardware-guide/components-overview/ne302-main-board-chip-map.png)
 
 | Component | Circuit role | Connected hardware path |
 | :--- | :--- | :--- |
@@ -29,7 +29,7 @@ The Main Board also carries the external-power input, Alarm I/O, Trigger button,
 
 ## Main Board rear and Reset
 
-![NE302 Main Board rear component map](/img/neoeyes-ne302-series/hardware-guide/ne302-main-board-rear-map.png)
+![NE302 Main Board rear component map](https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/hardware-guide/components-overview/ne302-main-board-rear-map.png)
 
 The rear-side map identifies the **Reset Button**. Use Reset only when the operating procedure requires it. It restarts the device; it is not a substitute for selecting the N6 or U0 programming target.
 
@@ -53,8 +53,8 @@ This separation matters during development: N6 firmware covers the FSBL, App, We
 The Interface Board includes the USB-C and MicroSD connection circuits, programming headers, and an **SHT31-DIS** temperature/humidity sensor. It is the service-access board; it does not replace the Main Board's compute, image, or wireless circuits.
 
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', margin: '20px 0' }}>
-  <img src="/img/neoeyes-ne302-series/hardware-guide/ne302-interface-board-programming-map.png" alt="NE302 Interface Board programming interface map" style={{ width: '100%', borderRadius: '8px' }} />
-  <img src="/img/neoeyes-ne302-series/hardware-guide/ne302-interface-board-storage-map.png" alt="NE302 Interface Board storage and USB-C map" style={{ width: '100%', borderRadius: '8px' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/hardware-guide/components-overview/ne302-interface-board-programming-map.png" alt="NE302 Interface Board programming interface map" style={{ width: '100%', borderRadius: '8px' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/hardware-guide/components-overview/ne302-interface-board-storage-map.png" alt="NE302 Interface Board storage and USB-C map" style={{ width: '100%', borderRadius: '8px' }} />
 </div>
 
 | Interface-board component or area | Function | Use boundary |

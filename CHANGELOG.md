@@ -6,6 +6,11 @@ All notable changes to the CamThink Wiki documentation will be documented in thi
 
 > This changelog reflects updates starting from **2025-12-23**. Major changes prior to this date are not recorded.
 
+## [2026-08-14]
+
+### Added
+- **NeoEyes NE302 Documentation**: A new 10-page documentation section for the compact STM32N6 AI camera, covering product information, quick start, capture and storage, data transmission, AI model validation, system maintenance, hardware components and connections, development environment setup, and build/flash workflows. Images are served from CDN and the full section is available in English and Simplified Chinese.
+
 ## [2026-08-12]
 
 ### Added

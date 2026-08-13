@@ -2,9 +2,9 @@
 id: ne302-overview
 title: Product Information
 sidebar_position: 0
-description: NeoEyes NE302 Mini AI Vision Camera 的产品定位、核心能力、硬件组成、应用方向和开发资源。
-keywords: [NE302, NeoEyes, Mini AI Camera, STM32N6, 边缘 AI, 智能视觉]
-tags: [NE302, AI相机, 边缘计算, 智能硬件]
+description: 介绍 NeoEyes NE302 Mini AI Vision Camera 的产品定位、核心能力、硬件组成、应用方向和开发资源入口。
+keywords: [NE302, NeoEyes, 迷你 AI 相机, STM32N6, 边缘 AI, 智能视觉]
+tags: [NE302, AI 相机, 边缘计算, 智能硬件]
 ---
 
 import ApplicationScenarios from '@site/src/components/ApplicationScenarios';
@@ -14,24 +14,24 @@ import SupportGrid from '@site/src/components/SupportGrid';
 
 ## 产品简介
 
-NeoEyes NE302 是一款用于设备集成的 Mini AI Vision Camera。它把 4 MP 图像采集、STM32N6 边缘 AI、无线连接和本地存储放在 38 × 38 mm 的双板平台中，适合在室内持续供电环境中完成图像采集、设备侧推理和结果输出。
+NeoEyes NE302 是一款面向设备集成的迷你 AI 视觉相机。它把 4 MP 图像采集、STM32N6 边缘 AI、无线连接和本地存储集成在 38 × 38 mm 的双板平台中，适合在室内持续供电的设备中完成图像采集、本地推理和结果输出。
 
-![NE302 白色外壳和外置天线](/img/neoeyes-ne302-series/overview/ne302-white-external-render-large-transparent.png)
+![NE302 白色外壳和外置天线](https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/overview/ne302-white-external-render-large-transparent.png)
 
 ### 核心能力
 
 - **边缘 AI 推理**：基于 STM32N6 Cortex-M55 和 Neural-ART 加速器，在设备侧执行 INT8 神经网络推理，减少对云端推理的依赖。
 - **图像采集与编码**：支持 4 MP 图像输入，最高 2688 × 1520、30 fps，并提供硬件 H.264 和 JPEG 编码能力。
-- **紧凑双板设计**：主板承载视觉 AI 核心，接口板集中提供供电、存储、控制和开发连接，便于集成和版本管理。
-- **无线连接**：支持 2.4 GHz Wi-Fi 6 和 BLE；无线版本、天线和区域配置以交付版本为准。
+- **紧凑双板设计**：主板承载视觉 AI 核心，接口板集中提供供电、存储、控制和开发连接，便于安装、维护和二次开发。
+- **无线连接**：支持 2.4 GHz Wi-Fi 6 和 BLE；无线配置、天线形态和可用区域以交付版本为准。
 - **本地存储与数据流**：支持 MicroSD 本地存储，结合 Web 控制台完成预览、抓拍、推理验证和设备管理。
 - **补光与扩展**：部分硬件版本可能提供补光或扩展模块；是否可用以交付 SKU 和当前固件为准。
 - **开发资源**：开源工程包含 FSBL、主应用、Web、模型和 WakeCore 等组件，可用于构建、打包、烧录和 OTA 开发。
-- **灵活安装**：整机尺寸基线为 42 × 42 × 20 mm，支持室内磁吸或 3M 胶固定方向。
+- **灵活安装**：整机尺寸基线为 42 × 42 × 20 mm，适用于室内磁吸或 3M 胶固定安装。
 
 ## 产品规格
 
-以下规格以 NE302 datasheet 为公开基线。交付硬件的接口和工程版本差异请参阅 [Hardware Guide](./3-hardware-guide/0-components-overview.md)。
+以下规格以 NE302 数据手册为公开基线。交付硬件的接口和工程版本差异请参阅[硬件指南](./3-hardware-guide/0-components-overview.md)。
 
 ### 核心平台
 
@@ -47,10 +47,10 @@ NeoEyes NE302 是一款用于设备集成的 Mini AI Vision Camera。它把 4 MP
 | 项目 | 规格 |
 | :--- | :--- |
 | 图像传感器 | 4 MP 高灵敏度 CMOS |
-| 最大模式 | 2688 × 1520，最高 30 fps |
+| 最高分辨率与帧率 | 2688 × 1520，最高 30 fps |
 | 编码 | H.264、JPEG 硬件编码 |
 | 镜头 | 标准 M12；HFOV 88° / 137° 可选 |
-| 板载器件 | 白色补光灯、环境温湿度传感器 |
+| 板载传感与补光 | 白色补光灯、环境温湿度传感器 |
 
 ### 无线、存储与控制
 
@@ -67,7 +67,7 @@ NeoEyes NE302 是一款用于设备集成的 Mini AI Vision Camera。它把 4 MP
 | 供电 | USB Type-C 持续供电 |
 | PCBA | 38 × 38 mm |
 | 外壳 | 42 × 42 × 20 mm |
-| 环境 | 室内，−20 °C 至 +50 °C |
+| 工作环境 | 室内，−20 °C 至 +50 °C |
 | 安装 | 后置磁吸或 3M 胶安装 |
 
 ### 产品组成与交付物
@@ -76,12 +76,12 @@ NE302 由以下主要部件组成：
 
 | 部件 | 作用 | 备注 |
 | :--- | --- | --- |
-| Main Board | 承载 STM32N6、STM32U0、图像和无线相关电路 | 38 × 38 mm 主板基线 |
-| Interface Board | 提供供电、存储、控制和开发连接 | 接口数量与布局按硬件版本确认 |
-| Camera assembly | 提供图像输入 | 适用镜头型号和焦距按 SKU 确认 |
-| Antenna | 提供无线连接 | 公共 datasheet 基线为外置 SMA |
-| Enclosure | 提供结构保护和安装 | 公共 datasheet 基线为 42 × 42 × 20 mm |
-| USB Type-C cable | 设备供电 | 采用交付版本兼容的电源和线缆 |
+| 主板 | 承载 STM32N6、STM32U0、图像和无线相关电路 | 38 × 38 mm 主板基线 |
+| 接口板 | 提供供电、存储、控制和开发连接 | 接口数量与布局按硬件版本确认 |
+| 相机组件 | 提供图像输入 | 适用镜头型号和焦距按 SKU 确认 |
+| 天线 | 提供无线连接 | 公共 datasheet 基线为外置 SMA |
+| 外壳 | 提供结构保护和安装 | 公共 datasheet 基线为 42 × 42 × 20 mm |
+| USB Type-C 线缆 | 设备供电 | 使用交付版本兼容的电源和线缆 |
 
 ## 性能与边缘 AI
 
@@ -101,12 +101,12 @@ NE302 以 STM32N6 为主控，使用 Cortex-M55 和 Neural-ART 加速器承担�
 
 ```mermaid
 flowchart LR
-  S[Image sensor] --> I[ISP and capture]
-  I --> E[H.264 or JPEG]
-  I --> N[Local INT8 inference]
-  E --> P[Preview or storage]
-  N --> R[Structured result]
-  P --> W[Web console or application]
+  S[图像传感器] --> I[图像处理与采集]
+  I --> E[H.264 或 JPEG 编码]
+  I --> N[本地 INT8 推理]
+  E --> P[预览或存储]
+  N --> R[结构化结果]
+  P --> W[Web 控制台或应用]
   R --> W
 ```
 
@@ -114,17 +114,17 @@ flowchart LR
 
 ## 硬件介绍
 
-### Main Board
+### 主板
 
-NE302 的两板平台集成 STM32N6、STM32U0、摄像头、PSRAM、SPI Flash 和无线相关电路。主板、相机、天线与硬件版本的识别方式请参见 [Components Overview](./3-hardware-guide/0-components-overview.md)。
+NE302 的两板平台集成 STM32N6、STM32U0、摄像头、PSRAM、SPI Flash 和无线相关电路。主板、相机、天线与硬件版本的识别方式请参见[硬件组成](./3-hardware-guide/0-components-overview.md)。
 
-![NE302 主板标注图](/img/neoeyes-ne302-series/hardware-guide/ne302-main-board-cropped.png)
+![NE302 主板标注图](https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/overview/ne302-main-board-cropped.png)
 
-### Interface Board
+### 接口板
 
-接口板将设备使用和开发所需的连接引出，包括 USB Type-C、MicroSD、调试/烧录连接、串口或其它版本相关接口。接口板是首次组装、烧录和现场连接的主要参考对象。
+接口板集中提供设备使用和开发所需的连接，包括 USB Type-C、MicroSD、调试/烧录连接、串口和其他版本相关接口。首次组装、烧录和现场接线时，应以接口板的丝印和交付资料为准。
 
-![NE302 接口板标注图](/img/neoeyes-ne302-series/hardware-guide/ne302-interface-board-cropped.png)
+![NE302 接口板标注图](https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/overview/ne302-interface-board-cropped.png)
 
 ### 版本说明
 
@@ -142,15 +142,15 @@ NE302 的应用方向是“紧凑摄像头 + 本地 AI + 设备集成”。以�
     {
       title: '设备状态与事件检测',
       items: [
-        { title: '工位或设备状态识别', description: '对固定工位或设备状态进行本地识别，再将结构化结果交给上层系统；部署前需要验证镜头视场、光照、模型和结果协议。', image: '/img/neoeyes-ne302-series/overview/ne302-application-workstation.jpg', imageAlt: '工业设备工位示意' },
-        { title: '事件触发抓拍', description: '结合 IO/PIR、远程控制或定时采集，在事件发生时保存或发送图像；部署前需要确认触发接线、存储策略和失败重试。', image: '/img/neoeyes-ne302-series/overview/ne302-application-entry-terminal.jpg', imageAlt: '出入口终端示意' }
+        { title: '工位或设备状态识别', description: '对固定工位或设备状态进行本地识别，再将结构化结果交给上层系统；部署前需要验证镜头视场、光照、模型和结果协议。', image: 'https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/overview/ne302-application-workstation.jpg', imageAlt: '工业设备工位示意' },
+        { title: '事件触发抓拍', description: '结合 IO/PIR、远程控制或定时采集，在事件发生时保存或发送图像；部署前需要确认触发接线、存储策略和失败重试。', image: 'https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/overview/ne302-application-entry-terminal.jpg', imageAlt: '出入口终端示意' }
       ]
     },
     {
       title: '紧凑型视觉集成',
       items: [
-        { title: '小型终端视觉模块', description: '利用双板结构、无线连接和本地存储为定制设备增加视觉能力；集成前需确认安装空间、供电、天线和维护方式。', image: '/img/neoeyes-ne302-series/overview/ne302-application-self-service-terminal.jpg', imageAlt: '小型自助终端示意' },
-        { title: '边缘 AI 原型验证', description: '使用 Web 控制台和开源工程验证模型、镜头和数据输出方式；单台设备的测试结果不能替代量产性能和可靠性测试。', image: '/img/neoeyes-ne302-series/overview/ne302-application-edge-ai-prototype-validation.png', imageAlt: '边缘 AI 原型验证流程示意' }
+        { title: '小型终端视觉模块', description: '利用双板结构、无线连接和本地存储为定制设备增加视觉能力；集成前需确认安装空间、供电、天线和维护方式。', image: 'https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/overview/ne302-application-self-service-terminal.jpg', imageAlt: '小型自助终端示意' },
+        { title: '边缘 AI 原型验证', description: '使用 Web 控制台和开源工程验证模型、镜头和数据输出方式；单台设备的测试结果不能替代量产性能和可靠性测试。', image: 'https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/overview/ne302-application-edge-ai-prototype-validation.png', imageAlt: '边缘 AI 原型验证流程示意' }
       ]
     }
   ]}
@@ -162,16 +162,16 @@ NE302 的应用方向是“紧凑摄像头 + 本地 AI + 设备集成”。以�
 
 ### Wiki 指南
 
-- [Quick Guide](./1-quick-start.md)：完成组装、首次登录、AI 验证和触发记录。
-- [User Guide](./2-user-guide/0-capture-storage.md)：按设备管理职责深入配置抓拍、数据发送、AI 验证和系统维护。
-- [Hardware Guide](./3-hardware-guide/0-components-overview.md)：查看主板、接口板和硬件版本边界。
-- [Software Guide](./4-software-guide/0-development-environment.md)：配置源码环境并执行构建、打包和烧录流程。
+- [快速指南](./1-quick-start.md)：完成组装、首次登录、AI 验证和触发记录。
+- [用户指南](./2-user-guide/0-capture-storage.md)：按设备管理职责深入配置抓拍、数据发送、AI 验证和系统维护。
+- [硬件指南](./3-hardware-guide/0-components-overview.md)：查看主板、接口板和硬件版本边界。
+- [软件指南](./4-software-guide/0-development-environment.md)：配置源码环境并执行构建、打包和烧录流程。
 
 ### 开发资源
 
-- [NE302 GitHub Repository](https://github.com/camthink-ai/ne302)：源码、README、SETUP 和构建脚本。
-- [Hardware Guide](./3-hardware-guide/0-components-overview.md)：查看 V1.1 硬件组成、连接和开发接口。
-- [Build, Flash and Update](./4-software-guide/1-build-and-flash.md)：了解各组件的构建、打包、烧录和更新边界。
+- [NE302 GitHub 仓库](https://github.com/camthink-ai/ne302)：源码、README、SETUP 和构建脚本。
+- [硬件指南](./3-hardware-guide/0-components-overview.md)：查看硬件组成、连接和开发接口。
+- [构建、烧录与更新](./4-software-guide/1-build-and-flash.md)：了解各组件的构建、打包、烧录和更新边界。
 
 ## 技术支持
 

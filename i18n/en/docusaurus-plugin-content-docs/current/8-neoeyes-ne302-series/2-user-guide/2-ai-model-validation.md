@@ -15,7 +15,7 @@ Use this page to upload a model package to NE302, then confirm that it produces 
 
 In the [CamThink Model Zoo](https://www.camthink.ai/developer-center/models/?product=ne302), select **ne302**, then filter by scenario, task or model architecture.
 
-![NE302 Model Zoo filter](/img/neoeyes-ne302-series/user-guide/ne302-model-zoo.png)
+![NE302 Model Zoo filter](https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/user-guide/ai-model-validation/ne302-model-zoo.png)
 
 The device upload requires an NE302 model package, such as `ne302_Model_xxx_pkg.bin`. A raw `.tflite` or `.onnx` download cannot be uploaded directly; prepare its JSON configuration and build the package according to the [NE302 Model README](https://github.com/camthink-ai/ne302/blob/main/Model/README.md).
 
@@ -23,7 +23,7 @@ The device upload requires an NE302 model package, such as `ne302_Model_xxx_pkg.
 
 Open **Feature Debugging → Camera Settings**. This page manages the loaded model, inference thresholds, operating mode and work frequency.
 
-![NE302 model upload entry](/img/neoeyes-ne302-series/user-guide/ne302-model-upload.png)
+![NE302 model upload entry](https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/user-guide/ai-model-validation/ne302-model-upload.png)
 
 | Setting | Purpose and operation |
 | :--- | :--- |
@@ -40,6 +40,6 @@ Do not refresh or power off during upload. If Current Model does not change, fir
 
 Open **Model Validation**. Select a `jpg`, `jpeg`, `png` or `webp` image no larger than 10 MB, then wait for the JSON result area to update.
 
-![NE302 Model Validation page](/img/neoeyes-ne302-series/user-guide/ne302-model-validation.png)
+![NE302 Model Validation page](https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/user-guide/ai-model-validation/ne302-model-validation.png)
 
 A fixed-image validation passes when the page shows the current model, accepts the image and updates the JSON result. Empty `detections` means that image produced no detection; it does not mean model upload failed. Try a known-target image first, or adjust **Confidence Threshold** and repeat with the same image.

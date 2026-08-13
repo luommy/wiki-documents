@@ -17,7 +17,7 @@ Prepare the camera image and supplementary light in **Hardware Management** firs
 
 Open **Hardware Management → Image Management**. Confirm that **Connection Status** is `connected`, then inspect the preview. Do not configure image flip, ISP mode or grayscale mode until the camera is connected.
 
-![Image Management in Hardware Management](/img/neoeyes-ne302-series/user-guide/ne302-hardware-management.png)
+![Image Management in Hardware Management](https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/user-guide/capture-storage/ne302-hardware-management.png)
 
 | Setting | When to adjust it | How to confirm |
 | :--- | :--- | :--- |
@@ -32,7 +32,7 @@ Changes to **ISP mode** and **Grayscale mode** apply after the next wake-up or r
 
 Open **Hardware Management → Lighting Management**, confirm that the camera is still `connected`, then inspect **Work Supplement Light**. The page exposes the options available for the connected device and its current light mode. `Always Off` in the screenshot is the state captured from this device, not a universal recommendation.
 
-![Lighting Management in Hardware Management](/img/neoeyes-ne302-series/user-guide/ne302-hardware-lighting.png)
+![Lighting Management in Hardware Management](https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/user-guide/capture-storage/ne302-hardware-lighting.png)
 
 For a low-light installation, select an available mode appropriate to the scene, run one real trigger, and inspect the stored image under **Records**. Preview alone is not enough to judge whether supplementary light is suitable for capture and inference.
 
@@ -40,7 +40,7 @@ For a low-light installation, select an available mode appropriate to the scene,
 
 Open **Capture Settings → Capture Config**. Select **Capture Mode** and **Storage Location** first, then configure upload and retention.
 
-![Capture Config: mode, storage and upload settings](/img/neoeyes-ne302-series/user-guide/ne302-capture-settings.png)
+![Capture Config: mode, storage and upload settings](https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/user-guide/capture-storage/ne302-capture-settings.png)
 
 | Setting | When to use it | Configuration guidance |
 | :--- | :--- | :--- |
@@ -56,7 +56,7 @@ Without an SD card, the page shows the current Flash record limit. This is a lim
 
 On the same page, configure retry, retention and camera parameters, then click **save** at the bottom.
 
-![Capture Config: retry, camera parameters and save](/img/neoeyes-ne302-series/user-guide/ne302-capture-settings-lower.png)
+![Capture Config: retry, camera parameters and save](https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/user-guide/capture-storage/ne302-capture-settings-lower.png)
 
 | Setting | What it affects | Selection guidance |
 | :--- | :--- | :--- |
@@ -72,7 +72,7 @@ After saving, reopen the page to confirm that the values remain. Upload settings
 
 Run one real trigger, then open **Capture Settings → Records** and find the entry by trigger time.
 
-![Records in Capture Settings](/img/neoeyes-ne302-series/user-guide/ne302-capture-records.png)
+![Records in Capture Settings](https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/user-guide/capture-storage/ne302-capture-records.png)
 
 | Status | Meaning | Next action |
 | :--- | :--- | :--- |
@@ -87,7 +87,7 @@ Use **From / To** to narrow the trigger-time range, then filter by **Pending / S
 
 Open **Feature Debugging → Wakeup Source Configuration**. For first validation, enable one source only. Save it, then find the record at the matching time under **Capture Settings → Records**.
 
-![NE302 Wakeup Source Configuration](/img/neoeyes-ne302-series/user-guide/ne302-feature-debugging-stream-wakeup.png)
+![NE302 Wakeup Source Configuration](https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/user-guide/capture-storage/ne302-feature-debugging-stream-wakeup.png)
 
 ### IO Trigger-PIR
 

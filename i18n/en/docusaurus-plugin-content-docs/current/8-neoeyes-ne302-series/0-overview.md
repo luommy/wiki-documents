@@ -16,7 +16,7 @@ import SupportGrid from '@site/src/components/SupportGrid';
 
 NeoEyes NE302 is a Mini AI Vision Camera for device integration. It combines 4 MP image capture, STM32N6 edge AI, wireless connectivity and local storage in a 38 × 38 mm two-board platform. It is intended for indoor, continuously powered deployments that need image capture, on-device inference and result delivery.
 
-![NE302 white enclosure with external antenna](/img/neoeyes-ne302-series/overview/ne302-white-external-render-large-transparent.png)
+![NE302 white enclosure with external antenna](https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/overview/ne302-white-external-render-large-transparent.png)
 
 ### Core Capabilities
 
@@ -118,13 +118,13 @@ The Web console can show a preview, execute a capture, validate a model and insp
 
 The NE302 two-board platform integrates the STM32N6, STM32U0, camera, PSRAM, SPI Flash, and wireless-related circuits. See [Components Overview](./3-hardware-guide/0-components-overview.md) to identify the board, camera, antenna, and hardware-version boundaries.
 
-![Annotated NE302 main board](/img/neoeyes-ne302-series/hardware-guide/ne302-main-board-cropped.png)
+![Annotated NE302 main board](https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/overview/ne302-main-board-cropped.png)
 
 ### Interface Board
 
 The Interface Board exposes the connections needed for use and development, including USB Type-C, MicroSD, debug/flash channels, serial access and other revision-dependent interfaces. It is the main reference for first assembly, flashing and field connection.
 
-![Annotated NE302 interface board](/img/neoeyes-ne302-series/hardware-guide/ne302-interface-board-cropped.png)
+![Annotated NE302 interface board](https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/overview/ne302-interface-board-cropped.png)
 
 ### Version Notes
 
@@ -142,15 +142,15 @@ NE302 is positioned around compact camera integration, local AI and device-level
     {
       title: 'Device state and event detection',
       items: [
-        { title: 'Workstation or equipment state recognition', description: 'Recognize a fixed workstation or equipment state locally and deliver structured results to an upper-layer system; validate the field of view, lighting, model and result protocol first.', image: '/img/neoeyes-ne302-series/overview/ne302-application-workstation.jpg', imageAlt: 'Industrial workstation example' },
-        { title: 'Event-triggered capture', description: 'Combine IO/PIR, remote control or scheduled capture to save or send images on events; confirm trigger wiring, storage policy and retry behavior before deployment.', image: '/img/neoeyes-ne302-series/overview/ne302-application-entry-terminal.jpg', imageAlt: 'Entry terminal example' }
+        { title: 'Workstation or equipment state recognition', description: 'Recognize a fixed workstation or equipment state locally and deliver structured results to an upper-layer system; validate the field of view, lighting, model and result protocol first.', image: 'https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/overview/ne302-application-workstation.jpg', imageAlt: 'Industrial workstation example' },
+        { title: 'Event-triggered capture', description: 'Combine IO/PIR, remote control or scheduled capture to save or send images on events; confirm trigger wiring, storage policy and retry behavior before deployment.', image: 'https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/overview/ne302-application-entry-terminal.jpg', imageAlt: 'Entry terminal example' }
       ]
     },
     {
       title: 'Compact vision integration',
       items: [
-        { title: 'Vision module for a small terminal', description: 'Use the two-board design, wireless connectivity and local storage to add vision to a custom device; confirm installation space, power, antenna and maintenance access.', image: '/img/neoeyes-ne302-series/overview/ne302-application-self-service-terminal.jpg', imageAlt: 'Small self-service terminal example' },
-        { title: 'Edge-AI prototype validation', description: 'Use the Web console and the engineering project to validate models, lenses and result-delivery methods; one-device results do not replace production performance and reliability testing.', image: '/img/neoeyes-ne302-series/overview/ne302-application-edge-ai-prototype-validation.png', imageAlt: 'Edge-AI prototype validation workflow' }
+        { title: 'Vision module for a small terminal', description: 'Use the two-board design, wireless connectivity and local storage to add vision to a custom device; confirm installation space, power, antenna and maintenance access.', image: 'https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/overview/ne302-application-self-service-terminal.jpg', imageAlt: 'Small self-service terminal example' },
+        { title: 'Edge-AI prototype validation', description: 'Use the Web console and the engineering project to validate models, lenses and result-delivery methods; one-device results do not replace production performance and reliability testing.', image: 'https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/overview/ne302-application-edge-ai-prototype-validation.png', imageAlt: 'Edge-AI prototype validation workflow' }
       ]
     }
   ]}

@@ -16,8 +16,8 @@ Complete this first-use path: assemble and power the device → sign in to the W
 Prepare the NE302 Main Board, Interface Board, camera assembly, the antenna for the delivered SKU, and USB Type-C power. Add a MicroSD card when capture records must be saved, and use a computer that can reach the device network.
 
 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', alignItems: 'center', margin: '24px 0' }}>
-  <img src="/img/neoeyes-ne302-series/quick-start/ne302-product-render-cropped.png" alt="NE302 white finished product with external antenna" style={{ width: '100%', height: '360px', objectFit: 'contain' }} />
-  <img src="/img/neoeyes-ne302-series/quick-start/ne302-board-connection-tight.png" alt="NE302 main board and interface board assembly" style={{ width: '100%', height: '360px', objectFit: 'contain' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/quick-start/ne302-product-render-cropped.png" alt="NE302 white finished product with external antenna" style={{ width: '100%', height: '360px', objectFit: 'contain' }} />
+  <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/quick-start/ne302-board-connection-tight.png" alt="NE302 main board and interface board assembly" style={{ width: '100%', height: '360px', objectFit: 'contain' }} />
 </div>
 
 The left image shows the finished product; the right image shows the board assembly. Follow the delivery hardware record for power, antenna and board revision.
@@ -36,7 +36,7 @@ If the device does not start, disconnect power, check the board connection, came
 2. Open the device address in a browser. Some test devices use `http://192.168.10.10/`; the actual address follows the device configuration.
 3. Sign in with the credentials delivered with the device. If the page requires a login-password change, complete it and sign in again with the new password.
 
-![NE302 Web console login page](/img/neoeyes-ne302-series/quick-start/ne302-login.png)
+![NE302 Web console login page](https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/quick-start/ne302-login.png)
 
 The access check passes when the console opens and displays the function navigation.
 
@@ -46,7 +46,7 @@ The access check passes when the console opens and displays the function navigat
 2. Wait for the preview area and Camera Settings to finish loading.
 3. Confirm that the preview continuously shows an image and that its orientation matches the installation.
 
-![NE302 Feature Debugging live preview and Camera Settings](/img/neoeyes-ne302-series/quick-start/ne302-feature-debugging.png)
+![NE302 Feature Debugging live preview and Camera Settings](https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/quick-start/ne302-feature-debugging.png)
 
 If there is no image, check the camera connection and power first, then see [Capture and Storage](./2-user-guide/0-capture-storage.md).
 
@@ -57,7 +57,7 @@ If there is no image, check the camera connection and power first, then see [Cap
 3. Open **Model Validation** and upload one fixed test image.
 4. Wait for the result area to update and confirm that the page returned an inference result.
 
-![NE302 Model Validation page](/img/neoeyes-ne302-series/user-guide/ne302-model-validation.png)
+![NE302 Model Validation page](https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/quick-start/ne302-model-validation.png)
 
 See [AI Model Validation](./2-user-guide/2-ai-model-validation.md) for model formats, parameters and result interpretation.
 
@@ -67,9 +67,9 @@ See [AI Model Validation](./2-user-guide/2-ai-model-validation.md) for model for
 2. Use that source to trigger the device once.
 3. Open **Capture Settings → Records** and find the matching entry by trigger time.
 
-![NE302 Wakeup Source Configuration](/img/neoeyes-ne302-series/user-guide/ne302-feature-debugging-stream-wakeup.png)
+![NE302 Wakeup Source Configuration](https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/quick-start/ne302-feature-debugging-stream-wakeup.png)
 
-![NE302 Capture Settings → Records](/img/neoeyes-ne302-series/user-guide/ne302-capture-records.png)
+![NE302 Capture Settings → Records](https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/quick-start/ne302-capture-records.png)
 
 The first capture check passes when Records contains the entry with the matching time.
 

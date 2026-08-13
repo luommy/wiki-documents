@@ -2,52 +2,52 @@
 id: ne302-hardware-connection
 title: Hardware Connection
 sidebar_position: 1
-description: Assemble, power and connect the NE302 hardware for storage and N6 or U0 firmware flashing.
-keywords: [NE302, hardware connection, USB Type-C, MicroSD, ST-LINK, N6, U0]
-tags: [NE302, hardware-guide, ST-LINK]
+description: 说明 NE302 的板卡组装、上电、存储与外置天线连接，以及 N6、U0 烧录接口和开关的识别方法。
+keywords: [NE302, 硬件连接, USB Type-C, MicroSD, ST-LINK, N6, U0]
+tags: [NE302, 硬件指南, 硬件连接, ST-LINK]
 ---
 
 # Hardware Connection
 
-Work with the device unpowered whenever connecting boards, MicroSD, ST-LINK or changing a programming switch. The label on the delivered board is authoritative.
+连接板卡、MicroSD、ST-LINK 或切换烧录开关前，必须先给设备断电。具体接口以交付板卡上的丝印为准。
 
 ## 装配与首次上电
 
-1. Disconnect USB-C and every external power source.
-2. Seat the Main Board and Interface Board vertically and evenly. Install the camera, matching antenna and enclosure before use.
-3. Insert MicroSD before power-on only when the task requires local image or record storage.
-4. Leave all programming switches in the run position for normal operation.
-5. Connect USB-C power and wait for startup. Open the Web console and confirm that Device Information loads and Feature Debugging shows a camera preview.
+1. 断开 USB-C 和所有外部电源。
+2. 将主板和接口板垂直、均匀地压入连接器。使用前安装相机、匹配的天线和外壳。
+3. 仅在需要本地保存图片或记录时，于上电前插入 MicroSD。
+4. 正常运行时，所有烧录开关保持在运行位置。
+5. 连接 USB-C 电源并等待启动。打开 Web 控制台，确认**设备信息**可以加载、**功能调试**显示相机预览。
 
-If the device does not start, disconnect power. Recheck the board-to-board seating, camera cable, antenna and approved USB-C supply before changing any programming switch.
+设备未启动时，先断电，再检查板间连接是否到位、相机排线、天线和认可的 USB-C 电源；在排除这些问题前，不要切换烧录开关。
 
 ## 外部连接
 
-| Connection | Use | Success check |
+| 连接项 | 用途 | 确认方式 |
 | :--- | :--- | :--- |
-| USB Type-C | Continuous device power and the supported USB connection for the delivered configuration | Device starts and the Web console becomes reachable |
-| MicroSD | Local storage for the configured capture or record workflow | Storage Management reports the card state after startup |
-| Trigger / Reset | Physical input or recovery control provided by the delivered hardware and firmware | Use only the function exposed by the delivered device; do not infer signal levels from this guide |
-| External SMA antenna | Wireless connection for an external-antenna configuration | Antenna is firmly fitted, has clearance from metal, and wireless connectivity can be tested |
+| USB Type-C | 设备持续供电，以及交付配置支持的 USB 连接 | 设备启动，Web 控制台可访问 |
+| MicroSD | 已配置抓拍或记录流程的本地存储 | 启动后**存储管理**显示存储卡状态 |
+| Trigger / Reset | 交付硬件和固件提供的物理触发或复位控制 | 仅使用交付设备实际提供的功能；本文不定义信号电平 |
+| 外置 SMA 天线 | 外置天线配置的无线连接 | 天线已牢固安装、避开金属遮挡，且可测试无线连接 |
 
-The Interface Board provides **U6-UART** for the STM32N6 serial console. Use the matching adapter and serial procedure; the source README lists 921600 baud. Do not infer electrical levels or pin assignments from this guide.
+接口板的 **U6-UART** 是 STM32N6 串口控制台接口。仅使用匹配的转接器和串口流程；源码 README 标注为 921600 波特率。本文不定义其电平或引脚分配。
 
 ## 编程接口识别
 
-![NE302 Interface Board programming interface map](/img/neoeyes-ne302-series/hardware-guide/ne302-interface-board-programming-map.png)
+![NE302 接口板烧录接口标注图](https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/hardware-guide/hardware-connection/ne302-interface-board-programming-map.png)
 
-| Board label | Physical target |
+| 板卡丝印 | 物理目标 |
 | :--- | :--- |
-| `N6-STLINK` | STM32N6 SWD programming and debugging interface |
-| `U0-STLINK` | STM32U0 SWD programming and debugging interface |
-| `U6-UART` | STM32N6 serial-console interface |
-| `N6-BOOT` | STM32N6 boot-mode switch |
-| `U0-BOOT` | STM32U0 boot-mode switch |
+| `N6-STLINK` | STM32N6 SWD 烧录与调试接口 |
+| `U0-STLINK` | STM32U0 SWD 烧录与调试接口 |
+| `U6-UART` | STM32N6 串口控制台接口 |
+| `N6-BOOT` | STM32N6 启动模式开关 |
+| `U0-BOOT` | STM32U0 启动模式开关 |
 
-This guide identifies the connectors and switches only. The target selection, switch sequence, ST-LINK-to-PC connection and flashing commands are in [Build, Flash and Update](../4-software-guide/1-build-and-flash.md).
+本页只说明连接器和开关的位置。烧录目标的选择、拨码顺序、ST-LINK 与电脑的连接和烧录命令见[构建、烧录与更新](../4-software-guide/1-build-and-flash.md)。
 
 ## 相关页面
 
-- 硬件组成和配置边界： [Components Overview](./0-components-overview.md)
-- 选择目标、连接 ST-LINK 和执行烧录： [Build, Flash and Update](../4-software-guide/1-build-and-flash.md)
-- 抓拍、存储和记录： [Capture and Storage](../2-user-guide/0-capture-storage.md)
+- 硬件组成和配置边界：[硬件组成](./0-components-overview.md)
+- 选择目标、连接 ST-LINK 和执行烧录：[构建、烧录与更新](../4-software-guide/1-build-and-flash.md)
+- 抓拍、存储和记录：[抓拍与存储](../2-user-guide/0-capture-storage.md)

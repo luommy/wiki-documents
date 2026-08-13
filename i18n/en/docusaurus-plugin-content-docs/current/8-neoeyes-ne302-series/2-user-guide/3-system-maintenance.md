@@ -21,13 +21,13 @@ Open **System Settings → Device Password**:
 
 **Username** is `admin`. **Local WiFi Settings** is a separate configuration group; saving Wi-Fi settings may require reconnecting to the device network.
 
-![NE302 Device Password settings](/img/neoeyes-ne302-series/user-guide/ne302-system-settings-device-password.png)
+![NE302 Device Password settings](https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/user-guide/system-maintenance/ne302-system-settings-device-password.png)
 
 ## 2. Firmware Upgrade
 
 Open **System Settings → Firmware Upgrade**. Check the installed versions under **Firmware Information**, then download firmware from [NE302 GitHub Releases](https://github.com/camthink-ai/ne302/releases). The table uses `v4.3.0`; for another version, use only the matching files from its Release.
 
-![NE302 Firmware Import dialog](/img/neoeyes-ne302-series/user-guide/ne302-firmware-upgrade.png)
+![NE302 Firmware Import dialog](https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/user-guide/system-maintenance/ne302-firmware-upgrade.png)
 
 | Component | v4.3.0 file | Use |
 | :--- | :--- | :--- |
@@ -51,7 +51,7 @@ Upgrade FSBL only when a Release or engineer explicitly requires it. Do not mix 
 
 Open **Storage Management** and check **SD Card Status** and available **Internal Flash** space.
 
-![NE302 Storage Management](/img/neoeyes-ne302-series/user-guide/ne302-storage-management.png)
+![NE302 Storage Management](https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/user-guide/system-maintenance/ne302-storage-management.png)
 
 In the relevant **File Manager**, use **Preview** to identify a file and **Download** to keep it before deleting the selected file or directory. Deleting a directory also deletes its contents.
 

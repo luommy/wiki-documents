@@ -71,7 +71,7 @@ STM32N6 covers FSBL, App, Web, Model and WiFi. The sequence is fixed: **set the 
 
 The image below labels the programming and serial interfaces on the actual Interface Board: `N6-STLINK` is for STM32N6, `U0-STLINK` is for STM32U0, and the middle `U6-UART` connector is serial, not an ST-LINK flashing interface.
 
-![NE302 flashing interface board](/img/neoeyes-ne302-series/hardware-guide/ne302-interface-board-programming-map.png)
+![NE302 flashing interface board](https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/software-guide/build-and-flash/ne302-interface-board-programming-map.png)
 
 ### Hardware connection
 
@@ -79,6 +79,8 @@ The image below labels the programming and serial interfaces on the actual Inter
 2. Set the interface-board `N6-BOOT` switch toward the printed **ON** side.
 3. Connect: **device `N6-STLINK` → ST-LINK → PC**.
 4. Power on or reset the device.
+
+![STM32N6 flashing connection: device N6-STLINK through ST-LINK to PC](https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/software-guide/build-and-flash/ne302-n6-flash-connection.png)
 
 ### Run the flashing command
 
@@ -117,6 +119,8 @@ STM32U0 runs WakeCore. It has a separate interface and Boot switch and must not 
 3. Connect: **device `U0-STLINK` → ST-LINK → PC**.
 4. Power on or reset the device.
 5. From the source directory on the PC, run:
+
+![STM32U0 flashing connection: device U0-STLINK through ST-LINK to PC](https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/software-guide/build-and-flash/ne302-u0-flash-connection.png)
 
    ```bash
    make flash-wakecore
