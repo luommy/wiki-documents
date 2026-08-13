@@ -6,6 +6,11 @@ All notable changes to the CamThink Wiki documentation will be documented in thi
 
 > This changelog reflects updates starting from **2025-12-23**. Major changes prior to this date are not recorded.
 
+## [2026-08-12]
+
+### Added
+- **NeoEyes NE503 User Guide**: A new 6-page Web UI user guide section under NE503 — Dashboard (overview & navigation), Video and Imaging (live view, image quality, overlay & image control, VLC RTSP verification), AI Apps and Models (app management, AI Model Showcase, install wizard), Peripherals, System Management (device info, time, network, storage, logs, file manager, terminal, process manager), and Troubleshooting (CLI reference & diagnostics). Every page is grounded in real-device screenshots served from CDN, covering the full NE503 web console surface (full bilingual support).
+
 ## [2026-07-21]
 
 ### Added

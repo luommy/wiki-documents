@@ -6,6 +6,11 @@
 
 > 本更新日志自 **2025-12-23** 起开始记录，此前的历史变更未作追溯。
 
+## [2026-08-12]
+
+### 新增 (Added)
+- **NeoEyes NE503 用户手册**: NE503 下新增 6 页 Web 控制台用户手册——Dashboard（总览与导航）、Video and Imaging（实时预览、图像质量、叠加与图像控制、VLC RTSP 验证）、AI Apps and Models（应用管理、AI 模型市场、安装向导）、Peripherals（外设）、System Management（设备信息、时间、网络、存储、日志、文件管理器、终端、进程管理器）、Troubleshooting（CLI 命令参考与故障排查）。每页均配真机截图（已上传 CDN），完整覆盖 NE503 Web 控制台各项功能（中英文完整支持）。
+
 ## [2026-07-21]
 
 ### 新增 (Added)

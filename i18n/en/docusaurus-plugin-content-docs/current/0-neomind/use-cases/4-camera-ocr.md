@@ -163,7 +163,7 @@ This section lists typical scenarios by AI capability. Device onboarding, compon
 
 **Product labels**: aim the camera at shelf price tags or conveyor labels, draw the ROI over the main text area (name, SKU, price, batch), and use multiple ROIs for multiple labels. The returned text can be pushed to ERP or reconciliation systems, or aggregated in the dashboard as "SKUs recognized this round".
 
-> For complex layouts (tables, invoices, warped documents), switch to [`paddle-ocr-vl`](./5-paddle-ocr-vl.md) (VLM; requires a GPU service).
+> For complex layouts (tables, invoices, warped documents), switch to `paddle-ocr-vl` (VLM; requires a GPU service).
 
 ### 6.2 Object detection
 
@@ -249,7 +249,6 @@ The [General OCR Solution](./2-ocr-text-extraction.md) uses a basic OCR panel fo
 - [General OCR Solution](./2-ocr-text-extraction.md)
 - [Object Detection Use Case](./1-object-detection.md)
 - [Face Recognition Solution](./3-face-recognition.md)
-- [PaddleOCR-VL Document Understanding](./5-paddle-ocr-vl.md)
 - [LocateAnything Visual Grounding](./6-locate-anything-v2.md)
 - [DeepStream Video Analytics (NG4500)](./7-deepstream-ng4500.md)
 - [Extension Management](../user-guide/9-extensions.md)
