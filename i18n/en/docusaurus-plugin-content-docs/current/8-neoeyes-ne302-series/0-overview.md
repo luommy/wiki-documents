@@ -14,15 +14,15 @@ import SupportGrid from '@site/src/components/SupportGrid';
 
 ## Product Overview
 
-NeoEyes NE302 is a Mini AI Vision Camera for device integration. It combines 4 MP image capture, STM32N6 edge AI, wireless connectivity and local storage in a 38 × 38 mm two-board platform. It is intended for indoor, continuously powered deployments that need image capture, on-device inference and result delivery.
+NeoEyes NE302 is a Mini AI Vision Camera for device integration. It combines 4 MP image capture, STM32N6 edge AI, wireless connectivity and local storage on a 38 × 38 mm Main Board, with an optional Interface Board. The standard two-board configuration supports continuous USB Type-C power or a USB Type-C external battery pack; a Main Board used alone uses DC power. It is intended for indoor device integrations that need image capture, on-device inference and result delivery.
 
 ![NE302 white enclosure with external antenna](https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/overview/ne302-white-external-render-large-transparent.png)
 
 ### Core Capabilities
 
 - **Edge AI inference**: STM32N6 Cortex-M55 and Neural-ART perform INT8 inference on the device.
-- **Image capture and encoding**: The product supports 4 MP image input and hardware H.264 and JPEG encoding.
-- **Two-board design**: The Main Board carries the vision-AI core; the Interface Board provides power, storage, control and development connections.
+- **Image capture and encoding**: The product supports 4 MP image capture; H.264 video encoding supports up to 1920 × 1080 at 30 fps, with hardware JPEG encoding.
+- **Flexible board configuration**: The Main Board can operate independently with DC power. In the standard two-board configuration, the Interface Board provides USB Type-C, MicroSD, control and development connections. A Main Board used alone has no MicroSD slot.
 - **Wireless connectivity**: 2.4 GHz Wi-Fi 6 and Bluetooth Low Energy are supported; radio revision, antenna and regional configuration follow the delivered SKU.
 - **Local storage and data delivery**: MicroSD storage and the Web console support preview, capture, model validation and device management.
 - **Lighting and extensions**: Some hardware revisions may expose supplemental lighting or extension modules. Confirm availability against the delivered SKU and firmware.
@@ -40,17 +40,17 @@ The following specifications use the NE302 datasheet as their public baseline. F
 | Primary MCU | STM32N6, Cortex-M55, 800 MHz, Arm Helium |
 | AI accelerator | Neural-ART, 1 GHz, up to 0.6 TOPS INT8 |
 | Memory | 4.2 MB on-chip SRAM / NPU RAM; 32 MB PSRAM |
-| Flash | 128 MB SPI Flash |
+| Flash | 64 MB SPI Flash |
 
 ### Imaging and sensing
 
 | Item | Specification |
 | :--- | :--- |
 | Image sensor | 4 MP high-sensitivity CMOS |
-| Maximum mode | 2688 × 1520 at up to 30 fps |
-| Encoding | H.264 and JPEG hardware encoding |
+| Maximum H.264 video mode | 1920 × 1080 at up to 30 fps |
+| JPEG encoding | Hardware JPEG encoding |
 | Lens | Standard M12; 88° / 137° HFOV options |
-| Onboard devices | White LED; ambient temperature and humidity sensor |
+| Onboard lighting | White LED |
 
 ### Wireless, storage and controls
 
@@ -64,7 +64,8 @@ The following specifications use the NE302 datasheet as their public baseline. F
 
 | Item | Specification |
 | :--- | :--- |
-| Power | Continuous power through USB Type-C |
+| Power | Standard two-board configuration: continuous USB Type-C (5 V) power or USB Type-C external battery-pack power; Main Board only: DC power |
+| Low power | STM32U0 always-on domain; supports low-power sleep and multi-source wake-up |
 | PCBA | 38 × 38 mm |
 | Enclosure | 42 × 42 × 20 mm |
 | Environment | Indoor, −20 °C to +50 °C |
@@ -116,7 +117,7 @@ The Web console can show a preview, execute a capture, validate a model and insp
 
 ### Main Board
 
-The NE302 two-board platform integrates the STM32N6, STM32U0, camera, PSRAM, SPI Flash, and wireless-related circuits. See [Components Overview](./3-hardware-guide/0-components-overview.md) to identify the board, camera, antenna, and hardware-version boundaries.
+The NE302 Main Board integrates the STM32N6, STM32U0, camera, PSRAM, SPI Flash, and wireless-related circuits, and can operate independently. The standard two-board configuration adds the Interface Board. See [Components Overview](./3-hardware-guide/0-components-overview.md) to identify the board, camera, antenna, and hardware-version boundaries.
 
 ![Annotated NE302 main board](https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/overview/ne302-main-board-cropped.png)
 
@@ -128,7 +129,9 @@ The Interface Board exposes the connections needed for use and development, incl
 
 ### Version Notes
 
-NE302 is a two-board platform, but delivered versions may differ in Flash capacity, radio revision, lens, power input, antenna and debug interfaces. Do not infer a specific SKU from a product render or generic annotated board image. Check the delivered hardware record before installation, flashing or model deployment.
+NE302 is centered on the Main Board and can also use an Interface Board as a two-board platform. A Main Board used alone uses DC power and has no MicroSD slot; delivered versions may also differ in radio revision, lens, power input, antenna and debug interfaces. Do not infer a specific SKU from a product render or generic annotated board image. Check the delivered hardware record before installation, flashing or model deployment.
+
+The current public wireless baseline is Wi-Fi 6 and Bluetooth Low Energy. A Wi-Fi HaLow-compatible version is planned, but it requires the corresponding wireless hardware and is not part of the current delivery baseline. Confirm the delivered version and hardware configuration when Wi-Fi HaLow is required.
 
 ## Product Applications
 

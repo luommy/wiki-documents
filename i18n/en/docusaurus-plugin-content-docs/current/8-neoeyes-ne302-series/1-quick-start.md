@@ -13,7 +13,9 @@ Complete this first-use path: assemble and power the device → sign in to the W
 
 ## 1. Prepare the hardware
 
-Prepare the NE302 Main Board, Interface Board, camera assembly, the antenna for the delivered SKU, and USB Type-C power. Add a MicroSD card when capture records must be saved, and use a computer that can reach the device network.
+Prepare the NE302 Main Board, Interface Board, camera assembly, the antenna for the delivered SKU, and either a continuous USB Type-C (5 V) supply or a delivery-compatible external battery pack that powers the device through USB Type-C. Add a MicroSD card when capture records must be saved, and use a computer that can reach the device network.
+
+This procedure applies to the standard two-board configuration. A Main Board-only configuration does not install the Interface Board and uses DC power according to the delivery record; MicroSD steps do not apply.
 
 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', alignItems: 'center', margin: '24px 0' }}>
   <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/quick-start/ne302-product-render-cropped.png" alt="NE302 white finished product with external antenna" style={{ width: '100%', height: '360px', objectFit: 'contain' }} />
@@ -26,7 +28,7 @@ The left image shows the finished product; the right image shows the board assem
 
 1. With power disconnected, mate the Main Board and Interface Board in the keyed connector direction. Do not force or angle the connector.
 2. Attach the antenna for the delivered SKU. Insert a MicroSD card when local storage is required.
-3. Connect USB Type-C power according to the delivery record and wait for startup.
+3. Connect USB Type-C to a continuous power supply or compatible external battery pack according to the delivery record, then wait for startup.
 
 If the device does not start, disconnect power, check the board connection, camera connection and power, then power it on again.
 

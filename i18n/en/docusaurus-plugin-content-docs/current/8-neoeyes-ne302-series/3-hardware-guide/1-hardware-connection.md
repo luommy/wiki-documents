@@ -17,7 +17,7 @@ Work with the device unpowered whenever connecting boards, MicroSD, ST-LINK, or 
 2. Seat the Main Board and Interface Board vertically and evenly. Install the camera, matching antenna, and enclosure before use.
 3. Insert MicroSD before power-on only when the task requires local image or record storage.
 4. Leave all programming switches in the run position for normal operation.
-5. Connect USB-C power and wait for startup. Open the Web console and confirm that Device Information loads and Feature Debugging shows a camera preview.
+5. Connect USB Type-C to a continuous power supply or a delivery-compatible external battery pack and wait for startup. Open the Web console and confirm that Device Information loads and Feature Debugging shows a camera preview.
 
 If the device does not start, disconnect power. Recheck the board-to-board seating, camera cable, antenna, and approved USB-C supply before changing any programming switch.
 
@@ -25,7 +25,7 @@ If the device does not start, disconnect power. Recheck the board-to-board seati
 
 | Connection | Use | Success check |
 | :--- | :--- | :--- |
-| USB Type-C | Continuous device power and the supported USB connection for the delivered configuration | Device starts and the Web console becomes reachable |
+| USB Type-C | Continuous 5 V device power, or a delivery-compatible external battery pack connected through USB Type-C; also provides the supported USB connection for the delivered configuration | Device starts and the Web console becomes reachable |
 | MicroSD | Local storage for the configured capture or record workflow | Storage Management reports the card state after startup |
 | Trigger / Reset | Physical input or recovery control provided by the delivered hardware and firmware | Use only the function exposed by the delivered device; do not infer signal levels from this guide |
 | External SMA antenna | Wireless connection for an external-antenna configuration | Antenna is firmly fitted, has clearance from metal, and wireless connectivity can be tested |

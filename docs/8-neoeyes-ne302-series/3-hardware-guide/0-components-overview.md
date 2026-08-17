@@ -9,7 +9,7 @@ tags: [NE302, 硬件指南, 硬件组成, STM32N6]
 
 # Components Overview
 
-NE302 采用主板和接口板组成的双板结构。主板集成成像、计算、存储、无线和控制电路；接口板提供供电、存储、烧录和维护接口。本页帮助识别这些硬件模块。连接线缆和烧录固件请参阅[硬件连接](./1-hardware-connection.md)。
+NE302 以主板为核心，可搭配接口板组成双板结构。主板集成成像、计算、存储、无线和控制电路，并可独立通过 DC 供电工作；单独使用主板时没有 MicroSD 卡座。接口板提供 USB Type-C、MicroSD、烧录和维护接口。本页帮助识别这些硬件模块。连接线缆和烧录固件请参阅[硬件连接](./1-hardware-connection.md)。
 
 ## 主板组件图
 
@@ -50,7 +50,7 @@ flowchart LR
 
 ## 接口板组件图
 
-接口板包括 USB-C 和 MicroSD 连接电路、烧录接口，以及 **SHT31-DIS** 温湿度传感器。它用于维护和服务接入，不承担主板上的计算、成像或无线功能。
+接口板包括 USB-C 和 MicroSD 连接电路、烧录接口，以及 **SHT31-DIS** 温湿度传感器。该器件位于接口板上，但整机标准外壳未为其开孔；不能将其作为整机的环境温湿度测量功能。
 
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', margin: '20px 0' }}>
   <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/hardware-guide/components-overview/ne302-interface-board-programming-map.png" alt="NE302 接口板烧录接口标注图" style={{ width: '100%', borderRadius: '8px' }} />
@@ -61,7 +61,7 @@ flowchart LR
 | :--- | :--- | :--- |
 | USB-C 电路 | 设备供电与 USB 连接 | 使用交付设备认可的 USB-C 电源和线缆 |
 | MicroSD 电路 | 访问本地存储卡 | 按当前设备流程操作；若未明确支持热插拔，请先停止设备并断电后再处理存储卡 |
-| SHT31-DIS | 原理图中的温湿度传感器 | 本文未核验固件读取路径和 Web UI 是否显示；不能将其视为已确认的用户可见功能 |
+| SHT31-DIS | 原理图中的温湿度传感器 | 标准外壳未为传感器开孔，且本文未核验固件读取路径和 Web UI 是否显示；不作为整机环境温湿度测量功能 |
 | N6-STLINK / U0-STLINK | 两条独立 SWD 烧录路径 | 选择与固件目标一致的路径 |
 | U6-UART | STM32N6 串口控制台接口 | 仅使用匹配的转接器和串口流程；源码 README 标注为 921600 波特率 |
 | N6-BOOT / U0-BOOT | 烧录模式控制 | 仅在设备断电时切换对应开关 |

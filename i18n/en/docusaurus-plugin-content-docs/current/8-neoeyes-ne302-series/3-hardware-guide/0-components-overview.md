@@ -9,7 +9,7 @@ tags: [NE302, hardware-guide, components, STM32N6]
 
 # Components Overview
 
-NE302 is a two-board vision platform. The Main Board contains the image, compute, memory, wireless, and control circuits; the Interface Board provides power, storage, programming, and service access. This page identifies those hardware blocks. For cable connection and firmware flashing, use [Hardware Connection](./1-hardware-connection.md).
+NE302 is centered on the Main Board and can use an Interface Board as a two-board platform. The Main Board contains the image, compute, memory, wireless, and control circuits and can operate independently with DC power; a Main Board used alone has no MicroSD slot. The Interface Board provides USB Type-C, MicroSD, programming, and service access. This page identifies those hardware blocks. For cable connection and firmware flashing, use [Hardware Connection](./1-hardware-connection.md).
 
 ## Main Board component map
 
@@ -50,7 +50,7 @@ This separation matters during development: N6 firmware covers the FSBL, App, We
 
 ## Interface Board component map
 
-The Interface Board includes the USB-C and MicroSD connection circuits, programming headers, and an **SHT31-DIS** temperature/humidity sensor. It is the service-access board; it does not replace the Main Board's compute, image, or wireless circuits.
+The Interface Board includes the USB-C and MicroSD connection circuits, programming headers, and an **SHT31-DIS** temperature/humidity sensor. The component is present on the board, but the standard enclosure has no opening for it; it must not be presented as an enclosure-level ambient temperature/humidity measurement feature.
 
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', margin: '20px 0' }}>
   <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/hardware-guide/components-overview/ne302-interface-board-programming-map.png" alt="NE302 Interface Board programming interface map" style={{ width: '100%', borderRadius: '8px' }} />
@@ -61,7 +61,7 @@ The Interface Board includes the USB-C and MicroSD connection circuits, programm
 | :--- | :--- | :--- |
 | USB-C circuit | Device power and USB connection | Use the approved USB-C supply and cable for the delivered unit |
 | MicroSD circuit | Local card access | Follow the current device procedure; if hot-plug behavior is not explicitly supported, stop the device and disconnect power before handling the card |
-| SHT31-DIS | Temperature/humidity sensor present in the schematic | The firmware read path and Web UI exposure were not verified here; do not treat the component as a confirmed user-visible feature |
+| SHT31-DIS | Temperature/humidity sensor present in the schematic | The standard enclosure has no opening for the sensor, and its firmware read path and Web UI exposure were not verified; do not present it as an enclosure-level ambient measurement feature |
 | N6-STLINK / U0-STLINK | Separate SWD programming paths | Select the path that matches the firmware target |
 | U6-UART | STM32N6 serial-console connector | Use only with the matching adapter and serial procedure; the source README lists 921600 baud |
 | N6-BOOT / U0-BOOT | Programming-mode controls | Change the matching switch only while the device is unpowered |
