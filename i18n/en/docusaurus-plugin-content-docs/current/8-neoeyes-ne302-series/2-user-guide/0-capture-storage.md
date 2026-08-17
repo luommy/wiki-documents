@@ -96,7 +96,7 @@ Enable **IO Trigger-PIR**, configure these fields, then click **save**:
 | Setting | Purpose and selection |
 | :--- | :--- |
 | **Trigger Signal** | Select **Rising Edge** or **Falling Edge** to match the PIR output signal at the installation. |
-| **Sensitivity** | Accepts 1–255. A smaller value is more sensitive to infrared change and is easier to trigger. |
+| **Sensitivity** | The effective range is 10–255. A smaller value is more sensitive to infrared change and is easier to trigger. |
 | **Ignore Time** | Ignores new triggers after a trigger. The page value `N` represents `N × 0.5 + 0.5` seconds. |
 | **Pulse Count** | Sets the required number of pulses, from 1 to 4. A higher value improves interference resistance but slows the response. |
 | **Window Time** | Sets the pulse-counting time window, from 0 to 3. The page value `M` represents `M × 2 + 2` seconds. |

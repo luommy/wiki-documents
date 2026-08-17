@@ -9,7 +9,7 @@ tags: [NE302, 硬件指南, 硬件组成, STM32N6]
 
 # Components Overview
 
-NE302 以主板为核心，可搭配接口板组成双板结构。主板集成成像、计算、存储、无线和控制电路，并可独立通过 DC 供电工作；单独使用主板时没有 MicroSD 卡座。接口板提供 USB Type-C、MicroSD、烧录和维护接口。本页帮助识别这些硬件模块。连接线缆和烧录固件请参阅[硬件连接](./1-hardware-connection.md)。
+NE302 整机交付包含主板和接口板，组成双板结构。主板集成成像、计算、存储、无线和控制电路；接口板提供 USB Type-C、MicroSD、烧录和维护接口。主板也可用于单主板定制集成，并通过 DC 供电；该形态不使用接口板提供的 MicroSD 卡座。本页帮助识别这些硬件模块。连接线缆和烧录固件请参阅[硬件连接](./1-hardware-connection.md)。
 
 ## 主板组件图
 
@@ -46,7 +46,7 @@ flowchart LR
   N6 --> LED[MP2410AGJ 白光 LED 驱动器]
 ```
 
-因此，烧录时必须区分目标：N6 固件包含 FSBL、App、Web 和 Model；U0 独立运行 WakeCore。不要通过 U0 烧录路径写入 N6 固件，也不要通过 N6 路径写入 WakeCore 映像。
+STM32N6 和 STM32U0 是独立 MCU。烧录前按接口板丝印确认目标；拨码、ST-LINK 接线和命令见[构建、烧录与更新](../4-software-guide/1-build-and-flash.md)。
 
 ## 接口板组件图
 

@@ -13,7 +13,13 @@ This page prepares the NE302 source development environment. Commands and tools 
 
 ## 1. Docker (recommended)
 
-NE302 and NE301 use the same development platform, so use the NE301 [`camthink/ne301-dev:latest`](https://hub.docker.com/r/camthink/ne301-dev) Docker image first. It keeps the cross-compilation toolchain and build dependencies in the container, avoiding a host installation of ARM GCC, Node.js, pnpm and ST tools.
+NE302 and NE301 use the same development platform. For the default `STEDGEAI_VARIANT=4.0`, use the NE301 [`camthink/ne301-dev:v4.0`](https://hub.docker.com/r/camthink/ne301-dev) Docker image. When building a `2.2` or `3.0` model variant, use the matching image tag; firmware, model packages and the toolchain must use the same variant. The image keeps the cross-compilation toolchain and build dependencies in the container, avoiding a host installation of ARM GCC, Node.js, pnpm and ST tools.
+
+| `STEDGEAI_VARIANT` | Docker image |
+| :--- | :--- |
+| `2.2` | `camthink/ne301-dev:v2.2` |
+| `3.0` | `camthink/ne301-dev:v3.0` |
+| `4.0` (default) | `camthink/ne301-dev:v4.0` |
 
 Confirm Docker is available, clone the NE302 source, and pull the image:
 
@@ -21,7 +27,7 @@ Confirm Docker is available, clone the NE302 source, and pull the image:
 docker version
 git clone https://github.com/camthink-ai/ne302.git
 cd ne302
-docker pull camthink/ne301-dev:latest
+docker pull camthink/ne301-dev:v4.0
 ```
 
 Start the container; the source directory is mounted at `/workspace`:
@@ -31,14 +37,14 @@ Start the container; the source directory is mounted at `/workspace`:
 docker run -it --rm \
   -v "$PWD":/workspace \
   -w /workspace \
-  camthink/ne301-dev:latest
+  camthink/ne301-dev:v4.0
 
 # Use USB pass-through only when flashing through ST-LINK on Linux.
 docker run -it --rm --privileged \
   -v "$PWD":/workspace \
   -v /dev/bus/usb:/dev/bus/usb \
   -w /workspace \
-  camthink/ne301-dev:latest
+  camthink/ne301-dev:v4.0
 ```
 
 Inside the container, use NE302's own checks and non-destructive build verification:

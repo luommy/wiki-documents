@@ -15,7 +15,7 @@ tags: [NE302, 快速指南, NeoEyes]
 
 准备 NE302 主板、接口板、摄像头组件、当前 SKU 对应的天线，以及 USB Type-C（5 V）持续电源或通过 USB Type-C 供电的交付兼容外部电池组。需要保存抓拍记录时，再准备 MicroSD 卡和一台可访问设备网络的电脑。
 
-本流程适用于标准双板配置。单主板配置不安装接口板，应按交付资料使用 DC 供电；其中不适用 MicroSD 相关步骤。
+本流程适用于 NE302 整机（主板 + 接口板）。主板也可用于单主板定制集成，应按交付资料使用 DC 供电；其中不适用接口板提供的 MicroSD 相关步骤。
 
 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', alignItems: 'center', margin: '24px 0' }}>
   <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/quick-start/ne302-product-render-cropped.png" alt="NE302 白色外置天线成品图" style={{ width: '100%', height: '360px', objectFit: 'contain' }} />

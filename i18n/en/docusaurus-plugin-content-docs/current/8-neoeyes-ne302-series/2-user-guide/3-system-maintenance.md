@@ -25,7 +25,7 @@ Open **System Settings → Device Password**:
 
 ## 2. Firmware Upgrade
 
-Open **System Settings → Firmware Upgrade**. Check the installed versions under **Firmware Information**, then download firmware from [NE302 GitHub Releases](https://github.com/camthink-ai/ne302/releases). The table uses `v4.3.0`; for another version, use only the matching files from its Release.
+Open **System Settings → Firmware Upgrade**. Check the installed versions under **Firmware Information**, then download firmware from [NE302 GitHub Releases](https://github.com/camthink-ai/ne302/releases). The table lists `v4.3.0` files verified as reachable on 2026-08-17; for another version, use only the matching files from its Release.
 
 ![NE302 Firmware Import dialog](https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/user-guide/system-maintenance/ne302-firmware-upgrade.png)
 

@@ -14,7 +14,7 @@ import SupportGrid from '@site/src/components/SupportGrid';
 
 ## 产品简介
 
-NeoEyes NE302 是一款面向设备集成的迷你 AI 视觉相机。它把 4 MP 图像采集、STM32N6 边缘 AI、无线连接和本地存储集成在 38 × 38 mm 主板中，并可选配接口板。标准双板配置可通过 USB Type-C 持续供电或外部电池组供电；单主板配置通过 DC 供电，适合室内设备集成中的图像采集、本地推理和结果输出。
+NeoEyes NE302 是一款面向设备集成的迷你 AI 视觉相机。它把 4 MP 图像采集、STM32N6 边缘 AI、无线连接和本地存储集成在 38 × 38 mm 主板中。NE302 整机交付包含主板和接口板：双板整机可通过 USB Type-C 持续供电或 USB Type-C 外部电池组供电；主板也可用于定制集成，并通过 DC 供电。
 
 ![NE302 白色外壳和外置天线](https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/overview/ne302-white-external-render-large-transparent.png)
 
@@ -22,7 +22,7 @@ NeoEyes NE302 是一款面向设备集成的迷你 AI 视觉相机。它把 4 MP
 
 - **边缘 AI 推理**：基于 STM32N6 Cortex-M55 和 Neural-ART 加速器，在设备侧执行 INT8 神经网络推理，减少对云端推理的依赖。
 - **图像采集与编码**：支持 4 MP 图像采集；H.264 视频编码最高为 1920 × 1080、30 fps，并提供 JPEG 硬件编码。
-- **灵活板卡配置**：主板可独立工作并通过 DC 供电；标准双板配置中，接口板集中提供 USB Type-C、MicroSD、控制和开发连接，便于安装、维护和二次开发。单独使用主板时没有 MicroSD 卡座。
+- **双板扩展与定制集成**：接口板为整机提供 USB Type-C 供电、MicroSD、控制和开发连接，便于安装、维护和二次开发；主板也可用于通过 DC 供电的定制集成。
 - **无线连接**：支持 2.4 GHz Wi-Fi 6 和 BLE；无线配置、天线形态和可用区域以交付版本为准。
 - **本地存储与数据流**：支持 MicroSD 本地存储，结合 Web 控制台完成预览、抓拍、推理验证和设备管理。
 - **补光与扩展**：部分硬件版本可能提供补光或扩展模块；是否可用以交付 SKU 和当前固件为准。
@@ -64,7 +64,7 @@ NeoEyes NE302 是一款面向设备集成的迷你 AI 视觉相机。它把 4 MP
 
 | 项目 | 规格 |
 | :--- | :--- |
-| 供电 | 标准双板配置：USB Type-C（5 V）持续供电或 USB Type-C 外部电池组供电；单主板配置：DC 供电 |
+| 供电 | 整机（主板 + 接口板）：USB Type-C（5 V）持续供电或 USB Type-C 外部电池组供电；单主板定制集成：DC 供电 |
 | 低功耗 | STM32U0 常开域；支持低功耗休眠和多源唤醒 |
 | PCBA | 38 × 38 mm |
 | 外壳 | 42 × 42 × 20 mm |
@@ -117,7 +117,7 @@ flowchart LR
 
 ### 主板
 
-NE302 的主板集成 STM32N6、STM32U0、摄像头、PSRAM、SPI Flash 和无线相关电路，可独立工作。标准双板配置会增加接口板；主板、相机、天线与硬件版本的识别方式请参见[硬件组成](./3-hardware-guide/0-components-overview.md)。
+主板集成 STM32N6、STM32U0、摄像头、PSRAM、SPI Flash 和无线相关电路。主板、相机、天线与硬件版本的识别方式请参见[硬件组成](./3-hardware-guide/0-components-overview.md)。
 
 ![NE302 主板标注图](https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/overview/ne302-main-board-cropped.png)
 
@@ -129,7 +129,7 @@ NE302 的主板集成 STM32N6、STM32U0、摄像头、PSRAM、SPI Flash 和无�
 
 ### 版本说明
 
-NE302 以主板为核心，也可搭配接口板组成双板硬件平台。单独使用主板时通过 DC 供电，且没有 MicroSD 卡座；不同交付版本还可能在无线版本、镜头、供电输入、天线和调试接口上有所不同。不要根据产品渲染图或通用标注图推断具体 SKU；安装、烧录和模型部署前先核对交付版本资料。
+不同交付版本可能在无线版本、镜头、天线、调试接口和供电输入上有所不同。不要根据产品渲染图或通用标注图推断具体 SKU；安装、烧录和模型部署前先核对交付版本资料。
 
 当前公开无线基线为 Wi-Fi 6 和 BLE。后续将兼容 Wi-Fi HaLow 版本，但该版本需要对应的无线硬件，不属于当前交付基线；需要 Wi-Fi HaLow 时，请先确认交付版本和硬件配置。
 
@@ -173,7 +173,6 @@ NE302 的应用方向是“紧凑摄像头 + 本地 AI + 设备集成”。以�
 ### 开发资源
 
 - [NE302 GitHub 仓库](https://github.com/camthink-ai/ne302)：源码、README、SETUP 和构建脚本。
-- [硬件指南](./3-hardware-guide/0-components-overview.md)：查看硬件组成、连接和开发接口。
 - [构建、烧录与更新](./4-software-guide/1-build-and-flash.md)：了解各组件的构建、打包、烧录和更新边界。
 
 ## 技术支持

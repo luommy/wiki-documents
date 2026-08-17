@@ -9,7 +9,7 @@ tags: [NE302, hardware-guide, components, STM32N6]
 
 # Components Overview
 
-NE302 is centered on the Main Board and can use an Interface Board as a two-board platform. The Main Board contains the image, compute, memory, wireless, and control circuits and can operate independently with DC power; a Main Board used alone has no MicroSD slot. The Interface Board provides USB Type-C, MicroSD, programming, and service access. This page identifies those hardware blocks. For cable connection and firmware flashing, use [Hardware Connection](./1-hardware-connection.md).
+A complete NE302 shipment includes the Main Board and Interface Board as a two-board platform. The Main Board contains the image, compute, memory, wireless, and control circuits; the Interface Board provides USB Type-C, MicroSD, programming, and service access. The Main Board can also be used in a custom Main-Board-only integration with DC power; this form does not use the MicroSD slot on the Interface Board. This page identifies those hardware blocks. For cable connection and firmware flashing, use [Hardware Connection](./1-hardware-connection.md).
 
 ## Main Board component map
 
@@ -46,7 +46,7 @@ flowchart LR
   N6 --> LED[MP2410AGJ white LED driver]
 ```
 
-This separation matters during development: N6 firmware covers the FSBL, App, Web, and Model targets, while the U0 runs the separate WakeCore target. Do not use an N6 firmware image on the U0 programming path, or a WakeCore image on the N6 path.
+STM32N6 and STM32U0 are separate MCUs. Before flashing, identify the target from the Interface Board silk-screen label; switch settings, ST-LINK wiring, and commands are in [Build, Flash and Update](../4-software-guide/1-build-and-flash.md).
 
 ## Interface Board component map
 

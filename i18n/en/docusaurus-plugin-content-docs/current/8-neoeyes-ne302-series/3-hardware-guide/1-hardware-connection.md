@@ -2,26 +2,16 @@
 id: ne302-hardware-connection
 title: Hardware Connection
 sidebar_position: 1
-description: Assemble, power and connect the NE302 hardware for storage and N6 or U0 firmware flashing.
+description: Identify external, serial and programming interfaces on the NE302 Interface Board, including N6 and U0 labels and switches.
 keywords: [NE302, hardware connection, USB Type-C, MicroSD, ST-LINK, N6, U0]
 tags: [NE302, hardware-guide, ST-LINK]
 ---
 
 # Hardware Connection
 
-Work with the device unpowered whenever connecting boards, MicroSD, ST-LINK, or changing a programming switch. The label on the delivered board is authoritative.
+This page identifies the external, serial, and programming interfaces on the Interface Board. Complete first assembly, installation, power-up, and sign-in with the [Quick Guide](../1-quick-start.md). Disconnect device power before connecting MicroSD or ST-LINK, or changing a programming switch. The silk-screen label on the delivered board is authoritative.
 
-## Assembly and first power-on
-
-1. Disconnect USB-C and every external power source.
-2. Seat the Main Board and Interface Board vertically and evenly. Install the camera, matching antenna, and enclosure before use.
-3. Insert MicroSD before power-on only when the task requires local image or record storage.
-4. Leave all programming switches in the run position for normal operation.
-5. Connect USB Type-C to a continuous power supply or a delivery-compatible external battery pack and wait for startup. Open the Web console and confirm that Device Information loads and Feature Debugging shows a camera preview.
-
-If the device does not start, disconnect power. Recheck the board-to-board seating, camera cable, antenna, and approved USB-C supply before changing any programming switch.
-
-## External connections
+## External interfaces
 
 | Connection | Use | Success check |
 | :--- | :--- | :--- |
@@ -45,9 +35,3 @@ The Interface Board provides **U6-UART** for the STM32N6 serial console. Use the
 | `U0-BOOT` | STM32U0 boot-mode switch |
 
 This guide identifies the connectors and switches only. Target selection, switch sequence, ST-LINK-to-PC connection, and flashing commands are in [Build, Flash and Update](../4-software-guide/1-build-and-flash.md).
-
-## Related pages
-
-- Hardware assembly and configuration boundaries: [Components Overview](./0-components-overview.md)
-- Select a target, connect ST-LINK, and run flashing: [Build, Flash and Update](../4-software-guide/1-build-and-flash.md)
-- Capture, storage, and records: [Capture and Storage](../2-user-guide/0-capture-storage.md)

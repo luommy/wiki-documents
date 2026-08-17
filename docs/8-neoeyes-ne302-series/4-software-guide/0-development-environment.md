@@ -13,7 +13,13 @@ tags: [NE302, 软件指南, 工具链, 构建]
 
 ## 1. Docker（推荐）
 
-NE302 与 NE301 复用同一开发平台，优先使用 NE301 的 [`camthink/ne301-dev:latest`](https://hub.docker.com/r/camthink/ne301-dev) Docker 镜像。它将交叉编译工具链和构建依赖隔离在容器中，避免先在主机安装 ARM GCC、Node.js、pnpm 和 ST 工具。
+NE302 与 NE301 复用同一开发平台。默认 `STEDGEAI_VARIANT=4.0` 时，使用 NE301 的 [`camthink/ne301-dev:v4.0`](https://hub.docker.com/r/camthink/ne301-dev) Docker 镜像。若构建 `2.2` 或 `3.0` 变体的模型，必须改用对应标签；固件、模型包和工具链必须使用同一变体。镜像将交叉编译工具链和构建依赖隔离在容器中，避免先在主机安装 ARM GCC、Node.js、pnpm 和 ST 工具。
+
+| `STEDGEAI_VARIANT` | Docker 镜像 |
+| :--- | :--- |
+| `2.2` | `camthink/ne301-dev:v2.2` |
+| `3.0` | `camthink/ne301-dev:v3.0` |
+| `4.0`（默认） | `camthink/ne301-dev:v4.0` |
 
 先确认 Docker 可用、克隆 NE302 源码并拉取镜像：
 
@@ -21,7 +27,7 @@ NE302 与 NE301 复用同一开发平台，优先使用 NE301 的 [`camthink/ne3
 docker version
 git clone https://github.com/camthink-ai/ne302.git
 cd ne302
-docker pull camthink/ne301-dev:latest
+docker pull camthink/ne301-dev:v4.0
 ```
 
 启动容器后，源码目录会挂载到容器内的 `/workspace`：
@@ -31,14 +37,14 @@ docker pull camthink/ne301-dev:latest
 docker run -it --rm \
   -v "$PWD":/workspace \
   -w /workspace \
-  camthink/ne301-dev:latest
+  camthink/ne301-dev:v4.0
 
 # 仅在 Linux 上通过 ST-LINK 烧录时，改用 USB 透传
 docker run -it --rm --privileged \
   -v "$PWD":/workspace \
   -v /dev/bus/usb:/dev/bus/usb \
   -w /workspace \
-  camthink/ne301-dev:latest
+  camthink/ne301-dev:v4.0
 ```
 
 进入容器后，使用 NE302 自己的检查与只读构建验证：

@@ -25,7 +25,7 @@ tags: [NE302, 用户指南, 系统维护, 固件升级]
 
 ## 2. 固件升级
 
-打开**系统设置 → 固件升级**，先在**固件信息**中查看当前版本。固件从 [NE302 GitHub Releases](https://github.com/camthink-ai/ne302/releases) 下载。下表列出 `v4.3.0` 的对应文件；使用其他版本时，只能使用同一发布版本中的配套文件。
+打开**系统设置 → 固件升级**，先在**固件信息**中查看当前版本。固件从 [NE302 GitHub Releases](https://github.com/camthink-ai/ne302/releases) 下载。下表列出截至 2026-08-17 已核验可访问的 `v4.3.0` 文件；使用其他版本时，只能使用同一发布版本中的配套文件。
 
 ![NE302 固件导入对话框](https://resources.camthink.ai/wiki/img/neoeyes-ne302-series/user-guide/system-maintenance/ne302-firmware-upgrade.png)
 
