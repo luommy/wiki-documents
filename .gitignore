@@ -37,5 +37,9 @@ CLAUDE.md
 # Local tooling artifacts (not for repo)
 .serena/
 .superpowers-archive/
+.worktrees/
 AGENTS.md
 docs/superpowers/
+CHECKPOINT.md
+.playwright-mcp
+
