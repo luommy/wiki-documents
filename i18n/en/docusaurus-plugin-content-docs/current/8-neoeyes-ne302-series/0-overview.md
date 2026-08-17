@@ -159,8 +159,6 @@ NE302 is positioned around compact camera integration, local AI and device-level
   ]}
 />
 
-> These images illustrate potential application environments; they do not represent verified NE302 deployments. The first three image sources are [Mini Market Opens at LRMC](https://commons.wikimedia.org/wiki/File:Mini_Market_Opens_at_LRMC_(8964567).jpg) (U.S. Department of Defense, public domain), [Automated border control system at Lisbon Airport](https://commons.wikimedia.org/wiki/File:20230416_160655_April_2023_in_Lisbon.jpg) (CC0 1.0), and [Automated Manufacturing Research Facility 028](https://commons.wikimedia.org/wiki/File:AutomatedManufacturingResearchFacility_028.jpg) (U.S. NIST public-domain material; retain NIST attribution). The Edge-AI prototype validation image is a concept illustration generated for this Wiki to show the relationship between model, lens and result validation; it is not a real Web UI or a verified system workflow.
-
 ## Product Resources
 
 ### Wiki Guides

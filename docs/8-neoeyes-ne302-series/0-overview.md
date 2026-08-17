@@ -159,8 +159,6 @@ NE302 的应用方向是“紧凑摄像头 + 本地 AI + 设备集成”。以�
   ]}
 />
 
-> 以上图片用于说明潜在应用环境，不代表 NE302 已在对应现场部署。前三张图片来源： [Mini Market Opens at LRMC](https://commons.wikimedia.org/wiki/File:Mini_Market_Opens_at_LRMC_(8964567).jpg)（美国国防部公共领域作品）、[Automated border control system at Lisbon Airport](https://commons.wikimedia.org/wiki/File:20230416_160655_April_2023_in_Lisbon.jpg)（CC0 1.0）和 [Automated Manufacturing Research Facility 028](https://commons.wikimedia.org/wiki/File:AutomatedManufacturingResearchFacility_028.jpg)（美国 NIST 公共领域资料；保留 NIST 署名）。边缘 AI 原型验证配图为本 Wiki 的概念示意图，用于说明模型、镜头和结果验证关系，不代表真实 Web UI 或已验证系统流程。
-
 ## 产品资源
 
 ### Wiki 指南
