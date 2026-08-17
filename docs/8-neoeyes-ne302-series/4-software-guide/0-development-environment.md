@@ -11,9 +11,49 @@ tags: [NE302, 软件指南, 工具链, 构建]
 
 本页说明如何准备 NE302 源码开发环境。命令和工具以仓库 [SETUP.md](https://github.com/camthink-ai/ne302/blob/main/SETUP.md) 为准；完成本页后再进入[构建、烧录与更新](./1-build-and-flash.md)。
 
-## 1. 快速开始
+## 1. Docker（推荐）
 
-克隆源码后，先运行检查脚本，确认本机缺少哪些工具：
+NE302 与 NE301 复用同一开发平台，优先使用 NE301 的 [`camthink/ne301-dev:latest`](https://hub.docker.com/r/camthink/ne301-dev) Docker 镜像。它将交叉编译工具链和构建依赖隔离在容器中，避免先在主机安装 ARM GCC、Node.js、pnpm 和 ST 工具。
+
+先确认 Docker 可用、克隆 NE302 源码并拉取镜像：
+
+```bash
+docker version
+git clone https://github.com/camthink-ai/ne302.git
+cd ne302
+docker pull camthink/ne301-dev:latest
+```
+
+启动容器后，源码目录会挂载到容器内的 `/workspace`：
+
+```bash
+# 构建，不包含烧录设备所需的 USB 透传
+docker run -it --rm \
+  -v "$PWD":/workspace \
+  -w /workspace \
+  camthink/ne301-dev:latest
+
+# 仅在 Linux 上通过 ST-LINK 烧录时，改用 USB 透传
+docker run -it --rm --privileged \
+  -v "$PWD":/workspace \
+  -v /dev/bus/usb:/dev/bus/usb \
+  -w /workspace \
+  camthink/ne301-dev:latest
+```
+
+进入容器后，使用 NE302 自己的检查与只读构建验证：
+
+```bash
+./check_env.sh
+make info
+make -n
+```
+
+当 `./check_env.sh` 显示 `Result: Essential tools complete! ✓`，且 `make info`、`make -n` 无报错时，Docker 环境已可用于后续构建。烧录命令见[构建、烧录与更新](./1-build-and-flash.md)。
+
+## 2. 本机构建环境（备选）
+
+仅在 Docker 不可用，或需要在主机直接运行工具时使用本节。克隆源码后，先运行检查脚本，确认本机缺少哪些工具：
 
 ```bash
 git clone https://github.com/camthink-ai/ne302.git
@@ -33,9 +73,9 @@ setup.bat
 check_env.bat
 ```
 
-安装脚本会在项目根目录生成 `.make.env`。脚本执行完并不代表所有任务都已可用；请以第 4 节的检查结果判断能否构建、烧录或重新生成模型。
+安装脚本会在项目根目录生成 `.make.env`。脚本执行完并不代表所有任务都已可用；请以第 5 节的检查结果判断能否构建、烧录或重新生成模型。
 
-## 2. 按任务安装工具
+## 3. 按任务安装工具
 
 | 任务 | 必需工具 | 何时需要 |
 | :--- | :--- | :--- |
@@ -84,7 +124,7 @@ npm install -g pnpm
 C:\Program Files\STMicroelectronics\STM32Cube\STM32CubeProgrammer\bin
 ```
 
-安装后将对应目录加入 `PATH`，然后执行第 4 节的验证命令。
+安装后将对应目录加入 `PATH`，然后执行第 5 节的验证命令。
 
 ### ST Edge AI Core
 
@@ -102,7 +142,7 @@ export PATH="$STEDGEAI_CORE_DIR/Utilities/mac:$PATH"
 
 Windows 将 `stedgeai` 所在目录加入系统环境变量，并设置 `STEDGEAI_CORE_DIR` 为对应的 X-CUBE-AI 安装目录。使用的 ST Edge AI 变体必须与后续固件和模型构建的 `STEDGEAI_VARIANT` 一致。
 
-## 3. 配置 `.make.env`
+## 4. 配置 `.make.env`
 
 安装脚本会在项目根目录生成 `.make.env`。打开该文件，将本机工具路径填入 `GCC_PATH`；只有需要重新生成模型时才设置 `STEDGEAI_CORE_DIR`。例如：
 
@@ -120,7 +160,7 @@ make GCC_PATH=/path/to/toolchain/bin
 
 不要把其他工程的 Flash 地址复制到 `.make.env`；烧录命令和地址由 NE302 根目录的 Makefile 管理。
 
-## 4. 验证环境
+## 5. 验证本机环境
 
 运行与系统对应的仓库检查脚本：
 
@@ -166,7 +206,7 @@ pnpm
 
 `Note: <number> optional tool(s) missing` 表示可以进行基础构建，但不能执行依赖缺失工具的操作。
 
-## 5. 不烧录时检查构建
+## 6. 不烧录时检查构建
 
 ```bash
 make info
@@ -177,7 +217,7 @@ make -n
 
 两条命令均无报错后，即可开始构建。构建、打包和烧录命令见[构建、烧录与更新](./1-build-and-flash.md)。
 
-## 6. 常见环境问题
+## 7. 常见环境问题
 
 | 现象 | 先检查 |
 | :--- | :--- |

@@ -11,9 +11,49 @@ tags: [NE302, software-guide, toolchain, build]
 
 This page prepares the NE302 source development environment. Commands and tools follow the repository [SETUP.md](https://github.com/camthink-ai/ne302/blob/main/SETUP.md). When this page is complete, continue to [Build, Flash and Update](./1-build-and-flash.md).
 
-## 1. Quick start
+## 1. Docker (recommended)
 
-Clone the source, then check which tools are missing:
+NE302 and NE301 use the same development platform, so use the NE301 [`camthink/ne301-dev:latest`](https://hub.docker.com/r/camthink/ne301-dev) Docker image first. It keeps the cross-compilation toolchain and build dependencies in the container, avoiding a host installation of ARM GCC, Node.js, pnpm and ST tools.
+
+Confirm Docker is available, clone the NE302 source, and pull the image:
+
+```bash
+docker version
+git clone https://github.com/camthink-ai/ne302.git
+cd ne302
+docker pull camthink/ne301-dev:latest
+```
+
+Start the container; the source directory is mounted at `/workspace`:
+
+```bash
+# Build only; no USB pass-through is needed.
+docker run -it --rm \
+  -v "$PWD":/workspace \
+  -w /workspace \
+  camthink/ne301-dev:latest
+
+# Use USB pass-through only when flashing through ST-LINK on Linux.
+docker run -it --rm --privileged \
+  -v "$PWD":/workspace \
+  -v /dev/bus/usb:/dev/bus/usb \
+  -w /workspace \
+  camthink/ne301-dev:latest
+```
+
+Inside the container, use NE302's own checks and non-destructive build verification:
+
+```bash
+./check_env.sh
+make info
+make -n
+```
+
+The Docker environment is ready for the next build step when `./check_env.sh` shows `Result: Essential tools complete! ✓` and both `make info` and `make -n` complete without an error. See [Build, Flash and Update](./1-build-and-flash.md) for flashing commands.
+
+## 2. Local build environment (fallback)
+
+Use this section only when Docker is unavailable or host tools must be run directly. Clone the source, then check which tools are missing:
 
 ```bash
 git clone https://github.com/camthink-ai/ne302.git
@@ -33,9 +73,9 @@ setup.bat
 check_env.bat
 ```
 
-The setup script generates `.make.env` at the project root. Script completion does not mean that every task is available; use the result in section 4 to determine whether the environment is ready to build, flash, or regenerate a model.
+The setup script generates `.make.env` at the project root. Script completion does not mean that every task is available; use the result in section 5 to determine whether the environment is ready to build, flash, or regenerate a model.
 
-## 2. Install tools by task
+## 3. Install tools by task
 
 | Task | Required tools | When required |
 | :--- | :--- | :--- |
@@ -84,7 +124,7 @@ npm install -g pnpm
 C:\Program Files\STMicroelectronics\STM32Cube\STM32CubeProgrammer\bin
 ```
 
-Add the relevant directories to `PATH`, then run the checks in section 4.
+Add the relevant directories to `PATH`, then run the checks in section 5.
 
 ### ST Edge AI Core
 
@@ -102,7 +142,7 @@ export PATH="$STEDGEAI_CORE_DIR/Utilities/mac:$PATH"
 
 On Windows, add the `stedgeai` directory to the system environment and set `STEDGEAI_CORE_DIR` to the matching X-CUBE-AI installation directory. The ST Edge AI variant must match the `STEDGEAI_VARIANT` used for the firmware and model build.
 
-## 3. Configure `.make.env`
+## 4. Configure `.make.env`
 
 The setup script generates `.make.env` at the project root. Set `GCC_PATH` for the local toolchain; set `STEDGEAI_CORE_DIR` only when regenerating a model. For example:
 
@@ -120,7 +160,7 @@ make GCC_PATH=/path/to/toolchain/bin
 
 Do not copy Flash addresses from another project into `.make.env`; the NE302 root Makefile manages flashing commands and addresses.
 
-## 4. Verify the environment
+## 5. Verify the local environment
 
 Run the repository check for your operating system:
 
@@ -166,7 +206,7 @@ Use the following extra checks for task-specific work:
 
 `Note: <number> optional tool(s) missing` means basic builds are available, but the operation that needs the missing tool is not.
 
-## 5. Check the build without flashing
+## 6. Check the build without flashing
 
 ```bash
 make info
@@ -177,7 +217,7 @@ Successful `make info` output includes `NE302 Version Information`, with FSBL, A
 
 When both commands finish without an error, continue to [Build, Flash and Update](./1-build-and-flash.md).
 
-## 6. Common setup issues
+## 7. Common setup issues
 
 | Symptom | Check first |
 | :--- | :--- |
