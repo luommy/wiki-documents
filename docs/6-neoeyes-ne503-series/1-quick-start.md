@@ -69,7 +69,13 @@ ping 10.0.0.1
 
 NE503 的 AI 能力通过容器应用体现。官方应用仓库 [camthink-ai/neoruntime-apps](https://github.com/camthink-ai/neoruntime-apps) 提供多个示例应用，其中 **AI Model Showcase** 集中展示多模型推理——目标检测、语义分割、关键点、OCR、CLIP 零样本分类、单目深度估计等。
 
-从仓库克隆源码、按仓库说明构建 `.aipc` 安装包，然后在 **Applications** 页面点 **Import** 上传该包，按向导勾选 Permissions（应用所需的模型与码流）完成安装：
+从仓库克隆源码、按仓库说明构建 `.aipc` 安装包。控制台导入向导需要分别选择 `app.yaml` 和 `image.tar`，不能直接上传 `.aipc`。如果构建后只保留了 `.aipc`，先解压：
+
+```bash
+unzip -o <package>.aipc -d <package-directory>
+```
+
+在 **Applications** 页面点 **Import**，选择 **Upload Package**。在 **App Manifest** 中选择 `app.yaml`，在 **Container Image** 中选择 `image.tar`，再按向导勾选 Permissions（应用所需的模型与码流）完成安装：
 
 <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/quick-start/qs-app-management.png" />
 

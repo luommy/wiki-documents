@@ -69,7 +69,13 @@ While you're here, confirm the stream works end to end: in the right-side **Conf
 
 NE503's AI capabilities are delivered through container apps. The official app repository [camthink-ai/neoruntime-apps](https://github.com/camthink-ai/neoruntime-apps) provides sample apps, including **AI Model Showcase**, which demonstrates multi-model inference — object detection, semantic segmentation, keypoints, OCR, CLIP zero-shot classification, monocular depth estimation, and more.
 
-Clone the repository, build the `.aipc` package by following the repo's instructions, then on the **Applications** page click **Import**, upload the package, and follow the wizard to grant the Permissions (models and streams) the app needs:
+Clone the repository and build the `.aipc` package by following the repo's instructions. The console import wizard requires `app.yaml` and `image.tar` as separate files; it does not accept a `.aipc` archive directly. If the build leaves only the `.aipc` archive, extract it first:
+
+```bash
+unzip -o <package>.aipc -d <package-directory>
+```
+
+On the **Applications** page, click **Import** and select **Upload Package**. Select `app.yaml` under **App Manifest** and `image.tar` under **Container Image**, then use the wizard to grant the Permissions (models and streams) the app needs:
 
 <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/quick-start/qs-app-management.png" />
 
