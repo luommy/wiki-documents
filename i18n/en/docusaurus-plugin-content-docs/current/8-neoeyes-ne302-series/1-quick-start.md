@@ -28,7 +28,26 @@ The left image shows the finished product; the right image shows the board assem
 
 1. With power disconnected, mate the Main Board and Interface Board in the keyed connector direction. Do not force or angle the connector.
 2. Attach the antenna for the delivered SKU. Insert a MicroSD card when local storage is required.
-3. Connect USB Type-C to a continuous power supply or compatible external battery pack according to the delivery record, then wait for startup.
+3. Mount the device for the site field of view. The standard enclosure supports a rear magnetic mount or double-sided adhesive; use the method below.
+4. Connect USB Type-C to a continuous power supply or compatible external battery pack according to the delivery record, then wait for startup.
+
+### Mounting methods
+
+This section applies to the standard two-board device with its enclosure. Mount with power disconnected, and leave a clear lens view plus access for power, antenna and maintenance. A Main Board-only configuration must use the delivered information for DC power and mechanical integration; the standard enclosure mounting methods may not apply.
+
+**Rear magnetic mount**
+
+1. Choose a flat mounting surface that the magnet can hold, and confirm that the position covers the intended field of view.
+2. Bring the rear magnetic surface fully into contact with the mounting surface.
+3. Gently push the device to confirm that it does not slide or detach. Connect the antenna and power cable afterwards, without allowing either cable to pull on the device.
+
+**Rear double-sided adhesive**
+
+1. Choose a flat, dry mounting surface and clean both it and the rear of the device.
+2. Remove the adhesive liner, align the device with the target position, then press the rear evenly into place.
+3. Confirm that the device is fixed before connecting the antenna and power cable, without allowing either cable to pull on the device.
+
+After mounting, confirm that the lens view is unobstructed and that the external antenna is fitted and clear of large metal obstructions. Power on, then confirm under **Feature Debugging** that the preview orientation and coverage match the site target. If the image is unsuitable, disconnect power, adjust the mounting position, then check the preview again.
 
 If the device does not start, disconnect power, check the board connection, camera connection and power, then power it on again.
 
