@@ -22,7 +22,7 @@ tags: [应用开发, NE503, AI 辅助开发, skill]
 | 条件 | 说明 |
 |:---|:---|
 | Claude Code | 安装到本机。 |
-| ne503 源码仓库 | 克隆到本地（随 NE503 SDK 一并提供），`ne503-dev` skill 位于仓库的 `.claude/skills/ne503-dev/`；或[下载 skill zip](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/app-development/ai-assisted-dev/ne503-dev.zip) 解压至 `.claude/skills/`。 |
+| ne503-dev skill | [下载 skill zip](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/app-development/ai-assisted-dev/ne503-dev.zip)，解压至 `~/.claude/skills/`（即 `~/.claude/skills/ne503-dev/`）。 |
 | Docker | 安装到本机，用于构建应用镜像。 |
 | NE503 设备 | 准备一台就绪的设备：记下设备 IP 与 admin 密码，并确认平台已初始化（HALv2 已装、ai-runtime 健康、检测模型已 scan+load）。 |
 

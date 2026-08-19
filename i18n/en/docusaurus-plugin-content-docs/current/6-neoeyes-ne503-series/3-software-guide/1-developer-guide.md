@@ -21,30 +21,59 @@ This document guides you through setting up the complete NE503 AIPC development 
 
 ### 2. Get Source Code
 
-```bash
-git clone <repo-url> && cd ne503
-```
-
-Verify repository integrity:
+The source is split into three repositories — clone the ones you need (app developers usually only need the last two):
 
 ```bash
-ls Makefile platform/ web/
+# Platform repo: platform services, HAL, web console, firmware build
+git clone https://github.com/camthink-ai/neoruntime.git
+
+# SDK repo: Python SDK (hailo_ipc_sdk), C++ SDK, proto definitions
+git clone https://github.com/camthink-ai/neoruntime-sdks.git
+
+# Apps repo: example apps, showcases, app templates and the unified build script
+git clone https://github.com/camthink-ai/neoruntime-apps.git
 ```
 
-Project root structure:
+> When building apps, clone `neoruntime-apps` and `neoruntime-sdks` into the **same parent directory** — the unified build script `scripts/build_app.sh` picks up the SDK from the sibling `neoruntime-sdks` by default.
+
+Verify the platform repo:
+
+```bash
+cd neoruntime && ls Makefile platform/ web/
+```
+
+Repository layout:
 
 ```
-ne503/
-├── platform/      # Platform services (Go + C++)
-├── hal/           # HAL v1 (C, legacy)
-├── hal_v2/        # HAL v2 (C++, recommended)
-├── sdk/           # Developer SDK (Python / Go)
-├── web/           # Web console (React + TypeScript)
-├── apps/          # Example applications
-├── configs/       # Configuration templates
-├── tools/         # Development tools
-├── scripts/       # Build/test/deploy scripts
-└── docker/        # Docker development environment
+neoruntime/               # Platform repo
+├── platform/             # Platform services (Go + C++)
+│   ├── camera-daemon/    #   Capture/ISP/encoding/RTSP (C++)
+│   ├── ai-runtime/       #   AI inference runtime (C++)
+│   ├── device-control/   #   Peripheral control (Go)
+│   ├── event-bus/        #   Event bus (Go)
+│   ├── app-manager/      #   Container app management (Go)
+│   ├── platform-api/     #   REST/WebSocket gateway (Go)
+│   └── device-discovery/ #   CT-Disc device discovery (Go)
+├── hal_v2/               # HAL v2 (C++, the only maintained version)
+├── mcu_board_prj/        # MCU firmware project
+├── web/                  # Web console (React + TypeScript)
+├── configs/              # Configuration templates (platform/, ai/)
+├── tools/                # Dev tools (incl. aipc-cli)
+├── scripts/              # Device-side scripts (firstboot, healthmon, ...)
+├── systemd/              # Service unit definitions
+├── deploy/               # Deployment scripts
+└── docker/               # Docker development environment
+
+neoruntime-sdks/          # SDK repo
+├── python/hailo_ipc_sdk/ # Python SDK (protobuf stubs included)
+├── cpp/                  # C++ SDK
+└── proto/                # protobuf definitions
+
+neoruntime-apps/          # Apps repo
+├── examples/             # Tutorial examples (hello-world, person-detection, ...)
+├── showcases/            # model-showcase, parking-lot, gym-ops
+├── templates/basic/      # App scaffold
+└── scripts/build_app.sh  # Unified app build script
 ```
 
 ### 3. Install Dependencies
@@ -73,14 +102,16 @@ Most developers only need Layer 1/2.
 
 #### Option A: Docker Pre-built Image (Recommended)
 
-The pre-built image includes all three layers of dependencies, ready to use out of the box.
+The official image `camthink/ne503-dev:v1.0` includes all three layers of dependencies (Hailo/Poky SDK included at `/opt/hailo-sdk`), ready to use out of the box — this is also the fastest release path recommended by the repo README.
 
 The image is **multi-platform** (amd64 + arm64); on Apple Silicon it pulls the arm64 native variant automatically — no QEMU emulation, with performance on par with native Linux.
+
+> `docker/dev/` in the repo also has self-build images `ne503-dev-env` (lightweight, SDK mounted at runtime) and `ne503-dev-env-full` (SDK baked in) for customization.
 
 **Pull the image:**
 
 ```bash
-docker pull camthink/ne503-dev:latest
+docker pull camthink/ne503-dev:v1.0
 ```
 
 **Create a persistent dev container:**
@@ -89,7 +120,7 @@ docker pull camthink/ne503-dev:latest
 docker run -d --name ne503-dev \
   -v $(pwd):/ne503 \
   -w /ne503 \
-  camthink/ne503-dev:latest \
+  camthink/ne503-dev:v1.0 \
   bash -c "sleep infinity"
 ```
 
@@ -97,10 +128,10 @@ The container is reusable and long-lived — no need to recreate it each time. U
 
 ```bash
 docker exec -it ne503-dev bash         # Enter container interactively
-docker exec ne503-dev make env-check   # Run commands inside the container
+docker exec ne503-dev make pack-release VERSION=1.0.0   # Run builds inside the container
 ```
 
-All three layers are pre-installed. Skip to [§4 Verify Environment](#4-verify-environment) to confirm.
+All three layers are pre-installed. Proceed directly to §6 Full Build.
 
 #### Option B: Script Install
 
@@ -227,45 +258,18 @@ macOS cannot install the Hailo SDK natively (it is an x86_64 Linux-only cross-co
 
 ### 4. Verify Environment
 
+The Makefile has no dedicated `env-check` target — verify key dependencies directly with per-tool commands (or skip this section and go straight to §6, using §8 to diagnose failures):
+
 ```bash
-make env-check
+go version          # Layer 1: Go services
+node --version      # Layer 1: web console
+protoc --version    # Layer 1: proto compilation
+cmake --version     # Layer 2: C++ components
+g++ --version       # Layer 2
+ls /opt/hailo-sdk 2>/dev/null || ls /opt/poky 2>/dev/null   # Layer 3: Hailo SDK (full release only)
 ```
 
-This command checks all three layers and reports status. Output when all three layers pass:
-
-```plaintext
-=== NE503 Build Environment ===
-
---- Layer 1 (Universal) ---
-  OK: go version go1.25.x linux/arm64
-  OK: libprotoc 3.x.x
-  OK: protoc-gen-go
-  OK: protoc-gen-go-grpc
-  OK: Node.js v22.x.x
-  OK: Python 3.x.x
-  OK: pnpm x.x.x
-
---- Layer 2 (Native C/C++) ---
-  OK: cmake version 3.x.x
-  OK: g++ (Ubuntu 13.x / Apple clang) x.x.x
-  OK: grpc_cpp_plugin
-
---- Layer 3 (Hailo-15 Cross-compile) ---
-  OK: Hailo SDK (/opt/hailo-sdk)
-```
-
-> The above is the output from the Docker pre-built image (Option A). Under manual install (Option C), Layer 3 shows `OK: Hailo SDK (/opt/poky/4.0.23)` — both paths are valid.
-
-If Layer 3 is not installed, you will see:
-
-```plaintext
---- Layer 3 (Hailo-15 Cross-compile) ---
-  NOT FOUND: Hailo SDK
-```
-
-Missing Layer 3 only affects full release builds (`pack-release`), not Go service or Web console development.
-
-> If you see `WARNING: hailo15 target requested`, a stale `Makefile.docker` exists in the project root. Remove it: `rm Makefile.docker`.
+A version output from each command means that layer is ready. Missing Layer 3 only affects full release builds (`pack-release`), not Go service or Web console development.
 
 ### 5. Python SDK & IDE Configuration
 
@@ -273,15 +277,17 @@ Missing Layer 3 only affects full release builds (`pack-release`), not Go servic
 
 #### Python SDK (development mode)
 
+The Python SDK lives in the separate `neoruntime-sdks` repository:
+
 ```bash
-cd sdk/python
+cd ../neoruntime-sdks/python
 pip3 install -e ".[dev]"
 ```
 
 > On `error: externally-managed-environment` (Ubuntu 24.04+, macOS Homebrew Python), use a venv:
 >
 > ```bash
-> cd sdk/python
+> cd ../neoruntime-sdks/python
 > python3 -m venv .venv && source .venv/bin/activate
 > pip install -e ".[dev]"
 > ```
@@ -318,7 +324,7 @@ docker exec ne503-dev bash -c \
 # Expected output (stage progress; per-file compile lines omitted)
 ==> Compiling proto (inference / device / event / camera / app / ...)
 ==> Building device-control (CGO_ENABLED=0)
-==> Building event-bus / app-manager / platform-api / device-discovery
+==> Building event-bus / app-manager / platform-api / device-discovery / os-updater
 ==> Building Web Console
 ==> Building Python SDK
 === Layer 1 complete: proto + Go services + web + Python SDK ===
@@ -326,9 +332,10 @@ docker exec ne503-dev bash -c \
 ==> Building camera-daemon / ai-runtime (C++) / aipc-cli
 ==> Building tools (shm-reader, nv12-to-jpeg)
 === Layer 2 complete ===
+==> Building MCU firmware          # built by default (BUILD_MCU_FW=0 skips it)
 ==> Packaging release [1.0.0, platform=hailo15]
 === Release Package Ready ===
-File:   build/release/aipc-hailo15-1.0.0.tar.gz (111M)
+File:   build/release/aipc-hailo15-1.0.0.tar.gz
 ```
 
 > Under manual install (Option C), the SDK path is `/opt/poky/4.0.23` — replace the env script and `SDK_PATH` in the command above with that path.
@@ -429,26 +436,28 @@ The `Building Python SDK Documentation` stage prints many `ModuleNotFoundError: 
 
 ### Make Target Reference
 
+(Per the current `make help` output in the repo Makefile; common targets below)
+
 | Target | Description |
 |--------|-------------|
-| `make pack-release` | Full Hailo-15 release (build + package) |
-| `make pack` | Package from existing build artifacts (no SDK needed) |
-| `make platform` | All Go services |
-| `make hal-v2` | HAL v2 (`HAL_PLATFORM=hailo15` cross-compile) |
-| `make camera-daemon` | C++ camera-daemon |
-| `make ai-runtime` | C++ AI inference service |
-| `make proto` | Compile .proto to Go code |
-| `make web` | Web console (pnpm) |
-| `make layer1` | proto + Go + Web + Python SDK |
-| `make layer2` | Layer 1 + HAL stub + C++ components |
-| `make env-check` | Check build dependencies |
+| `make pack-release` | Full Hailo-15 release (requires `SDK_PATH`; builds MCU firmware by default — `BUILD_MCU_FW=0` skips it) |
+| `make docker-pack-release` | Build the release tarball inside Docker (no local SDK install) |
+| `make build-go` | proto + all Go platform services |
+| `make build-native` | Go + HAL v2 + camera-daemon + ai-runtime + aipc-cli + tools |
+| `make build-web` | Web console |
+| `make platform` | All Go platform services (incl. os-updater) |
+| `make hal-v2` | HAL v2 (`HAL_PLATFORM=hailo15` cross-compile; defaults to `stub`) |
+| `make camera-daemon` / `make ai-runtime` | Build single C++ components |
+| `make proto` | Compile .proto files |
+| `make aipc-cli` | Device CLI tool |
+| `make test` / `test-basic` / `test-smoke` | Unit / repo checks / HTTP smoke |
+| `make fmt` / `make lint` | Format / static checks |
 | `make clean` | Clean build artifacts |
-| `make test` | Run all tests |
 
 ## Related Documentation
 
 - [System Architecture](./0-system-architecture.md) — Four-layer architecture and core services
 - [System Flashing](./2-system-flashing.md) — System image flashing and upgrades
 - [Software Deployment](./3-software-deployment.md) — Platform software deployment and iterative development
-- [Platform Services](./4-reference/0-platform-services.md) — Service responsibilities and source pointers
-- [Troubleshooting](./4-reference/1-troubleshooting.md) — Runtime issue diagnostics
+- [Platform Services](./4-platform-services.md) — Service responsibilities and source pointers
+- [Troubleshooting FAQ](../5-troubleshooting.md) — Runtime issue diagnostics

@@ -22,7 +22,7 @@ Want to skip development and deploy the finished app right away? Download the pr
 | Prerequisite | Description |
 |:---|:---|
 | Claude Code | Install it on your local machine. |
-| ne503 source repo | Clone locally (bundled with the NE503 SDK); the `ne503-dev` skill resides at `.claude/skills/ne503-dev/`. Alternatively, [download the skill zip](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/app-development/ai-assisted-dev/ne503-dev.zip) and extract it into `.claude/skills/`. |
+| ne503-dev skill | [Download the skill zip](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/app-development/ai-assisted-dev/ne503-dev.zip) and extract it into `~/.claude/skills/` (i.e. `~/.claude/skills/ne503-dev/`). |
 | Docker | Install it on your local machine, for building app images. |
 | NE503 device | Prepare a ready device: note its IP + admin password, and confirm the platform is initialized (HALv2 installed, ai-runtime healthy, detection model scanned + loaded). |
 

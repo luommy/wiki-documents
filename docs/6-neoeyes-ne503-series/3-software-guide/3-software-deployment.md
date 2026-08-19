@@ -116,32 +116,14 @@ Proceed with deployment? [y/N] y
 
 ### 3.1 手动替换单个服务
 
-```bash
-scp build/output/device-control root@<device-ip>:/opt/aipc/bin/
-ssh root@<device-ip> "systemctl restart device-control"
-```
-
-设备 `/opt` 空间不足时（root 分区 3.3G 已用 99%，仅剩约 60M），可部署到 `/data`：
+设备安装根在 `/data/aipc`（root 分区空间紧张，不部署到 `/opt`）：
 
 ```bash
 scp build/output/device-control root@<device-ip>:/data/aipc/bin/
+ssh root@<device-ip> "systemctl restart device-control"
 ```
 
-### 3.2 Make 部署目标
-
-Makefile 提供自动化部署命令：
-
-```bash
-make setup-ssh TARGET=root@<device-ip>          # 首次：配置免密登录
-make deploy-init TARGET=root@<device-ip>         # 首次：初始化目录结构
-make deploy-all TARGET=root@<device-ip>          # 逐服务 build + scp + restart
-```
-
-指定 `/data` 分区：
-
-```bash
-make deploy-all TARGET=root@<device-ip> REMOTE_PREFIX=/data/aipc
-```
+> Makefile 不提供自动化部署目标（`deploy-all` 等不存在）。批量迭代要么逐服务重复上述 scp + restart，要么走 §2 的 `deploy.sh` 完整热替换。
 
 ## 4. 发布包内容
 
@@ -180,11 +162,11 @@ systemctl status ai-runtime camera-daemon app-manager event-bus device-control d
 
 ```bash
 # 2. 二进制架构（应为 ARM aarch64）
-file /opt/aipc/bin/ai-runtime
+file /data/aipc/bin/ai-runtime
 # ELF 64-bit LSB pie executable, ARM aarch64
 
 # 3. HAL 库
-ls -l /opt/aipc/lib/hal/libaipc_hal*.so
+ls -l /data/aipc/lib/hal/libaipc_hal*.so
 
 # 4. NPU 设备
 lsmod | grep hailo && ls -la /dev/hailo*
@@ -194,7 +176,7 @@ curl -s http://localhost:8080/ | head -1
 # <!DOCTYPE html>
 ```
 
-浏览器访问 `http://<device-ip>:8080`，默认凭据 `admin` / `password`。
+浏览器访问 `https://<device-ip>`，默认凭据 `admin` / `password`。
 
 ## 6. 故障排查
 

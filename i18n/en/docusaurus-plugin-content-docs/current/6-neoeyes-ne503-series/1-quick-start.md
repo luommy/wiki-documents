@@ -6,12 +6,15 @@ tags: [Quick Start, NE503, First Deployment]
 
 # Quick Start
 
-This guide walks you through the first deployment of the NE503: unbox → connect → log in & change password → verify the camera → experience AI → configure network and time zone. Once done, the device is ready to go live. For more features, see the [User Guide](./2-user-guide/0-dashboard.md).
+This guide walks you through the first deployment of the NE503: unbox → connect → log in & change password → verify the camera → experience AI → configure network and time zone. Once done, the device is ready to go live.
 
 <div align="center">
   <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/overview/ne503-main.png" alt="NeoEyes NE503" width="100%" />
 </div>
 
+## Who this page is for
+
+This page is the linear closed loop for **evaluators / first deployment** (unboxing to live, about 10 minutes).
 ## 1. Kit and Preparation
 
 ### Kit Contents
@@ -41,7 +44,7 @@ IP67 rated, -40 °C to +60 °C operating temperature, suitable for outdoor insta
 ping 10.0.0.1
 ```
 
-If it replies, proceed to the next step.
+If it replies, proceed to the next step. If not, check in order: the Ethernet cable / PoE power (watch the device LED), that the computer IP is really on the `10.0.0.x` subnet, and that the firewall allows ICMP. If the device was previously attached to a router with DHCP, its IP is no longer `10.0.0.1` — look up the assigned address in the router admin page. Still nothing? See [Troubleshooting](./5-troubleshooting.md).
 
 ## 3. Log In and Change the Password
 
@@ -53,7 +56,7 @@ After logging in, you land on the Dashboard. Click the expand icon in the top-le
 
 <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/quick-start/qs-dashboard.png" />
 
-**⚠️ First thing: change the default password.** The default password is public knowledge; leaving it unchanged exposes the device. Go to **Settings → Device Info**, scroll to **Change Password** at the bottom, and set a new password.
+**⚠️ First thing: change the default password.** The default password is public knowledge; leaving it unchanged exposes the device. Go to **Settings → Device Info**, scroll to **Change Password** at the bottom, and set a new password. Note: **the device has no factory-reset or password-reset function — a lost password requires reflashing via support**, so keep the new password safe.
 
 <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/quick-start/qs-settings-device-info.png" />
 
@@ -63,7 +66,7 @@ Go to the **Media** page. The main area shows the live camera feed — seeing th
 
 <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/quick-start/qs-media.png" />
 
-While you're here, confirm the stream works end to end: in the right-side **Configuration** panel, enable **Enable RTSP Stream**, copy the main stream URL `rtsp://<device-ip>:8554/main`, and pull it in VLC (Media → Open Network Stream → paste the URL → Play). Smooth playback means the full pipeline is healthy.
+While you're here, confirm the stream works end to end: in the right-side **Configuration** panel, enable **Enable RTSP Stream**, copy the main stream URL `rtsp://<device-ip>:8554/main`, and pull it in VLC (Media → Open Network Stream → paste the URL → Play). Smooth playback means the full pipeline is healthy. This stream is factory 4K (3840×2160@30) and requires no authentication. If VLC shows a black screen or stutters: confirm the RTSP toggle was saved, force TCP transport in the player, then check [Troubleshooting · Video & Streams](./5-troubleshooting.md).
 
 ## 5. Experience the AI
 
@@ -104,13 +107,13 @@ After saving, the device switches to the new IP. Change your computer's IP back 
 
 ### Set the Time Zone
 
-A wrong time zone breaks video OSD timestamps and recording file names. Go to **Settings → Time Settings**: pick your deployment time zone, configure an NTP server (e.g., `pool.ntp.org`), and click **Sync Now**.
+A wrong time zone breaks video OSD timestamps, and once the device feeds an external NVR the recording files' time marks will be off too. Go to **Settings → Time Settings**: pick your deployment time zone, configure an NTP server (e.g., `pool.ntp.org`), and click **Sync Now**.
 
 <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/quick-start/qs-settings-time-settings.png" />
 
 ## 7. What's Next
 
-The device is live. Continue based on your goal:
+The device is live. Look up where to go by task:
 
 | Your goal | Where to go |
 |-----------|-------------|
@@ -118,9 +121,7 @@ The device is live. Continue based on your goal:
 | Pull an RTSP stream into an NVR / VMS | [User Guide · Video and Imaging](./2-user-guide/1-media-and-image.md) |
 | Install your own AI app, manage models | [User Guide · AI Apps and Models](./2-user-guide/2-applications-and-models.md) |
 | Wire up alarm / access control / audio | [User Guide · Peripherals](./2-user-guide/3-peripherals.md) |
-| Upgrade firmware / view logs / operate | [User Guide · System Management](./2-user-guide/4-settings-and-maintenance.md) |
-| Integrate via REST API / Event Bus | [Integration Guide](./4-application-guide/2-3rd-party-integration/0-restful-api.md) |
-| Develop your own container app | [App Development Guide](./4-application-guide/1-app-development/0-sdk-workflow.md) |
+| Upgrade firmware / view logs / operate | [User Guide · System Management](./2-user-guide/5-deployment.md) |
 
 ### Quick Reference
 

@@ -19,23 +19,21 @@ The **Peripherals** page manages NE503's external hardware interfaces: audio, al
 
 ### Alarm Input
 
-- **Alarm Input**: enable alarm input detection.
-- **Alarm Input Level**: choose the trigger level — **High** or **Low** — the external signal level considered "triggered."
+- **Alarm Input**: alarm input switch. In the current firmware, alarm-input signal reporting (event bus / API) is not yet available — wire alarm linkage through the external system directly.
+- **Alarm Input Level**: trigger level selection (**High** / **Low**). Not yet effective in the current firmware; follow the firmware release notes.
 
-> NE503 exposes 1 alarm input channel.
+> NE503 exposes 1 alarm input channel (dry-contact signals such as door contacts, IR beams, or smoke detectors).
 
-### Wiegand (Access Control)
+### Wiegand Output
 
-- **Wiegand CH0 / CH1**: two Wiegand channels for connecting Wiegand-protocol access-control readers.
+- **Wiegand CH0 / CH1**: two output channels (relay + level) for driving access-control controllers and other external devices.
 
-Once enabled, card-swipe data from the reader can be emitted to the Event Bus for apps or external systems, enabling access-control linkage.
+Enabling a channel drives its output to the active level. Wiegand is an output interface — it does not accept card readers.
 
-## Linkage with Other Features
+## Linkage Notes
 
-Peripherals are not isolated. Common linkage patterns:
+- **Two-way talk**: **Talk** button on the Media page, with Mic Input / Speaker Output enabled.
+- **AI events driving external devices**: there is no built-in "AI detection → alarm output" auto-linkage; an app or business system subscribes to AI events and acts on them (e.g. drives an external relay).
+- **Alarm input reporting**: not yet wired into the event bus in the current firmware — see the Alarm Input section above.
 
-| Scenario | Path |
-|----------|------|
-| AI detects a target → trigger alarm output / access control | App receives AI events via Event Bus → controls IO |
-| Alarm input triggers → push event to a business system | Alarm IN signal → Event Bus → MQTT / HTTP |
-| Two-way talk | Media page Talk button + Mic/Speaker enabled |
+> For physical wiring and power selection of each interface, see [Product Wiring & Power](./8-product-wiring.md).

@@ -65,14 +65,14 @@ Download the firmware package from the open-source repository [camthink-ai/meta-
 
 > Only needed for [§2 Flash Boot Chain](#2-flash-boot-chain); skip this section if you only do §3/§5 system-image flashing or upgrades.
 
-Boot-chain flashing in §2 supports both **Ubuntu** and **macOS** (validated `hailo15_board_tools` version 1.9.0). `hailo15_board_tools` is a cross-platform Python wheel; the only differences between the two platforms are how dependencies are installed and the serial device node.
+Boot-chain flashing in §2 supports both **Ubuntu** and **macOS** (current version shipped with meta-hailo-os is 1.10.1). `hailo15_board_tools` is a cross-platform Python wheel; the only differences between the two platforms are how dependencies are installed and the serial device node.
 
 > **Critical dependency `mkenvimage`:** the `hailo15_spi_flash_program` tool in §2.3 shells out to `mkenvimage` to build the U-Boot env image. If not installed, the flash crashes while writing the 5th component (U-Boot env), **leaving a half-written boot chain**. Both platforms must install it first — Ubuntu provides it via `apt-get install u-boot-tools`, macOS via `brew install u-boot-tools`.
 
 #### Ubuntu
 
 ```bash
-# Hailo flashing tool (replace <VERSION> with the actual version; validated version is 1.9.0)
+# Hailo flashing tool (replace <VERSION> with the actual version; the current version shipped with meta-hailo-os is 1.10.1)
 pip install hailo15_board_tools-<VERSION>.whl
 
 # U-Boot utilities (provides mkenvimage, required by §2.3)
@@ -464,7 +464,7 @@ This performs: connect SWD → mass erase → write `ne503_mcu.elf` → verify �
 If platform software is already deployed on the SoC, after the device boots:
 
 ```bash
-curl -s -H "Authorization: Bearer <token>" http://<device-ip>:8080/api/v1/device/status
+curl -k -s -H "Authorization: Bearer <token>" https://<device-ip>/api/v1/device/status
 # returns 200; data.mcu_version / mcu_temp_c / light_sensor etc. have values
 ```
 

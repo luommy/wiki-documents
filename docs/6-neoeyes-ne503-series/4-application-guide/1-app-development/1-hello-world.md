@@ -21,9 +21,9 @@ Hello World 不依赖 AI SDK，在一个循环中持续打印计数，用于验�
 
 | 条件 | 验证方法 |
 |:---|:---|
-| NE503 设备已联网并运行 | 浏览器访问 `http://<设备IP>:8080`，能看到 Web 登录页 |
+| NE503 设备已联网并运行 | 浏览器访问 `https://<设备IP>`，能看到 Web 登录页 |
 | 开发机已安装 Docker | 终端执行 `docker --version`，版本 >= 20.10 |
-| 开发机能 ping 通设备 | `curl -o /dev/null -w "%{http_code}" http://<设备IP>:8080` 返回 `200` |
+| 开发机能 ping 通设备 | `curl -k -o /dev/null -w "%{http_code}" https://<设备IP>` 返回 `200` |
 | 知道设备登录凭据 | Web 控制台默认 `admin` / `password`（首次登录后请修改） |
 
 :::tip 架构说明
@@ -37,7 +37,7 @@ NE503 设备为 ARM64 架构。开发机为 Apple Silicon（M 系列芯片）时
 
 ## 2. 应用结构
 
-Hello World 应用由三个文件组成（完整源码在仓库 `apps/hello-world/`）：
+Hello World 应用由三个文件组成（完整源码在 neoruntime-apps 仓库 `examples/hello-world/`）：
 
 ```
 hello-world/
@@ -107,7 +107,7 @@ CMD ["python3", "/app/app.py"]
 在应用目录下构建 ARM64 镜像，导出为 tar，再打包成 `.aipc` 安装包：
 
 ```bash
-cd apps/hello-world
+cd neoruntime-apps/examples/hello-world
 
 # 1. 构建 ARM64 镜像（--load 载入本地 Docker）
 docker buildx build --platform linux/arm64 --load -t aipc/hello-world:1.0.0 .
@@ -138,12 +138,12 @@ zip hello-world.aipc app.yaml image.tar
 构建完成后手上有 `app.yaml` 与 `image.tar`。三种部署方式，**推荐 Web 控制台**（图形界面、无需 SSH）：
 
 :::note 提前准备
-三种方式都需要 `app.yaml` 和 `image.tar` 两个独立文件。按 §3 的手动步骤构建后，两文件都在应用目录里。若用仓库 `apps/<app>/build.sh`（打包 `.aipc` 后会删掉中间的 `image.tar`），请先 `unzip -o <app>.aipc` 解压。
+三种方式都需要 `app.yaml` 和 `image.tar` 两个独立文件。按 §3 的手动步骤构建后，两文件都在应用目录里。若用仓库统一构建脚本 `scripts/build_app.sh`（打包 `.aipc` 后会清理中间的 `image.tar`），请先 `unzip -o <app>.aipc` 解压。
 :::
 
 ### 4.1 通过 Web 控制台上传（推荐）
 
-1. 浏览器打开 Web 控制台 `http://<设备IP>:8080`，用默认凭据 `admin` / `password` 登录。
+1. 浏览器打开 Web 控制台 `https://<设备IP>`，用默认凭据 `admin` / `password` 登录。
 
 2. 在左侧导航点击 **App Management**（应用管理），进入应用列表页。页面右上角有一张 **Import**（导入）卡片，点击它。
 
@@ -178,22 +178,22 @@ aipc-cli app install app.yaml image.tar
 
 ```bash
 # 登录取 token（返回值含 "Bearer " 前缀，后续整串作为 Authorization 头）
-curl -X POST http://<设备IP>:8080/api/login \
+curl -k -X POST https://<设备IP>/api/login \
   -H "Content-Type: application/json" \
   -d '{"username":"admin","password":"password"}'
 
 # 上传镜像与清单（字段名均为 file，返回各自的 path）
-curl -X POST http://<设备IP>:8080/api/v1/apps/upload-image \
+curl -k -X POST https://<设备IP>/api/v1/apps/upload-image \
   -H "Authorization: Bearer <token>" -F "file=@image.tar"
-curl -X POST http://<设备IP>:8080/api/v1/apps/upload-manifest \
+curl -k -X POST https://<设备IP>/api/v1/apps/upload-manifest \
   -H "Authorization: Bearer <token>" -F "file=@app.yaml"
 
 # 触发异步安装（JSON body 传入上面两个 path），再用返回的 task_id 轮询到 phase=complete
-curl -X POST http://<设备IP>:8080/api/v1/apps/install-package \
+curl -k -X POST https://<设备IP>/api/v1/apps/install-package \
   -H "Authorization: Bearer <token>" -H "Content-Type: application/json" \
   -d '{"manifest_path":"<manifest path>","image_path":"<image path>","force":true}'
 # → {"data":{"task_id":"0f26285a"}}
-curl http://<设备IP>:8080/api/v1/apps/install-progress/<task_id> \
+curl -k https://<设备IP>/api/v1/apps/install-progress/<task_id> \
   -H "Authorization: Bearer <token>"
 ```
 
@@ -212,7 +212,7 @@ curl http://<设备IP>:8080/api/v1/apps/install-progress/<task_id> \
 **方式二：HTTP API 启动**
 
 ```bash
-curl -X POST http://<设备IP>:8080/api/v1/apps/hello-world/start \
+curl -k -X POST https://<设备IP>/api/v1/apps/hello-world/start \
   -H "Authorization: Bearer <token>"
 ```
 
@@ -222,7 +222,7 @@ curl -X POST http://<设备IP>:8080/api/v1/apps/hello-world/start \
 
 ### 5.2 在 Web 控制台验收
 
-用浏览器登录 `http://<设备IP>:8080`（`admin` / `password`），从用户视角确认应用运行：
+用浏览器登录 `https://<设备IP>`（`admin` / `password`），从用户视角确认应用运行：
 
 ![Web 控制台登录页](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/app-development/hello-world/01-login.png)
 
@@ -243,7 +243,7 @@ Dashboard 顶部展示设备状态，中部 **Applications** 区域可见运行�
 应用日志也可通过接口获取（返回 NDJSON 格式，每行一个 JSON 对象）：
 
 ```bash
-curl "http://<设备IP>:8080/api/v1/apps/hello-world/logs?max_lines=10" \
+curl -k "https://<设备IP>/api/v1/apps/hello-world/logs?max_lines=10" \
   -H "Authorization: Bearer <token>"
 ```
 
@@ -261,11 +261,11 @@ curl "http://<设备IP>:8080/api/v1/apps/hello-world/logs?max_lines=10" \
 
 ```bash
 # 停止
-curl -X POST http://<设备IP>:8080/api/v1/apps/hello-world/stop -H "Authorization: Bearer <token>"
+curl -k -X POST https://<设备IP>/api/v1/apps/hello-world/stop -H "Authorization: Bearer <token>"
 # → {"data":{"message":"App stopped successfully"}}
 
 # 卸载
-curl -X DELETE http://<设备IP>:8080/api/v1/apps/hello-world -H "Authorization: Bearer <token>"
+curl -k -X DELETE https://<设备IP>/api/v1/apps/hello-world -H "Authorization: Bearer <token>"
 # → {"data":{"message":"App uninstalled successfully"}}
 ```
 

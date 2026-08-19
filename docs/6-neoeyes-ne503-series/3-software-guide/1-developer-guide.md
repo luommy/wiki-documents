@@ -21,30 +21,59 @@ tags: [平台开发, NE503, 环境搭建, 构建]
 
 ### 2. 获取源码
 
-```bash
-git clone <repo-url> && cd ne503
-```
-
-验证仓库完整性：
+源码拆分为三个仓库，按需 clone（应用开发者通常只需后两个）：
 
 ```bash
-ls Makefile platform/ web/
+# 平台主仓：平台服务、HAL、Web 控制台、固件构建
+git clone https://github.com/camthink-ai/neoruntime.git
+
+# SDK 仓：Python SDK（hailo_ipc_sdk）、C++ SDK、proto 定义
+git clone https://github.com/camthink-ai/neoruntime-sdks.git
+
+# 应用仓：示例应用、showcase、应用模板与统一构建脚本
+git clone https://github.com/camthink-ai/neoruntime-apps.git
 ```
 
-项目根目录结构：
+> 构建应用时，把 `neoruntime-apps` 与 `neoruntime-sdks` clone 到**同一父目录**下——应用统一构建脚本 `scripts/build_app.sh` 默认从旁边的 `neoruntime-sdks` 取 SDK。
+
+验证平台主仓完整性：
+
+```bash
+cd neoruntime && ls Makefile platform/ web/
+```
+
+三个仓库的目录结构：
 
 ```
-ne503/
-├── platform/      # 平台服务（Go + C++）
-├── hal/           # HAL v1（C，legacy）
-├── hal_v2/        # HAL v2（C++，推荐）
-├── sdk/           # 开发者 SDK（Python / Go）
-├── web/           # Web 控制台（React + TypeScript）
-├── apps/          # 示例应用
-├── configs/       # 配置模板
-├── tools/         # 开发工具
-├── scripts/       # 构建/测试/部署脚本
-└── docker/        # Docker 开发环境
+neoruntime/               # 平台主仓
+├── platform/             # 平台服务（Go + C++）
+│   ├── camera-daemon/    #   采集/ISP/编码/RTSP（C++）
+│   ├── ai-runtime/       #   AI 推理运行时（C++）
+│   ├── device-control/   #   设备外设控制（Go）
+│   ├── event-bus/        #   事件总线（Go）
+│   ├── app-manager/      #   容器应用管理（Go）
+│   ├── platform-api/     #   REST/WebSocket 网关（Go）
+│   └── device-discovery/ #   设备发现 CT-Disc（Go）
+├── hal_v2/               # HAL v2（C++，当前唯一维护版本）
+├── mcu_board_prj/        # MCU 固件工程
+├── web/                  # Web 控制台（React + TypeScript）
+├── configs/              # 配置模板（platform/、ai/）
+├── tools/                # 开发工具（含 aipc-cli）
+├── scripts/              # 设备侧脚本（firstboot、healthmon 等）
+├── systemd/              # 服务 unit 定义
+├── deploy/               # 部署脚本
+└── docker/               # Docker 开发环境
+
+neoruntime-sdks/          # SDK 仓
+├── python/hailo_ipc_sdk/ # Python SDK（含 protobuf 桩）
+├── cpp/                  # C++ SDK
+└── proto/                # protobuf 定义
+
+neoruntime-apps/          # 应用仓
+├── examples/             # 教程示例（hello-world、person-detection 等）
+├── showcases/            # model-showcase、parking-lot、gym-ops
+├── templates/basic/      # 应用脚手架
+└── scripts/build_app.sh  # 应用统一构建脚本
 ```
 
 ### 3. 安装依赖
@@ -73,14 +102,16 @@ NE503 构建系统分为三层：
 
 #### 方式一：Docker 预打包镜像（推荐）
 
-预打包镜像已包含三层全部依赖，开箱即用。
+官方发布镜像 `camthink/ne503-dev:v1.0` 已包含三层全部依赖（含 Hailo/Poky SDK，位于 `/opt/hailo-sdk`），开箱即用——这也是仓库 README 推荐的最快出包路径。
 
 镜像为**多平台**（amd64 + arm64），在 Apple Silicon 上自动拉取 arm64 原生版，无需 QEMU 模拟，性能与 Linux 原生一致。
+
+> 仓库 `docker/dev/` 下另有自建镜像 `ne503-dev-env`（轻量版，SDK 运行时挂载）与 `ne503-dev-env-full`（SDK 内置版），需要定制时用。
 
 **拉取镜像：**
 
 ```bash
-docker pull camthink/ne503-dev:latest
+docker pull camthink/ne503-dev:v1.0
 ```
 
 **创建持久开发容器：**
@@ -89,7 +120,7 @@ docker pull camthink/ne503-dev:latest
 docker run -d --name ne503-dev \
   -v $(pwd):/ne503 \
   -w /ne503 \
-  camthink/ne503-dev:latest \
+  camthink/ne503-dev:v1.0 \
   bash -c "sleep infinity"
 ```
 
@@ -97,10 +128,10 @@ docker run -d --name ne503-dev \
 
 ```bash
 docker exec -it ne503-dev bash         # 进入容器交互
-docker exec ne503-dev make env-check   # 在容器内执行命令
+docker exec ne503-dev make pack-release VERSION=1.0.0   # 在容器内执行构建
 ```
 
-容器内三层依赖已预装，跳到 [§4 验证环境](#4-验证环境) 确认即可。
+容器内三层依赖已预装，可直接进入 §6 完整构建。
 
 #### 方式二：脚本安装
 
@@ -227,45 +258,18 @@ macOS 无法本机安装 Hailo SDK（x86_64 Linux 专用交叉编译工具链）
 
 ### 4. 验证环境
 
+Makefile 没有专门的 `env-check` 目标——用逐项命令直接验证关键依赖（也可跳过本节，直接进 §6 构建并按 §8 排查报错）：
+
 ```bash
-make env-check
+go version          # Layer 1：Go 服务
+node --version      # Layer 1：Web 控制台
+protoc --version    # Layer 1：proto 编译
+cmake --version     # Layer 2：C++ 组件
+g++ --version       # Layer 2
+ls /opt/hailo-sdk 2>/dev/null || ls /opt/poky 2>/dev/null   # Layer 3：Hailo SDK（仅完整发布包需要）
 ```
 
-该命令逐项检查三层依赖并报告状态。三层全通时的输出：
-
-```plaintext
-=== NE503 Build Environment ===
-
---- Layer 1 (Universal) ---
-  OK: go version go1.25.x linux/arm64
-  OK: libprotoc 3.x.x
-  OK: protoc-gen-go
-  OK: protoc-gen-go-grpc
-  OK: Node.js v22.x.x
-  OK: Python 3.x.x
-  OK: pnpm x.x.x
-
---- Layer 2 (Native C/C++) ---
-  OK: cmake version 3.x.x
-  OK: g++ (Ubuntu 13.x / Apple clang) x.x.x
-  OK: grpc_cpp_plugin
-
---- Layer 3 (Hailo-15 Cross-compile) ---
-  OK: Hailo SDK (/opt/hailo-sdk)
-```
-
-> 以上为 Docker 预打包镜像（方式一）的输出。手动安装（方式三）下，Layer 3 显示 `OK: Hailo SDK (/opt/poky/4.0.23)`，两种路径均正常。
-
-如果 Layer 3 未安装，会显示：
-
-```plaintext
---- Layer 3 (Hailo-15 Cross-compile) ---
-  NOT FOUND: Hailo SDK
-```
-
-Layer 3 缺失仅影响完整发布包构建（`pack-release`），不影响 Go 服务和 Web 控制台开发。
-
-> 如果出现 `WARNING: hailo15 target requested`，说明项目根目录存在 `Makefile.docker`（Docker 容器自动生成的）。删除即可：`rm Makefile.docker`。
+各命令有版本输出即对应层就绪。Layer 3 缺失仅影响完整发布包构建（`pack-release`），不影响 Go 服务和 Web 控制台开发。
 
 ### 5. Python SDK 与 IDE 配置
 
@@ -273,15 +277,17 @@ Layer 3 缺失仅影响完整发布包构建（`pack-release`），不影响 Go 
 
 #### Python SDK（开发模式）
 
+Python SDK 在独立的 `neoruntime-sdks` 仓库：
+
 ```bash
-cd sdk/python
+cd ../neoruntime-sdks/python
 pip3 install -e ".[dev]"
 ```
 
 > 报错 `error: externally-managed-environment`（Ubuntu 24.04+、macOS Homebrew Python）时改用 venv：
 >
 > ```bash
-> cd sdk/python
+> cd ../neoruntime-sdks/python
 > python3 -m venv .venv && source .venv/bin/activate
 > pip install -e ".[dev]"
 > ```
@@ -318,7 +324,7 @@ docker exec ne503-dev bash -c \
 # 预期输出（阶段进度，省略单文件编译细节）
 ==> Compiling proto (inference / device / event / camera / app / ...)
 ==> Building device-control (CGO_ENABLED=0)
-==> Building event-bus / app-manager / platform-api / device-discovery
+==> Building event-bus / app-manager / platform-api / device-discovery / os-updater
 ==> Building Web Console
 ==> Building Python SDK
 === Layer 1 complete: proto + Go services + web + Python SDK ===
@@ -326,9 +332,10 @@ docker exec ne503-dev bash -c \
 ==> Building camera-daemon / ai-runtime (C++) / aipc-cli
 ==> Building tools (shm-reader, nv12-to-jpeg)
 === Layer 2 complete ===
-==> Packaging release [1.0.0, platform=hailo15]
+==> Building MCU firmware          # 默认连带构建（BUILD_MCU_FW=0 可跳过）
+=== Packaging release [1.0.0, platform=hailo15]
 === Release Package Ready ===
-File:   build/release/aipc-hailo15-1.0.0.tar.gz (111M)
+File:   build/release/aipc-hailo15-1.0.0.tar.gz
 ```
 
 > 手动安装环境（方式三）下，SDK 路径为 `/opt/poky/4.0.23`，将上述命令中的 env 脚本和 `SDK_PATH` 替换为该路径即可。
@@ -429,26 +436,28 @@ lib/
 
 ### Make 目标速查
 
+（以仓库 Makefile 当前 `make help` 输出为准，常用目标如下）
+
 | 目标 | 说明 |
 |------|------|
-| `make pack-release` | 完整 Hailo-15 发布（构建 + 打包） |
-| `make pack` | 从已有构建产物打包（无 SDK） |
-| `make platform` | 所有 Go 服务 |
-| `make hal-v2` | HAL v2（`HAL_PLATFORM=hailo15` 交叉编译） |
-| `make camera-daemon` | C++ camera-daemon |
-| `make ai-runtime` | C++ AI 推理服务 |
-| `make proto` | 编译 .proto 生成 Go 代码 |
-| `make web` | Web 控制台（pnpm） |
-| `make layer1` | proto + Go + Web + Python SDK |
-| `make layer2` | Layer 1 + HAL stub + C++ 组件 |
-| `make env-check` | 检查构建依赖 |
+| `make pack-release` | 完整 Hailo-15 发布包（需 `SDK_PATH`；默认连带构建 MCU 固件，`BUILD_MCU_FW=0` 可跳过） |
+| `make docker-pack-release` | 在 Docker 容器内出发布包（免本机装 SDK） |
+| `make build-go` | proto + 所有 Go 平台服务 |
+| `make build-native` | Go + HAL v2 + camera-daemon + ai-runtime + aipc-cli + tools |
+| `make build-web` | Web 控制台 |
+| `make platform` | 所有 Go 平台服务（含 os-updater） |
+| `make hal-v2` | HAL v2（`HAL_PLATFORM=hailo15` 交叉编译；默认 `stub`） |
+| `make camera-daemon` / `make ai-runtime` | 单独构建 C++ 组件 |
+| `make proto` | 编译 .proto 生成代码 |
+| `make aipc-cli` | 设备 CLI 工具 |
+| `make test` / `test-basic` / `test-smoke` | 单元 / 仓库检查 / HTTP 冒烟 |
+| `make fmt` / `make lint` | 格式化 / 静态检查 |
 | `make clean` | 清理构建产物 |
-| `make test` | 运行所有测试 |
 
 ## 相关文档
 
 - [System Architecture](./0-system-architecture.md) — 四层架构和核心服务详解
 - [System Flashing](./2-system-flashing.md) — 系统镜像烧录和升级
 - [Software Deployment](./3-software-deployment.md) — 平台软件部署和迭代开发
-- [Platform Services](./4-reference/0-platform-services.md) — 各服务职责与源码指针
-- [Troubleshooting](./4-reference/1-troubleshooting.md) — 运行时问题排查
+- [Platform Services](./4-platform-services.md) — 各服务职责与源码指针
+- [Troubleshooting](../5-troubleshooting.md) — 运行时问题排查

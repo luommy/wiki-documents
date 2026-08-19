@@ -21,9 +21,9 @@ Don't want to build the image yourself? Download the prebuilt package [hello-wor
 
 | Condition | Verification |
 |:---|:---|
-| NE503 device online and running | Open `http://<device-ip>:8080` in a browser; the Web login page should appear |
+| NE503 device online and running | Open `https://<device-ip>` in a browser; the Web login page should appear |
 | Docker installed on the dev machine | `docker --version` reports >= 20.10 |
-| Dev machine can reach the device | `curl -o /dev/null -w "%{http_code}" http://<device-ip>:8080` returns `200` |
+| Dev machine can reach the device | `curl -k -o /dev/null -w "%{http_code}" https://<device-ip>` returns `200` |
 | Device login credentials | Web Console defaults to `admin` / `password` (change after first login) |
 
 :::tip Architecture
@@ -37,7 +37,7 @@ The NE503 device uses ARM64 architecture. Apple Silicon (M-series) development m
 
 ## 2. Application Structure
 
-The Hello World app consists of three files (full source in the repo at `apps/hello-world/`):
+The Hello World app consists of three files (full source in the neoruntime-apps repo at `examples/hello-world/`):
 
 ```
 hello-world/
@@ -107,7 +107,7 @@ CMD ["python3", "/app/app.py"]
 In the app directory, build the ARM64 image, export it as a tar, then package it as an `.aipc` installer:
 
 ```bash
-cd apps/hello-world
+cd neoruntime-apps/examples/hello-world
 
 # 1. Build the ARM64 image (--load loads it into local Docker)
 docker buildx build --platform linux/arm64 --load -t aipc/hello-world:1.0.0 .
@@ -138,12 +138,12 @@ On macOS + Docker Desktop, `apk add` occasionally fails with `Failed to create .
 After building, you have `app.yaml` and `image.tar`. Three deployment options — **Web Console recommended** (graphical, no SSH):
 
 :::note Prepare first
-All three options need `app.yaml` and `image.tar` as two separate files. After the manual build in §3, both are in the app directory. If you used the repo's `apps/<app>/build.sh` (which deletes the intermediate `image.tar` after packaging `.aipc`), run `unzip -o <app>.aipc` first.
+All three options need `app.yaml` and `image.tar` as two separate files. After the manual build in §3, both are in the app directory. If you used the repo's unified build script `scripts/build_app.sh` (which cleans up the intermediate `image.tar` after packaging `.aipc`), run `unzip -o <app>.aipc` first.
 :::
 
 ### 4.1 Upload via Web Console (recommended)
 
-1. Open the Web Console at `http://<device-ip>:8080` and log in with the defaults `admin` / `password`.
+1. Open the Web Console at `https://<device-ip>` and log in with the defaults `admin` / `password`.
 
 2. Click **App Management** in the left nav to open the app list. Click the **Import** card in the top-right.
 
@@ -178,22 +178,22 @@ Suited to scripting / CI automation. The flow is **two-step upload + async insta
 
 ```bash
 # Log in for a token (the returned value carries a "Bearer " prefix; pass the whole string as the Authorization header)
-curl -X POST http://<device-ip>:8080/api/login \
+curl -k -X POST https://<device-ip>/api/login \
   -H "Content-Type: application/json" \
   -d '{"username":"admin","password":"password"}'
 
 # Upload image and manifest (field name is "file" for both; each returns its path)
-curl -X POST http://<device-ip>:8080/api/v1/apps/upload-image \
+curl -k -X POST https://<device-ip>/api/v1/apps/upload-image \
   -H "Authorization: Bearer <token>" -F "file=@image.tar"
-curl -X POST http://<device-ip>:8080/api/v1/apps/upload-manifest \
+curl -k -X POST https://<device-ip>/api/v1/apps/upload-manifest \
   -H "Authorization: Bearer <token>" -F "file=@app.yaml"
 
 # Trigger the async install (JSON body with the two paths above), then poll the returned task_id until phase=complete
-curl -X POST http://<device-ip>:8080/api/v1/apps/install-package \
+curl -k -X POST https://<device-ip>/api/v1/apps/install-package \
   -H "Authorization: Bearer <token>" -H "Content-Type: application/json" \
   -d '{"manifest_path":"<manifest path>","image_path":"<image path>","force":true}'
 # → {"data":{"task_id":"0f26285a"}}
-curl http://<device-ip>:8080/api/v1/apps/install-progress/<task_id> \
+curl -k https://<device-ip>/api/v1/apps/install-progress/<task_id> \
   -H "Authorization: Bearer <token>"
 ```
 
@@ -212,7 +212,7 @@ Go to **App Management**, find the Hello World card (Stopped), and click **Start
 **Option 2: HTTP API**
 
 ```bash
-curl -X POST http://<device-ip>:8080/api/v1/apps/hello-world/start \
+curl -k -X POST https://<device-ip>/api/v1/apps/hello-world/start \
   -H "Authorization: Bearer <token>"
 ```
 
@@ -222,7 +222,7 @@ On first start of an image, the platform loads it into the container runtime, wh
 
 ### 5.2 Verify in the Web Console
 
-Log into `http://<device-ip>:8080` (`admin` / `password`) and confirm the app is running from a user's perspective:
+Log into `https://<device-ip>` (`admin` / `password`) and confirm the app is running from a user's perspective:
 
 ![Web Console login page](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/app-development/hello-world/01-login.png)
 
@@ -243,7 +243,7 @@ The detail page shows app ID, version, uptime, and Stop / Restart / Uninstall ac
 App logs can also be fetched via the API (returns NDJSON, one JSON object per line):
 
 ```bash
-curl "http://<device-ip>:8080/api/v1/apps/hello-world/logs?max_lines=10" \
+curl -k "https://<device-ip>/api/v1/apps/hello-world/logs?max_lines=10" \
   -H "Authorization: Bearer <token>"
 ```
 
@@ -261,11 +261,11 @@ After verification, stop and uninstall the app:
 
 ```bash
 # Stop
-curl -X POST http://<device-ip>:8080/api/v1/apps/hello-world/stop -H "Authorization: Bearer <token>"
+curl -k -X POST https://<device-ip>/api/v1/apps/hello-world/stop -H "Authorization: Bearer <token>"
 # → {"data":{"message":"App stopped successfully"}}
 
 # Uninstall
-curl -X DELETE http://<device-ip>:8080/api/v1/apps/hello-world -H "Authorization: Bearer <token>"
+curl -k -X DELETE https://<device-ip>/api/v1/apps/hello-world -H "Authorization: Bearer <token>"
 # → {"data":{"message":"App uninstalled successfully"}}
 ```
 

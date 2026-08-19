@@ -302,39 +302,7 @@ NE503 采用**核心处理板**与**接口板**双板结构，通过板对板连
   <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/overview/software-stack.png" alt="软件栈架构" width="80%" />
 </div>
 
-NeoEyes NE503 采用四层分层架构，从底层硬件到 Web 管理界面清晰解耦：
-
-<table>
-  <thead>
-    <tr>
-      <th>层级</th>
-      <th>组件</th>
-      <th>说明</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>Web 管理控制台</td>
-      <td>React 19 + TypeScript + Vite</td>
-      <td>仪表盘、媒体设置、应用管理、系统管理</td>
-    </tr>
-    <tr>
-      <td>平台服务层（Go）</td>
-      <td>platform-api · app-manager · device-control · ai-runtime · event-bus</td>
-      <td>REST API 网关、容器生命周期、硬件控制、AI 推理、事件总线</td>
-    </tr>
-    <tr>
-      <td>HAL 及 C++ 服务层</td>
-      <td>camera-daemon · libaipc_hal.so</td>
-      <td>视频采集编码、硬件抽象层</td>
-    </tr>
-    <tr>
-      <td>硬件层</td>
-      <td>Hailo-15H SoC · Hailo NPU · MCU</td>
-      <td>AI 加速、视频处理、外设控制</td>
-    </tr>
-  </tbody>
-</table>
+NeoEyes NE503 软件栈自底向上分为硬件、硬件抽象（HAL）、平台服务、Web 管理控制台四层：应用以容器形式运行，只通过平台服务调用 NPU、相机与外设，不直接触碰硬件——这保证了应用的可移植性与系统安全边界。分层数据流与各层职责详见[系统架构](./3-software-guide/0-system-architecture.md)。
 
 ## 产品应用
 

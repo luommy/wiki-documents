@@ -65,14 +65,14 @@ NE503 整机软件分为两层：
 
 > 仅 [§2 烧录引导链](#2-烧录引导链) 需要；只做 §3/§5 系统镜像烧录或升级的可跳过本节。
 
-§2 引导链烧录支持 **Ubuntu** 和 **macOS**（验证的 `hailo15_board_tools` 版本 1.9.0）。`hailo15_board_tools` 是跨平台 Python wheel，两个平台的差异只在依赖安装方式和串口设备节点。
+§2 引导链烧录支持 **Ubuntu** 和 **macOS**（随 meta-hailo-os 发布的当前版本为 1.10.1）。`hailo15_board_tools` 是跨平台 Python wheel，两个平台的差异只在依赖安装方式和串口设备节点。
 
 > **关键依赖 `mkenvimage`：** §2.3 的 `hailo15_spi_flash_program` 会调用 `mkenvimage` 生成 U-Boot env 镜像。若主机未安装，烧录会在写入第 5 个组件（U-Boot env）时崩溃，**留下半写的引导链**。两个平台都必须先装好——Ubuntu 由 `apt-get install u-boot-tools` 提供，macOS 由 `brew install u-boot-tools` 提供。
 
 #### Ubuntu
 
 ```bash
-# Hailo 烧录工具（将 <VERSION> 替换为实际版本号，当前验证版本 1.9.0）
+# Hailo 烧录工具（将 <VERSION> 替换为实际版本号，随 meta-hailo-os 发布的当前版本为 1.10.1）
 pip install hailo15_board_tools-<VERSION>.whl
 
 # U-Boot 辅助工具（提供 mkenvimage，§2.3 必需）
@@ -463,7 +463,7 @@ STM32_Programmer_CLI -c port=swd -e all -w ./ne503_mcu.elf -v -rst
 若 SoC 已部署平台软件，设备启动后：
 
 ```bash
-curl -s -H "Authorization: Bearer <token>" http://<device-ip>:8080/api/v1/device/status
+curl -k -s -H "Authorization: Bearer <token>" https://<device-ip>/api/v1/device/status
 # 返回 200，data.mcu_version / mcu_temp_c / light_sensor 等字段有值
 ```
 

@@ -183,7 +183,7 @@ I2C1 从设备地址 **0x6A**，25 MHz，PCIe Gen4 低抖动 0.3 ps。
 | H_I2C0_SDA | I2C0 数据线 |
 | H_I2C0_SCL | I2C0 时钟线 |
 
-### 镜头驱动（SPI CS1）
+### 镜头驱动
 
 核心板 SPI 总线通过 CS1 片选引出，连接 AN41908A-VBA AF 自动变焦与自动对焦镜头驱动。与 QSPI Flash 共享 SPI 总线，通过不同片选区分。MCU 侧 SPI1 也连接同一芯片，负责镜头归零与限位保护（详见 [Interface Board](./2-aipc-board-connection.md)）。
 

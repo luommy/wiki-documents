@@ -1,12 +1,12 @@
 ---
-description: NE503 AIPC 平台架构详解，涵盖四层分层架构、7 个平台服务、HAL v2 硬件抽象、Python SDK、零拷贝优化及多平台支持，帮助开发者和集成商深入理解系统设计与数据流。
+description: NE503 AIPC 平台架构详解，涵盖四层分层架构、端到端数据链路、7 个平台服务、HAL v2 硬件抽象、零拷贝优化及多平台支持，帮助开发者和集成商深入理解系统设计与数据流。
 keywords: [NE503架构, AIPC平台, HAL硬件抽象, 零拷贝, gRPC, DMA-BUF, 边缘AI, Python SDK, 事件总线]
 tags: [平台架构, NE503, 边缘AI, 开发者文档, 系统设计]
 ---
 
 # System Architecture
 
-NE503 AIPC（AI IPC）平台是一个面向边缘 AI 计算的完整软件栈，采用四层分层架构设计，支持多 SoC 平台（Hailo-15 / RKxxx / Jetson）通过硬件抽象层实现平滑迁移。本文档详细介绍平台各层架构、核心服务与数据流。
+NE503 的软件栈分为四层：应用容器、平台服务、硬件抽象（HAL）、硬件。本文帮你搞清三件事：**系统怎么分层、一帧图像怎么从传感器变成应用拿到的检测结果、每个服务经 HAL 操作哪些硬件**。读完你能定位功能归属（改哪里）、理解数据路径（调什么流），需要更深的实现细节时按文末链接进开源仓。
 
 ## 1. 四层架构总览
 
@@ -22,7 +22,7 @@ graph TB
     end
 
     subgraph "硬件抽象层 HAL"
-        HAL["HAL C API\n动态库加载"]
+        HAL["HAL 统一接口"]
     end
 
     subgraph "硬件层 Hardware"
@@ -32,57 +32,90 @@ graph TB
     APP -- "SDK gRPC" --> GO
     APP -- "SDK gRPC + SHM" --> CPP
     GO -- gRPC --> CPP
-    CPP -- "HAL C API" --> HAL
+    CPP -- "HAL 统一接口" --> HAL
     HAL -- 驱动 --> SOC
 ```
 
-| 层级 | 职责 | 技术 |
+| 层级 | 管什么 | 说明 |
 |:---|:---|:---|
 | 应用容器层 | 第三方 AI 应用、模型推理管线 | Python/Go/C++，容器化运行 |
 | 平台服务层 | 摄像头管理、AI 推理、容器管理、事件分发、设备控制、API 网关、设备发现 | Go 微服务 + C++ 守护进程 |
-| 硬件抽象层 | 统一硬件接口，解耦平台服务与 SoC | C/C++ 函数指针表（Ops），DMA-BUF 零拷贝 |
-| 硬件层 | SoC、NPU、ISP、传感器、MCU | Hailo-15H（当前）、RKxxx / Jetson（可扩展） |
+| 硬件抽象层 | 给所有硬件（NPU/传感器/编码器/外设）提供统一接口 | 服务层只调 HAL，不直接碰硬件 |
+| 硬件层 | SoC、NPU、ISP、传感器、MCU | Hailo-15H（当前），RKxxx / Jetson（可扩展） |
+
+四层如何在一次完整的推理中协作，见下节。
 
 ---
 
-## 2. 平台服务层
+## 2. 端到端数据链路
 
-平台服务层包含多个微服务，通过 gRPC over Unix Domain Socket 进行内部通信。
+一帧图像从传感器到应用拿到的检测结果，走的是同一条流水线：
 
-### 2.1 服务总览
+```mermaid
+graph LR
+    SENSOR["IMX678 传感器 4K"] -->|MIPI| ISP["ISP 图像处理"]
+    ISP -->|GStreamer 管线| CAM["camera-daemon"]
+    CAM -->|硬件缩放| MAIN["主码流 4K@30"]
+    CAM -->|硬件缩放| SUB["子码流 720p@30"]
+    CAM -->|硬件缩放| THIRD["第三路 640×384@15"]
+    MAIN -->|H.264| R1["RTSP :8554/main"]
+    SUB -->|H.264| R2["RTSP :8554/sub"]
+    THIRD -->|H.264| R3["RTSP :8554/third"]
+    SUB -.原始 NV12 帧 零拷贝.-> AIRT["ai-runtime"]
+    THIRD -.原始 NV12 帧 零拷贝.-> AIRT
+    AIRT -->|HAL.ML| NPU["NPU 推理"]
+    NPU -->|"结果带 frame_sequence + timestamp_ns"| APP["应用容器（SDK subscribe）"]
+    NPU --> EBUS["event-bus（检测事件）"]
+    NPU -->|"Overlay 检测框叠加到画面"| R1
+```
 
-| 服务 | 语言 | 监听地址 | 职责 |
-|:---|:---|:---|:---|
-| **ai-runtime** | C++ | `unix:///run/aipc/ai-runtime.sock` | AI 模型管理与推理调度，NPU 资源分配，GenAI 流式推理 |
-| **app-manager** | Go | `unix:///run/aipc/app-manager.sock` | 容器应用生命周期管理（安装/启动/停止/卸载），基于 containerd |
-| **event-bus** | Go | `unix:///run/aipc/event-bus.sock` + TCP `127.0.0.1:50053` | 发布/订阅消息总线，MQTT 风格通配符匹配 |
-| **device-control** | Go | `unix:///run/aipc/device-control.sock` | 硬件外设控制（灯光/PTZ/镜头/GPIO），MCU UART 通信 |
-| **device-discovery** | Go | `unix:///run/aipc/device-discovery.sock` | 网络设备发现（CT-Disc 协议），设备注册与状态管理 |
-| **platform-api** | Go | `:8080` | HTTP/RESTful API 网关，代理所有后端 gRPC 服务 |
-| **camera-daemon** | C++ | `unix:///run/aipc/camera.sock`（FD 发布）+ `unix:///run/aipc/camera-control.sock`（gRPC 控制）+ `/run/aipc/shm/`（SHM） | 视频采集、双通道帧分发（FD/SHM）、编码、RTSP 流媒体 |
+采集、缩放、编码、RTSP 与原始帧分发由 camera-daemon 完成；推理调度由 ai-runtime 完成，两者均通过 HAL 统一接口操作硬件（HAL 详见 §4）。应用控制外设（灯光/PTZ/GPIO）走另一条链：应用 → device-control（gRPC）→ HAL.IO → MCU。
 
-### 2.2 gRPC API 定义
+### 三路码流的分工
 
-平台通过 Protocol Buffers 文件定义所有 gRPC 接口：
+| 码流 | 分辨率@帧率 | 编码输出 | 原始帧 | 角色 |
+|------|------------|---------|--------|------|
+| 主码流 `main` | 3840×2160@30（4K） | H.264 → RTSP | ✗ | 高清录像、大屏预览 |
+| 子码流 `sub` | 1280×720@30 | H.264 → RTSP | ✓ | 多路预览；也可供 AI 订阅 |
+| 第三路 `third` | 640×384@15 | H.264 → RTSP | ✓ | **AI 推理默认流**，尺寸与平台前处理匹配 |
 
-| Proto 文件 | 服务 | 说明 |
-|:---|:---|:---|
-| `inference.proto` | AI 推理 | 模型注册/推理/流式推理/GenAI 会话管理 |
-| `app.proto` | 容器管理 | 应用安装/生命周期 + 容器/镜像/资源管理 |
-| `event.proto` | 事件总线 | 发布/订阅，MQTT 风格通配符，主题统计 |
-| `device.proto` | 设备控制 | 灯光/PTZ/镜头（含 AF0832）/GPIO/环境/告警/RS485 |
-| `camera.proto` | 摄像头管理 | 视频采集管道、RTSP 流媒体、OSD 叠加 |
-| `lens_hal.proto` | 镜头控制 | `device.proto` 镜头部分的 HAL 桥接实现 |
-| `discovery.proto` | 设备发现 | CT-Disc 协议设备发现、监听与扫描 |
+「原始帧」指未经编码的 NV12 帧——只有拿到原始帧的流才能送 NPU 推理。三路均由 ISP 硬件缩放输出，无软件缩放开销；出厂码率、GOP 等参数与热更新方式见[视频集成 · 码流概览](../4-application-guide/3-reference/4-video-integration.md)。
 
-> 各 proto 的完整操作列表见对应的服务参考文档。
+> 应用订阅推理时，`stream` 必须填发布原始帧的流（`sub` 或 `third`）；`main` 只发编码 H.264，订阅它会永远等不到结果。
+
+### 检测结果如何与帧、事件、画面对齐
+
+每次推理结果都携带 `frame_sequence`（帧序号）与 `timestamp_ns`（纳秒时间戳），三方共用这一序号：
+
+- **取原始帧**：应用用 `FdMediaClient.get_frame()` 取同一帧的原始画面（抓拍、二次处理）；
+- **事件对时**：event-bus 上的检测事件同样携带时间戳，可与业务系统对时；
+- **画面叠加**：平台按配置 `stream_map`（出厂 `third:main,sub:main`）把检测框绘制到对应编码流的画面上——RTSP / Web 里看到的检测框、推理结果、事件输出是同一帧对齐的。
+
+### 应用为什么不直接触碰硬件
+
+应用容器对 NPU、传感器、编码器没有任何直接访问权：
+
+1. **调用走服务**：SDK 通过 Unix Socket 调平台服务（推理、事件、设备控制），由服务经 HAL 操作硬件；
+2. **权限即契约**：应用能调什么，由 `app.yaml` 的 `permissions` 声明决定，未声明的调用被平台直接拒绝；
+3. **五层沙箱**：容器运行在命名空间隔离、能力裁剪、seccomp 系统调用过滤、cgroups 资源限制、只读 rootfs 之中。
+
+隔离与安全模型的完整设计见开源仓库 [security-architecture.md](https://github.com/camthink-ai/neoruntime/blob/main/docs/architecture/security-architecture.md)。
 
 ---
 
-## 3. 硬件抽象层（HAL）
+## 3. 平台服务层
 
+平台服务按职责分两组：**数据面**（ai-runtime、camera-daemon——帧与推理的搬运工，性能敏感，C++）与**管理面**（其余五个——生命周期、事件、API、外设、发现，Go 微服务）。服务间通过 gRPC over Unix Domain Socket 通信；对外 REST API 统一由 platform-api 网关暴露（内部 `127.0.0.1:8080`，经 nginx `:443`）。
 
-### 3.1 HAL 接口总览
+每个服务的职责、socket 路径、启动依赖与源码指针，见[平台服务总览](./4-platform-services.md)；gRPC 接口的 proto 定义也在该页按服务逐一列出。
+
+---
+
+## 4. 硬件抽象层（HAL）
+
+HAL 是平台服务与硬件之间的唯一通道：换 SoC 只需要重写 HAL 实现，所有服务层代码不动。
+
+### 4.1 HAL 接口总览
 
 HAL 头文件按组件子目录组织，位于 `hal_v2/include/`：
 
@@ -94,104 +127,74 @@ HAL 头文件按组件子目录组织，位于 `hal_v2/include/`：
 | `peripheral/` | MCU 通信、GPIO/传感器；设备层含 LED、镜头、告警、RS485、RTC、OTA 等 |
 | `common/` | 公共枚举/错误码、`HalFrameBuffer` 帧缓冲、基础类型、日志 |
 
-> 各服务消费的具体子接口（如 `HalInferenceOps`、`HalPostprocessOps` 等）详见对应的服务参考文档。
+每个服务消费 HAL 的哪个子接口（如 ai-runtime 消费 `model/` 推理接口、camera-daemon 消费 `media/` 采集编码接口），见开源仓库 [HAL v2 总览](https://github.com/camthink-ai/neoruntime/blob/main/docs/architecture/hal_v2_overview.md)。
 
-### 3.2 核心数据结构：HalFrameBuffer
+### 4.2 核心数据结构：HalFrameBuffer
 
-`HalFrameBuffer` 是平台的核心帧数据载体，用于在视频采集、AI 推理、编码等模块间传递帧数据。
-
-**数据封装：**
-- **图像元数据**：宽高、像素格式、时间戳
-- **内存描述**：DMA-BUF fd、虚拟地址、stride/size
-- **私有数据**：通过 `priv` 指针透传平台特定信息
-
-- **内存模式**：支持 DMA-BUF（零拷贝）和 CPU Memory 两种。视频→AI→编码全链路共享同一 DMA-BUF，无需内存拷贝。
-- **生命周期**：通过引用计数管理（`hal_frame_buffer_ref` / `hal_frame_buffer_release`）。
+`HalFrameBuffer` 是平台的核心帧数据载体：帧的元数据（宽高、像素格式、时间戳）与内存描述（DMA-BUF fd、stride）打包在一起，在采集、推理、编码模块间传递。支持 DMA-BUF 零拷贝与 CPU 内存两种模式，通过引用计数管理生命周期——视频→AI→编码全程共享同一份 DMA-BUF，无需内存拷贝。
 
 > 完整结构体定义见 GitHub 仓库 `hal_v2/include/common/` 目录。
 
-### 3.3 多平台支持
+### 4.3 多平台支持
 
 ```mermaid
 graph LR
-    HAL_API[HAL 统一接口 hal_*.h] --> STUB[Stub 实现 本地测试]
-    HAL_API --> HAILO[Hailo-15 实现 NPU 加速]
-    HAL_API --> RK[RKxxx 实现 Rockchip]
-    HAL_API --> JETSON[Jetson 实现 NVIDIA]
+    HAL_API["HAL 统一接口 hal_*.h"] --> STUB["Stub 实现（本地测试）"]
+    HAL_API --> HAILO["Hailo-15 实现（NPU 加速）"]
+    HAL_API --> RK["RKxxx 实现（Rockchip）"]
+    HAL_API --> JETSON["Jetson 实现（NVIDIA）"]
 ```
 
-当前实现：Hailo-15（完整）+ Stub（完整桩实现，无硬件开发用）。RKxxx 和 Jetson 可通过实现对应的 HAL 接口扩展支持。
+当前实现：Hailo-15（完整）+ Stub（完整桩实现，无硬件开发用）。要支持新 SoC，实现对应的 HAL 接口即可，服务层与应用全部不动。
 
 ---
 
-## 4. Web 控制台
+## 5. Web 控制台
 
-Web 控制台基于 React 19 + TypeScript + Vite 构建，提供设备管理、视频监控、AI 模型管理、应用管理、系统监控等功能。
+Web 控制台是设备的管理界面：设备信息与网络配置、实时画面预览、模型与应用管理、外设控制、日志查看（含 WebSocket 终端与容器日志实时流）。
 
-| 技术栈 | 组件 |
-|:---|:---|
-| 框架 | React 19 + TypeScript |
-| 构建 | Vite |
-| 状态管理 | Zustand |
-| 数据获取 | TanStack Query |
-| UI 组件 | shadcn/ui + Radix |
-| 测试 | Vitest |
-
-Web 控制台通过 REST API 和 WebSocket 与 platform-api 通信，实时推送 AI 推理结果和设备事件。
-
-访问地址：`http://<设备IP>:8080`。
+访问地址 `https://<设备IP>`（开发与使用细节见开源仓库 [web-console.md](https://github.com/camthink-ai/neoruntime/blob/main/docs/services/web-console.md)）。
 
 ---
 
-## 5. 关键技术特性
+## 6. 关键技术特性
 
-### 5.1 零拷贝优化
+### 6.1 零拷贝优化
 
 ```mermaid
 sequenceDiagram
     participant S as 传感器
-    participant D as DMA-BUF
-    participant V as Video 模块
-    participant A as AI Runtime
-    participant C as Codec
+    participant CAM as camera-daemon
+    participant AI as ai-runtime
+    participant E as 编码器
 
-    S->>D: 采集原始数据，创建 DMA-BUF
-    D->>V: 共享 DMA-BUF（无内存拷贝）
-    V->>A: 路由至推理模块（零拷贝访问）
-    A->>A: 执行 AI 推理
-    D->>C: 同一 DMA-BUF 路由至编码模块
-    Note over D,C: DMA-BUF 生命周期由引用计数管理
+    S->>CAM: 采集原始数据，创建 DMA-BUF
+    CAM->>AI: SCM_RIGHTS 传递 DMA-BUF fd（无内存拷贝）
+    AI->>AI: HAL.ML 调度 NPU 推理
+    CAM->>E: 同一 DMA-BUF 路由至编码模块
+    Note over CAM,E: DMA-BUF 生命周期由引用计数管理
 ```
 
 核心机制：
 - `HalFrameBuffer` 通过 `dma_fds[]` 传递 DMA-BUF 文件描述符，视频→AI→编码全程零拷贝
 - 引用计数管理帧生命周期（`hal_frame_buffer_ref` / `hal_frame_buffer_release`）
-- AI Runtime 与 Camera Daemon 之间通过 `SCM_RIGHTS` 传递 FD（无需内存拷贝）
+- ai-runtime 与 camera-daemon 之间通过 `SCM_RIGHTS` 传递 FD（无需内存拷贝）
 
-### 5.2 事件驱动架构
+### 6.2 事件驱动架构
 
-Event Bus 采用发布/订阅模式，支持 MQTT 风格通配符匹配：
+Event Bus 采用发布/订阅模式，支持 MQTT 风格通配符匹配（`*` 单级、`**` 多级、`**/suffix` 后缀）。AI 推理结果发布在 `inference/{model_id}/{stream_id}`，应用自定义事件在 `app/{app_id}/...` 之下；所有服务产生的推理结果、容器事件、设备事件均经它分发，第三方应用通过 SDK 的 `EventClient` 订阅。Topic 命名规范、通配符匹配规则与订阅代码见[事件集成](../4-application-guide/3-reference/5-event-integration.md)。
 
-| 模式 | 说明 | 示例 |
-|:---|:---|:---|
-| 精确匹配 | 完全匹配主题名 | `app/myapp/status` |
-| ``*`` 单级通配 | 匹配一个层级 | `app/*/status` |
-| ``**`` 多级通配 | 匹配多个层级 | `model/**/detections` |
+### 6.3 容器化应用平台
 
-所有服务产生的推理结果、容器事件、设备事件均通过 Event Bus 分发，第三方应用通过 SDK 的 `EventClient` 订阅感兴趣的主题。
-
-### 5.3 容器化应用平台
-
-- 基于 containerd 运行时，OCI 标准镜像部署
-- 多容器支持（Main + Sub），插件化依赖解析
-- 健康检查系统（Command / HTTP / TCP，指数退避策略）
-- 自动重启（故障时 backoff 策略）
+- 基于 containerd 运行时，OCI 标准镜像部署——应用用标准 Docker 镜像交付，与平台解耦
+- 多容器支持（Main + Sub），依赖声明后由平台自动拉起，无需自己编排启动顺序
+- 健康检查（Command / HTTP / TCP）+ 故障自动重启（backoff 策略）——应用被重启不报错给用户，因此应用设计要做幂等（重复收到同一帧/事件不产生副作用）
 
 ---
 
-## 6. 系统配置
+## 7. 系统配置
 
-平台使用 YAML 配置文件管理所有服务参数，配置文件位于 `configs/` 目录：
+平台配置分两类：**日常配置**（网络、时区、码流参数——在 Web 控制台或 REST API 上改，本篇不展开）与**系统配置**（服务参数——仅平台开发/定制时碰）。系统配置为 YAML 文件，出厂位于设备 `/data/aipc/etc/` 下，源码位于仓库 `configs/` 目录：
 
 | 配置文件 | 服务 | 核心配置项 |
 |:---|:---|:---|
@@ -202,15 +205,23 @@ Event Bus 采用发布/订阅模式，支持 MQTT 风格通配符匹配：
 | `platform/camera-daemon.yaml` | camera-daemon | 视频采集、编码参数、RTSP 配置 |
 | `platform/discovery.yaml` | device-discovery | CT-Disc 协议参数 |
 | `ai/ai-runtime.yaml` | ai-runtime | HAL 库路径、模型仓库、调度器、自动推理管道 |
-| `preload.yaml` | pack-factory | 工厂预装（预装模型与应用） |
+| `preload.yaml` | 出厂预装 | 预装模型与应用清单（首次部署时由平台注册） |
 | `security/seccomp-default.json` | 安全 | 默认 Seccomp 系统调用白名单 |
 
-安装位置：`/opt/aipc/`（二进制 `bin/`、配置 `etc/`）。
+安装位置：`/data/aipc/`（二进制 `bin/`、配置 `etc/`）。
 
 ---
 
-## 7. 相关文档
+## 8. 相关文档
 
-- [应用开发指南](../4-application-guide/1-app-development/reference/1-app-reference.md) — 如何编写和部署容器应用
-- [Python SDK 参考](../4-application-guide/1-app-development/reference/2-sdk-reference.md) — SDK API 签名与使用示例
-- [平台服务总览](./4-reference/0-platform-services.md) — 各服务职责、协作关系与源码指针
+**Wiki 内**：
+
+- [平台服务总览](./4-platform-services.md) — 各服务职责、协作关系与源码指针
+- [应用开发指南](../4-application-guide/3-reference/0-app-reference.md) — 如何编写和部署容器应用
+- [Python SDK 参考](../4-application-guide/3-reference/1-sdk-reference.md) — SDK API 签名与使用示例
+
+**开源仓库（实现向深读）**：
+
+- [架构总览与数据流](https://github.com/camthink-ai/neoruntime/blob/main/docs/architecture/README.md) — 完整架构文档，含四张数据流图
+- [安全架构](https://github.com/camthink-ai/neoruntime/blob/main/docs/architecture/security-architecture.md) — 沙箱隔离与安全模型设计
+- [服务参考文档](https://github.com/camthink-ai/neoruntime/tree/main/docs/services) — 各服务逐一展开（ai-runtime / event-bus / camera-daemon 设计等）

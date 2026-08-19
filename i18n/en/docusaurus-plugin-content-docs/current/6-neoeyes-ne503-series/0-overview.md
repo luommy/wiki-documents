@@ -302,39 +302,7 @@ The interface board manages all peripherals and communication interfaces through
   <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/overview/software-stack.png" alt="Software Stack Architecture" width="80%" />
 </div>
 
-NeoEyes NE503 adopts a four-layer architecture with clear separation from underlying hardware to the web management interface:
-
-<table>
-  <thead>
-    <tr>
-      <th>Layer</th>
-      <th>Components</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>Web Management Console</td>
-      <td>React 19 + TypeScript + Vite</td>
-      <td>Dashboard, media settings, application management, system management</td>
-    </tr>
-    <tr>
-      <td>Platform Services (Go)</td>
-      <td>platform-api · app-manager · device-control · ai-runtime · event-bus</td>
-      <td>REST API gateway, container lifecycle, hardware control, AI inference, event bus</td>
-    </tr>
-    <tr>
-      <td>HAL &amp; C++ Services</td>
-      <td>camera-daemon · libaipc_hal.so</td>
-      <td>Video capture and encoding, hardware abstraction layer</td>
-    </tr>
-    <tr>
-      <td>Hardware Layer</td>
-      <td>Hailo-15H SoC · Hailo NPU · MCU</td>
-      <td>AI acceleration, video processing, peripheral control</td>
-    </tr>
-  </tbody>
-</table>
+The NE503 software stack has four layers from the bottom up: hardware, hardware abstraction (HAL), platform services, and the web management console. Applications run as containers and reach the NPU, camera, and peripherals only through platform services — they never touch hardware directly. This preserves app portability and the system security boundary. Layered data flow and each layer's responsibilities are covered in [System Architecture](./3-software-guide/0-system-architecture.md).
 
 ## Applications
 

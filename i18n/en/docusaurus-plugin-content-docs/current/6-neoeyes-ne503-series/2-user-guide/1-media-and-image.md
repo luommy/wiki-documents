@@ -32,7 +32,7 @@ The device provides **Main / Sub / Third** streams, each independently configura
 |-----------|-------------|--------------------|
 | **Enable Stream** | Whether this stream is active | Disable unused streams to save resources |
 | **Codec** | Encoding format (H.264 / H.265) | H.265 gives lower bitrate at equal quality; confirm the receiver supports it |
-| **Resolution** | Resolution | 1920×1080 recommended for the main stream; 4K for high-detail scenes |
+| **Resolution** | Resolution | The main stream ships at 4K (3840×2160@30); drop to 1080p when bandwidth is limited or the peer doesn't support 4K |
 | **Frame Rate** | Frames per second | Typically 25/30; raise for fast-motion scenes |
 | **Bitrate** | Bitrate (Kbps) | Higher is clearer but uses more bandwidth |
 | **I-Frame Interval (GOP)** | I-frame interval | Larger compresses better but increases seek latency |

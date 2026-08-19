@@ -35,33 +35,35 @@ import VideoCarousel from '@site/src/components/VideoCarousel';
   {/* ================= Latest Updates ================= */}
 <h2 className="docs-section-title">Latest Docs</h2>
 <div className="latest-docs-grid">
-    <Link to="/docs/neoeyes-ne302-series/ne302-overview" className="update-card">
+    <Link to="/docs/neoeyes-ne503-series/troubleshooting" className="update-card">
       <span className="update-badge">NEW</span>
+      <div className="update-title">NE503 Troubleshooting FAQ</div>
+      <div className="update-meta">
+        <span>New Doc</span>
+        <span>• 2026-08-19</span>
+      </div>
+    </Link>
+    <Link to="/docs/neoeyes-ne503-series/application-guide/cookbook/parking-lot" className="update-card">
+      <span className="update-badge">NEW</span>
+      <div className="update-title">NE503 Cookbook: Parking Lot</div>
+      <div className="update-meta">
+        <span>New Doc</span>
+        <span>• 2026-08-17</span>
+      </div>
+    </Link>
+    <Link to="/docs/neoeyes-ne503-series/software-guide/version-matrix" className="update-card">
+      <span className="update-badge">NEW</span>
+      <div className="update-title">NE503 Version Matrix</div>
+      <div className="update-meta">
+        <span>New Doc</span>
+        <span>• 2026-08-17</span>
+      </div>
+    </Link>
+    <Link to="/docs/neoeyes-ne302-series/ne302-overview" className="update-card">
       <div className="update-title">NeoEyes NE302 Documentation</div>
       <div className="update-meta">
         <span>New Doc</span>
         <span>• 2026-08-14</span>
-      </div>
-    </Link>
-    <Link to="/docs/neoeyes-ne503-series/user-guide/dashboard" className="update-card">
-      <div className="update-title">NE503 User Guide</div>
-      <div className="update-meta">
-        <span>New Doc</span>
-        <span>• 2026-08-12</span>
-      </div>
-    </Link>
-    <Link to="/docs/neoeyes-ne503-series/application-guide/app-development/model-training-and-hef" className="update-card">
-      <div className="update-title">NE503 Model Training &amp; HEF</div>
-      <div className="update-meta">
-        <span>New Doc</span>
-        <span>• 2026-07-21</span>
-      </div>
-    </Link>
-    <Link to="/docs/neoeyes-ne503-series/application-guide/verified-apps" className="update-card">
-      <div className="update-title">NE503 Verified Apps</div>
-      <div className="update-meta">
-        <span>New Doc</span>
-        <span>• 2026-07-16</span>
       </div>
     </Link>
  </div>

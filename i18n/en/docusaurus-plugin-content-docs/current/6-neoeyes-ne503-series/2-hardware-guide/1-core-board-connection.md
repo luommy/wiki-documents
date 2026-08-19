@@ -183,7 +183,7 @@ The core board connects to the image sensor via MIPI CSI-2 data lanes and I2C0 c
 | H_I2C0_SDA | I2C0 data line |
 | H_I2C0_SCL | I2C0 clock line |
 
-### Lens Driver (SPI CS1)
+### Lens Driver
 
 The core board SPI bus is routed via CS1 chip select to connect the AN41908A-VBA AF auto-zoom and autofocus lens driver. Shares SPI bus with QSPI Flash, distinguished by different chip selects. MCU SPI1 also connects to the same chip for homing and limit protection (see [Interface Board](./2-aipc-board-connection.md)).
 

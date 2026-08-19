@@ -16,6 +16,19 @@ tags: [NE503, 模型训练, Hailo, HEF, 教程]
 
 本教程覆盖从数据集准备到 HEF 部署的完整流程：
 
+### HEF 的三个来源
+
+设备上能运行的 HEF 有三个来源，是否需要走本篇完整流水线取决于来源：
+
+| 来源 | 适用场景 | 所需操作 |
+|:---|:---|:---|
+| 设备预置模型 | 通用目标检测等出厂即用的能力 | 无需训练，直接在 app 中按 model_id 订阅；完整清单见[版本兼容性矩阵](../../3-software-guide/5-version-matrix.md) |
+| 自训模型（本篇） | 预置模型不满足业务（自定类别、精度要求） | 走本篇全流程：训练 → ONNX → 量化编译 → 部署；订阅侧须 `raw_output_only=True`（见 [SDK 参考](../3-reference/1-sdk-reference.md#1-inference--ai-推理)） |
+| [Hailo Model Zoo](https://github.com/hailo-ai/hailo_model_zoo) 官方模型仓库 | 需要常见检测/分割现成模型 | 仓库提供预编译 HEF 与 ONNX/HAR；**HEF 多为 640×640 等标准尺寸，不能直接导入**——下载 ONNX/HAR 按 §6 重编译为 384×640，否则推理报 `byte_size mismatch`；订阅侧按自训模型处理 |
+| 其他第三方 HEF | 已有 Hailo 兼容的现成模型 | 跳过训练编译，从 §7 部署开始；仍须核对输入尺寸为 384×640（平台前处理固定），且订阅侧按自训模型处理 |
+
+无论哪个来源，HEF 的输入尺寸必须匹配平台固定的 **384×640 NV12** 前处理输出，否则推理报 `byte_size mismatch`。
+
 ### 全链路流水线
 
 ```mermaid
@@ -37,7 +50,7 @@ flowchart LR
 
 ---
 
-## 2. 环境准备（NVIDIA CUDA）
+## 2. 环境准备（CUDA）
 
 ### 2.1 硬件需求
 
@@ -110,7 +123,7 @@ cd safety-helmet
 ls -d train valid test   # 三个 split 都在
 ```
 
-确保数据集目录对 DFC 容器可读（Roboflow 下载默认为 700 权限）：
+数据集目录须对 DFC 容器可读（Roboflow 下载默认为 700 权限）：
 
 ```bash
 chmod -R a+rX ~/yolo-train/datasets/safety-helmet
@@ -150,7 +163,7 @@ names: ["Helmet", "No Helmet"]
 
 ### 4.1 关键超参：为何固定为 640×384
 
-NE503 的 `sub` 流（用于 AI 推理的低分辨率流）固定尺寸为 **640W×384H**，像素格式 NV12。模型输入需与此尺寸匹配，NCHW `[1, 3, 384, 640]`（H 在前，W 在后）。
+NE503 平台前处理固定输出 **384(H)×640(W)** 的 NV12 帧，模型输入需与此尺寸匹配，NCHW `[1, 3, 384, 640]`（H 在前，W 在后）。该尺寸由平台自动缩放生成，与 app 订阅哪条码流无关。
 
 ultralytics 8.4.75 存在一个限制：`train` 的 `imgsz` 仅接受 int（8.4.96+ 版本才支持 tuple）。解决方法为使用 `imgsz=640` + `rect=True`（矩形训练），实际生成 384×640 的训练输入：
 
@@ -321,7 +334,7 @@ flowchart LR
 Hailo 量化需要校准集（calibration set）。本教程使用 **2048 张** train 集图片作为校准集，以保证 int8 量化的精度。
 
 ```python
-# prepare_calib_npy.py — 从 valid 集抽 2048 张，导出为 NHWC float32 0-255 的 .npy
+# prepare_calib_npy.py — 从 train 集抽 2048 张，导出为 NHWC float32 0-255 的 .npy
 import os, glob, numpy as np
 from PIL import Image
 
@@ -384,6 +397,7 @@ performance_param(optimize_for_power=True)
 - `nms_postprocess`：在优化图尾部插入 NMS 算子（在设备 CPU 上运行），最终 HEF 输出张量名变成 `<network>/yolov8_nms_postprocess`，格式 `HAILO NMS BY CLASS`
 - `post_quantization_optimization(finetune, ...)`：**FineTune 的触发配置**，基于无标签知识蒸馏。`policy=enabled` 强制开启，不依赖 `optimization_level` 默认值。FineTune 执行 8 个 epoch（约 14 分钟），将量化后的置信度恢复至 teacher（fp32）分布
 - `nms_postprocess` 引用的 `yolov8_2cls_nms_config.json` 定义 bbox_decoders 的 stride/reg/cls layer 映射、score/iou threshold、`classes`（本教程 = 2）
+- `nms_scores_th`（本教程 = 0.2）是 NMS 置信度阈值，编译进 HEF——低于该分数的候选框在 HEF 内就被丢弃，app 侧调不到；app 侧阈值只能在此基础上再收紧
 **`yolov8_2cls_nms_config.json` 全文**（2 类版）：
 
 ```json
@@ -403,12 +417,20 @@ performance_param(optimize_for_power=True)
 }
 ```
 
+**类别名称不随 HEF 走**：HEF 文件里只有类别 id（`data.yaml` 的 `names` 顺序即 id 顺序），不含类别名字符串。平台后处理路径的类别名来自模型注册时的 config_json；而自训模型走 `raw_output_only=True` 自解码时，**类别 id → 名称的映射表由 app 自己维护**（如 `labels = ["Helmet", "No Helmet"]`），解码结果里的 class id 按这张表翻译。映射顺序与训练时 `names` 不一致，业务侧就会张冠李戴。
+
 ### 6.5 步骤 3：hailo compiler（HAR → HEF）
 
 ```bash
 hailo compiler safety_helmet_yolov8n_384_640_optimized.har --hw-arch hailo15h
 # 产物：safety_helmet_yolov8n_384_640.hef（约 4 MB）
 ```
+
+### 命名规范
+
+产物文件名建议遵循 `<任务>_<网络>_<H>_<W>.hef` 结构（如 `safety_helmet_yolov8n_384_640.hef`）：任务与网络便于识别用途和模型架构，`384_640` 即输入高×宽——文件名自带关键规格，排查尺寸不匹配问题时一眼可查。
+
+**文件名即 model_id**：部署时模型以文件名（去 `.hef` 后缀）作为 model_id 注册（本篇 §7 的 `safety_helmet_yolov8n_384_640` 即由文件名而来），app 中 `subscribe(model=...)` / `app.yaml` 的模型声明都用这个 id。命名时避免大写、空格和特殊字符，防止注册后与配置不一致。
 
 ### 6.6 编译产物校验
 
@@ -425,6 +447,19 @@ md5sum safety_helmet_yolov8n_384_640.hef
 
 ## 7. 部署到 NE503
 
+导入 HEF 有两条路：**Web 控制台**（交互导入，本节主线）或 **API 正路**（适合脚本化 / 批量部署）。API 路径为「文件放设备模型库 → 扫描入库 → 加载到 NPU」三步：
+
+```bash
+# 1. 上传 HEF 到设备模型库（按类型选子目录，检测类放 detection/）
+scp safety_helmet_yolov8n_384_640.hef root@<设备IP>:/data/aipc/models/detection/
+
+# 2. 扫描模型库，注册到数据库（已存在的会跳过）
+curl -k -X POST "https://<设备IP>/api/v1/ai/models/scan" -H "Authorization: Bearer <token>"
+
+# 3. 加载到 NPU
+curl -k -X POST "https://<设备IP>/api/v1/ai/models/safety_helmet_yolov8n_384_640/load" -H "Authorization: Bearer <token>"
+```
+
 ### 7.1 通过 Web 控制台导入模型
 
 打开 NE503 Web 控制台，进入 **AI Models** 页面，点击 **Import** 导入编译好的 `safety_helmet_yolov8n_384_640.hef` 文件：
@@ -435,28 +470,29 @@ md5sum safety_helmet_yolov8n_384_640.hef
 
 ![上传 HEF 文件](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/app-development/model-training-and-hef/import-model-2.png)
 
-填写模型参数：
+在导入向导中填写模型参数，各字段如下：
+
+![填写模型参数](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/app-development/model-training-and-hef/import-model-3.png)
 
 | 参数 | 值 |
 |:---|:---|
 | Model ID | `safety_helmet_yolov8n_384_640` |
 | Model Type | `hef` |
-| Threshold | `0.3`（检测置信度阈值） |
-
-![填写模型参数](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/app-development/model-training-and-hef/import-model-3.png)
+| Threshold | `0.3`（置信度阈值，用于平台后处理过滤；`raw_output_only` 自训模型路径下 app 拿到的是 NMS 原始输出，实际过滤以 SDK 参考 / [故障排查 §3.1](../../5-troubleshooting.md) 为准） |
 
 导入后模型自动加载到 NPU，页面状态显示为 Loaded：
 
 ![模型导入完成](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/app-development/model-training-and-hef/import-model-4.png)
 
+**完成标准**：AI Models 页面中 `safety_helmet_yolov8n_384_640` 状态显示为 Loaded；`aipc-cli model list` 或 `GET /api/v1/ai/models` 可查到该模型。
+
 ### 7.2 验证模型加载
 
-在 **AI Models** 页面确认 `safety_helmet_yolov8n_384_640` 出现在模型列表中且状态为 Loaded。点击模型卡片可查看详细信息（ID、版本、加载时间、模型路径）。
+在 **AI Models** 页面确认 `safety_helmet_yolov8n_384_640` 出现在模型列表中且状态为 **Loaded**（未加载则不会推理，选中模型触发加载或调用 `POST /api/v1/ai/models/<id>/load`）。脚本化部署也可用 API / CLI 确认：`GET /api/v1/ai/models` 或 `aipc-cli model list`。点击模型卡片可查看详细信息（ID、版本、加载时间、模型路径）。
 
 ### 7.3 端到端验证
 
-模型加载完成后，部署一个安全帽检测 app 进行端到端验证。app 通过 SDK 订阅 `sub` 流的推理结果，当画面中出现佩戴或未佩戴安全帽的人头时输出检测事件。部署 app 的完整流程（构建镜像、编写 app.yaml、部署到设备、启动验收）参见 NE503 应用开发文档。
-自训模型在 app 中需设置 `raw_output_only=True` 获取检测结果（设备内置后处理算子按预加载模型的张量名查找，无法匹配自训模型的张量名）。完整示例见 NE503 应用开发文档。
+模型加载完成后，部署一个安全帽检测 app 进行端到端验证。app 通过 SDK 订阅推理结果——`stream` 须填发布原始帧的流（`third` 为默认推理流，`sub` 亦可；`main` 只发编码 H.264，订阅它等不到结果），当画面中出现佩戴或未佩戴安全帽的人头时输出检测事件。部署 app 的完整流程（构建镜像、编写 app.yaml、部署到设备、启动验收）参见 [Hello World](./1-hello-world.md)；自训模型订阅时须 `raw_output_only=True` 并自解码 NMS 输出，用法与示例见 [SDK 参考 · raw_output_only 与自训模型](../3-reference/1-sdk-reference.md#raw_output_only-与自训模型)。
 
 ---
 
@@ -484,12 +520,38 @@ md5sum safety_helmet_yolov8n_384_640.hef
 检查 `imgsz` 参数。CLI 用 `imgsz=384,640`（逗号分隔），Python 用 `imgsz=[384, 640]`（list）。如果输出 channel 数不对，检查 `data.yaml` 的 `nc`。
 
 **Q4：部署到 Hailo 后无检测结果如何排查？**
-按以下顺序排查：① 用 `onnxruntime` 验证 FP ONNX 的训练精度；② 用 `hailo parse-hef xxx.hef` 确认 HEF 包含 `yolov8_nms_postprocess HAILO NMS BY CLASS, Classes: 2`；③ 确认 app 已按 §7.3 设置 `raw_output_only=True`。
+按以下顺序排查：① 用 `onnxruntime` 验证 FP ONNX 的训练精度；② 用 `hailo parse-hef xxx.hef` 确认 HEF 包含 `yolov8_nms_postprocess HAILO NMS BY CLASS, Classes: 2`；③ 确认 NMS config 的 `classes` 数与模型实际类别数一致（§8.3 裁类后尤其要同步改 nms_config，不一致会零检出或结果错乱）；④ 确认 app 已按 §7.3 设置 `raw_output_only=True`（用法见 [SDK 参考](../3-reference/1-sdk-reference.md#raw_output_only-与自训模型)）；仍无结果时按[故障排查 FAQ §3.1](../../5-troubleshooting.md) 的五步排查。
 
 **Q5：量化后精度下降明显？**
 确认校准集为 2048 张（见 §6.2），且 alls 中已配置 `post_quantization_optimization(finetune, ...)`。FineTune 通过无标签知识蒸馏将量化后的置信度恢复至 teacher 分布。
 
-### 8.3 参考资源
+### 8.3 进阶：torch surgery 裁剪类别
+
+已有训练好的多类模型但只想保留其中几类时，可以不重训，直接对权重做手术再重新编译 HEF。以下以把通用 80 类 YOLOv8n 裁成「仅 person」为例（2026-08 真机验证可跑）：
+
+```python
+# prune_person.py — 裁掉 80 类中除 person（class 0）外的所有类别
+import torch
+from ultralytics import YOLO
+
+KEEP = [0]  # 保留的类别 id
+model = YOLO("yolov8n.pt").model
+head = model.model[-1]
+
+# 1) 重建 Detect head，nc 改为 len(KEEP)，按 KEEP 索引拷贝权重
+new_head = type(head)(nc=len(KEEP), ch=head.ch)
+for i in range(len(head.cv2)):
+    new_head.cv2[i].conv.weight.copy_(head.cv2[i].conv.weight[KEEP])
+    new_head.cv3[i].conv.weight.copy_(head.cv3[i].conv.weight[KEEP])
+    new_head.dfl = head.dfl
+model.model[-1] = new_head
+
+# 2) 更新类别数；3) 导出 ONNX（imgsz 同原模型）；4) 按 §6 流程重新量化编译——nms_config 的 `classes` 须同步改为裁剪后的类数
+```
+
+裁类后的模型 `nc` 减小，HEF 输出更小、编译产物校验（§6.6）中的 `Classes:` 数量相应变化。裁剪只保留原权重，**不恢复被裁类别的精度**——原模型对这些类的召回即裁剪后模型的召回上限；若裁剪后精度不满足业务，回退重训（本篇 §3-§4）。
+
+### 8.4 参考资源
 
 - [ultralytics YOLOv8 文档](https://docs.ultralytics.com/) — 训练 / 导出 / 评估官方文档
 - [Hailo Developer Zone](https://hailo.ai/developer-zone/) — DFC / SW Suite 下载（免费注册）
@@ -498,4 +560,4 @@ md5sum safety_helmet_yolov8n_384_640.hef
 
 ---
 
-*最后更新: 2026-07-21*
+*最后更新: 2026-08-19*

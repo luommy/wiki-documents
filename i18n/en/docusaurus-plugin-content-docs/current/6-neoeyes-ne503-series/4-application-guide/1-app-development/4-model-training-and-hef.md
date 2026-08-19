@@ -16,6 +16,19 @@ Target audience: ML engineers who want to deploy custom-trained detection models
 
 This tutorial covers the complete flow from dataset preparation to HEF deployment:
 
+### Where your HEF comes from
+
+There are three sources for a HEF that runs on the device, which determine whether you need this tutorial's full pipeline:
+
+| Source | When to use | What you do |
+|:---|:---|:---|
+| Preloaded models | Out-of-the-box capabilities such as generic object detection | No training; subscribe by model_id in your app. Full list in the [Version Compatibility Matrix](../../3-software-guide/5-version-matrix.md) |
+| Custom-trained (this tutorial) | Preloaded models don't fit the business (custom classes, accuracy needs) | Full pipeline here: training → ONNX → quantized compilation → deployment; subscription requires `raw_output_only=True` (see [SDK Reference](../3-reference/1-sdk-reference.md#raw_output_only-and-custom-trained-models)) |
+| [Hailo Model Zoo](https://github.com/hailo-ai/hailo_model_zoo) | Ready-made detection/segmentation models | The zoo provides precompiled HEFs plus ONNX/HAR; **HEFs come in standard sizes like 640×640 and cannot be imported directly** — download the ONNX/HAR and recompile at 384×640 per §6, otherwise inference reports `byte_size mismatch`; treat it like a custom model on the subscription side |
+| Other third-party HEF | An existing Hailo-compatible model | Skip training/compilation; start from §7 deployment. Still verify the input size is 384×640 (fixed platform preprocessing) and treat it like a custom model on the subscription side |
+
+Whatever the source, the HEF input size must match the platform's fixed **384×640 NV12** preprocessing output, otherwise inference reports `byte_size mismatch`.
+
 ### End-to-end pipeline
 
 ```mermaid
@@ -37,7 +50,7 @@ The final artifact of this tutorial, `safety_helmet_yolov8n_384_640.hef`, has be
 
 ---
 
-## 2. Environment Preparation (NVIDIA CUDA)
+## 2. Environment Preparation (CUDA)
 
 ### 2.1 Hardware requirements
 
@@ -152,7 +165,7 @@ Business mapping: `Helmet box count = helmeted people`, `No Helmet box count = u
 
 ### 4.1 Key hyperparameters: why lock 640×384
 
-The NE503 `sub` stream (the low-resolution stream used for AI inference) is fixed at **640W×384H**, pixel format NV12. The model input must match this size, NCHW `[1, 3, 384, 640]` (H before W).
+The NE503 platform preprocessing always outputs **384(H)×640(W)** NV12 frames; the model input must match this size, NCHW `[1, 3, 384, 640]` (H before W). The platform scales frames to this size automatically — it is independent of which stream the app subscribes to.
 
 ultralytics 8.4.75 has a known limitation: `train`'s `imgsz` only accepts an int (tuple support came in 8.4.96+). The workaround is `imgsz=640` + `rect=True` (rectangular training), which actually produces 384×640 training inputs:
 
@@ -323,7 +336,7 @@ flowchart LR
 Hailo quantization requires a calibration set. This tutorial uses **2048 images** from the train set as the calibration set to ensure int8 quantization accuracy.
 
 ```python
-# prepare_calib_npy.py — sample 2048 images from the valid set, export as NHWC float32 0-255 .npy
+# prepare_calib_npy.py — sample 2048 images from the train set, export as NHWC float32 0-255 .npy
 import os, glob, numpy as np
 from PIL import Image
 
@@ -387,6 +400,7 @@ Key points:
 - `nms_postprocess`: inserts an NMS operator at the tail of the optimized graph (runs on the device CPU); the final HEF output tensor name becomes `<network>/yolov8_nms_postprocess`, format `HAILO NMS BY CLASS`
 - `post_quantization_optimization(finetune, ...)`: **FineTune configuration**, based on unlabeled knowledge distillation, executing 8 epochs (~14 minutes) to recover the post-quantization confidence toward the teacher (fp32) distribution, ensuring int8 inference accuracy
 - the `yolov8_2cls_nms_config.json` referenced by `nms_postprocess` defines bbox_decoders stride/reg/cls layer mapping, score/iou thresholds, and `classes` (= 2 in this tutorial)
+- `nms_scores_th` (= 0.2 here) is the NMS confidence threshold, baked into the HEF — candidates below it are dropped inside the HEF and never reach the app; the app-side threshold can only tighten further on top of it
 **Full `yolov8_2cls_nms_config.json`** (2-class version):
 
 ```json
@@ -406,6 +420,7 @@ Key points:
 }
 ```
 
+**Class names don't travel with the HEF**: the HEF contains only class ids (the order of `names` in `data.yaml` is the id order), not the name strings. On the platform post-processing path, class names come from the config_json registered with the model; when a custom model subscribes with `raw_output_only=True` and decodes the NMS output itself, **the app maintains its own class id → name mapping** (e.g. `labels = ["Helmet", "No Helmet"]`) and translates the class ids from the decoded results against this table. If the mapping order doesn't match the training-time `names`, business logic will silently mislabel detections.
 
 ### 6.5 Step 3: hailo compiler (HAR → HEF)
 
@@ -413,6 +428,12 @@ Key points:
 hailo compiler safety_helmet_yolov8n_384_640_optimized.har --hw-arch hailo15h
 # Output: safety_helmet_yolov8n_384_640.hef (~4 MB)
 ```
+
+### Naming convention
+
+Name the artifact following `<task>_<network>_<H>_<W>.hef` (e.g. `safety_helmet_yolov8n_384_640.hef`): task and network identify purpose and architecture, and `384_640` is the input height×width — the key spec travels with the filename, making size-mismatch issues visible at a glance.
+
+**The filename is the model_id**: at deployment the model is registered under the filename (minus the `.hef` suffix) as its model_id (`safety_helmet_yolov8n_384_640` in §7 comes from the filename); `subscribe(model=...)` in apps and the model declarations in `app.yaml` all use this id. Avoid uppercase, spaces, and special characters to keep registration consistent with your configs.
 
 ### 6.6 Compile-artifact verification
 
@@ -429,6 +450,19 @@ md5sum safety_helmet_yolov8n_384_640.hef
 
 ## 7. Deploy to NE503
 
+There are two ways to import a HEF: the **Web console** (interactive, the main path in this section) or the **API path** (scriptable / batch deployment). The API path is "place the file in the model library → scan into the DB → load onto the NPU":
+
+```bash
+# 1. Upload the HEF to the device model library (pick the subdirectory by type; detection goes in detection/)
+scp safety_helmet_yolov8n_384_640.hef root@<device_ip>:/data/aipc/models/detection/
+
+# 2. Scan the model library to register into the DB (existing entries are skipped)
+curl -k -X POST "https://<device_ip>/api/v1/ai/models/scan" -H "Authorization: Bearer <token>"
+
+# 3. Load onto the NPU
+curl -k -X POST "https://<device_ip>/api/v1/ai/models/safety_helmet_yolov8n_384_640/load" -H "Authorization: Bearer <token>"
+```
+
 ### 7.1 Import the model via the Web console
 
 Open the NE503 Web console, navigate to the **AI Models** page, and click **Import** to upload the compiled `safety_helmet_yolov8n_384_640.hef` file:
@@ -439,28 +473,29 @@ Upload the HEF file:
 
 ![Upload HEF file](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/app-development/model-training-and-hef/import-model-2.png)
 
-Fill in the model parameters:
+Fill in the model parameters in the import wizard (fields shown below):
+
+![Fill in model parameters](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/app-development/model-training-and-hef/import-model-3.png)
 
 | Parameter | Value |
 |:---|:---|
 | Model ID | `safety_helmet_yolov8n_384_640` |
 | Model Type | `hef` |
-| Threshold | `0.3` (detection confidence threshold) |
-
-![Fill in model parameters](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/app-development/model-training-and-hef/import-model-3.png)
+| Threshold | `0.3` (confidence threshold for platform post-processing filtering; the `raw_output_only` custom-model path returns raw NMS output to the app — actual filtering follows the [SDK Reference](../3-reference/1-sdk-reference.md#raw_output_only-and-custom-trained-models) / [Troubleshooting §3.1](../../5-troubleshooting.md)) |
 
 After import, the model is automatically loaded onto the NPU, and the page status shows Loaded:
 
 ![Model import complete](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/app-development/model-training-and-hef/import-model-4.png)
 
+**Completion criteria**: `safety_helmet_yolov8n_384_640` shows Loaded status on the AI Models page; `aipc-cli model list` or `GET /api/v1/ai/models` returns the model.
+
 ### 7.2 Verify model loading
 
-On the **AI Models** page, confirm that `safety_helmet_yolov8n_384_640` appears in the model list with a Loaded status. Click the model card to view details (ID, version, load time, model path).
+On the **AI Models** page, confirm that `safety_helmet_yolov8n_384_640` appears in the model list with a **Loaded** status (an unloaded model won't run inference — select it to trigger loading or call `POST /api/v1/ai/models/<id>/load`). For scripted deployment, verify via API/CLI: `GET /api/v1/ai/models` or `aipc-cli model list`. Click the model card to view details (ID, version, load time, model path).
 
 ### 7.3 End-to-end verification
 
-After the model is loaded, deploy a safety helmet detection app for end-to-end verification. The app subscribes to the `sub` stream inference results via the SDK and outputs detection events when helmeted or unhelmeted heads appear in the frame. The complete app deployment process (building the image, writing app.yaml, deploying to the device, startup verification) is described in the NE503 application development documentation.
-Custom-trained models require `raw_output_only=True` in the app to obtain detection results (the device's built-in post-processing operator looks up tensors by the preloaded model's name and cannot match a custom model's tensor name). For a complete example, see the NE503 application development documentation.
+After the model is loaded, deploy a safety helmet detection app for end-to-end verification. The app subscribes to inference results via the SDK — `stream` must name a stream that publishes raw frames (`third` is the default inference stream, `sub` also works; `main` publishes encoded H.264 only and never yields results) — and outputs detection events when helmeted or unhelmeted heads appear in the frame. The complete app deployment process (building the image, writing app.yaml, deploying to the device, startup verification) is described in [Hello World](./1-hello-world.md); custom-trained models must subscribe with `raw_output_only=True` and decode the NMS output themselves — see [SDK Reference · raw_output_only and custom models](../3-reference/1-sdk-reference.md#raw_output_only-and-custom-trained-models).
 
 ---
 
@@ -488,12 +523,38 @@ Lower `batch` (8 → 4 → 2), or use a GPU with more VRAM.
 Check the `imgsz` parameter. CLI uses `imgsz=384,640` (comma-separated); Python uses `imgsz=[384, 640]` (list). If the output channel count is wrong, check `data.yaml`'s `nc`.
 
 **Q4: 0 detections after deploying to Hailo?**
-Troubleshoot in the following order: ① verify FP ONNX training accuracy with `onnxruntime`; ② confirm the HEF contains `yolov8_nms_postprocess HAILO NMS BY CLASS, Classes: 2` via `hailo parse-hef xxx.hef`; ③ confirm the app has set `raw_output_only=True` per §7.3.
+Troubleshoot in the following order: ① verify FP ONNX training accuracy with `onnxruntime`; ② confirm the HEF contains `yolov8_nms_postprocess HAILO NMS BY CLASS, Classes: 2` via `hailo parse-hef xxx.hef`; ③ confirm the NMS config `classes` count matches the model's actual class count (after pruning classes per §8.3, remember to update the nms_config in sync — a mismatch causes 0 detections or garbled results); ④ confirm the app has set `raw_output_only=True` per §7.3 (see the [SDK Reference](../3-reference/1-sdk-reference.md#raw_output_only-and-custom-trained-models)); if still no results, follow the five-step check in [Troubleshooting FAQ §3.1](../../5-troubleshooting.md).
 
 **Q5: Big accuracy drop after quantization?**
 Confirm the calibration set is 2048 images (see §6.2) and that alls has `post_quantization_optimization(finetune, ...)` configured. FineTune recovers the post-quantization confidence toward the teacher distribution via unlabeled knowledge distillation.
 
-### 8.3 References
+### 8.3 Advanced: pruning classes with torch surgery
+
+When you have an already-trained multi-class model but only need a few of its classes, you can operate on the weights directly and recompile the HEF instead of retraining. The example below prunes an 80-class YOLOv8n down to "person only" (verified on a real device in 2026-08):
+
+```python
+# prune_person.py — drop every class except person (class 0) from 80 classes
+import torch
+from ultralytics import YOLO
+
+KEEP = [0]  # class ids to keep
+model = YOLO("yolov8n.pt").model
+head = model.model[-1]
+
+# 1) Rebuild the Detect head with nc=len(KEEP); copy weights indexed by KEEP
+new_head = type(head)(nc=len(KEEP), ch=head.ch)
+for i in range(len(head.cv2)):
+    new_head.cv2[i].conv.weight.copy_(head.cv2[i].conv.weight[KEEP])
+    new_head.cv3[i].conv.weight.copy_(head.cv3[i].conv.weight[KEEP])
+    new_head.dfl = head.dfl
+model.model[-1] = new_head
+
+# 2) Update the class count; 3) export ONNX (same imgsz as the original); 4) re-quantize/compile per §6 — the nms_config `classes` must be updated to the pruned class count in sync
+```
+
+A pruned model has a smaller `nc` and HEF output; the `Classes:` count in the compile-artifact verification (§6.6) changes accordingly. Pruning only keeps existing weights — it **does not restore the accuracy of pruned classes**; the original model's recall on the kept classes is the ceiling. If pruned accuracy doesn't meet the business need, fall back to retraining (§3–§4).
+
+### 8.4 References
 
 - [ultralytics YOLOv8 docs](https://docs.ultralytics.com/) — official training / export / evaluation docs
 - [Hailo Developer Zone](https://hailo.ai/developer-zone/) — DFC / SW Suite download (free registration)
@@ -502,4 +563,4 @@ Confirm the calibration set is 2048 images (see §6.2) and that alls has `post_q
 
 ---
 
-*Last updated: 2026-07-21*
+*Last updated: 2026-08-19*

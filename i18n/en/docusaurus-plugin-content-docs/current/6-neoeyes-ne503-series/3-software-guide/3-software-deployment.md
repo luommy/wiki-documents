@@ -116,32 +116,14 @@ During development, you can replace individual service binaries without a full d
 
 ### 3.1 Manual Single Service Replacement
 
-```bash
-scp build/output/device-control root@<device-ip>:/opt/aipc/bin/
-ssh root@<device-ip> "systemctl restart device-control"
-```
-
-If `/opt` runs low on space (root partition 3.3G, 99% used, ~60M free), deploy to `/data` instead:
+The device install root is `/data/aipc` (the root partition is tight on space; do not deploy to `/opt`):
 
 ```bash
 scp build/output/device-control root@<device-ip>:/data/aipc/bin/
+ssh root@<device-ip> "systemctl restart device-control"
 ```
 
-### 3.2 Make Deploy Targets
-
-The Makefile provides automated deployment commands:
-
-```bash
-make setup-ssh TARGET=root@<device-ip>          # First time: configure SSH key auth
-make deploy-init TARGET=root@<device-ip>         # First time: initialize directory structure
-make deploy-all TARGET=root@<device-ip>          # Per-service build + scp + restart
-```
-
-Specify `/data` partition:
-
-```bash
-make deploy-all TARGET=root@<device-ip> REMOTE_PREFIX=/data/aipc
-```
+> The Makefile provides no automated deployment targets (`deploy-all` etc. do not exist). For batch iteration, either repeat the scp + restart above per service, or use the full `deploy.sh` hot replacement from §2.
 
 ## 4. Release Package Contents
 
@@ -180,11 +162,11 @@ Expected output:
 
 ```bash
 # 2. Binary architecture (should be ARM aarch64)
-file /opt/aipc/bin/ai-runtime
+file /data/aipc/bin/ai-runtime
 # ELF 64-bit LSB pie executable, ARM aarch64
 
 # 3. HAL libraries
-ls -l /opt/aipc/lib/hal/libaipc_hal*.so
+ls -l /data/aipc/lib/hal/libaipc_hal*.so
 
 # 4. NPU device
 lsmod | grep hailo && ls -la /dev/hailo*
@@ -194,7 +176,7 @@ curl -s http://localhost:8080/ | head -1
 # <!DOCTYPE html>
 ```
 
-Access the Web console at `http://<device-ip>:8080` with default credentials `admin` / `password`.
+Access the Web console at `https://<device-ip>` with default credentials `admin` / `password`.
 
 ## 6. Troubleshooting
 
