@@ -6,7 +6,7 @@ tags: [app development, NE503, SDK, examples]
 
 # SDK Examples
 
-This page shows how to assemble `hailo_ipc_sdk` for the 4 most common scenarios. Pick a pattern from the [selection table](#1-the-four-patterns-choose-first), then follow the skeleton. **Complete, runnable source for every pattern lives under `examples/` in the `neoruntime-apps` repo** — copy and adapt it instead of re-typing full code here.
+This page shows how to assemble `neoruntime_ipc_sdk` for the 4 most common scenarios. Pick a pattern from the [selection table](#1-the-four-patterns-choose-first), then follow the skeleton. **Complete, runnable source for every pattern lives under `examples/` in the `neoruntime-apps` repo** — copy and adapt it instead of re-typing full code here.
 
 The `stream` and `model` in the skeletons are sample values — query the device's real ones before deploying (see [SDK Reference §3.2](./1-sdk-reference.md#32-dont-hardcode-stream-and-model-names)).
 
@@ -27,7 +27,7 @@ Every frame returns detections; use `count_by_label()` to tally per label and pr
 
 ```python
 import time
-from hailo_ipc_sdk import InferenceClient
+from neoruntime_ipc_sdk import InferenceClient
 
 inf = InferenceClient()
 report_at = time.monotonic() + 5.0        # print a summary every 5 seconds
@@ -49,7 +49,7 @@ The full version (threshold filtering, alert events, graceful exit) is in [examp
 When the alert condition is met, broadcast on the event bus; other apps (dashboards, interlock scripts) subscribe to the same topic and act:
 
 ```python
-from hailo_ipc_sdk import InferenceClient, EventClient
+from neoruntime_ipc_sdk import InferenceClient, EventClient
 
 inf = InferenceClient()
 events = EventClient()
@@ -71,7 +71,7 @@ Event subscription, wildcards, and permission declarations: [SDK Reference §3 P
 `DeviceClient` drives the hardware directly; detection results switch the light and day/night mode:
 
 ```python
-from hailo_ipc_sdk import InferenceClient, DeviceClient, IrCutMode
+from neoruntime_ipc_sdk import InferenceClient, DeviceClient, IrCutMode
 
 inf = InferenceClient()
 device = DeviceClient()

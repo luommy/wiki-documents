@@ -208,7 +208,7 @@ On a device with a working camera, the same app outputs real detections.
 **Fix**: Query the real names first, then fill them back in.
 
 ```python
-from hailo_ipc_sdk import InferenceClient, FdMediaClient
+from neoruntime_ipc_sdk import InferenceClient, FdMediaClient
 print(InferenceClient().list_models())   # e.g. ['hailo_yolov8n_384_640']
 print(FdMediaClient().list_streams())    # e.g. ['main', 'sub']
 ```

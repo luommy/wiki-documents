@@ -84,7 +84,7 @@ curl -k https://<deviceIP>/api/v1/ai/models -H "Authorization: $TOKEN"
 **Query streams** (no dedicated curl endpoint; the SDK is the most direct way):
 
 ```python
-from hailo_ipc_sdk import FdMediaClient as MediaClient
+from neoruntime_ipc_sdk import FdMediaClient as MediaClient
 print(MediaClient().list_streams())   # → ['main', 'sub']
 ```
 
@@ -207,7 +207,7 @@ import os, sys, time, signal, logging
 from datetime import datetime
 from typing import Optional
 
-from hailo_ipc_sdk import (
+from neoruntime_ipc_sdk import (
     InferenceClient, EventClient, DeviceClient,
     FdMediaClient as MediaClient, Config, InferenceResult,
 )
@@ -295,7 +295,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /app
 
 # Local SDK install (copied in by the build script before build)
-COPY hailo_ipc_sdk/ /app/hailo_ipc_sdk/
+COPY neoruntime_ipc_sdk/ /app/neoruntime_ipc_sdk/
 COPY setup.py README.md /app/
 RUN pip install --no-cache-dir -e .
 
@@ -311,7 +311,7 @@ ENV PYTHONUNBUFFERED=1
 ENV LOG_LEVEL=INFO
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-    CMD python3 -c "from hailo_ipc_sdk import InferenceClient; c = InferenceClient(); c.close()" || exit 1
+    CMD python3 -c "from neoruntime_ipc_sdk import InferenceClient; c = InferenceClient(); c.close()" || exit 1
 
 USER appuser
 CMD ["python3", "/app/app.py"]
@@ -320,7 +320,7 @@ CMD ["python3", "/app/app.py"]
 `requirements.txt` is just `numpy>=1.21.0` (the SDK already bundles protobuf/grpc).
 
 :::note Why does the Dockerfile install the SDK locally?
-The device container runtime has no external network, so the SDK must travel with the image. The build script copies `neoruntime-sdks/python/hailo_ipc_sdk/` into the app directory before build; the Dockerfile's `COPY hailo_ipc_sdk/` bakes it in, then `pip install -e .` installs it locally.
+The device container runtime has no external network, so the SDK must travel with the image. The build script copies `neoruntime-sdks/python/neoruntime_ipc_sdk/` into the app directory before build; the Dockerfile's `COPY neoruntime_ipc_sdk/` bakes it in, then `pip install -e .` installs it locally.
 :::
 
 ## 5. Deployment
@@ -337,7 +337,7 @@ cd neoruntime-apps
 
 | Step | Action | Notes |
 |:--|:--|:--|
-| 1 | Copy SDK | copies `hailo_ipc_sdk/`, `setup.py`, `README.md` from sibling `neoruntime-sdks/python/` into the app directory |
+| 1 | Copy SDK | copies `neoruntime_ipc_sdk/`, `setup.py`, `README.md` from sibling `neoruntime-sdks/python/` into the app directory |
 | 2 | Build image | `docker buildx build --platform linux/arm64` produces `aipc/person-detection:1.0.0` |
 | 3 | Export image | `docker save` exports `image.tar` |
 | 4 | Package | `zip` bundles `app.yaml` + `image.tar` into `person-detection.aipc` |

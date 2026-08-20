@@ -1,12 +1,12 @@
 ---
-description: NE503 Python SDK (hailo_ipc_sdk) 使用指南：一分钟跑通第一个推理，各模块解决什么问题，以及推理订阅用 sub/third、自训模型走 raw_output_only 等平台特有约束。
-keywords: [NE503 SDK, Python SDK, hailo_ipc_sdk, InferenceClient, 推理订阅, sub流, raw_output_only, EventClient]
+description: NE503 Python SDK (neoruntime_ipc_sdk) 使用指南：一分钟跑通第一个推理，各模块解决什么问题，以及推理订阅用 sub/third、自训模型走 raw_output_only 等平台特有约束。
+keywords: [NE503 SDK, Python SDK, neoruntime_ipc_sdk, InferenceClient, 推理订阅, sub流, raw_output_only, EventClient]
 tags: [SDK参考, NE503, Python, 应用开发, 开发者]
 ---
 
 # SDK Reference
 
-`hailo_ipc_sdk` 是 NE503 容器应用的 Python SDK。它在容器内通过 gRPC / Unix Socket 直连平台的 AI Runtime、Event Bus、Device Control 等服务，让你不用碰底层协议就能做推理、收事件、控设备。典型作用是把一行
+`neoruntime_ipc_sdk` 是 NE503 容器应用的 Python SDK。它在容器内通过 gRPC / Unix Socket 直连平台的 AI Runtime、Event Bus、Device Control 等服务，让你不用碰底层协议就能做推理、收事件、控设备。典型作用是把一行
 
 ```python
 for seq, result in inf.subscribe(stream="sub", model="hailo_yolov8n_384_640"):
@@ -23,7 +23,7 @@ for seq, result in inf.subscribe(stream="sub", model="hailo_yolov8n_384_640"):
 以最常见、也是多数 AI 应用的骨架——「订阅视频流做实时推理」为例：
 
 ```python
-from hailo_ipc_sdk import InferenceClient
+from neoruntime_ipc_sdk import InferenceClient
 
 inf = InferenceClient()
 for seq, result in inf.subscribe(stream="sub", model="hailo_yolov8n_384_640"):
@@ -49,9 +49,9 @@ SDK 按平台能力拆成多个模块，每个 `XxxClient` 对应设备上的一
 | `app` | 应用生命周期：安装/启停/卸载/日志（通常由 Web 控制台承担） | `AppClient` | [官方站 app](https://camthink-ai.github.io/neoruntime-sdks/python/zh/api/app.html) |
 | `plugin` | gRPC 插件发现与托管（扩展平台能力的高级用法） | `PluginDiscovery`、`PluginServer` | [官方站 plugin](https://camthink-ai.github.io/neoruntime-sdks/python/zh/api/plugin.html) |
 | `config` | 读环境变量拿连接端点，/ 容器内外路径转换 | `Config` | [官方站 config](https://camthink-ai.github.io/neoruntime-sdks/python/zh/api/config.html) |
-| `camera` | 摄像头底层：ISP、编码器、RTSP、OSD、AI 叠加 | `CameraClient` | 官方站未收录，见[源码 camera.py](https://github.com/camthink-ai/neoruntime-sdks/blob/main/python/hailo_ipc_sdk/camera.py) |
-| `overlay` | 把检测框叠加到画面（RTSP/Web） | `OverlayClient` | 官方站未收录，见[源码 overlay.py](https://github.com/camthink-ai/neoruntime-sdks/blob/main/python/hailo_ipc_sdk/overlay.py) |
-| `audio` / `audio_stream` | 音频采集/播放、双向对讲 | `AudioClient`、`AudioStreamClient` | 官方站未收录，见[源码 audio.py](https://github.com/camthink-ai/neoruntime-sdks/blob/main/python/hailo_ipc_sdk/audio.py) |
+| `camera` | 摄像头底层：ISP、编码器、RTSP、OSD、AI 叠加 | `CameraClient` | 官方站未收录，见[源码 camera.py](https://github.com/camthink-ai/neoruntime-sdks/blob/main/python/neoruntime_ipc_sdk/camera.py) |
+| `overlay` | 把检测框叠加到画面（RTSP/Web） | `OverlayClient` | 官方站未收录，见[源码 overlay.py](https://github.com/camthink-ai/neoruntime-sdks/blob/main/python/neoruntime_ipc_sdk/overlay.py) |
+| `audio` / `audio_stream` | 音频采集/播放、双向对讲 | `AudioClient`、`AudioStreamClient` | 官方站未收录，见[源码 audio.py](https://github.com/camthink-ai/neoruntime-sdks/blob/main/python/neoruntime_ipc_sdk/audio.py) |
 
 **选模块的方法**：先问「我要做什么」，再对表找对应 Client。绝大多数容器应用只用到前三个——`inference`（推理）+ `events`（告警联动）+ `device`（必要时控硬件）。`app`/`plugin`/`camera`/`audio` 属高级用法，用到时再查。
 
@@ -72,7 +72,7 @@ SDK 按平台能力拆成多个模块，每个 `XxxClient` 对应设备上的一
 本页示例里的 `stream="sub"`、`model="hailo_yolov8n_384_640"` 是**示例值**。模型名随设备预置可改，推理流随配置可增删（`main`/`sub`/`third`）。部署前在设备上跑一遍：
 
 ```python
-from hailo_ipc_sdk import InferenceClient, FdMediaClient
+from neoruntime_ipc_sdk import InferenceClient, FdMediaClient
 print(InferenceClient().list_models())   # 如 ['hailo_yolov8n_384_640']
 print(FdMediaClient().list_streams())    # 硬编码返回 ['main', 'sub']，不含 third
 ```
@@ -109,7 +109,7 @@ def main():
 
 ## 4. 环境变量与配置
 
-`hailo_ipc_sdk` 通过环境变量拿到各服务连接端点（`AI_RUNTIME_ENDPOINT`、`EVENT_BUS_ENDPOINT` 等）和容器身份（`APP_ID`）。平台会在应用启动时自动注入，容器内**无需手动设置**。完整变量列表与意义见[应用参考 §7 环境变量参考](./0-app-reference.md#7-环境变量参考)。
+`neoruntime_ipc_sdk` 通过环境变量拿到各服务连接端点（`AI_RUNTIME_ENDPOINT`、`EVENT_BUS_ENDPOINT` 等）和容器身份（`APP_ID`）。平台会在应用启动时自动注入，容器内**无需手动设置**。完整变量列表与意义见[应用参考 §7 环境变量参考](./0-app-reference.md#7-环境变量参考)。
 
 ## 相关文档
 

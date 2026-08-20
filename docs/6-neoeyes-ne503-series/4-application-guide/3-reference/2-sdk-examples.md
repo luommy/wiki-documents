@@ -6,7 +6,7 @@ tags: [应用开发, NE503, SDK, 示例]
 
 # SDK Examples
 
-本文用 4 个最常见场景演示 `hailo_ipc_sdk` 怎么搭。先看[选型表](#1-四类典型模式先选型)定位你要的模式，再照骨架写。**每个模式的完整可运行源码在 `neoruntime-apps` 仓库 `examples/` 目录下**，直接拿去改，不用在这篇里抄完整代码。
+本文用 4 个最常见场景演示 `neoruntime_ipc_sdk` 怎么搭。先看[选型表](#1-四类典型模式先选型)定位你要的模式，再照骨架写。**每个模式的完整可运行源码在 `neoruntime-apps` 仓库 `examples/` 目录下**，直接拿去改，不用在这篇里抄完整代码。
 
 骨架里的 `stream`、`model` 是示例值，部署前先查设备真实值再填（见 [SDK 参考 §3.2](./1-sdk-reference.md#32-流名与模型名不能写死)）。
 
@@ -27,7 +27,7 @@ tags: [应用开发, NE503, SDK, 示例]
 
 ```python
 import time
-from hailo_ipc_sdk import InferenceClient
+from neoruntime_ipc_sdk import InferenceClient
 
 inf = InferenceClient()
 report_at = time.monotonic() + 5.0        # 每 5 秒打印一次汇总
@@ -49,7 +49,7 @@ for frame_seq, result in inf.subscribe(stream="sub", model="hailo_yolov8n_384_64
 检测到告警条件时通过事件总线广播，其他应用（如仪表板、联动脚本）订阅同一主题处理：
 
 ```python
-from hailo_ipc_sdk import InferenceClient, EventClient
+from neoruntime_ipc_sdk import InferenceClient, EventClient
 
 inf = InferenceClient()
 events = EventClient()
@@ -71,7 +71,7 @@ for frame_seq, result in inf.subscribe(stream="sub", model="hailo_yolov8n_384_64
 `DeviceClient` 直接控制硬件外设，检测结果驱动灯光/日夜切换：
 
 ```python
-from hailo_ipc_sdk import InferenceClient, DeviceClient, IrCutMode
+from neoruntime_ipc_sdk import InferenceClient, DeviceClient, IrCutMode
 
 inf = InferenceClient()
 device = DeviceClient()

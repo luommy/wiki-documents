@@ -208,7 +208,7 @@ ssh root@<设备IP> "journalctl -u camera-daemon -n 20 --no-pager"
 **修复**：先查真实名字，再填回配置。
 
 ```python
-from hailo_ipc_sdk import InferenceClient, FdMediaClient
+from neoruntime_ipc_sdk import InferenceClient, FdMediaClient
 print(InferenceClient().list_models())   # 如 ['hailo_yolov8n_384_640']
 print(FdMediaClient().list_streams())    # 如 ['main', 'sub']
 ```

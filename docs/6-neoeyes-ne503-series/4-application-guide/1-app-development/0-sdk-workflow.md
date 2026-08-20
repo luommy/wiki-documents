@@ -2,14 +2,14 @@
 id: sdk-workflow
 title: SDK Workflow
 sidebar_position: 0
-description: NE503 Python SDK（hailo_ipc_sdk）上手工作流——SDK 是什么、源码在哪、三种方式装进应用镜像、调用范式与权限契约。读完即具备看懂后续教程的 SDK 基础。
-keywords: [NE503, Python SDK, hailo_ipc_sdk, SDK 嵌入, 容器应用, build_app.sh, 调用范式]
+description: NE503 Python SDK（neoruntime_ipc_sdk）上手工作流——SDK 是什么、源码在哪、三种方式装进应用镜像、调用范式与权限契约。读完即具备看懂后续教程的 SDK 基础。
+keywords: [NE503, Python SDK, neoruntime_ipc_sdk, SDK 嵌入, 容器应用, build_app.sh, 调用范式]
 tags: [应用开发, NE503, SDK, 入门]
 ---
 
 # SDK Workflow
 
-本篇走一遍「把 NE503 Python SDK（`hailo_ipc_sdk`）用起来」的完整流程：**SDK 是什么 → 源码从哪来 → 怎么装进应用镜像 → 第一次怎么调 → 权限注意什么**。走完这一步，[Hello World](./1-hello-world.md)（部署闭环）和 [Person Detection](../2-cookbook/1-person-detection.md)（真实 AI 应用）就只剩各自的业务细节，不用再回头查 SDK 怎么接。
+本篇走一遍「把 NE503 Python SDK（`neoruntime_ipc_sdk`）用起来」的完整流程：**SDK 是什么 → 源码从哪来 → 怎么装进应用镜像 → 第一次怎么调 → 权限注意什么**。走完这一步，[Hello World](./1-hello-world.md)（部署闭环）和 [Person Detection](../2-cookbook/1-person-detection.md)（真实 AI 应用）就只剩各自的业务细节，不用再回头查 SDK 怎么接。
 
 :::info 阅读顺序
 **SDK Workflow（本篇）→ [Hello World](./1-hello-world.md)（部署闭环，不用 SDK）→ [Person Detection](../2-cookbook/1-person-detection.md)（真实 AI 应用，用 SDK）**
@@ -17,9 +17,9 @@ tags: [应用开发, NE503, SDK, 入门]
 
 ## 1. SDK 是什么
 
-`hailo_ipc_sdk` 运行在**应用容器内**，通过 Unix Socket 连平台的 AI Runtime、Event Bus、Device Control 等服务——应用代码不直接碰硬件或推理引擎，只调 SDK 客户端，由 SDK 转发到对应服务。
+`neoruntime_ipc_sdk` 运行在**应用容器内**，通过 Unix Socket 连平台的 AI Runtime、Event Bus、Device Control 等服务——应用代码不直接碰硬件或推理引擎，只调 SDK 客户端，由 SDK 转发到对应服务。
 
-**关键约束：SDK 不在 PyPI 上，不能 `pip install` 从网上拉。** 源码在 `neoruntime-sdks` 仓库的 `python/hailo_ipc_sdk/` 目录，必须随应用镜像一起带进设备——设备容器运行时没有外网 pip。
+**关键约束：SDK 不在 PyPI 上，不能 `pip install` 从网上拉。** 源码在 `neoruntime-sdks` 仓库的 `python/neoruntime_ipc_sdk/` 目录，必须随应用镜像一起带进设备——设备容器运行时没有外网 pip。
 
 每个客户端解决什么问题、怎么选，见 [SDK 参考 §2 模块速览](../3-reference/1-sdk-reference.md#2-每个模块解决什么问题)。
 
@@ -36,7 +36,7 @@ git clone https://github.com/camthink-ai/neoruntime-apps.git
 
 **方式 A：统一构建脚本（推荐，仓库示例应用都用这种）**
 
-`neoruntime-apps` 的 `scripts/build_app.sh` 自动把旁边的 `neoruntime-sdks/python/hailo_ipc_sdk/` 复制进应用目录，`docker buildx` 打进镜像并打包 `.aipc`。无需手动 `pip install`，也不需要联网：
+`neoruntime-apps` 的 `scripts/build_app.sh` 自动把旁边的 `neoruntime-sdks/python/neoruntime_ipc_sdk/` 复制进应用目录，`docker buildx` 打进镜像并打包 `.aipc`。无需手动 `pip install`，也不需要联网：
 
 ```bash
 cd neoruntime-apps
@@ -49,8 +49,8 @@ cd neoruntime-apps
 应用不在仓库示例结构内时，在 Dockerfile 里把 SDK 拷进去并本地安装：
 
 ```dockerfile
-COPY hailo_ipc_sdk /app/hailo_ipc_sdk
-RUN pip install --no-cache-dir /app/hailo_ipc_sdk
+COPY neoruntime_ipc_sdk /app/neoruntime_ipc_sdk
+RUN pip install --no-cache-dir /app/neoruntime_ipc_sdk
 ```
 
 **方式 C：打成 wheel 再 `pip install`（适合分发与跨应用复用）**
@@ -59,15 +59,15 @@ RUN pip install --no-cache-dir /app/hailo_ipc_sdk
 
 ```bash
 cd neoruntime-sdks/python
-pip wheel . --no-deps -w dist/     # 产出 dist/hailo_ipc_sdk-<版本>-py3-none-any.whl（版本随 setup.py）
+pip wheel . --no-deps -w dist/     # 产出 dist/neoruntime_ipc_sdk-<版本>-py3-none-any.whl（版本随 setup.py）
 ```
 
 ```dockerfile
-COPY hailo_ipc_sdk-<版本>-py3-none-any.whl /tmp/
-RUN pip install --no-cache-dir /tmp/hailo_ipc_sdk-<版本>-py3-none-any.whl && rm /tmp/hailo_ipc_sdk-<版本>-py3-none-any.whl
+COPY neoruntime_ipc_sdk-<版本>-py3-none-any.whl /tmp/
+RUN pip install --no-cache-dir /tmp/neoruntime_ipc_sdk-<版本>-py3-none-any.whl && rm /tmp/neoruntime_ipc_sdk-<版本>-py3-none-any.whl
 ```
 
-> 无论哪种方式，要点都是 **SDK 必须随镜像带入**。SDK 自带生成好的 protobuf 桩（`python/hailo_ipc_sdk/proto/*_pb2.py`），`import hailo_ipc_sdk` 开箱即用，无需手动生成。
+> 无论哪种方式，要点都是 **SDK 必须随镜像带入**。SDK 自带生成好的 protobuf 桩（`python/neoruntime_ipc_sdk/proto/*_pb2.py`），`import neoruntime_ipc_sdk` 开箱即用，无需手动生成。
 
 ## 3. 调用范式
 

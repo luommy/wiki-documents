@@ -18,8 +18,8 @@ tags: [软件指南, NE503, 版本管理, 兼容性]
 | 平台服务 | v1.0.1（开源版本线从此起算，不延续旧内部版本号；以 [neoruntime Releases](https://github.com/camthink-ai/neoruntime/releases) 为准） | [camthink-ai/neoruntime](https://github.com/camthink-ai/neoruntime) | 与 OS 一同发布、一同升级 |
 | Web 控制台 | 0.2.4（随平台服务一同发布） | 同上 | Web 控制台 **Settings → 设备信息** |
 | 接口板 MCU 固件 | 0.1.7.0（实测样机） | 固件包内 `ne503_ota_package_v<X.Y.Z>.bin` | API `GET /api/v1/device/status` 的 `mcu_version` 字段 |
-| Python SDK（`hailo_ipc_sdk`） | 0.4.0 | [camthink-ai/neoruntime-sdks](https://github.com/camthink-ai/neoruntime-sdks) | SDK 随应用镜像携带；接口演进时的兼容性以 [neoruntime-sdks Releases](https://github.com/camthink-ai/neoruntime-sdks/releases) 说明为准 |
-| C++ SDK（`hailo_ipc_sdk`） | 0.1.0（与 Python SDK 模块镜像，`cv::Mat` 对应 numpy） | 同上（`cpp/` 目录） | API 参考见 [Doxygen 文档站](https://camthink-ai.github.io/neoruntime-sdks/cpp/en/) |
+| Python SDK（`neoruntime_ipc_sdk`） | 0.4.0 | [camthink-ai/neoruntime-sdks](https://github.com/camthink-ai/neoruntime-sdks) | SDK 随应用镜像携带；接口演进时的兼容性以 [neoruntime-sdks Releases](https://github.com/camthink-ai/neoruntime-sdks/releases) 说明为准 |
+| C++ SDK（`neoruntime_ipc_sdk`） | 0.1.0（与 Python SDK 模块镜像，`cv::Mat` 对应 numpy） | 同上（`cpp/` 目录） | API 参考见 [Doxygen 文档站](https://camthink-ai.github.io/neoruntime-sdks/cpp/en/) |
 | 示例应用（neoruntime-apps） | 无独立版本号，跟随 main 更新 | [camthink-ai/neoruntime-apps](https://github.com/camthink-ai/neoruntime-apps) | 构建包从 [Releases](https://github.com/camthink-ai/neoruntime-apps/releases) 取最新（`showcase-bundles-latest`） |
 | 烧录工具 `hailo15_board_tools` | 1.10.1 | meta-hailo-os 仓库 `tools/` 目录 | 详见[系统烧录](./2-system-flashing.md) |
 

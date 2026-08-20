@@ -61,7 +61,7 @@ Event Bus 使用 `/` 分隔的层级式 Topic，支持三种通配符：`*`（�
 | `timestamp_ns` | uint64 | 纳秒级时间戳 |
 | `source` | string | 来源（服务名或 app_id） |
 | `event_id` | string | 自动生成的唯一 ID |
-| `payload` | bytes / dict | 线上为 JSON 编码的 bytes；Python SDK（`hailo_ipc_sdk`）已自动反序列化为 dict，故示例中可直接 `event.payload.get(...)` |
+| `payload` | bytes / dict | 线上为 JSON 编码的 bytes；Python SDK（`neoruntime_ipc_sdk`）已自动反序列化为 dict，故示例中可直接 `event.payload.get(...)` |
 | `metadata` | map | 可选键值对元数据（多数事件不携带） |
 
 ## 2. MQTT 桥接配置
@@ -77,7 +77,7 @@ NE503 Event Bus (gRPC) --> [Bridge] --> MQTT Broker --> 业务系统
 ```python
 import json
 import paho.mqtt.client as mqtt
-from hailo_ipc_sdk.events import EventClient
+from neoruntime_ipc_sdk.events import EventClient
 
 MQTT_BROKER = "mqtt.example.com"
 MQTT_PORT = 1883
@@ -135,7 +135,7 @@ AI Runtime 完成推理后自动发布到 `inference/{model_id}/{stream_id}` Top
 以下代码运行在能访问设备 Event Bus TCP 端点（`127.0.0.1:50053`）的主机上：
 
 ```python
-from hailo_ipc_sdk.events import EventClient
+from neoruntime_ipc_sdk.events import EventClient
 
 event_client = EventClient()  # 通过 TCP 端点连接
 
@@ -176,7 +176,7 @@ for event in event_client.subscribe(
 应用管理器发布生命周期事件：`app/started`、`app/stopped`、`app/installed`、`app/uninstalled`。
 
 ```python
-from hailo_ipc_sdk.events import EventClient
+from neoruntime_ipc_sdk.events import EventClient
 
 event_client = EventClient()  # 通过 TCP 端点连接
 

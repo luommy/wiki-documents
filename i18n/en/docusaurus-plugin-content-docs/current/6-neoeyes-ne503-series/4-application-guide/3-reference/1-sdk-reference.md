@@ -1,12 +1,12 @@
 ---
-description: "NE503 Python SDK (hailo_ipc_sdk) usage guide: run your first inference in one minute, what each module solves, and platform-specific constraints such as subscribing with sub/third and raw_output_only for custom models."
-keywords: [NE503 SDK, Python SDK, hailo_ipc_sdk, InferenceClient, inference subscription, sub stream, raw_output_only, EventClient]
+description: "NE503 Python SDK (neoruntime_ipc_sdk) usage guide: run your first inference in one minute, what each module solves, and platform-specific constraints such as subscribing with sub/third and raw_output_only for custom models."
+keywords: [NE503 SDK, Python SDK, neoruntime_ipc_sdk, InferenceClient, inference subscription, sub stream, raw_output_only, EventClient]
 tags: [SDK reference, NE503, Python, app development, developer]
 ---
 
 # SDK Reference
 
-`hailo_ipc_sdk` is the Python SDK for NE503 container applications. Inside the container it talks to the platform's AI Runtime, Event Bus, Device Control, and other services directly over gRPC / Unix sockets, so you can do inference, receive events, and control devices without touching the low-level protocols. Its typical job is to turn this one line:
+`neoruntime_ipc_sdk` is the Python SDK for NE503 container applications. Inside the container it talks to the platform's AI Runtime, Event Bus, Device Control, and other services directly over gRPC / Unix sockets, so you can do inference, receive events, and control devices without touching the low-level protocols. Its typical job is to turn this one line:
 
 ```python
 for seq, result in inf.subscribe(stream="sub", model="hailo_yolov8n_384_640"):
@@ -23,7 +23,7 @@ For installation: the SDK ships inside each app image on the device; for local d
 The most common shape — and the skeleton of most AI apps — is "subscribe to the inference stream and process each frame":
 
 ```python
-from hailo_ipc_sdk import InferenceClient
+from neoruntime_ipc_sdk import InferenceClient
 
 inf = InferenceClient()
 for seq, result in inf.subscribe(stream="sub", model="hailo_yolov8n_384_640"):
@@ -49,9 +49,9 @@ The SDK is split into modules, one per platform capability — each `XxxClient` 
 | `app` | App lifecycle: install/start/stop/uninstall/logs (usually handled by the Web Console) | `AppClient` | [docs site — app](https://camthink-ai.github.io/neoruntime-sdks/python/en/api/app.html) |
 | `plugin` | gRPC plugin discovery and hosting (advanced platform extension) | `PluginDiscovery`, `PluginServer` | [docs site — plugin](https://camthink-ai.github.io/neoruntime-sdks/python/en/api/plugin.html) |
 | `config` | Read connection endpoints from env vars, container/host path conversion | `Config` | [docs site — config](https://camthink-ai.github.io/neoruntime-sdks/python/en/api/config.html) |
-| `camera` | Camera internals: ISP, encoder, RTSP, OSD, AI overlay | `CameraClient` | Not on the docs site yet; see [source camera.py](https://github.com/camthink-ai/neoruntime-sdks/blob/main/python/hailo_ipc_sdk/camera.py) |
-| `overlay` | Draw detection boxes onto the video (RTSP/Web) | `OverlayClient` | Not on the docs site yet; see [source overlay.py](https://github.com/camthink-ai/neoruntime-sdks/blob/main/python/hailo_ipc_sdk/overlay.py) |
-| `audio` / `audio_stream` | Audio capture/playback, two-way intercom | `AudioClient`, `AudioStreamClient` | Not on the docs site yet; see [source audio.py](https://github.com/camthink-ai/neoruntime-sdks/blob/main/python/hailo_ipc_sdk/audio.py) |
+| `camera` | Camera internals: ISP, encoder, RTSP, OSD, AI overlay | `CameraClient` | Not on the docs site yet; see [source camera.py](https://github.com/camthink-ai/neoruntime-sdks/blob/main/python/neoruntime_ipc_sdk/camera.py) |
+| `overlay` | Draw detection boxes onto the video (RTSP/Web) | `OverlayClient` | Not on the docs site yet; see [source overlay.py](https://github.com/camthink-ai/neoruntime-sdks/blob/main/python/neoruntime_ipc_sdk/overlay.py) |
+| `audio` / `audio_stream` | Audio capture/playback, two-way intercom | `AudioClient`, `AudioStreamClient` | Not on the docs site yet; see [source audio.py](https://github.com/camthink-ai/neoruntime-sdks/blob/main/python/neoruntime_ipc_sdk/audio.py) |
 
 **How to choose**: ask "what am I doing", then find the matching Client in the table. The vast majority of container apps only need the first three — `inference` (reasoning) + `events` (alert interlock) + `device` (hardware control when needed). `app`/`plugin`/`camera`/`audio` are advanced; consult them when you get there.
 
@@ -72,7 +72,7 @@ Full constraints of the three streams (resolution/encoding/raw frames/inference 
 The `stream="sub"` and `model="hailo_yolov8n_384_640"` in the examples on this page are **sample values**. Model names change with what's preloaded on the device, and inference streams can be added or removed (`main`/`sub`/`third`). Run this on the device before deploying:
 
 ```python
-from hailo_ipc_sdk import InferenceClient, FdMediaClient
+from neoruntime_ipc_sdk import InferenceClient, FdMediaClient
 print(InferenceClient().list_models())   # e.g. ['hailo_yolov8n_384_640']
 print(FdMediaClient().list_streams())    # hardcoded ['main', 'sub'], no third
 ```
@@ -109,7 +109,7 @@ A complete runnable example: [Person Detection tutorial](../2-cookbook/1-person-
 
 ## 4. Environment Variables and Config
 
-`hailo_ipc_sdk` reads service endpoints (`AI_RUNTIME_ENDPOINT`, `EVENT_BUS_ENDPOINT`, etc.) and the container identity (`APP_ID`) from environment variables. The platform injects them automatically at app startup — **no manual setup inside the container**. The full list and meaning: [App Reference §7 Environment Variable Reference](./0-app-reference.md#7-environment-variable-reference).
+`neoruntime_ipc_sdk` reads service endpoints (`AI_RUNTIME_ENDPOINT`, `EVENT_BUS_ENDPOINT`, etc.) and the container identity (`APP_ID`) from environment variables. The platform injects them automatically at app startup — **no manual setup inside the container**. The full list and meaning: [App Reference §7 Environment Variable Reference](./0-app-reference.md#7-environment-variable-reference).
 
 ## Related Docs
 

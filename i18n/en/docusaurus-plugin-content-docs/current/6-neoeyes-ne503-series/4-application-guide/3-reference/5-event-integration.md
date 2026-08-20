@@ -61,7 +61,7 @@ The Event Bus uses `/`-separated hierarchical Topics and supports three wildcard
 | `timestamp_ns` | uint64 | Nanosecond timestamp |
 | `source` | string | Source (service name or app_id) |
 | `event_id` | string | Auto-generated unique ID |
-| `payload` | bytes / dict | On the wire this is JSON-encoded bytes; the Python SDK (`hailo_ipc_sdk`) already deserializes it into a dict, so the examples can call `event.payload.get(...)` directly |
+| `payload` | bytes / dict | On the wire this is JSON-encoded bytes; the Python SDK (`neoruntime_ipc_sdk`) already deserializes it into a dict, so the examples can call `event.payload.get(...)` directly |
 | `metadata` | map | Optional key-value metadata (not carried by most events) |
 
 ## 2. MQTT Bridge Configuration
@@ -77,7 +77,7 @@ Example bridge client (**runs on the device itself**, connects to the Event Bus 
 ```python
 import json
 import paho.mqtt.client as mqtt
-from hailo_ipc_sdk.events import EventClient
+from neoruntime_ipc_sdk.events import EventClient
 
 MQTT_BROKER = "mqtt.example.com"
 MQTT_PORT = 1883
@@ -135,7 +135,7 @@ The result type in the payload depends on the model: detection models populate `
 The following code runs on a host that can reach the device's Event Bus TCP endpoint (`127.0.0.1:50053`):
 
 ```python
-from hailo_ipc_sdk.events import EventClient
+from neoruntime_ipc_sdk.events import EventClient
 
 event_client = EventClient()  # Connects via the TCP endpoint
 
@@ -176,7 +176,7 @@ The device control service automatically publishes the following events:
 The Application Manager publishes lifecycle events: `app/started`, `app/stopped`, `app/installed`, `app/uninstalled`.
 
 ```python
-from hailo_ipc_sdk.events import EventClient
+from neoruntime_ipc_sdk.events import EventClient
 
 event_client = EventClient()  # Connects via the TCP endpoint
 

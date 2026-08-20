@@ -84,7 +84,7 @@ curl -k https://<设备IP>/api/v1/ai/models -H "Authorization: $TOKEN"
 **查流**（curl 无专门接口，用 SDK 最直接）：
 
 ```python
-from hailo_ipc_sdk import FdMediaClient as MediaClient
+from neoruntime_ipc_sdk import FdMediaClient as MediaClient
 print(MediaClient().list_streams())   # → ['main', 'sub']
 ```
 
@@ -207,7 +207,7 @@ import os, sys, time, signal, logging
 from datetime import datetime
 from typing import Optional
 
-from hailo_ipc_sdk import (
+from neoruntime_ipc_sdk import (
     InferenceClient, EventClient, DeviceClient,
     FdMediaClient as MediaClient, Config, InferenceResult,
 )
@@ -294,7 +294,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /app
 
 # SDK 本地安装（由构建脚本在构建前复制进来）
-COPY hailo_ipc_sdk/ /app/hailo_ipc_sdk/
+COPY neoruntime_ipc_sdk/ /app/neoruntime_ipc_sdk/
 COPY setup.py README.md /app/
 RUN pip install --no-cache-dir -e .
 
@@ -310,7 +310,7 @@ ENV PYTHONUNBUFFERED=1
 ENV LOG_LEVEL=INFO
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-    CMD python3 -c "from hailo_ipc_sdk import InferenceClient; c = InferenceClient(); c.close()" || exit 1
+    CMD python3 -c "from neoruntime_ipc_sdk import InferenceClient; c = InferenceClient(); c.close()" || exit 1
 
 USER appuser
 CMD ["python3", "/app/app.py"]
@@ -319,7 +319,7 @@ CMD ["python3", "/app/app.py"]
 `requirements.txt` 仅 `numpy>=1.21.0`（SDK 已自带 protobuf/grpc）。
 
 :::note Dockerfile 为何本地安装 SDK？
-设备容器运行时无外网，SDK 必须随镜像带入。构建脚本会在构建前把 `neoruntime-sdks/python/hailo_ipc_sdk/` 复制进应用目录，Dockerfile 的 `COPY hailo_ipc_sdk/` 将其打进镜像，再 `pip install -e .` 本地安装。
+设备容器运行时无外网，SDK 必须随镜像带入。构建脚本会在构建前把 `neoruntime-sdks/python/neoruntime_ipc_sdk/` 复制进应用目录，Dockerfile 的 `COPY neoruntime_ipc_sdk/` 将其打进镜像，再 `pip install -e .` 本地安装。
 :::
 
 ## 5. 部署步骤
@@ -336,7 +336,7 @@ cd neoruntime-apps
 
 | 步骤 | 动作 | 说明 |
 |:-----|:-----|:-----|
-| 1 | 复制 SDK | 把同级 `neoruntime-sdks/python/` 下的 `hailo_ipc_sdk/`、`setup.py`、`README.md` 复制进应用目录 |
+| 1 | 复制 SDK | 把同级 `neoruntime-sdks/python/` 下的 `neoruntime_ipc_sdk/`、`setup.py`、`README.md` 复制进应用目录 |
 | 2 | 构建镜像 | `docker buildx build --platform linux/arm64` 生成 `aipc/person-detection:1.0.0` |
 | 3 | 导出镜像 | `docker save` 导出为 `image.tar` |
 | 4 | 打包 | `zip` 把 `app.yaml` + `image.tar` 打成 `person-detection.aipc` |

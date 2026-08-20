@@ -350,8 +350,8 @@ CMD ["python", "app.py"]
 ```dockerfile
 FROM python:3.9-slim
 WORKDIR /app
-COPY hailo_ipc_sdk-*.whl /tmp/
-RUN pip install --no-cache-dir /tmp/hailo_ipc_sdk-*.whl && rm /tmp/*.whl
+COPY neoruntime_ipc_sdk-*.whl /tmp/
+RUN pip install --no-cache-dir /tmp/neoruntime_ipc_sdk-*.whl && rm /tmp/*.whl
 COPY . /app/
 RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
 USER appuser

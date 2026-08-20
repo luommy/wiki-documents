@@ -16,7 +16,7 @@ tags: [平台开发, NE503, 环境搭建, 构建]
 # 平台主仓：平台服务、HAL、Web 控制台、固件构建
 git clone https://github.com/camthink-ai/neoruntime.git
 
-# SDK 仓：Python SDK（hailo_ipc_sdk）、C++ SDK、proto 定义
+# SDK 仓：Python SDK（neoruntime_ipc_sdk）、C++ SDK、proto 定义
 git clone https://github.com/camthink-ai/neoruntime-sdks.git
 
 # 应用仓：示例应用、showcase、应用模板与统一构建脚本

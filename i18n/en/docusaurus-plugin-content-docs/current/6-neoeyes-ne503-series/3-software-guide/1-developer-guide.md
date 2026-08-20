@@ -16,7 +16,7 @@ The source is split into three repositories — clone the ones you need (app dev
 # Platform repo: platform services, HAL, web console, firmware build
 git clone https://github.com/camthink-ai/neoruntime.git
 
-# SDK repo: Python SDK (hailo_ipc_sdk), C++ SDK, proto definitions
+# SDK repo: Python SDK (neoruntime_ipc_sdk), C++ SDK, proto definitions
 git clone https://github.com/camthink-ai/neoruntime-sdks.git
 
 # Apps repo: example apps, showcases, app templates, and the unified build script
