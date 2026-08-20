@@ -606,4 +606,4 @@ SDK 自动读取的连接配置变量（通常无需修改，平台已通过 Soc
 - [Python SDK 参考](./1-sdk-reference.md) -- SDK API 签名与数据类型
 - [SDK 示例](./2-sdk-examples.md) -- 完整应用示例和开发教程
 - [平台架构](../../3-software-guide/0-system-architecture.md) -- 系统设计与数据流
-- [平台服务总览](../../3-software-guide/4-platform-services.md) -- App Manager 等服务职责与源码指针
+- [系统架构 · 平台服务层](../../3-software-guide/0-system-architecture.md) -- App Manager 等服务职责与源码指针

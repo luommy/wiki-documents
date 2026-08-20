@@ -264,5 +264,5 @@ The bridge program must likewise run on the device itself (50053 is loopback-onl
 ## 7. Related Documentation
 
 - [RESTful API Reference](./3-restful-api.md) — Complete reference for all HTTP endpoints
-- [Platform Services Overview](../../3-software-guide/4-platform-services.md) — Responsibilities and source pointers for services such as the Event Bus
+- [System Architecture · Platform Services Layer](../../3-software-guide/0-system-architecture.md) — Responsibilities and source pointers for services such as the Event Bus
 - [Application Development Reference](./0-app-reference.md) — Building custom applications based on the SDK

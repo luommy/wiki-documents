@@ -606,4 +606,4 @@ Connection-config variables auto-read by the SDK (usually no need to change; the
 - [Python SDK Reference](./1-sdk-reference.md) — SDK API signatures and data types
 - [SDK Examples](./2-sdk-examples.md) — full app examples and development tutorials
 - [Platform Architecture](../../3-software-guide/0-system-architecture.md) — system design and data flow
-- [Platform Services Overview](../../3-software-guide/4-platform-services.md) — App Manager and other service responsibilities, with source pointers
+- [System Architecture · Platform Services Layer](../../3-software-guide/0-system-architecture.md) — App Manager and other service responsibilities, with source pointers

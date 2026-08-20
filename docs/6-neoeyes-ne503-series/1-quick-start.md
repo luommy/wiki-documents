@@ -122,6 +122,7 @@ unzip -o <package>.aipc -d <package-directory>
 | RTSP 拉流接入 NVR / VMS | [用户指南 · 视频与成像](./2-user-guide/1-media-and-image.md) |
 | 安装自己的 AI 应用、管理模型 | [用户指南 · AI 应用与模型](./2-user-guide/2-applications-and-models.md) |
 | 接报警器 / 门禁 / 音频外设 | [用户指南 · 外设 IO](./2-user-guide/3-peripherals.md) |
+| 批量发现设备 / 命令行管理 | [用户指南 · 设备管理工具](./2-user-guide/4-device-management-tools.md) |
 | 升级固件 / 看日志 / 运维 | [用户指南 · 系统管理](./2-user-guide/5-deployment.md) |
 
 ### 速查卡

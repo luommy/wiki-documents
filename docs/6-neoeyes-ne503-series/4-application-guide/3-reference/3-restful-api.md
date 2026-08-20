@@ -615,6 +615,6 @@ SSH 服务状态查询（只读）与自定义键值配置（key-value），供�
 - [平台架构](../../3-software-guide/0-system-architecture.md) — NE503 四层架构与服务依赖关系
 - [应用开发](./0-app-reference.md) — 容器应用开发参考
 - [SDK 参考](./1-sdk-reference.md) — Python SDK 完整 API 参考
-- [平台服务总览](../../3-software-guide/4-platform-services.md) — 各服务职责与源码指针
-- [视频集成](./4-video-integration.md) — RTSP 视频流对接实战
+- [系统架构 · 平台服务层](../../3-software-guide/0-system-architecture.md) — 各服务职责与源码指针
+- [视频集成](../../2-user-guide/1-media-and-image.md) — RTSP 视频流对接与 NVR/VMS 接入
 - [事件集成](./5-event-integration.md) — Event Bus 对接实战

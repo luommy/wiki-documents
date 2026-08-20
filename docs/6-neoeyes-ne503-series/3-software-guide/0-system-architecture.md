@@ -71,17 +71,9 @@ graph LR
 
 采集、缩放、编码、RTSP 与原始帧分发由 camera-daemon 完成；推理调度由 ai-runtime 完成，两者均通过 HAL 统一接口操作硬件（HAL 详见 §4）。应用控制外设（灯光/PTZ/GPIO）走另一条链：应用 → device-control（gRPC）→ HAL.IO → MCU。
 
-### 三路码流的分工
+如上图所示，只有 `sub` 与 `third` 两路向 ai-runtime 零拷贝分发**原始 NV12 帧**（未经编码），`main` 只输出编码 H.264——这是推理路径的关键约束：
 
-| 码流 | 分辨率@帧率 | 编码输出 | 原始帧 | 角色 |
-|------|------------|---------|--------|------|
-| 主码流 `main` | 3840×2160@30（4K） | H.264 → RTSP | ✗ | 高清录像、大屏预览 |
-| 子码流 `sub` | 1280×720@30 | H.264 → RTSP | ✓ | 多路预览；也可供 AI 订阅 |
-| 第三路 `third` | 640×384@15 | H.264 → RTSP | ✓ | **AI 推理默认流**，尺寸与平台前处理匹配 |
-
-「原始帧」指未经编码的 NV12 帧——只有拿到原始帧的流才能送 NPU 推理。三路均由 ISP 硬件缩放输出，无软件缩放开销；出厂码率、GOP 等参数与热更新方式见[视频集成 · 码流概览](../4-application-guide/3-reference/4-video-integration.md)。
-
-> 应用订阅推理时，`stream` 必须填发布原始帧的流（`sub` 或 `third`）；`main` 只发编码 H.264，订阅它会永远等不到结果。
+> 应用订阅推理时，`stream` 必须填 `sub` 或 `third`；填 `main` 会永远等不到结果。三路码流的完整参数（分辨率/码率/GOP/原始帧）见[视频与成像 · RTSP 对接](../2-user-guide/1-media-and-image.md#rtsp-对接)。
 
 ### 检测结果如何与帧、事件、画面对齐
 
@@ -107,7 +99,79 @@ graph LR
 
 平台服务按职责分两组：**数据面**（ai-runtime、camera-daemon——帧与推理的搬运工，性能敏感，C++）与**管理面**（其余五个——生命周期、事件、API、外设、发现，Go 微服务）。服务间通过 gRPC over Unix Domain Socket 通信；对外 REST API 统一由 platform-api 网关暴露（内部 `127.0.0.1:8080`，经 nginx `:443`）。
 
-每个服务的职责、socket 路径、启动依赖与源码指针，见[平台服务总览](./4-platform-services.md)；gRPC 接口的 proto 定义也在该页按服务逐一列出。
+### 3.1 服务协作
+
+platform-api 是对外统一入口，聚合全部服务的 gRPC 接口；event-bus 是消息中枢，几乎所有服务都向它发布事件；camera-daemon 与 device-control 通过专用 socket 协作控制镜头。
+
+```mermaid
+flowchart LR
+    API["platform-api<br/>REST · WebSocket"]
+    Cam["camera-daemon"]
+    AI["ai-runtime"]
+    Bus{{"event-bus"}}
+    AppMgr["app-manager"]
+    DevCtrl["device-control"]
+
+    API -->|gRPC 聚合| AI
+    API -->|gRPC 聚合| AppMgr
+    API -->|gRPC 聚合| DevCtrl
+    API -->|gRPC 聚合| Bus
+    API -->|camera-control.sock| Cam
+    AppMgr -->|调度容器| AI
+    DevCtrl -->|camera-control.sock| Cam
+    Cam -.发布事件.-> Bus
+    AI -.发布事件.-> Bus
+    DevCtrl -.发布事件.-> Bus
+```
+
+device-discovery 相对独立，通过 MQTT/UDP 管理外部被管设备，不消费其他平台服务，不在图中展示。gRPC 接口契约以[源码仓](https://github.com/camthink-ai/neoruntime)的 proto 与 YAML 为准，本文不复述。
+
+### 3.2 Socket 一览
+
+平台内部通信统一走 `/run/aipc/*.sock`（设备上排障用 `ss -x | grep aipc` 或 `systemctl status` 看）。唯一例外：event-bus 额外监听 TCP `127.0.0.1:50053`，供 Hailo C++ gRPC 客户端使用（Hailo gRPC 库不支持 unix socket resolver）。
+
+| Socket | 提供方 | 消费方 | 用途 |
+|:--|:--|:--|:--|
+| `/run/aipc/camera.sock` | camera-daemon | ai-runtime | 原始帧 fd 接收（SCM_RIGHTS 零拷贝） |
+| `/run/aipc/camera-control.sock` | camera-daemon | device-control、platform-api | 镜头控制（lens_hal 协议） |
+| `/run/aipc/ai-runtime.sock` | ai-runtime | SDK 应用、platform-api、app-manager | 推理（inference.proto） |
+| `/run/aipc/app-manager.sock` | app-manager | platform-api | 应用生命周期（app.proto） |
+| `/run/aipc/event-bus.sock` | event-bus | 全部服务、SDK 应用 | 事件发布/订阅（event.proto） |
+| `/run/aipc/device-control.sock` | device-control | SDK 应用、platform-api | 外设控制（device.proto） |
+| `/run/aipc/device-discovery.sock` | device-discovery | platform-api | 设备发现（discovery.proto） |
+
+### 3.3 启动依赖
+
+启动依赖源自 [systemd unit 声明](https://github.com/camthink-ai/neoruntime/tree/main/systemd)（`After` / `Wants`）。全体服务共同的前置：`aipc-restore.service`、`aipc-firstboot.service`、`network.target`；下表只列各服务**特有**的部分：
+
+| 服务 | 特有依赖 |
+|:--|:--|
+| camera-daemon | After `aipc-mcu-prep`、`isp_media_server`、`hailort_server` |
+| ai-runtime | After + Wants `containerd.service` |
+| event-bus、device-discovery | 无特有依赖 |
+| device-control | After + Wants **camera-daemon**；After `aipc-mcu-prep` |
+| app-manager | Wants `ai-runtime`、`event-bus`、`containerd` |
+| platform-api | After + Wants `ai-runtime`、`app-manager`、`device-control`、`event-bus` |
+
+排障要点：
+
+- **camera-daemon 依赖最深的底层单元链**（MCU 准备 → ISP 媒体服务 → HailoRT 服务）——画面类问题先 `systemctl status isp_media_server hailort_server` 再查 camera-daemon 本身；
+- ai-runtime 与 camera-daemon 并行启动，靠 socket 重连机制建立连接——ai-runtime 起得比 camera-daemon 早属正常现象；
+- platform-api 最后启动，`After` 只保证顺序不保证就绪（Wants 弱依赖，被依赖服务失败也会拉起）。
+
+### 3.4 服务清单
+
+以下路径均相对[neoruntime 仓库](https://github.com/camthink-ai/neoruntime)根目录。
+
+| 服务 | 职责 | 源码入口 |
+|:--|:--|:--|
+| camera-daemon（C++） | 硬件抽象层入口：传感器、ISP、H.264/H.265 编码、RTSP、MCU 通信、音频；以 DMA-BUF fd 零拷贝供帧 | `platform/camera-daemon/`，proto `camera.proto`/`lens_hal.proto`，设计文档 `docs/services/CAMERA_DAEMON_DESIGN.md` |
+| ai-runtime（C++） | AI 推理运行时：HEF 模型加载、单次/流式推理、NPU 调度、CLIP 文本编码、GenAI 流式生成与后处理；结果自动发布到 event-bus | `platform/ai-runtime/`，proto `inference.proto`，参考 `docs/services/ai-runtime.md` |
+| app-manager | 容器应用生命周期：封装 containerd，应用/镜像/容器的安装、启停、日志、exec、Web URL 注册 | `platform/app-manager/`，proto `app.proto` |
+| event-bus | 平台消息中枢：发布/订阅、批量发布、topic 管理，支持通配订阅 | `platform/event-bus/`，proto `event.proto` |
+| device-control | 外设控制：PTZ、镜头、补光灯/IR LED/IR-Cut、风扇/加热/雷达、报警输出（继电器/Wiegand）、RS485、GPIO | `platform/device-control/`，proto `device.proto` |
+| device-discovery | CamThink 设备发现与管理：CT-Disc 协议（LAN UDP 组播 `239.255.255.250:19850`、CAT1 走 MQTT 注册），SN 归并设备注册表，心跳与管理命令下发 | `platform/device-discovery/`，proto `discovery.proto` |
+| platform-api | HTTP/WebSocket 网关：聚合各服务 gRPC，对外暴露 REST API 与 WebSocket，承载 Web 控制台后端与认证 | `platform/platform-api/` + 前端 `web/` |
 
 ---
 
@@ -192,31 +256,10 @@ Event Bus 采用发布/订阅模式，支持 MQTT 风格通配符匹配（`*` �
 
 ---
 
-## 7. 系统配置
-
-平台配置分两类：**日常配置**（网络、时区、码流参数——在 Web 控制台或 REST API 上改，本篇不展开）与**系统配置**（服务参数——仅平台开发/定制时碰）。系统配置为 YAML 文件，出厂位于设备 `/data/aipc/etc/` 下，源码位于仓库 `configs/` 目录：
-
-| 配置文件 | 服务 | 核心配置项 |
-|:---|:---|:---|
-| `platform-api.yaml` | platform-api | 服务器端口、认证密钥、日志级别 |
-| `platform/app-manager.yaml` | app-manager | containerd 连接、安全策略、资源限制 |
-| `platform/event-bus.yaml` | event-bus | Socket 路径、TCP 监听、主题 ACL |
-| `platform/device-control.yaml` | device-control | MCU UART 设备、镜头参数、自动化规则 |
-| `platform/camera-daemon.yaml` | camera-daemon | 视频采集、编码参数、RTSP 配置 |
-| `platform/discovery.yaml` | device-discovery | CT-Disc 协议参数 |
-| `ai/ai-runtime.yaml` | ai-runtime | HAL 库路径、模型仓库、调度器、自动推理管道 |
-| `preload.yaml` | 出厂预装 | 预装模型与应用清单（首次部署时由平台注册） |
-| `security/seccomp-default.json` | 安全 | 默认 Seccomp 系统调用白名单 |
-
-安装位置：`/data/aipc/`（二进制 `bin/`、配置 `etc/`）。
-
----
-
-## 8. 相关文档
+## 7. 相关文档
 
 **Wiki 内**：
 
-- [平台服务总览](./4-platform-services.md) — 各服务职责、协作关系与源码指针
 - [应用开发指南](../4-application-guide/3-reference/0-app-reference.md) — 如何编写和部署容器应用
 - [Python SDK 参考](../4-application-guide/3-reference/1-sdk-reference.md) — SDK API 签名与使用示例
 

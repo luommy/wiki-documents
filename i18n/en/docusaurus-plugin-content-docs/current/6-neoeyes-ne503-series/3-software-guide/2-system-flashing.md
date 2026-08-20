@@ -632,4 +632,4 @@ Common issues are listed in operational order (§2 boot chain → §3 system ima
 ## 9. Related Documentation
 
 - [System Architecture](./0-system-architecture.md) — Four-layer architecture and core services
-- [Software Deployment](./3-software-deployment.md) — Platform software deployment and iterative development
+- [Software Deployment](./3-software-deployment.md) — Platform software deployment

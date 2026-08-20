@@ -1,6 +1,6 @@
 ---
-description: NE503 平台软件部署指南，涵盖发布包部署、服务依赖、迭代开发和部署验证。
-keywords: [NE503, 部署, deploy.sh, systemd, 迭代开发]
+description: NE503 平台软件部署指南，涵盖发布包部署和部署验证。
+keywords: [NE503, 部署, deploy.sh, systemd]
 tags: [平台开发, NE503, 部署, 运维]
 ---
 
@@ -10,55 +10,21 @@ tags: [平台开发, NE503, 部署, 运维]
 
 > 前置条件：已完成 [Developer Guide](./1-developer-guide.md) 中的环境搭建和构建，产出 `build/release/aipc-hailo15-<version>.tar.gz` 发布包。
 
-## 1. 服务依赖关系
+## 1. 发布包部署
 
-NE503 运行多个平台服务，通过 systemd 管理启动顺序：
-
-```mermaid
-graph LR
-    FB[aipc-firstboot] --> HM[aipc-healthmon]
-    FB --> EB[event-bus]
-    FB --> CD[camera-daemon]
-    FB --> ER[ai-runtime]
-    FB --> DC[device-control]
-    FB --> DD[device-discovery]
-    EB --> AM[app-manager]
-    ER --> AM
-    ER --> PA[platform-api]
-    AM --> PA
-    DC --> PA
-    EB --> PA
-```
-
-| 服务 | 语言 | 依赖 |
-|------|------|------|
-| aipc-firstboot | Shell | 无（oneshot，先于所有服务） |
-| aipc-healthmon | Shell | aipc-firstboot（黑盒健康采样，常驻） |
-| event-bus | Go | 无 |
-| camera-daemon | C++ | 无 |
-| ai-runtime | C++ | containerd |
-| device-control | Go | 无 |
-| device-discovery | Go | 无 |
-| app-manager | Go | event-bus + ai-runtime + containerd |
-| platform-api | Go | event-bus + ai-runtime + app-manager + device-control |
-
-> containerd 不在上表中，但 ai-runtime 和 app-manager 依赖它。确保设备上已启用：`systemctl enable containerd`。
-
-## 2. 发布包部署
-
-### 2.1 传输发布包
+### 1.1 传输发布包
 
 ```bash
 scp build/release/aipc-hailo15-<version>.tar.gz root@<device-ip>:/data/
 ```
 
-### 2.2 执行部署
+### 1.2 执行部署
 
 ```bash
 ssh root@<device-ip>
 # root 分区已满（3.3G、已用 99%），直接在 /data 分区解压
 cd /data && tar xzf aipc-hailo15-<version>.tar.gz
-cd aipc-hailo15-<version> && ./deploy.sh --prefix /data/aipc
+cd aipc-hailo15-<version> && ./deploy.sh
 ```
 
 预期输出（节选关键阶段，省略逐文件 `+ xxx -> ...` 日志）：
@@ -92,40 +58,26 @@ Proceed with deployment? [y/N] y
 [deploy]   Version: 1.0.0
 ```
 
-### 2.3 deploy.sh 参数
+### 1.3 deploy.sh 参数
 
 | 参数 | 说明 |
 |------|------|
-| `--prefix /data/aipc` | 安装到指定目录（推荐 `/data`：root 分区 3.3G 已用 99%，仅剩约 60M） |
 | `--force` | 强制部署，跳过确认提示 |
 | `--rollback` | 回滚到上一版本 |
 | `--status` | 查看当前部署状态 |
 | `--no-config` | 跳过配置文件覆盖（保留设备上的配置） |
 
+> 安装路径固定为 `/data/aipc`，不支持自定义（root 分区 3.3G 已用 99%，装不下发布包）。
+
 完整示例：
 
 ```bash
-./deploy.sh --prefix /data/aipc --force    # 部署到 /data 分区
-./deploy.sh --rollback                      # 回滚到上一版本
-./deploy.sh --status                        # 查看部署状态
+./deploy.sh --force              # 强制部署（跳过确认）
+./deploy.sh --rollback           # 回滚到上一版本
+./deploy.sh --status             # 查看部署状态
 ```
 
-## 3. 迭代开发
-
-开发过程中，替换单个服务二进制无需完整部署。
-
-### 3.1 手动替换单个服务
-
-设备安装根在 `/data/aipc`（root 分区空间紧张，不部署到 `/opt`）：
-
-```bash
-scp build/output/device-control root@<device-ip>:/data/aipc/bin/
-ssh root@<device-ip> "systemctl restart device-control"
-```
-
-> Makefile 不提供自动化部署目标（`deploy-all` 等不存在）。批量迭代要么逐服务重复上述 scp + restart，要么走 §2 的 `deploy.sh` 完整热替换。
-
-## 4. 发布包内容
+## 2. 发布包内容
 
 `aipc-hailo15-<version>.tar.gz` 包含以下内容：
 
@@ -143,12 +95,11 @@ ssh root@<device-ip> "systemctl restart device-control"
 | `deploy.sh` | 热替换部署脚本 |
 | `VERSION` | 版本元数据 |
 
-## 5. 部署验证
+## 3. 部署验证
 
-部署完成后在设备上执行以下检查：
+部署完成后在设备上检查服务状态（应全部 active）：
 
 ```bash
-# 1. 服务状态（应全部 active）
 systemctl status ai-runtime camera-daemon app-manager event-bus device-control device-discovery platform-api
 ```
 
@@ -160,53 +111,10 @@ systemctl status ai-runtime camera-daemon app-manager event-bus device-control d
      Active: active (running)
 ```
 
-```bash
-# 2. 二进制架构（应为 ARM aarch64）
-file /data/aipc/bin/ai-runtime
-# ELF 64-bit LSB pie executable, ARM aarch64
-
-# 3. HAL 库
-ls -l /data/aipc/lib/hal/libaipc_hal*.so
-
-# 4. NPU 设备
-lsmod | grep hailo && ls -la /dev/hailo*
-
-# 5. Web 控制台
-curl -s http://localhost:8080/ | head -1
-# <!DOCTYPE html>
-```
-
 浏览器访问 `https://<device-ip>`，默认凭据 `admin` / `password`。
 
-## 6. 故障排查
-
-### containerd 未运行
-
-app-manager 启动失败时检查 containerd：
-
-```bash
-systemctl enable containerd && systemctl start containerd
-```
-
-### "exec format error"
-
-二进制架构与设备不匹配：
-
-```bash
-file build/output/ai-runtime    # 检查产物架构，应为 ARM aarch64
-ssh root@<device-ip> "uname -m" # 设备应为 aarch64
-```
-
-### 服务启动失败
-
-查看服务日志定位原因：
-
-```bash
-journalctl -u <service-name> -n 50 --no-pager
-```
-
-## 7. 相关文档
+## 4. 相关文档
 
 - [Developer Guide](./1-developer-guide.md) — 开发环境搭建和构建
-- [System Architecture](./0-system-architecture.md) — 四层架构和核心服务
+- [System Architecture](./0-system-architecture.md) — 四层架构、数据链路与服务清单（服务启动依赖见其 §3.3）
 - [System Flashing](./2-system-flashing.md) — 系统镜像烧录

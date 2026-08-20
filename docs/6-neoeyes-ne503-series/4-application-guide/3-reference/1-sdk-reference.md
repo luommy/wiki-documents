@@ -8,6 +8,8 @@ tags: [SDK参考, NE503, Python, API文档, 开发者]
 
 `hailo_ipc_sdk` 是 NE503 容器应用的 Python SDK，提供 8 个核心模块。安装方式参见[应用参考](./0-app-reference.md#3-dockerfile-模式)。
 
+> **C++ 应用**：同一 SDK 另有 C++ 实现（neoruntime-sdks 仓库 `cpp/` 目录，当前 0.1.0），客户端模块与 Python 版一一镜像（InferenceClient / DeviceClient / EventClient / FdMediaClient 等），`cv::Mat` 对应 Python 的 numpy。C++ API 细节见 [Doxygen 文档站](https://camthink-ai.github.io/neoruntime-sdks/cpp/en/)，本文不复述。
+
 ## 快速开始
 
 ```python
@@ -526,4 +528,4 @@ class Config:
 
 - [SDK 示例](./2-sdk-examples.md) — 完整应用示例和开发指南
 - [应用参考](./0-app-reference.md) — 项目创建、app.yaml 配置、部署流程
-- [平台服务总览](../../3-software-guide/4-platform-services.md) — AI Runtime、Event Bus 等服务职责与源码指针
+- [系统架构 · 平台服务层](../../3-software-guide/0-system-architecture.md) — AI Runtime、Event Bus 等服务职责与源码指针

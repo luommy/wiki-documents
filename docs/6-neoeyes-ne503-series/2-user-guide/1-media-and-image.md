@@ -1,6 +1,6 @@
 ---
-description: NE503 视频与成像完整指南：Media 页的码流参数、RTSP 推流与 VLC 验证；Image 页三子标签——画质与变换（AI ISP / ISP 设置 / Transform）、叠加层与隐私遮罩（Text / DateTime / Image Overlay / Privacy Mask / AI Auto Mask）、镜头与红外控制。
-keywords: [NE503 视频, 码流设置, RTSP, VLC 拉流, AI ISP, Privacy Mask, AI Auto Mask, 镜头控制, 红外补光, IR-CUT]
+description: NE503 视频与成像完整指南：Media 页的码流参数、RTSP 推流与外部系统对接（VLC / FFmpeg / NVR 接入示例）；Image 页三子标签——画质与变换（AI ISP / ISP 设置 / Transform）、叠加层与隐私遮罩（Text / DateTime / Image Overlay / Privacy Mask / AI Auto Mask）、镜头与红外控制。
+keywords: [NE503 视频, 码流设置, RTSP, VLC 拉流, FFmpeg, NVR 对接, AI ISP, Privacy Mask, AI Auto Mask, 镜头控制, 红外补光, IR-CUT]
 tags: [用户指南, NE503, 视频, 图像, RTSP]
 ---
 
@@ -51,7 +51,28 @@ NE503 的视频能力由 **Media** 与 **Image** 两个页面共同配置：Medi
 
 默认端口 `8554`。
 
-### 用 VLC 验证 RTSP
+## RTSP 对接
+
+外部系统（NVR / VMS / 业务服务器）通过 RTSP 拉取 NE503 码流。对接前先了解三条约束和出厂参数：
+
+- **仅支持 RTSP over TCP**（RTP/AVP/TCP 交织传输），不支持 UDP，拉流命令需指定 TCP；
+- **RTSP 端口无认证**——URL 不含用户名密码，任何能访问设备端口的主机都能拉流，公网部署务必置于网关/防火墙之后（见[安全加固](./7-security-hardening.md)）；
+- 出厂参数如下，可通过 Platform API `PUT /media/encoder` 运行时热更新码率、帧率、GOP，无需重启：
+
+| 参数 | 主码流 (main) | 子码流 (sub) | 三码流 (third) |
+|------|-------------|-------------|---------------|
+| 分辨率 | 3840×2160（4K） | 1280×720 | 640×384 |
+| 帧率 | 30 fps | 30 fps | 15 fps |
+| 码率 | 4 Mbps | 2 Mbps | 512 Kbps |
+| GOP | 30（1s） | 60（2s） | 30（2s） |
+| Profile | High 4.1 | High | Main |
+| 原始帧（NV12） | ✗ 仅编码 H.264 | ✓ | ✓（平台默认推理流） |
+
+三路码流的典型分工：主码流高清录像与大屏显示，子码流多路预览与中等质量录制，三码流移动端、AI 分析与低带宽场景。RTSP over TCP 的网络开销约 10–25%，带宽规划按上表码率预留余量；多客户端可同时拉流，并发上限取决于设备负载，建议实测确认。
+
+> 「原始帧」列决定该流能否送 NPU 推理：只有 `sub` 和 `third` 发布未经编码的 NV12 帧。应用订阅推理时 `stream` 必须填这两者之一；填 `main`（仅编码 H.264）会永远等不到结果。三路均由 ISP 硬件缩放输出，无软件缩放开销。
+
+### 示例：用 VLC 验证拉流
 
 RTSP 是 NE503 对接 NVR / VMS 的主要协议。用 VLC 快速验证能否正常拉流：
 
@@ -70,6 +91,38 @@ RTSP 是 NE503 对接 NVR / VMS 的主要协议。用 VLC 快速验证能否正�
 </div>
 
 > 无法拉流时，用 `aipc-cli stream list` 确认码流状态。
+
+### 示例：FFmpeg 拉流与录制
+
+FFmpeg 拉流必须加 `-rtsp_transport tcp`：
+
+```bash
+# 验证码流可用（播放 10 秒，不做实际输出）
+ffmpeg -rtsp_transport tcp -i "rtsp://192.168.1.100:8554/main" -t 10 -f null -
+
+# 直接录制（不转码，保持原始 H.264）
+ffmpeg -rtsp_transport tcp -i "rtsp://192.168.1.100:8554/main" \
+  -c copy -f mp4 recording_main.mp4
+
+# 转码为 720p H.264 用于 Web 分发
+ffmpeg -rtsp_transport tcp -i "rtsp://192.168.1.100:8554/main" \
+  -vf scale=1280:720 -c:v libx264 -preset fast -crf 23 -f mp4 output_720p.mp4
+
+# 每 5 秒截一帧存 JPEG
+ffmpeg -rtsp_transport tcp -i "rtsp://192.168.1.100:8554/sub" \
+  -vf fps=1/5 -q:v 2 snapshot_%04d.jpg
+```
+
+GStreamer（`rtspsrc protocols=tcp latency=0`）、OpenCV 等支持 RTSP over TCP 的工具同样可用。
+
+### 示例：接入 NVR / VMS
+
+NE503 以 RTSP 对接为主，不提供 ONVIF 设备发现。在 NVR 中手动添加设备：
+
+1. 选择「手动添加设备」或「自定义 RTSP」
+2. 填写 RTSP 地址：`rtsp://<设备IP>:8554/main`
+3. 传输协议选择 **TCP**
+4. 按需选码流：NVR 录像用 `main`，多画面预览用 `sub`
 
 ## 画面、叠加与镜头
 

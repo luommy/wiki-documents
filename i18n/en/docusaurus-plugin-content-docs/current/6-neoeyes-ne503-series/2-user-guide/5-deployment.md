@@ -124,8 +124,8 @@ Storage management points:
 
 - **Alert threshold**: when Data usage exceeds 80%, clean up logs, uninstall idle apps, or remove unused models; a microSD card can be inserted to expand capacity.
 - **Log cleanup**: via SSH, run `truncate -s 0 /data/aipc/logs/*.log`.
-- **Video recording**: the current firmware does not store video locally; recording is done by an external NVR / VMS pulling the streams (see [Video Integration](../4-application-guide/3-reference/4-video-integration.md)).
-- **Command-line management**: use `aipc-cli`; common commands in the [Platform Services Overview](../3-software-guide/4-platform-services.md#cli-tool).
+- **Video recording**: the current firmware does not store video locally; recording is done by an external NVR / VMS pulling the streams (see [Video Integration](../2-user-guide/1-media-and-image.md)).
+- **Command-line management**: use `aipc-cli`; common commands in the [Device Management Tools](./4-device-management-tools.md).
 
 ### 3.3 Maintenance Tools
 

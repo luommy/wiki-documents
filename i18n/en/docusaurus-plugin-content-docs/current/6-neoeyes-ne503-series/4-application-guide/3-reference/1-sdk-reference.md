@@ -8,6 +8,8 @@ tags: [SDK reference, NE503, Python, API docs, developer]
 
 `hailo_ipc_sdk` is the Python SDK for NE503 container applications, providing 8 core modules. For installation, see [App Reference](./0-app-reference.md#3-dockerfile-patterns).
 
+> **C++ apps**: the same SDK also ships as a C++ implementation (the `cpp/` directory of the neoruntime-sdks repo, currently 0.1.0), mirroring the Python client modules one-to-one (InferenceClient / DeviceClient / EventClient / FdMediaClient, etc.), with `cv::Mat` where Python uses numpy. For the C++ API details, see the [Doxygen docs site](https://camthink-ai.github.io/neoruntime-sdks/cpp/en/); this page does not restate them.
+
 ## Quick Start
 
 ```python
@@ -525,4 +527,4 @@ The connection endpoints `Config` reads (`AI_RUNTIME_ENDPOINT`, `EVENT_BUS_ENDPO
 
 - [SDK Examples](./2-sdk-examples.md) — full app examples and development guides
 - [App Reference](./0-app-reference.md) — project setup, app.yaml config, deployment flow
-- [Platform Services Overview](../../3-software-guide/4-platform-services.md) — AI Runtime, Event Bus, and other service responsibilities, with source pointers
+- [System Architecture · Platform Services Layer](../../3-software-guide/0-system-architecture.md) — AI Runtime, Event Bus, and other service responsibilities, with source pointers

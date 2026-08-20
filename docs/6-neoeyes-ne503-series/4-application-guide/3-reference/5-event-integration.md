@@ -269,5 +269,5 @@ for event in event_client.subscribe("inference/**"):
 ## 7. 相关文档
 
 - [RESTful API 参考](./3-restful-api.md) — 所有 HTTP 端点的完整参考
-- [平台服务总览](../../3-software-guide/4-platform-services.md) — Event Bus 等服务职责与源码指针
+- [系统架构 · 平台服务层](../../3-software-guide/0-system-architecture.md) — Event Bus 等服务职责与源码指针
 - [应用开发参考](./0-app-reference.md) — 基于 SDK 开发自定义应用

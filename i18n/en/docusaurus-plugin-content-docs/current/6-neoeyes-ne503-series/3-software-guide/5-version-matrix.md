@@ -1,6 +1,6 @@
 ---
 description: NE503 version compatibility matrix — current versions of the system firmware, platform services, SDK, MCU, and flashing tools, the six OS-upgrade compatibility gates, and the factory-preloaded models and apps, to help diagnose hidden issues caused by version mismatches.
-keywords: [NE503 version, firmware version, compatibility matrix, Hailo, HEF model, factory preload, MCU firmware, board_tools, platform service version]
+keywords: [NE503 version, firmware version, compatibility matrix, factory preload, MCU firmware, board_tools, platform service version]
 tags: [Software Guide, NE503, versioning, compatibility]
 ---
 
@@ -18,7 +18,8 @@ Current firmware line (2026-07 build):
 | Platform services | v1.0.1 (the open-source version line starts here; old internal version numbers do not carry over — see [neoruntime Releases](https://github.com/camthink-ai/neoruntime/releases)) | [camthink-ai/neoruntime](https://github.com/camthink-ai/neoruntime) | Released and upgraded together with the OS |
 | Web Console | 0.2.4 (shipped with the platform services) | Same as above | Web Console **Settings → Device Info** |
 | Interface-board MCU firmware | 0.1.7.0 (measured on a sample device) | `ne503_ota_package_v<X.Y.Z>.bin` inside the firmware package | `mcu_version` field of `GET /api/v1/device/status` |
-| Python SDK (`hailo_ipc_sdk`) | 0.3.0 | [camthink-ai/neoruntime-sdks](https://github.com/camthink-ai/neoruntime-sdks) | Carried inside each app image; for interface-evolution compatibility see the [neoruntime-sdks Releases](https://github.com/camthink-ai/neoruntime-sdks/releases) notes |
+| Python SDK (`hailo_ipc_sdk`) | 0.4.0 | [camthink-ai/neoruntime-sdks](https://github.com/camthink-ai/neoruntime-sdks) | Carried inside each app image; for interface-evolution compatibility see the [neoruntime-sdks Releases](https://github.com/camthink-ai/neoruntime-sdks/releases) notes |
+| C++ SDK (`hailo_ipc_sdk`) | 0.1.0 (mirrors the Python SDK's modules; `cv::Mat` where Python uses numpy) | Same repo (`cpp/` directory) | API reference on the [Doxygen docs site](https://camthink-ai.github.io/neoruntime-sdks/cpp/en/) |
 | Example apps (neoruntime-apps) | No standalone version number; tracks main | [camthink-ai/neoruntime-apps](https://github.com/camthink-ai/neoruntime-apps) | Get the latest build bundles from [Releases](https://github.com/camthink-ai/neoruntime-apps/releases) (`showcase-bundles-latest`) |
 | Flashing tool `hailo15_board_tools` | 1.10.1 | `tools/` directory of the meta-hailo-os repo | See [System Flashing](./2-system-flashing.md) |
 
@@ -41,7 +42,7 @@ When an upgrade is rejected, the error names the failing gate (e.g. `machine mis
 
 ## 3. Factory Preload
 
-The factory preload for the current firmware line (authoritative source: `configs/preload.yaml` in the neoruntime repo).
+The models and apps below are **options the platform can provide as factory presets** (authoritative source: `configs/preload.yaml` in the neoruntime repo; selected per project). What a given device actually ships with is determined by its order/firmware configuration:
 
 ### Preloaded Models (14)
 
@@ -55,30 +56,11 @@ The factory preload for the current firmware line (authoritative source: `config
 | Depth estimation | `depth/scdepthv3` |
 | OCR | `ocr/paddle_ocr_v5_mobile_detection`, `ocr/paddle_ocr_v5_mobile_recognition_nv12`, `ocr/lprnet` (license-plate recognition) |
 
-> The GenAI model `Qwen3-VL-2B-Instruct` (~3GB) is **not** bundled with factory firmware by default; import it separately when needed (see [AI Apps and Models](../2-user-guide/2-applications-and-models.md) for import steps and the [SDK Reference](../4-application-guide/3-reference/1-sdk-reference.md) for model subscription).
-
 ### Preloaded Apps
 
-- **AI Model Showcase** (`model-showcase`): a multi-model capability demo, preloaded on the current firmware line (preloaded but **not auto-started**; start it manually from the Applications page on first use).
+- **AI Model Showcase** (`model-showcase`): a multi-model capability demo, available as a factory-preload option (preloaded but **not auto-started**; start it manually from the Applications page on first use).
 
-> The actual list on a device is authoritative: check the Web Console **Applications & Models** page, or call `GET /api/v1/ai/models` / `GET /api/v1/apps`. Devices on earlier firmware may carry fewer preloads than the table above; models and apps you import yourself appear on top of the factory list.
-
-## 4. Hailo DFC and HEF Model Compatibility
-
-Factory HEF files target the Hailo-15H NPU and are compiled with the Hailo Dataflow Compiler (DFC); the exact DFC version per factory model is stated in its release notes. The currently validated combination for the self-training compile route:
-
-| Item | Validated value (2026-08) |
-|:--|:--|
-| DFC toolchain | Hailo AI SW Suite v5.3.0 |
-| Target arch | `--hw-arch hailo15h` |
-| ONNX opset | 11 |
-| Training framework | ultralytics 8.4.75+ |
-
-For the full convert-and-compile walkthrough for custom models, see [Model Training & HEF Deployment](../4-application-guide/1-app-development/4-model-training-and-hef.md).
-
-The platform's inference preprocessing is **fixed at 384x640 (NV12)**: if a model's input size doesn't match, inference fails with `byte_size mismatch` instead of degrading — always verify the input size before importing a custom model.
-
-## 5. Related Documentation
+## 4. Related Documentation
 
 - [System Flashing](./2-system-flashing.md) — firmware package layout, flashing, and upgrade steps
 - [Model Training & HEF Deployment](../4-application-guide/1-app-development/4-model-training-and-hef.md) — the full lifecycle of custom models

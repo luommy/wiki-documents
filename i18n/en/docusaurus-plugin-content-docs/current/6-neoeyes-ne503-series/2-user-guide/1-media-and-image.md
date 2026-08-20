@@ -1,6 +1,6 @@
 ---
-description: "Complete guide to NE503 video and imaging: the Media page (stream parameters, RTSP, VLC verification) and the three Image sub-tabs — quality and transform (AI ISP / ISP settings / Transform), overlays and privacy masking (Text / DateTime / Image Overlay / Privacy Mask / AI Auto Mask), and lens / IR control."
-keywords: [NE503 video, stream settings, RTSP, VLC pull, AI ISP, Privacy Mask, AI Auto Mask, lens control, IR fill light, IR-CUT]
+description: "Complete guide to NE503 video and imaging: the Media page (stream parameters, RTSP streaming and external-system integration with VLC / FFmpeg / NVR examples) and the three Image sub-tabs — quality and transform (AI ISP / ISP settings / Transform), overlays and privacy masking (Text / DateTime / Image Overlay / Privacy Mask / AI Auto Mask), and lens / IR control."
+keywords: [NE503 video, stream settings, RTSP, VLC pull, FFmpeg, NVR integration, AI ISP, Privacy Mask, AI Auto Mask, lens control, IR fill light, IR-CUT]
 tags: [User Guide, NE503, Video, Image, RTSP]
 ---
 
@@ -51,7 +51,28 @@ Enable **Enable RTSP Stream** to expose the selected stream as a standard RTSP a
 
 Default port: `8554`.
 
-### Verify RTSP with VLC
+## RTSP Integration
+
+External systems (NVR / VMS / business servers) pull NE503 streams via RTSP. Know three constraints and the factory parameters first:
+
+- **RTSP over TCP only** (RTP/AVP/TCP interleaved transport); UDP is not supported — stream-pulling commands must specify TCP;
+- **The RTSP port has no authentication** — the URL carries no username/password, so any host that can reach the port can pull the stream; for public-network deployment, place the device behind a gateway/firewall (see [Security Hardening](./7-security-hardening.md));
+- Factory defaults below; hot-update bitrate, frame rate, and GOP at runtime via the Platform API `PUT /media/encoder` endpoint without rebooting:
+
+| Parameter | Main (main) | Sub (sub) | Third (third) |
+|------|-------------|-------------|---------------|
+| Resolution | 3840×2160 (4K) | 1280×720 | 640×384 |
+| Frame rate | 30 fps | 30 fps | 15 fps |
+| Bitrate | 4 Mbps | 2 Mbps | 512 Kbps |
+| GOP | 30 (1s) | 60 (2s) | 30 (2s) |
+| Profile | High 4.1 | High | Main |
+| Raw frames (NV12) | ✗ encoded H.264 only | ✓ | ✓ (default inference stream) |
+
+Typical division of labor: main stream for HD recording and large-screen display, sub stream for multi-view preview and medium-quality recording, third stream for mobile, AI analysis, and low-bandwidth scenarios. RTSP over TCP adds roughly 10–25% network overhead — budget bandwidth margin beyond the bitrates above. Multiple clients may pull concurrently; the limit depends on device load, so test under your actual deployment.
+
+> The "Raw frames" column determines whether a stream can feed the NPU: only `sub` and `third` publish unencoded NV12 frames. When subscribing for inference, `stream` must be one of these two; specifying `main` (encoded H.264 only) will never yield results. All three are ISP hardware-scaled outputs with no software-scaling overhead.
+
+### Example: Verify the Stream with VLC
 
 RTSP is the primary protocol for integrating NE503 with NVR / VMS platforms. Verify the stream quickly with VLC:
 
@@ -70,6 +91,38 @@ RTSP is the primary protocol for integrating NE503 with NVR / VMS platforms. Ver
 </div>
 
 > If the stream won't pull, check stream status with `aipc-cli stream list`.
+
+### Example: FFmpeg Pulling and Recording
+
+FFmpeg commands must include `-rtsp_transport tcp`:
+
+```bash
+# Verify the stream is available (play for 10 seconds, no actual output)
+ffmpeg -rtsp_transport tcp -i "rtsp://192.168.1.100:8554/main" -t 10 -f null -
+
+# Record directly (no transcoding, keep raw H.264)
+ffmpeg -rtsp_transport tcp -i "rtsp://192.168.1.100:8554/main" \
+  -c copy -f mp4 recording_main.mp4
+
+# Transcode to 720p H.264 for web distribution
+ffmpeg -rtsp_transport tcp -i "rtsp://192.168.1.100:8554/main" \
+  -vf scale=1280:720 -c:v libx264 -preset fast -crf 23 -f mp4 output_720p.mp4
+
+# Capture one frame every 5 seconds as JPEG
+ffmpeg -rtsp_transport tcp -i "rtsp://192.168.1.100:8554/sub" \
+  -vf fps=1/5 -q:v 2 snapshot_%04d.jpg
+```
+
+GStreamer (`rtspsrc protocols=tcp latency=0`), OpenCV, or any tool supporting RTSP over TCP works equally well.
+
+### Example: Connect to an NVR / VMS
+
+NE503 focuses on RTSP integration and does not provide ONVIF device discovery. Add the device manually in the NVR:
+
+1. Choose "Add device manually" or "Custom RTSP"
+2. Fill in the RTSP address: `rtsp://<device-ip>:8554/main`
+3. Select **TCP** as the transport protocol
+4. Choose the stream as needed: `main` for NVR recording, `sub` for multi-view preview
 
 ## Image (Picture, Overlays, and Lens)
 

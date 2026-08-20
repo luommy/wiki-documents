@@ -1,6 +1,6 @@
 ---
 description: NE503 版本兼容性矩阵：系统固件、平台服务、SDK、MCU、烧录工具的当前版本对照，OS 升级的六道兼容关卡，以及出厂预置模型与应用清单，帮助排查版本不匹配导致的隐性问题。
-keywords: [NE503 版本, 固件版本, 兼容性矩阵, Hailo, HEF 模型, 出厂预置, MCU 固件, board_tools, 平台服务版本]
+keywords: [NE503 版本, 固件版本, 兼容性矩阵, 出厂预置, MCU 固件, board_tools, 平台服务版本]
 tags: [软件指南, NE503, 版本管理, 兼容性]
 ---
 
@@ -18,7 +18,8 @@ tags: [软件指南, NE503, 版本管理, 兼容性]
 | 平台服务 | v1.0.1（开源版本线从此起算，不延续旧内部版本号；以 [neoruntime Releases](https://github.com/camthink-ai/neoruntime/releases) 为准） | [camthink-ai/neoruntime](https://github.com/camthink-ai/neoruntime) | 与 OS 一同发布、一同升级 |
 | Web 控制台 | 0.2.4（随平台服务一同发布） | 同上 | Web 控制台 **Settings → 设备信息** |
 | 接口板 MCU 固件 | 0.1.7.0（实测样机） | 固件包内 `ne503_ota_package_v<X.Y.Z>.bin` | API `GET /api/v1/device/status` 的 `mcu_version` 字段 |
-| Python SDK（`hailo_ipc_sdk`） | 0.3.0 | [camthink-ai/neoruntime-sdks](https://github.com/camthink-ai/neoruntime-sdks) | SDK 随应用镜像携带；接口演进时的兼容性以 [neoruntime-sdks Releases](https://github.com/camthink-ai/neoruntime-sdks/releases) 说明为准 |
+| Python SDK（`hailo_ipc_sdk`） | 0.4.0 | [camthink-ai/neoruntime-sdks](https://github.com/camthink-ai/neoruntime-sdks) | SDK 随应用镜像携带；接口演进时的兼容性以 [neoruntime-sdks Releases](https://github.com/camthink-ai/neoruntime-sdks/releases) 说明为准 |
+| C++ SDK（`hailo_ipc_sdk`） | 0.1.0（与 Python SDK 模块镜像，`cv::Mat` 对应 numpy） | 同上（`cpp/` 目录） | API 参考见 [Doxygen 文档站](https://camthink-ai.github.io/neoruntime-sdks/cpp/en/) |
 | 示例应用（neoruntime-apps） | 无独立版本号，跟随 main 更新 | [camthink-ai/neoruntime-apps](https://github.com/camthink-ai/neoruntime-apps) | 构建包从 [Releases](https://github.com/camthink-ai/neoruntime-apps/releases) 取最新（`showcase-bundles-latest`） |
 | 烧录工具 `hailo15_board_tools` | 1.10.1 | meta-hailo-os 仓库 `tools/` 目录 | 详见[系统烧录](./2-system-flashing.md) |
 
@@ -41,7 +42,7 @@ tags: [软件指南, NE503, 版本管理, 兼容性]
 
 ## 3. 出厂预置清单
 
-以下为当前固件线的出厂预置内容（权威来源：neoruntime 仓库 `configs/preload.yaml`）。
+以下是平台**可以作为出厂预设提供的**模型与应用选项（权威来源：neoruntime 仓库 `configs/preload.yaml`，按项目需求选择）。实际设备上的预置内容以订单/固件配置为准：
 
 ### 预置模型（14 个）
 
@@ -55,30 +56,11 @@ tags: [软件指南, NE503, 版本管理, 兼容性]
 | 深度估计 | `depth/scdepthv3` |
 | OCR | `ocr/paddle_ocr_v5_mobile_detection`、`ocr/paddle_ocr_v5_mobile_recognition_nv12`、`ocr/lprnet`（车牌识别） |
 
-> GenAI 模型 `Qwen3-VL-2B-Instruct`（约 3GB）默认**不**随出厂固件内置，需要时另行导入（见 [AI 应用与模型](../2-user-guide/2-applications-and-models.md) 的导入操作与 [SDK 参考](../4-application-guide/3-reference/1-sdk-reference.md) 的模型订阅）。
-
 ### 预装应用
 
-- **AI Model Showcase**（`model-showcase`）：多模型能力演示应用，当前固件线出厂预装（预装**不自启动**，首次在 Applications 页手动启动）。
+- **AI Model Showcase**（`model-showcase`）：多模型能力演示应用，可作为出厂预装选项（预装**不自启动**，首次在 Applications 页手动启动）。
 
-> 设备上的实际清单以实查为准：Web 控制台 **Applications & Models** 页，或 API `GET /api/v1/ai/models` / `GET /api/v1/apps`。早期固件的设备预置集可能少于上表，自行导入的模型与应用会叠加在预置清单之上。
-
-## 4. Hailo DFC 与 HEF 模型兼容
-
-出厂 HEF 均面向 Hailo-15H NPU，由 Hailo Dataflow Compiler（DFC）编译。各出厂模型对应的 DFC 版本以模型发布说明为准；自训练编译路线当前验证可用的组合：
-
-| 项 | 验证值（2026-08） |
-|:--|:--|
-| DFC 工具链 | Hailo AI SW Suite v5.3.0 |
-| 目标架构 | `--hw-arch hailo15h` |
-| ONNX opset | 11 |
-| 训练框架 | ultralytics 8.4.75+ |
-
-自训练模型的完整转换编译流程见[模型训练与 HEF 部署](../4-application-guide/1-app-development/4-model-training-and-hef.md)。
-
-平台推理前处理**固定为 384×640（NV12）**：模型输入尺寸不匹配时，推理会报 `byte_size mismatch` 而非降级运行——导入自定义模型前务必核对输入尺寸。
-
-## 5. 相关文档
+## 4. 相关文档
 
 - [系统烧录](./2-system-flashing.md) — 固件包构成、烧录与升级步骤
 - [模型训练与 HEF 部署](../4-application-guide/1-app-development/4-model-training-and-hef.md) — 自定义模型的完整生命周期

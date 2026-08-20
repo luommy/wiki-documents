@@ -71,17 +71,9 @@ graph LR
 
 Capture, scaling, encoding, RTSP, and raw-frame distribution are handled by camera-daemon; inference scheduling by ai-runtime. Both operate the hardware through the unified HAL interface (see §4). Peripheral control (light/PTZ/GPIO) takes a separate path: app → device-control (gRPC) → HAL.IO → MCU.
 
-### Roles of the Three Streams
+As shown in the diagram, only `sub` and `third` hand **raw NV12 frames** (unencoded) to ai-runtime zero-copy; `main` outputs encoded H.264 only — the key constraint of the inference path:
 
-| Stream | Resolution@fps | Encoded output | Raw frames | Role |
-|--------|---------------|----------------|-----------|------|
-| Main `main` | 3840x2160@30 (4K) | H.264 → RTSP | ✗ | HD recording, large-screen preview |
-| Sub `sub` | 1280x720@30 | H.264 → RTSP | ✓ | Multi-view preview; can also feed AI |
-| Third `third` | 640x384@15 | H.264 → RTSP | ✓ | **Default AI inference stream**; size matches the platform preprocessing |
-
-"Raw frames" means unencoded NV12 frames — only streams that publish raw frames can feed the NPU. All three are ISP hardware-scaled outputs with no software-scaling overhead; factory bitrate, GOP, and hot-update details are in [Video Integration · Stream Overview](../4-application-guide/3-reference/4-video-integration.md).
-
-> When subscribing for inference, `stream` must name a stream that publishes raw frames (`sub` or `third`); `main` only publishes encoded H.264, and subscribing to it will never yield results.
+> When subscribing for inference, `stream` must be `sub` or `third`; specifying `main` will never yield results. Full stream parameters (resolution/bitrate/GOP/raw frames) are in [Video and Imaging · RTSP Integration](../2-user-guide/1-media-and-image.md#rtsp-integration).
 
 ### How Detections Stay Aligned with Frames, Events, and the Picture
 
@@ -107,7 +99,79 @@ See [security-architecture.md](https://github.com/camthink-ai/neoruntime/blob/ma
 
 Platform services fall into two groups: the **data plane** (ai-runtime, camera-daemon — the movers of frames and inference, performance-critical, C++) and the **management plane** (the other five — lifecycle, events, API, peripherals, discovery, Go microservices). Services communicate via gRPC over Unix Domain Sockets; the REST API is exposed externally through the platform-api gateway (internal `127.0.0.1:8080`, via nginx `:443`).
 
-Each service's responsibility, socket path, startup dependencies, and source pointers are in the [Platform Services Overview](./4-platform-services.md); the proto definitions of the gRPC interfaces are also listed there per service.
+### 3.1 Service Collaboration
+
+platform-api is the unified external entry point, aggregating every service's gRPC interfaces; event-bus is the messaging hub that nearly all services publish to; camera-daemon and device-control cooperate over a dedicated socket for lens control.
+
+```mermaid
+flowchart LR
+    API["platform-api<br/>REST · WebSocket"]
+    Cam["camera-daemon"]
+    AI["ai-runtime"]
+    Bus{{"event-bus"}}
+    AppMgr["app-manager"]
+    DevCtrl["device-control"]
+
+    API -->|gRPC aggregate| AI
+    API -->|gRPC aggregate| AppMgr
+    API -->|gRPC aggregate| DevCtrl
+    API -->|gRPC aggregate| Bus
+    API -->|camera-control.sock| Cam
+    AppMgr -->|schedule containers| AI
+    DevCtrl -->|camera-control.sock| Cam
+    Cam -.publish events.-> Bus
+    AI -.publish events.-> Bus
+    DevCtrl -.publish events.-> Bus
+```
+
+device-discovery is relatively independent: it manages external managed devices via MQTT/UDP and consumes no other platform services, so it is not in the diagram. The gRPC contract authority is the [source repository](https://github.com/camthink-ai/neoruntime)'s proto and YAML files; this page does not restate them.
+
+### 3.2 Socket Overview
+
+Internal communication goes over `/run/aipc/*.sock` (for on-device diagnosis, use `ss -x | grep aipc` or `systemctl status`). The single exception: event-bus also listens on TCP `127.0.0.1:50053` for Hailo C++ gRPC clients (the Hailo gRPC library lacks a unix socket resolver).
+
+| Socket | Provider | Consumers | Purpose |
+|:--|:--|:--|:--|
+| `/run/aipc/camera.sock` | camera-daemon | ai-runtime | Raw-frame fd receiving (SCM_RIGHTS zero-copy) |
+| `/run/aipc/camera-control.sock` | camera-daemon | device-control, platform-api | Lens control (lens_hal protocol) |
+| `/run/aipc/ai-runtime.sock` | ai-runtime | SDK apps, platform-api, app-manager | Inference (inference.proto) |
+| `/run/aipc/app-manager.sock` | app-manager | platform-api | App lifecycle (app.proto) |
+| `/run/aipc/event-bus.sock` | event-bus | all services, SDK apps | Event pub/sub (event.proto) |
+| `/run/aipc/device-control.sock` | device-control | SDK apps, platform-api | Peripheral control (device.proto) |
+| `/run/aipc/device-discovery.sock` | device-discovery | platform-api | Device discovery (discovery.proto) |
+
+### 3.3 Startup Dependencies
+
+Startup dependencies come from the [systemd unit declarations](https://github.com/camthink-ai/neoruntime/tree/main/systemd) (`After` / `Wants`). Shared prerequisites for every service: `aipc-restore.service`, `aipc-firstboot.service`, `network.target`; the table lists only what is **specific** to each service:
+
+| Service | Specific dependencies |
+|:--|:--|
+| camera-daemon | After `aipc-mcu-prep`, `isp_media_server`, `hailort_server` |
+| ai-runtime | After + Wants `containerd.service` |
+| event-bus, device-discovery | none specific |
+| device-control | After + Wants **camera-daemon**; After `aipc-mcu-prep` |
+| app-manager | Wants `ai-runtime`, `event-bus`, `containerd` |
+| platform-api | After + Wants `ai-runtime`, `app-manager`, `device-control`, `event-bus` |
+
+Troubleshooting notes:
+
+- **camera-daemon has the deepest base-unit chain** (MCU prep → ISP media server → HailoRT server) — for picture issues, check `systemctl status isp_media_server hailort_server` before camera-daemon itself;
+- ai-runtime starts in parallel with camera-daemon and connects via socket retry — ai-runtime coming up before camera-daemon is normal;
+- platform-api starts last; `After` guarantees ordering, not readiness (Wants is a weak dependency — a failed dependency still lets it start).
+
+### 3.4 Service Inventory
+
+All paths below are relative to the [neoruntime repository](https://github.com/camthink-ai/neoruntime) root.
+
+| Service | Responsibility | Source entry |
+|:--|:--|:--|
+| camera-daemon (C++) | Hardware abstraction entry: sensor, ISP, H.264/H.265 encoding, RTSP, MCU communication, audio; hands frames downstream zero-copy via DMA-BUF fds | `platform/camera-daemon/`, proto `camera.proto`/`lens_hal.proto`, design doc `docs/services/CAMERA_DAEMON_DESIGN.md` |
+| ai-runtime (C++) | AI inference runtime: HEF model loading, single-shot/streaming inference, NPU scheduling, CLIP text encoding, GenAI streaming and post-processing; results auto-published to event-bus | `platform/ai-runtime/`, proto `inference.proto`, reference `docs/services/ai-runtime.md` |
+| app-manager | Container app lifecycle: wraps containerd for app/image/container install, start/stop, logs, exec, Web URL registration | `platform/app-manager/`, proto `app.proto` |
+| event-bus | Platform messaging hub: pub/sub, batch publish, topic management, wildcard subscription | `platform/event-bus/`, proto `event.proto` |
+| device-control | Peripheral control: PTZ, lens, fill light/IR LED/IR-Cut, fan/heater/radar, alarm output (relay/Wiegand), RS485, GPIO | `platform/device-control/`, proto `device.proto` |
+| device-discovery | CamThink device discovery and management: CT-Disc protocol (LAN UDP multicast `239.255.255.250:19850`, CAT1 via MQTT registration), SN-keyed device registry, heartbeat and management commands | `platform/device-discovery/`, proto `discovery.proto` |
+| platform-api | HTTP/WebSocket gateway: aggregates each service's gRPC, exposes REST APIs and WebSocket externally, hosts the web console backend and authentication | `platform/platform-api/` + frontend `web/` |
 
 ---
 
@@ -192,31 +256,10 @@ The Event Bus uses a publish/subscribe pattern with MQTT-style wildcard matching
 
 ---
 
-## 7. System Configuration
-
-Platform configuration falls into two kinds: **daily settings** (network, time zone, stream parameters — change them in the web console or via the REST API; not covered here) and **system configuration** (service parameters — only touched for platform development/customization). System configuration is YAML files, shipped under `/data/aipc/etc/` on the device and located under `configs/` in the repository:
-
-| Configuration File | Service | Core Configuration |
-|:---|:---|:---|
-| `platform-api.yaml` | platform-api | Server port, authentication keys, log level |
-| `platform/app-manager.yaml` | app-manager | containerd connection, security policies, resource limits |
-| `platform/event-bus.yaml` | event-bus | Socket path, TCP listener, topic ACL |
-| `platform/device-control.yaml` | device-control | MCU UART device, lens parameters, automation rules |
-| `platform/camera-daemon.yaml` | camera-daemon | Video capture, encoding parameters, RTSP configuration |
-| `platform/discovery.yaml` | device-discovery | CT-Disc protocol parameters |
-| `ai/ai-runtime.yaml` | ai-runtime | HAL library paths, model repository, scheduler, auto-inference pipeline |
-| `preload.yaml` | Factory preload | Preloaded models and apps list (registered by the platform on first deployment) |
-| `security/seccomp-default.json` | Security | Default Seccomp system call allowlist |
-
-Installation path: `/data/aipc/` (binaries in `bin/`, configuration in `etc/`).
-
----
-
-## 8. Related Documentation
+## 7. Related Documentation
 
 **Within this wiki**:
 
-- [Platform Services Overview](./4-platform-services.md) — Service responsibilities, collaboration, and source pointers
 - [Application Development Guide](../4-application-guide/3-reference/0-app-reference.md) — How to write and deploy container applications
 - [Python SDK Reference](../4-application-guide/3-reference/1-sdk-reference.md) — SDK API signatures and usage examples
 

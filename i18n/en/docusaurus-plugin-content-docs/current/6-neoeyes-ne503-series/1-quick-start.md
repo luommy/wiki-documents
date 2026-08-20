@@ -121,6 +121,7 @@ The device is live. Look up where to go by task:
 | Pull an RTSP stream into an NVR / VMS | [User Guide · Video and Imaging](./2-user-guide/1-media-and-image.md) |
 | Install your own AI app, manage models | [User Guide · AI Apps and Models](./2-user-guide/2-applications-and-models.md) |
 | Wire up alarm / access control / audio | [User Guide · Peripherals](./2-user-guide/3-peripherals.md) |
+| Discover devices in bulk / command-line management | [User Guide · Device Management Tools](./2-user-guide/4-device-management-tools.md) |
 | Upgrade firmware / view logs / operate | [User Guide · System Management](./2-user-guide/5-deployment.md) |
 
 ### Quick Reference

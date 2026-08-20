@@ -631,4 +631,4 @@ systemctl status ai-runtime camera-daemon app-manager event-bus device-control p
 ## 9. 相关文档
 
 - [System Architecture](./0-system-architecture.md) — 四层架构和核心服务
-- [Software Deployment](./3-software-deployment.md) — 平台软件部署和迭代开发
+- [Software Deployment](./3-software-deployment.md) — 平台软件部署

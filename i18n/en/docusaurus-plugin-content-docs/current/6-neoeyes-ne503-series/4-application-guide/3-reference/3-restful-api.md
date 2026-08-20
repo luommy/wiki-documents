@@ -606,6 +606,6 @@ All WebSocket endpoints pass the authentication token via `?token=<token>`.
 - [Platform Architecture](../../3-software-guide/0-system-architecture.md) — NE503 four-layer architecture and service dependencies
 - [App Development](./0-app-reference.md) — Container app development reference
 - [SDK Reference](./1-sdk-reference.md) — Complete Python SDK API reference
-- [Platform Services Overview](../../3-software-guide/4-platform-services.md) — Responsibilities and source pointers for each service
-- [Video Integration](./4-video-integration.md) — Practical RTSP video stream integration
+- [System Architecture · Platform Services Layer](../../3-software-guide/0-system-architecture.md) — Responsibilities and source pointers for each service
+- [Video Integration](../../2-user-guide/1-media-and-image.md) — RTSP integration and NVR/VMS connection
 - [Event Integration](./5-event-integration.md) — Practical Event Bus integration
