@@ -6,86 +6,7 @@ tags: [API参考, NE503, RESTful, HTTP接口, 开发者]
 
 # RESTful API Reference
 
-Platform API 是 NE503 的 HTTP 网关，基于 Go + Gin 框架构建，代理所有后端 gRPC 服务，支持 WebSocket 实时通信（事件流、视频流、终端、容器日志）。技术栈：Go + Gin + gRPC Client + SQLite (GORM)。
-
-```mermaid
-graph TB
-    subgraph "客户端层"
-        WC["Web 控制台 (React)"]
-        M["移动端 App"]
-        T["第三方客户端"]
-    end
-
-    subgraph "Platform API 网关"
-        subgraph "HTTP Server"
-            HS["HTTP Server (Gin)"]
-            RM["路由管理器"]
-        end
-
-        subgraph "中间件层"
-            AM["认证中间件"]
-            CM["CORS 中间件"]
-            LM["日志中间件"]
-            MM["监控中间件"]
-        end
-
-        subgraph "Handler 层"
-            MH["HTTP Handlers"]
-            WS["WebSocket Handlers"]
-        end
-
-        subgraph "连接池"
-            GC["gRPC 连接池 (复用)"]
-        end
-    end
-
-    subgraph "后端服务层"
-        AIR["AI Runtime"]
-        EB["Event Bus"]
-        DC["Device Control"]
-        AMG["App Manager"]
-        CC["camera-daemon"]
-        DIS["Discovery"]
-    end
-
-    subgraph "存储层"
-        DB["SQLite (GORM)"]
-        ES["事件日志"]
-        MS["模型存储 (CAS)"]
-    end
-
-    WC -->|HTTPS| RM
-    M -->|HTTPS| RM
-    T -->|HTTPS| RM
-
-    RM -->|请求| AM
-    AM -->|认证通过| CM
-    CM -->|处理| LM
-    LM -->|路由| MH
-    MH -->|代理| GC
-    MH -->|实时| WS
-
-    GC -->|gRPC| AIR
-    GC -->|gRPC| EB
-    GC -->|gRPC| DC
-    GC -->|gRPC| AMG
-    GC -->|gRPC| CC
-    GC -->|gRPC| DIS
-
-    MH -->|读写| DB
-    MH -->|日志| ES
-    MH -->|模型| MS
-
-    WS -->|WebSocket| EB
-    WS -->|WebSocket| CC
-    WS -->|WebSocket| AMG
-
-    style HS fill:#e3f2fd
-    style GC fill:#e8f5e9
-    style MH fill:#f3e5f5
-```
-
-请求处理流程：客户端发送 HTTP 请求 → CORS 处理 → 日志记录 → 认证校验 → 路由匹配 → 参数校验 → 权限检查 → 业务逻辑（通过 gRPC 连接池调用后端服务） → 响应包装。网关处理延迟约 1-5ms，后端服务处理约 10-50ms。
+Platform API 是 NE503 的 HTTP 网关，基于 Go + Gin 框架（数据存储 SQLite / GORM），通过 gRPC 连接池代理所有后端服务（AI Runtime、Event Bus、Device Control、App Manager、camera-daemon 等），并支持 WebSocket 实时通信（事件流、视频流、容器日志、Web 终端）。平台整体分层架构、服务拓扑与启动依赖见[系统架构](../../3-software-guide/0-system-architecture.md)。
 
 ---
 
@@ -612,9 +533,8 @@ SSH 服务状态查询（只读）与自定义键值配置（key-value），供�
 
 ## 15. 相关文档
 
-- [平台架构](../../3-software-guide/0-system-architecture.md) — NE503 四层架构与服务依赖关系
+- [平台架构](../../3-software-guide/0-system-architecture.md) — NE503 四层架构、服务职责与源码指针
 - [应用开发](./0-app-reference.md) — 容器应用开发参考
 - [SDK 参考](./1-sdk-reference.md) — Python SDK 完整 API 参考
-- [系统架构 · 平台服务层](../../3-software-guide/0-system-architecture.md) — 各服务职责与源码指针
-- [视频集成](../../2-user-guide/1-media-and-image.md) — RTSP 视频流对接与 NVR/VMS 接入
+- [视频与成像](../../2-user-guide/1-media-and-image.md) — RTSP 视频流对接与 NVR/VMS 接入
 - [事件集成](./5-event-integration.md) — Event Bus 对接实战

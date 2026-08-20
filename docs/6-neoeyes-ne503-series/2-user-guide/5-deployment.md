@@ -124,7 +124,7 @@ tags: [用户指南, NE503, 部署, 运维, 系统管理]
 
 - **告警阈值**：Data 使用率超过 80% 时应清理日志、卸载闲置应用或删除不再使用的模型，也可插入 microSD 卡扩展容量。
 - **日志清理**：通过 SSH 执行 `truncate -s 0 /data/aipc/logs/*.log`。
-- **录像存储**：当前固件不提供本机录像存储，录像由外部 NVR / VMS 拉流完成（见[视频集成](../2-user-guide/1-media-and-image.md)）。
+- **录像存储**：当前固件不提供本机录像存储，录像由外部 NVR / VMS 拉流完成（见[视频与成像](../2-user-guide/1-media-and-image.md)）。
 - **命令行管理**：使用 `aipc-cli`，常用命令见[设备管理工具](./4-device-management-tools.md)。
 
 ### 3.3 运维工具

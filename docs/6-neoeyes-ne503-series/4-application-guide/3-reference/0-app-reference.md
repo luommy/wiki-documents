@@ -211,7 +211,7 @@ spec:
 | `sub.raw` | 原始视频流（sub 流发布 NV12 帧，DMA-BUF 共享内存零拷贝，**推理订阅用**） |
 | `main` | 编码视频流（H264，RTSP 拉流用，无法用于推理订阅） |
 
-声明 `.raw` 流时，平台自动挂载 `/dev/dma_heap` 设备（多容器 main 容器还共享 host IPC 命名空间）以支持 DMA-BUF 零拷贝内存映射。`main` 只发编码 H264，`subscribe(stream="main")` 会永久挂住——推理必须用 `sub`。
+声明 `.raw` 流时，平台自动挂载 `/dev/dma_heap` 设备（多容器 main 容器还共享 host IPC 命名空间）以支持 DMA-BUF 零拷贝内存映射。推理订阅用 `sub`，`main` 只发编码 H.264 无法订阅推理，三路码流约束见[视频与成像 · RTSP 对接](../../2-user-guide/1-media-and-image.md#rtsp-对接)。
 
 **inference** -- AI 推理权限：
 
@@ -605,5 +605,4 @@ SDK 自动读取的连接配置变量（通常无需修改，平台已通过 Soc
 
 - [Python SDK 参考](./1-sdk-reference.md) -- SDK API 签名与数据类型
 - [SDK 示例](./2-sdk-examples.md) -- 完整应用示例和开发教程
-- [平台架构](../../3-software-guide/0-system-architecture.md) -- 系统设计与数据流
-- [系统架构 · 平台服务层](../../3-software-guide/0-system-architecture.md) -- App Manager 等服务职责与源码指针
+- [平台架构](../../3-software-guide/0-system-architecture.md) -- 系统设计、服务职责与源码指针

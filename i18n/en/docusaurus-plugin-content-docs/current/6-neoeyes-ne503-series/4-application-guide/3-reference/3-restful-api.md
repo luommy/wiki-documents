@@ -6,86 +6,7 @@ tags: [API reference, NE503, RESTful, HTTP interface, developer]
 
 # RESTful API Reference
 
-The Platform API is the HTTP gateway for the NE503. It is built on Go + Gin, proxies all backend gRPC services, and supports WebSocket real-time communication (event streams, video streams, terminal, container logs). Tech stack: Go + Gin + gRPC Client + SQLite (GORM).
-
-```mermaid
-graph TB
-    subgraph "Client Layer"
-        WC["Web Console (React)"]
-        M["Mobile App"]
-        T["Third-party Client"]
-    end
-
-    subgraph "Platform API Gateway"
-        subgraph "HTTP Server"
-            HS["HTTP Server (Gin)"]
-            RM["Router Manager"]
-        end
-
-        subgraph "Middleware Layer"
-            AM["Auth Middleware"]
-            CM["CORS Middleware"]
-            LM["Logging Middleware"]
-            MM["Monitoring Middleware"]
-        end
-
-        subgraph "Handler Layer"
-            MH["HTTP Handlers"]
-            WS["WebSocket Handlers"]
-        end
-
-        subgraph "Connection Pool"
-            GC["gRPC Connection Pool (reused)"]
-        end
-    end
-
-    subgraph "Backend Service Layer"
-        AIR["AI Runtime"]
-        EB["Event Bus"]
-        DC["Device Control"]
-        AMG["App Manager"]
-        CC["camera-daemon"]
-        DIS["Discovery"]
-    end
-
-    subgraph "Storage Layer"
-        DB["SQLite (GORM)"]
-        ES["Event Logs"]
-        MS["Model Storage (CAS)"]
-    end
-
-    WC -->|HTTPS| RM
-    M -->|HTTPS| RM
-    T -->|HTTPS| RM
-
-    RM -->|Request| AM
-    AM -->|Authenticated| CM
-    CM -->|Process| LM
-    LM -->|Route| MH
-    MH -->|Proxy| GC
-    MH -->|Realtime| WS
-
-    GC -->|gRPC| AIR
-    GC -->|gRPC| EB
-    GC -->|gRPC| DC
-    GC -->|gRPC| AMG
-    GC -->|gRPC| CC
-    GC -->|gRPC| DIS
-
-    MH -->|Read/Write| DB
-    MH -->|Logs| ES
-    MH -->|Models| MS
-
-    WS -->|WebSocket| EB
-    WS -->|WebSocket| CC
-    WS -->|WebSocket| AMG
-
-    style HS fill:#e3f2fd
-    style GC fill:#e8f5e9
-    style MH fill:#f3e5f5
-```
-
-Request processing flow: client sends HTTP request → CORS handling → logging → authentication check → route matching → parameter validation → permission check → business logic (calls backend services via the gRPC connection pool) → response wrapping. Gateway overhead is about 1–5 ms; backend service processing is about 10–50 ms.
+The Platform API is the HTTP gateway for the NE503. It is built on Go + Gin (data storage SQLite / GORM), proxies all backend services (AI Runtime, Event Bus, Device Control, App Manager, camera-daemon, etc.) via a gRPC connection pool, and supports WebSocket real-time communication (event streams, video streams, container logs, web terminal). The overall layered platform architecture, service topology, and startup dependencies are covered in [System Architecture](../../3-software-guide/0-system-architecture.md).
 
 ---
 
@@ -603,9 +524,8 @@ All WebSocket endpoints pass the authentication token via `?token=<token>`.
 
 ## 15. Related Documentation
 
-- [Platform Architecture](../../3-software-guide/0-system-architecture.md) — NE503 four-layer architecture and service dependencies
+- [Platform Architecture](../../3-software-guide/0-system-architecture.md) — NE503 four-layer architecture, service responsibilities and source pointers
 - [App Development](./0-app-reference.md) — Container app development reference
 - [SDK Reference](./1-sdk-reference.md) — Complete Python SDK API reference
-- [System Architecture · Platform Services Layer](../../3-software-guide/0-system-architecture.md) — Responsibilities and source pointers for each service
-- [Video Integration](../../2-user-guide/1-media-and-image.md) — RTSP integration and NVR/VMS connection
+- [Video and Imaging](../../2-user-guide/1-media-and-image.md) — RTSP integration and NVR/VMS connection
 - [Event Integration](./5-event-integration.md) — Practical Event Bus integration

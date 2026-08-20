@@ -71,21 +71,23 @@ ping 10.0.0.1
 
 ## 5. 体验 AI
 
-NE503 的 AI 能力通过容器应用体现。官方应用仓库 [camthink-ai/neoruntime-apps](https://github.com/camthink-ai/neoruntime-apps) 提供多个示例应用，其中 **AI Model Showcase** 集中展示多模型推理——目标检测、语义分割、关键点、OCR、CLIP 零样本分类、单目深度估计等。
+NE503 的 AI 能力通过容器应用体现。**AI Model Showcase** 集中演示多模型推理——目标检测、语义分割、关键点、OCR、CLIP 零样本分类、单目深度估计等。官方仓库 [camthink-ai/neoruntime-apps](https://github.com/camthink-ai/neoruntime-apps) 提供**预构建安装包**，无需自行编译：
 
-从仓库克隆源码、按仓库说明构建 `.aipc` 安装包。控制台导入向导需要分别选择 `app.yaml` 和 `image.tar`，不能直接上传 `.aipc`。如果构建后只保留了 `.aipc`，先解压：
+1. **下载并解压** [model-showcase-latest-arm64.tar.gz](https://github.com/camthink-ai/neoruntime-apps/releases/download/showcase-bundles-latest/model-showcase-latest-arm64.tar.gz)（约 300 MB，含 `app.yaml` 与 `image.tar`）：
 
-```bash
-unzip -o <package>.aipc -d <package-directory>
-```
+   ```bash
+   tar xzf model-showcase-latest-arm64.tar.gz
+   ```
 
-在 **Applications** 页面点 **Import**，选择 **Upload Package**。在 **App Manifest** 中选择 `app.yaml`，在 **Container Image** 中选择 `image.tar`，再按向导勾选 Permissions（应用所需的模型与码流）完成安装：
+2. **上传安装**：在 **Applications** 页面点 **Import**，选择 **Upload Package**，在 **App Manifest** 中选择 `app.yaml`、在 **Container Image** 中选择 `image.tar`，按向导勾选 Permissions（应用所需的模型与码流），点 **Install**：
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/quick-start/qs-app-management.png" />
+   <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/quick-start/qs-app-management.png" />
 
-安装启动后，点击应用卡片的 **Visit App** 打开 Showcase 界面，切换不同模型实时查看推理效果：
+3. **查看效果**：安装后启动应用，点应用卡片的 **Visit App** 打开 Showcase 界面，切换不同模型实时查看推理效果：
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/quick-start/qs-model-showcase.png" />
+   <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/quick-start/qs-model-showcase.png" />
+
+想从源码自行构建（clone → `scripts/build_app.sh` 打包 `.aipc`），见 [SDK 工作流](./4-application-guide/1-app-development/0-sdk-workflow.md)；安装向导各步骤字段的完整说明见 [AI 应用与模型](./2-user-guide/2-applications-and-models.md)。
 
 ## 6. 配置网络与时区
 

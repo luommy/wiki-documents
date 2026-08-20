@@ -164,7 +164,7 @@ journalctl -u platform-api | grep -i "websocket\|h264"
 wscat --no-check -c wss://<device_ip>/api/v1/h264/main
 ```
 
-For client-side reconnection strategies see [Video Integration](./2-user-guide/1-media-and-image.md).
+For client-side reconnection strategies see [Video and Imaging](./2-user-guide/1-media-and-image.md).
 
 ### 2.3 Stuck in SIMULATION Mode with No Detections
 
@@ -777,7 +777,6 @@ aipc-cli event subscribe "app/<your_app>/*"              # subscription test
 ## Related Docs
 
 - [System Architecture · Platform Services Layer](./3-software-guide/0-system-architecture.md) — service responsibilities and aipc-cli command reference
-- [Platform Architecture](./3-software-guide/0-system-architecture.md)
 - [System Flashing](./3-software-guide/2-system-flashing.md) — flashing procedures and flashing troubleshooting (§8)
 - [Hardware Wiring](./2-hardware-guide/2-aipc-board-connection.md) — peripheral terminal definitions
 - [Deployment & Operations](./2-user-guide/5-deployment.md) — disk policy, OTA & rollback

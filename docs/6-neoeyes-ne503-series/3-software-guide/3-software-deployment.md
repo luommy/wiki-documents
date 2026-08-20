@@ -97,21 +97,13 @@ Proceed with deployment? [y/N] y
 
 ## 3. 部署验证
 
-部署完成后在设备上检查服务状态（应全部 active）：
+部署完成后在设备上确认 AIPC 服务正常。先用平台健康端点快速探测 API 存活（`GET /system/health`，公开端点无需鉴权，见 [RESTful API](../4-application-guide/3-reference/3-restful-api.md#3-系统管理)），再确认关键服务 active：
 
 ```bash
-systemctl status ai-runtime camera-daemon app-manager event-bus device-control device-discovery platform-api
+systemctl status platform-api
 ```
 
-预期输出：
-
-```plaintext
-● ai-runtime.service - AI Runtime Service
-     Loaded: loaded (/etc/systemd/system/ai-runtime.service)
-     Active: active (running)
-```
-
-浏览器访问 `https://<device-ip>`，默认凭据 `admin` / `password`。
+全部服务列表与启动失败排查见[故障排查 · 服务启动失败](../5-troubleshooting.md#82-服务启动失败)。浏览器访问 `https://<device-ip>`，默认凭据 `admin` / `password`。
 
 ## 4. 相关文档
 

@@ -164,7 +164,7 @@ journalctl -u platform-api | grep -i "websocket\|h264"
 wscat --no-check -c wss://<设备IP>/api/v1/h264/main
 ```
 
-接入侧重连策略见[视频集成](./2-user-guide/1-media-and-image.md)。
+接入侧重连策略见[视频与成像](./2-user-guide/1-media-and-image.md)。
 
 ### 2.3 一直处于仿真模式（SIMULATION）无检测
 
@@ -777,7 +777,6 @@ aipc-cli event subscribe "app/<your_app>/*"              # 订阅测试
 ## 相关文档
 
 - [系统架构 · 平台服务层](./3-software-guide/0-system-architecture.md) — 各服务职责、协作关系与 aipc-cli 命令速查
-- [平台架构](./3-software-guide/0-system-architecture.md)
 - [系统烧录](./3-software-guide/2-system-flashing.md) — 烧录流程与烧录故障排查（§8）
 - [硬件接线](./2-hardware-guide/2-aipc-board-connection.md) — 外设端子定义
 - [部署与运维](./2-user-guide/5-deployment.md) — 磁盘策略、OTA 与回滚

@@ -97,21 +97,13 @@ Complete examples:
 
 ## 3. Deployment Verification
 
-After deployment, check service status on the device (all should be active):
+After deployment, confirm the AIPC services are running on the device. Start with the platform liveness endpoint (`GET /system/health`, a public endpoint requiring no auth; see [RESTful API](../4-application-guide/3-reference/3-restful-api.md#3-system-management)), then verify key services are active:
 
 ```bash
-systemctl status ai-runtime camera-daemon app-manager event-bus device-control device-discovery platform-api
+systemctl status platform-api
 ```
 
-Expected output:
-
-```plaintext
-● ai-runtime.service - AI Runtime Service
-     Loaded: loaded (/etc/systemd/system/ai-runtime.service)
-     Active: active (running)
-```
-
-Access the Web console at `https://<device-ip>` with default credentials `admin` / `password`.
+For the full service list and startup-failure troubleshooting, see [Troubleshooting · Service Startup Failure](../5-troubleshooting.md#82-service-startup-failure). Access the Web console at `https://<device-ip>` with default credentials `admin` / `password`.
 
 ## 4. Related Documentation
 

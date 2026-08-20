@@ -39,7 +39,7 @@ Each app depends on a different inference model. Before first use, load the corr
 ![Model preload: scan and load model](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/verified-apps/upload-model.png)
 :::
 
-> More app use cases are being adapted. For custom app development, see the [App Development Guide](/docs/neoeyes-ne503-series/application-guide/app-development/sdk-workflow).
+> More app use cases are being adapted. For custom app development, see the [SDK Workflow](./1-app-development/0-sdk-workflow.md).
 
 ---
 

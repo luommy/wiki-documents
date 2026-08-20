@@ -25,7 +25,7 @@ git clone https://github.com/camthink-ai/neoruntime-apps.git
 
 > When building apps, clone `neoruntime-apps` and `neoruntime-sdks` into the **same parent directory** — the unified build script `scripts/build_app.sh` takes the SDK from the adjacent `neoruntime-sdks`.
 
-Key directories in the platform repo: `platform/` (the seven platform services), `hal_v2/` (HAL, the only maintained version), `web/` (web console), `configs/` (config templates), `tools/` (incl. aipc-cli), `scripts/`, `systemd/`, `deploy/`, `docker/`. The build system has three layers: Layer 1 (Go + Node.js + protoc + Python — platform services and web), Layer 2 (+ CMake + g++ + gRPC C++ — native C/C++ components), Layer 3 (+ Hailo Yocto cross-compile SDK — HAL firmware and the full release package). Most developers need only Layers 1/2; the full release package (`pack-release`) requires Layer 3.
+Clone `neoruntime` only when you develop the platform services/HAL or build the full release package. The build has three layers — Layer 1 (Go + Node.js + Python: platform services and web), Layer 2 (+ C++ toolchain: native components like camera-daemon / ai-runtime and HAL v2), Layer 3 (+ Hailo Yocto cross-compile SDK: HAL firmware and the full release package). All layer dependencies are bundled in the official Docker image (see §2); most builds need only Layers 1/2, and only the `pack-release` step requires Layer 3.
 
 ## 2. Docker Development Environment
 
@@ -51,14 +51,14 @@ docker exec ne503-dev make pack-release VERSION=1.0.0   # run a build directly
 
 ### Python SDK (Development Mode)
 
-The Python SDK lives in the `neoruntime-sdks` repo. Inside the container (or at the project root):
+`pip3 install -e ".[dev]"` installs the Python SDK in **editable (development) mode** — changes to the SDK source take effect immediately, no reinstall needed. Run it from the `neoruntime-sdks` repo:
 
 ```bash
-cd ../neoruntime-sdks/python
+cd ../neoruntime-sdks/python   # adjust to your repo location
 pip3 install -e ".[dev]"
 ```
 
-> On `error: externally-managed-environment`, use a venv instead: `python3 -m venv .venv && source .venv/bin/activate` before installing; re-activate with `source .venv/bin/activate` before each session.
+> On `error: externally-managed-environment` (the system Python refuses to install packages globally), create a virtual environment first: `python3 -m venv .venv && source .venv/bin/activate`, then re-run the install command above (activate with `source .venv/bin/activate` again in each new shell).
 
 ## 3. Full Build
 

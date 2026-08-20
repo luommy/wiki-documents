@@ -39,7 +39,7 @@ tags: [NE503, 应用部署, 容器应用, Person Detection, 占用率监测, Saf
 ![模型预加载：扫描并加载模型](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/verified-apps/upload-model.png)
 :::
 
-> 更多应用用例正在适配中，自定义应用开发请参考 [应用开发指南](/docs/neoeyes-ne503-series/application-guide/app-development/sdk-workflow)。
+> 更多应用用例正在适配中，自定义应用开发请参考 [SDK 工作流](./1-app-development/0-sdk-workflow.md)。
 
 ---
 

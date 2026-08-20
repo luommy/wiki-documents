@@ -23,8 +23,6 @@ Current firmware line (2026-07 build):
 | Example apps (neoruntime-apps) | No standalone version number; tracks main | [camthink-ai/neoruntime-apps](https://github.com/camthink-ai/neoruntime-apps) | Get the latest build bundles from [Releases](https://github.com/camthink-ai/neoruntime-apps/releases) (`showcase-bundles-latest`) |
 | Flashing tool `hailo15_board_tools` | 1.10.1 | `tools/` directory of the meta-hailo-os repo | See [System Flashing](./2-system-flashing.md) |
 
-> Before upgrading firmware, check the current versions on the device's Settings → Device Info page, then pick the matching upgrade package. For cross-line upgrades (old internal builds → the open-source line), follow the instructions bundled with the upgrade package.
-
 ## 2. OS Upgrade Compatibility Gates
 
 Before installing an OS upgrade package, the platform enforces the following gates (declared in the package's `sw-description` and on the device side; validation logic lives in `platform/osupgrade/validate.go` in the neoruntime repo). **If any gate fails, the package is rejected**, which prevents bricking the device with mismatched firmware:

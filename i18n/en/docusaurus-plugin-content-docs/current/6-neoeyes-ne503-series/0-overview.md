@@ -31,130 +31,22 @@ NeoEyes NE503 is an edge AI smart camera based on the **Hailo-15H SoC**, featuri
 
 ## Product Specifications
 
-NE503 core specifications are as follows:
+Below is a summary of the NE503's core specifications. For full chip-level and module-level parameters, see [Hardware Specifications](./2-hardware-guide/0-specifications.md):
 
-<table>
-  <colgroup>
-    <col width="14%" />
-    <col width="18%" />
-    <col width="68%" />
-  </colgroup>
-  <thead>
-    <tr>
-      <th>Category</th>
-      <th>Item</th>
-      <th>Specification</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td rowSpan="6">Core Platform</td>
-      <td>SoC</td>
-      <td>Hailo-15H</td>
-    </tr>
-    <tr>
-      <td>CPU</td>
-      <td>Cortex-A53 × 4 @ 1.3 GHz</td>
-    </tr>
-    <tr>
-      <td>NPU</td>
-      <td>Hailo NPU, 20 TOPS @ INT8, supports 4-bit quantization</td>
-    </tr>
-    <tr>
-      <td>Memory / Storage</td>
-      <td>8 GB LPDDR4 / 64 GB eMMC, supports TF Card and M.2 SSD expansion (M.2 not yet supported)</td>
-    </tr>
-    <tr>
-      <td>Video Encoding</td>
-      <td>H.264 / H.265 hardware encoding, 4K@30fps</td>
-    </tr>
-    <tr>
-      <td>System Power</td>
-      <td>5–6W (typical load)</td>
-    </tr>
-    <tr>
-      <td rowSpan="3">Imaging System</td>
-      <td>Image Sensor</td>
-      <td>Sony IMX678, 1/1.8" CMOS, 4K UHD</td>
-    </tr>
-    <tr>
-      <td>Lens Module</td>
-      <td>AF auto-zoom 8–32mm, F1.6–F1.7</td>
-    </tr>
-    <tr>
-      <td>ISP</td>
-      <td>Hailo Gen2 AI-ISP, &lt;0.01 LUX full-color night vision</td>
-    </tr>
-    <tr>
-      <td rowSpan="4">Network &amp; Protocols</td>
-      <td>Ethernet</td>
-      <td>10/100M LAN, supports PoE 802.3AT</td>
-    </tr>
-    <tr>
-      <td>Video Protocol</td>
-      <td>RTSP</td>
-    </tr>
-    <tr>
-      <td>Data Protocol</td>
-      <td>MQTT / Event Bus / RTMP (planned)</td>
-    </tr>
-    <tr>
-      <td>Service Access</td>
-      <td>Engineering and maintenance access for integration and support</td>
-    </tr>
-    <tr>
-      <td rowSpan="5">Deployment Environment</td>
-      <td>Power Supply</td>
-      <td>DC 12V or PoE 802.3AT</td>
-    </tr>
-    <tr>
-      <td>Protection Rating</td>
-      <td>IP67 (dust/waterproof) / IK10 (impact resistance)</td>
-    </tr>
-    <tr>
-      <td>Operating Temp. / Humidity</td>
-      <td>-40°C to +60°C / 0–95% RH (non-condensing)</td>
-    </tr>
-    <tr>
-      <td>Certifications</td>
-      <td>CE / FCC</td>
-    </tr>
-    <tr>
-      <td>Dimensions / Weight</td>
-      <td>320 × 134 × 126 mm / 2.5 kg</td>
-    </tr>
-    <tr>
-      <td rowSpan="3">External Interfaces</td>
-      <td>Alarm IO</td>
-      <td>Alarm IN × 1 + Wiegand output × 2 (relay + level)</td>
-    </tr>
-    <tr>
-      <td>Audio</td>
-      <td>Line-In / Line-Out, supports voice and on-site interaction</td>
-    </tr>
-    <tr>
-      <td>Expansion Interfaces</td>
-      <td>RS-485 (fill light connector is an internal module, not a user-facing external interface)</td>
-    </tr>
-    <tr>
-      <td rowSpan="4">Software Platform</td>
-      <td>Operating System</td>
-      <td>Embedded Linux (Yocto build), containerd container runtime</td>
-    </tr>
-    <tr>
-      <td>Management</td>
-      <td>Web console + SSH + REST API + aipc-cli</td>
-    </tr>
-    <tr>
-      <td>Device Discovery</td>
-      <td>Supports device discovery and onboarding</td>
-    </tr>
-    <tr>
-      <td>Security</td>
-      <td>Application sandbox isolation, permission control, managed runtime resources</td>
-    </tr>
-  </tbody>
-</table>
+| Item | Specification |
+|------|---------------|
+| SoC | Hailo-15H, Cortex-A53 × 4 @ 1.3 GHz |
+| NPU | Hailo NPU, 20 TOPS @ INT8 (supports 4-bit quantization), DSP 350 GOPS |
+| Memory / Storage | 8 GB LPDDR4 / 64 GB eMMC, supports TF Card expansion (M.2 not yet supported) |
+| Image Sensor | Sony IMX678, 1/1.8" CMOS, 4K UHD, Hailo Gen2 AI-ISP (&lt;0.01 LUX full-color night vision) |
+| Lens | AF auto-zoom 8–32mm (4x), F1.6–F1.7 |
+| Video | H.264 / H.265 hardware encoding 4K@30fps; RTSP main / sub / third stream |
+| Network | 10/100M LAN, supports PoE 802.3AT; data protocols MQTT / Event Bus |
+| Power / Consumption | DC 12V or PoE 802.3AT; 5–6W (typical load) |
+| Protection / Environment | IP67 / IK10; -40°C to +60°C, 0–95% RH (non-condensing) |
+| External Interfaces | Alarm IN × 1 + Wiegand output × 2 (relay + level), Line-In / Line-Out, RS-485 |
+| Software Platform | Embedded Linux (Yocto) + containerd; Web console / SSH / REST API / aipc-cli |
+| Dimensions / Weight / Certifications | 320 × 134 × 126 mm / 2.5 kg / CE, FCC |
 
 ## Performance &amp; Edge AI
 
@@ -252,49 +144,11 @@ The NE503 supports AF autofocus and auto-zoom with 4x optical zoom. Lens control
 
 NE503 features a dual-board structure with a **Processor Board** and an **Interface Board**, interconnected via board-to-board connectors. The Processor Board carries the SoC, NPU, memory, and imaging subsystem, handling all computing and AI inference tasks. The Interface Board integrates an independent MCU, external IO, and power management circuitry. Even if the Processor Board fails, underlying functions such as lens homing, fill light control, and IO protection continue to operate normally.
 
-### Processor Board
+### Processor Board & Interface Board
 
-The Processor Board integrates the SoC, NPU, memory, storage, and camera interface, handling all computing and AI inference tasks:
+The Processor Board integrates the SoC, NPU, memory, storage, and camera interface (SoC, NPU, 8 GB LPDDR4, 64 GB eMMC; M.2 SSD expansion supported but not yet enabled), handling all computing and AI inference tasks. The Interface Board manages peripherals and communication interfaces through an independent MCU (Arm Cortex-M0+ @ 64 MHz) — AF lens, fill light, IR-CUT, Alarm IO, RS-485, light sensor, and reserved thermal control — so even if the Processor Board fails, underlying functions such as lens homing, fill light control, and IO protection continue to operate normally. External interfaces brought out by the Interface Board include Alarm IN × 1 + Wiegand output × 2, Line-In / Line-Out, RS-485, and TF Card (UHS-I); the fill light interface provides IR fill light (supported, 80m) with white fill light reserved.
 
-| Item | Specification |
-|------|---------------|
-| SoC | Hailo-15H, Cortex-A53 × 4 @ 1.3 GHz |
-| NPU | Hailo NPU, 20 TOPS @ INT8, supports 4-bit quantization |
-| DSP | 350 GOPS |
-| Memory | 8 GB LPDDR4 |
-| Storage | 64 GB eMMC |
-| SSD Expansion | M.2 KEY M (SoC natively supports PCIe Gen4, see hardware documentation for details) ⚠️ Not yet supported |
-
-### Interface Board
-
-The interface board manages all peripherals and communication interfaces through an independent MCU (Arm Cortex-M0+, 64 MHz), communicating with the Processor Board via UART0, and integrates the system power input and distribution circuitry. The Ethernet PHY is located on the core processing board, while SoC interfaces such as the TF card slot are routed to the interface board via board-to-board connectors.
-
-#### External Interfaces
-
-| Item | Specification |
-|------|---------------|
-| Alarm I/O | Alarm input × 1 + Wiegand output × 2 (relay + level) |
-| Audio | Line-In / Line-Out, supports voice and on-site interaction |
-| RS-485 | Serial communication bus |
-| Ethernet | 10/100M LAN, supports PoE 802.3AT power supply |
-| TF Card | Supports UHS-I high-speed storage cards |
-| Fill Light Interface | IR fill light (supported, 80m IR distance), White fill light (reserved) |
-
-#### MCU Management
-
-| Item | Specification |
-|------|---------------|
-| MCU | Arm Cortex-M0+ @ 64 MHz |
-| Management Scope | AF lens, fill light, IR-CUT, heater (reserved), fan (reserved), Alarm IO, RS-485, light sensor |
-| Thermal Control | 12V fan (reserved) + 12V heater (reserved) |
-| RTC | Supercapacitor power-fail retention |
-
-#### Power Supply
-
-| Item | Specification |
-|------|---------------|
-| Power Supply | DC 12V adapter or PoE 802.3AT (single-cable) |
-| System Power | 5–6W (typical load) |
+Board-level chip models, terminal definitions, and power supply details are covered in [Hardware Specifications](./2-hardware-guide/0-specifications.md), [Core Board](./2-hardware-guide/1-core-board-connection.md), and [Interface Board](./2-hardware-guide/2-aipc-board-connection.md).
 
 ## System Architecture
 
@@ -447,7 +301,7 @@ With 20 TOPS local computing power, containerized microservice architecture, and
 ### Developer Resources
 
 - Python SDK (MediaClient, InferenceClient, DeviceClient)
-- C++ SDK / Go SDK (planned, on the way)
+- [C++ SDK API reference](https://camthink-ai.github.io/neoruntime-sdks/cpp/en/)
 - aipc-cli command-line management tool
 - RESTful API (Bearer Token authentication)
 - Hailo Dataflow Compiler model compilation tool

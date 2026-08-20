@@ -23,7 +23,7 @@ There are three sources for a HEF that runs on the device, which determine wheth
 | Source | When to use | What you do |
 |:---|:---|:---|
 | Preloaded models | Out-of-the-box capabilities such as generic object detection | No training; subscribe by model_id in your app. Full list in the [Version Compatibility Matrix](../../3-software-guide/5-version-matrix.md) |
-| Custom-trained (this tutorial) | Preloaded models don't fit the business (custom classes, accuracy needs) | Full pipeline here: training → ONNX → quantized compilation → deployment; subscription requires `raw_output_only=True` (see [SDK Reference](../3-reference/1-sdk-reference.md#raw_output_only-and-custom-trained-models)) |
+| Custom-trained (this tutorial) | Preloaded models don't fit the business (custom classes, accuracy needs) | Full pipeline here: training → ONNX → quantized compilation → deployment; subscription requires `raw_output_only=True` (see [SDK Reference](../3-reference/1-sdk-reference.md#33-custom-models-need-raw_output_only)) |
 | [Hailo Model Zoo](https://github.com/hailo-ai/hailo_model_zoo) | Ready-made detection/segmentation models | The zoo provides precompiled HEFs plus ONNX/HAR; **HEFs come in standard sizes like 640×640 and cannot be imported directly** — download the ONNX/HAR and recompile at 384×640 per §6, otherwise inference reports `byte_size mismatch`; treat it like a custom model on the subscription side |
 | Other third-party HEF | An existing Hailo-compatible model | Skip training/compilation; start from §7 deployment. Still verify the input size is 384×640 (fixed platform preprocessing) and treat it like a custom model on the subscription side |
 
@@ -481,7 +481,7 @@ Fill in the model parameters in the import wizard (fields shown below):
 |:---|:---|
 | Model ID | `safety_helmet_yolov8n_384_640` |
 | Model Type | `hef` |
-| Threshold | `0.3` (confidence threshold for platform post-processing filtering; the `raw_output_only` custom-model path returns raw NMS output to the app — actual filtering follows the [SDK Reference](../3-reference/1-sdk-reference.md#raw_output_only-and-custom-trained-models) / [Troubleshooting §3.1](../../5-troubleshooting.md)) |
+| Threshold | `0.3` (confidence threshold for platform post-processing filtering; the `raw_output_only` custom-model path returns raw NMS output to the app — actual filtering follows the [SDK Reference](../3-reference/1-sdk-reference.md#33-custom-models-need-raw_output_only) / [Troubleshooting §3.1](../../5-troubleshooting.md)) |
 
 After import, the model is automatically loaded onto the NPU, and the page status shows Loaded:
 
@@ -495,7 +495,7 @@ On the **AI Models** page, confirm that `safety_helmet_yolov8n_384_640` appears 
 
 ### 7.3 End-to-end verification
 
-After the model is loaded, deploy a safety helmet detection app for end-to-end verification. The app subscribes to inference results via the SDK — `stream` must name a stream that publishes raw frames (`third` is the default inference stream, `sub` also works; `main` publishes encoded H.264 only and never yields results) — and outputs detection events when helmeted or unhelmeted heads appear in the frame. The complete app deployment process (building the image, writing app.yaml, deploying to the device, startup verification) is described in [Hello World](./1-hello-world.md); custom-trained models must subscribe with `raw_output_only=True` and decode the NMS output themselves — see [SDK Reference · raw_output_only and custom models](../3-reference/1-sdk-reference.md#raw_output_only-and-custom-trained-models).
+After the model is loaded, deploy a safety helmet detection app for end-to-end verification. The app subscribes to inference results via the SDK — `stream` must name a stream that publishes raw frames (`third` is the default inference stream, `sub` also works; `main` publishes encoded H.264 only and never yields results) — and outputs detection events when helmeted or unhelmeted heads appear in the frame. The complete app deployment process (building the image, writing app.yaml, deploying to the device, startup verification) is described in [Hello World](./1-hello-world.md); custom-trained models must subscribe with `raw_output_only=True` and decode the NMS output themselves — see [SDK Reference · raw_output_only and custom models](../3-reference/1-sdk-reference.md#33-custom-models-need-raw_output_only).
 
 ---
 
@@ -523,7 +523,7 @@ Lower `batch` (8 → 4 → 2), or use a GPU with more VRAM.
 Check the `imgsz` parameter. CLI uses `imgsz=384,640` (comma-separated); Python uses `imgsz=[384, 640]` (list). If the output channel count is wrong, check `data.yaml`'s `nc`.
 
 **Q4: 0 detections after deploying to Hailo?**
-Troubleshoot in the following order: ① verify FP ONNX training accuracy with `onnxruntime`; ② confirm the HEF contains `yolov8_nms_postprocess HAILO NMS BY CLASS, Classes: 2` via `hailo parse-hef xxx.hef`; ③ confirm the NMS config `classes` count matches the model's actual class count (after pruning classes per §8.3, remember to update the nms_config in sync — a mismatch causes 0 detections or garbled results); ④ confirm the app has set `raw_output_only=True` per §7.3 (see the [SDK Reference](../3-reference/1-sdk-reference.md#raw_output_only-and-custom-trained-models)); if still no results, follow the five-step check in [Troubleshooting FAQ §3.1](../../5-troubleshooting.md).
+Troubleshoot in the following order: ① verify FP ONNX training accuracy with `onnxruntime`; ② confirm the HEF contains `yolov8_nms_postprocess HAILO NMS BY CLASS, Classes: 2` via `hailo parse-hef xxx.hef`; ③ confirm the NMS config `classes` count matches the model's actual class count (after pruning classes per §8.3, remember to update the nms_config in sync — a mismatch causes 0 detections or garbled results); ④ confirm the app has set `raw_output_only=True` per §7.3 (see the [SDK Reference](../3-reference/1-sdk-reference.md#33-custom-models-need-raw_output_only)); if still no results, follow the five-step check in [Troubleshooting FAQ §3.1](../../5-troubleshooting.md).
 
 **Q5: Big accuracy drop after quantization?**
 Confirm the calibration set is 2048 images (see §6.2) and that alls has `post_quantization_optimization(finetune, ...)` configured. FineTune recovers the post-quantization confidence toward the teacher distribution via unlabeled knowledge distillation.

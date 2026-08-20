@@ -70,21 +70,23 @@ While you're here, confirm the stream works end to end: in the right-side **Conf
 
 ## 5. Experience the AI
 
-NE503's AI capabilities are delivered through container apps. The official app repository [camthink-ai/neoruntime-apps](https://github.com/camthink-ai/neoruntime-apps) provides sample apps, including **AI Model Showcase**, which demonstrates multi-model inference — object detection, semantic segmentation, keypoints, OCR, CLIP zero-shot classification, monocular depth estimation, and more.
+NE503's AI capabilities are delivered through container apps. **AI Model Showcase** demonstrates multi-model inference — object detection, semantic segmentation, keypoints, OCR, CLIP zero-shot classification, monocular depth estimation, and more. The official [camthink-ai/neoruntime-apps](https://github.com/camthink-ai/neoruntime-apps) repository provides **prebuilt installation bundles** — no compilation needed:
 
-Clone the repository and build the `.aipc` package by following the repo's instructions. The console import wizard requires `app.yaml` and `image.tar` as separate files; it does not accept a `.aipc` archive directly. If the build leaves only the `.aipc` archive, extract it first:
+1. **Download and extract** [model-showcase-latest-arm64.tar.gz](https://github.com/camthink-ai/neoruntime-apps/releases/download/showcase-bundles-latest/model-showcase-latest-arm64.tar.gz) (about 300 MB; contains `app.yaml` and `image.tar`):
 
-```bash
-unzip -o <package>.aipc -d <package-directory>
-```
+   ```bash
+   tar xzf model-showcase-latest-arm64.tar.gz
+   ```
 
-On the **Applications** page, click **Import** and select **Upload Package**. Select `app.yaml` under **App Manifest** and `image.tar` under **Container Image**, then use the wizard to grant the Permissions (models and streams) the app needs:
+2. **Upload and install**: On the **Applications** page, click **Import** and select **Upload Package**. Select `app.yaml` under **App Manifest** and `image.tar` under **Container Image**, then use the wizard to grant the Permissions (models and streams) the app needs, and click **Install**:
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/quick-start/qs-app-management.png" />
+   <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/quick-start/qs-app-management.png" />
 
-Once installed and running, click **Visit App** on the app card to open the Showcase UI and switch between models to see inference results in real time:
+3. **View results**: After installation, start the app and click **Visit App** on the app card to open the Showcase UI and switch between models to see inference results in real time:
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/quick-start/qs-model-showcase.png" />
+   <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/quick-start/qs-model-showcase.png" />
+
+To build from source instead (clone → `scripts/build_app.sh` to package the `.aipc`), see [SDK Workflow](./4-application-guide/1-app-development/0-sdk-workflow.md); for full field-by-field instructions on the install wizard, see [AI Apps and Models](./2-user-guide/2-applications-and-models.md).
 
 ## 6. Configure Network and Time Zone
 

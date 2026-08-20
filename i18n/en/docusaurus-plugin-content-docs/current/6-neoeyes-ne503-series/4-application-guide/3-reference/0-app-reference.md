@@ -211,7 +211,7 @@ spec:
 | `sub.raw` | raw video stream (sub publishes NV12 frames, DMA-BUF shared-memory zero-copy, **for inference subscription**) |
 | `main` | encoded video stream (H264, for RTSP pull, cannot be used for inference subscription) |
 
-When a `.raw` stream is declared, the platform auto-mounts the `/dev/dma_heap` device (multi-container main containers also share the host IPC namespace) to support DMA-BUF zero-copy memory mapping. `main` only emits encoded H264; `subscribe(stream="main")` hangs forever — inference must use `sub`.
+When a `.raw` stream is declared, the platform auto-mounts the `/dev/dma_heap` device (multi-container main containers also share the host IPC namespace) to support DMA-BUF zero-copy memory mapping. For inference, subscribe to `sub`; `main` only emits encoded H.264 and cannot be used for inference subscription. See [Video and Imaging · RTSP Integration](../../2-user-guide/1-media-and-image.md#rtsp-integration) for the full three-stream constraints.
 
 **inference** — AI inference permissions:
 
@@ -605,5 +605,4 @@ Connection-config variables auto-read by the SDK (usually no need to change; the
 
 - [Python SDK Reference](./1-sdk-reference.md) — SDK API signatures and data types
 - [SDK Examples](./2-sdk-examples.md) — full app examples and development tutorials
-- [Platform Architecture](../../3-software-guide/0-system-architecture.md) — system design and data flow
-- [System Architecture · Platform Services Layer](../../3-software-guide/0-system-architecture.md) — App Manager and other service responsibilities, with source pointers
+- [Platform Architecture](../../3-software-guide/0-system-architecture.md) — system design, service responsibilities and source pointers

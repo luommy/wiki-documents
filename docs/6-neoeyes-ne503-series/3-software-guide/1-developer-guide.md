@@ -25,7 +25,7 @@ git clone https://github.com/camthink-ai/neoruntime-apps.git
 
 > 构建应用时，把 `neoruntime-apps` 与 `neoruntime-sdks` clone 到**同一父目录**下——应用统一构建脚本 `scripts/build_app.sh` 默认从旁边的 `neoruntime-sdks` 取 SDK。
 
-平台主仓关键目录：`platform/`（7 个平台服务）、`hal_v2/`（HAL，当前唯一维护版本）、`web/`（Web 控制台）、`configs/`（配置模板）、`tools/`（含 aipc-cli）、`scripts/`、`systemd/`、`deploy/`、`docker/`。构建系统分三层：Layer 1（Go + Node.js + protoc + Python，平台服务与 Web）、Layer 2（+ CMake + g++ + gRPC C++，原生 C/C++ 组件）、Layer 3（+ Hailo Yocto 交叉编译 SDK，HAL 固件与完整发布包）。大多数开发者只需 Layer 1/2；完整发布包（`pack-release`）必须 Layer 3。
+平台主仓 `neoruntime` 只在开发平台服务/HAL 或构建完整发布包时需要 clone。构建分三层——Layer 1（Go + Node.js + Python，平台服务与 Web）、Layer 2（+ C++ 工具链，camera-daemon / ai-runtime 等原生组件与 HAL v2）、Layer 3（+ Hailo Yocto 交叉编译 SDK，HAL 固件与完整发布包）；各层依赖均已内置在官方 Docker 镜像（见 §2），多数构建只需 Layer 1/2，出 `pack-release` 发布包才需要 Layer 3。
 
 ## 2. Docker 开发环境
 
@@ -51,14 +51,14 @@ docker exec ne503-dev make pack-release VERSION=1.0.0   # 直接执行构建
 
 ### Python SDK（开发模式）
 
-Python SDK 在 `neoruntime-sdks` 仓库。容器内（或项目根目录）执行：
+`pip3 install -e ".[dev]"` 把 Python SDK 以**可编辑（开发）模式**装入当前环境——源码改动即时生效，无需重装。在 `neoruntime-sdks` 仓库目录下执行：
 
 ```bash
-cd ../neoruntime-sdks/python
+cd ../neoruntime-sdks/python   # 按你的仓库位置调整
 pip3 install -e ".[dev]"
 ```
 
-> 报错 `error: externally-managed-environment` 时改用 venv：`python3 -m venv .venv && source .venv/bin/activate` 后再安装；后续开发前 `source .venv/bin/activate` 重新激活。
+> 若报 `error: externally-managed-environment`（系统 Python 拒绝全局装包），先建虚拟环境：`python3 -m venv .venv && source .venv/bin/activate`，再重跑上面的安装命令（每次新开终端先 `source .venv/bin/activate` 激活）。
 
 ## 3. 完整构建
 

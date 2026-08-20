@@ -23,8 +23,6 @@ tags: [软件指南, NE503, 版本管理, 兼容性]
 | 示例应用（neoruntime-apps） | 无独立版本号，跟随 main 更新 | [camthink-ai/neoruntime-apps](https://github.com/camthink-ai/neoruntime-apps) | 构建包从 [Releases](https://github.com/camthink-ai/neoruntime-apps/releases) 取最新（`showcase-bundles-latest`） |
 | 烧录工具 `hailo15_board_tools` | 1.10.1 | meta-hailo-os 仓库 `tools/` 目录 | 详见[系统烧录](./2-system-flashing.md) |
 
-> 升级固件前，先在设备的 Settings → 设备信息页核对当前各层版本，再选择对应的升级包；跨线升级（旧内部版本 → 开源线）以升级包自带的说明为准。
-
 ## 2. OS 升级兼容关卡
 
 平台在安装 OS 升级包前强制校验以下关卡（定义于升级包的 `sw-description` 与设备侧，校验逻辑见 neoruntime 仓库 `platform/osupgrade/validate.go`）。**任一关卡不通过，升级包都会被拒绝安装**，从而避免刷入不匹配固件导致设备变砖：

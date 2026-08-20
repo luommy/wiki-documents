@@ -23,7 +23,7 @@ tags: [NE503, 模型训练, Hailo, HEF, 教程]
 | 来源 | 适用场景 | 所需操作 |
 |:---|:---|:---|
 | 设备预置模型 | 通用目标检测等出厂即用的能力 | 无需训练，直接在 app 中按 model_id 订阅；完整清单见[版本兼容性矩阵](../../3-software-guide/5-version-matrix.md) |
-| 自训模型（本篇） | 预置模型不满足业务（自定类别、精度要求） | 走本篇全流程：训练 → ONNX → 量化编译 → 部署；订阅侧须 `raw_output_only=True`（见 [SDK 参考](../3-reference/1-sdk-reference.md#1-inference--ai-推理)） |
+| 自训模型（本篇） | 预置模型不满足业务（自定类别、精度要求） | 走本篇全流程：训练 → ONNX → 量化编译 → 部署；订阅侧须 `raw_output_only=True`（见 [SDK 参考](../3-reference/1-sdk-reference.md#33-自训模型订阅要加-raw_output_only)） |
 | [Hailo Model Zoo](https://github.com/hailo-ai/hailo_model_zoo) 官方模型仓库 | 需要常见检测/分割现成模型 | 仓库提供预编译 HEF 与 ONNX/HAR；**HEF 多为 640×640 等标准尺寸，不能直接导入**——下载 ONNX/HAR 按 §6 重编译为 384×640，否则推理报 `byte_size mismatch`；订阅侧按自训模型处理 |
 | 其他第三方 HEF | 已有 Hailo 兼容的现成模型 | 跳过训练编译，从 §7 部署开始；仍须核对输入尺寸为 384×640（平台前处理固定），且订阅侧按自训模型处理 |
 
@@ -492,7 +492,7 @@ curl -k -X POST "https://<设备IP>/api/v1/ai/models/safety_helmet_yolov8n_384_6
 
 ### 7.3 端到端验证
 
-模型加载完成后，部署一个安全帽检测 app 进行端到端验证。app 通过 SDK 订阅推理结果——`stream` 须填发布原始帧的流（`third` 为默认推理流，`sub` 亦可；`main` 只发编码 H.264，订阅它等不到结果），当画面中出现佩戴或未佩戴安全帽的人头时输出检测事件。部署 app 的完整流程（构建镜像、编写 app.yaml、部署到设备、启动验收）参见 [Hello World](./1-hello-world.md)；自训模型订阅时须 `raw_output_only=True` 并自解码 NMS 输出，用法与示例见 [SDK 参考 · raw_output_only 与自训模型](../3-reference/1-sdk-reference.md#raw_output_only-与自训模型)。
+模型加载完成后，部署一个安全帽检测 app 进行端到端验证。app 通过 SDK 订阅推理结果——`stream` 须填发布原始帧的流（`third` 为默认推理流，`sub` 亦可；`main` 只发编码 H.264，订阅它等不到结果），当画面中出现佩戴或未佩戴安全帽的人头时输出检测事件。部署 app 的完整流程（构建镜像、编写 app.yaml、部署到设备、启动验收）参见 [Hello World](./1-hello-world.md)；自训模型订阅时须 `raw_output_only=True` 并自解码 NMS 输出，用法与示例见 [SDK 参考 · 自训模型订阅](../3-reference/1-sdk-reference.md#33-自训模型订阅要加-raw_output_only)。
 
 ---
 
@@ -520,7 +520,7 @@ curl -k -X POST "https://<设备IP>/api/v1/ai/models/safety_helmet_yolov8n_384_6
 检查 `imgsz` 参数。CLI 用 `imgsz=384,640`（逗号分隔），Python 用 `imgsz=[384, 640]`（list）。如果输出 channel 数不对，检查 `data.yaml` 的 `nc`。
 
 **Q4：部署到 Hailo 后无检测结果如何排查？**
-按以下顺序排查：① 用 `onnxruntime` 验证 FP ONNX 的训练精度；② 用 `hailo parse-hef xxx.hef` 确认 HEF 包含 `yolov8_nms_postprocess HAILO NMS BY CLASS, Classes: 2`；③ 确认 NMS config 的 `classes` 数与模型实际类别数一致（§8.3 裁类后尤其要同步改 nms_config，不一致会零检出或结果错乱）；④ 确认 app 已按 §7.3 设置 `raw_output_only=True`（用法见 [SDK 参考](../3-reference/1-sdk-reference.md#raw_output_only-与自训模型)）；仍无结果时按[故障排查 FAQ §3.1](../../5-troubleshooting.md) 的五步排查。
+按以下顺序排查：① 用 `onnxruntime` 验证 FP ONNX 的训练精度；② 用 `hailo parse-hef xxx.hef` 确认 HEF 包含 `yolov8_nms_postprocess HAILO NMS BY CLASS, Classes: 2`；③ 确认 NMS config 的 `classes` 数与模型实际类别数一致（§8.3 裁类后尤其要同步改 nms_config，不一致会零检出或结果错乱）；④ 确认 app 已按 §7.3 设置 `raw_output_only=True`（用法见 [SDK 参考](../3-reference/1-sdk-reference.md#33-自训模型订阅要加-raw_output_only)）；仍无结果时按[故障排查 FAQ §3.1](../../5-troubleshooting.md) 的五步排查。
 
 **Q5：量化后精度下降明显？**
 确认校准集为 2048 张（见 §6.2），且 alls 中已配置 `post_quantization_optimization(finetune, ...)`。FineTune 通过无标签知识蒸馏将量化后的置信度恢复至 teacher 分布。

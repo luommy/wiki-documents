@@ -1,12 +1,12 @@
 ---
-description: Overview of the NE503 Python SDK (hailo_ipc_sdk) workflow — what it is, where the source lives, how to embed it into your container image, and the client calling pattern. Read this before the hands-on tutorials.
-keywords: [NE503, Python SDK, hailo_ipc_sdk, SDK embedding, container application, InferenceClient]
+description: NE503 Python SDK (hailo_ipc_sdk) getting-started workflow — what the SDK is, where the source lives, three ways to embed it into your app image, calling patterns, and the permission contract. Read this before the hands-on tutorials.
+keywords: [NE503, Python SDK, hailo_ipc_sdk, SDK embedding, container application, build_app.sh, calling pattern]
 tags: [application development, NE503, SDK, getting started]
 ---
 
 # SDK Workflow
 
-This page covers exactly one thing: **how to get the NE503 Python SDK (`hailo_ipc_sdk`) up and running** — what it is, where the source lives, how to embed it into your container image, and the client calling pattern. Once you understand this, the [Hello World](./1-hello-world.md) tutorial (deployment closed loop) and the [Person Detection](../2-cookbook/1-person-detection.md) tutorial (real AI app) focus on their own business logic, with no need to revisit how the SDK plugs in.
+This page walks through the full "get the NE503 Python SDK (`hailo_ipc_sdk`) up and running" flow: **what it is → where the source lives → how to embed it into your app image → how to make your first call → what permissions require**. Once you've been through it, [Hello World](./1-hello-world.md) (the deployment loop) and [Person Detection](../2-cookbook/1-person-detection.md) (a real AI app) are only about their own business logic — no need to revisit how the SDK plugs in.
 
 :::info Reading order
 **SDK Workflow (this page) → [Hello World](./1-hello-world.md) (deployment loop, no SDK) → [Person Detection](../2-cookbook/1-person-detection.md) (real AI app, uses the SDK)**
@@ -14,55 +14,26 @@ This page covers exactly one thing: **how to get the NE503 Python SDK (`hailo_ip
 
 ## 1. What the SDK Is
 
-`hailo_ipc_sdk` is the Python SDK that exposes NE503 platform capabilities. It runs **inside your application container** and talks to the platform's background services over Unix Sockets. Your application code never touches hardware or the inference engine directly — it calls SDK clients, which forward to the corresponding services. The table below lists the four core clients you'll use most when building an AI inference app:
+`hailo_ipc_sdk` runs **inside your application container** and talks to the platform's AI Runtime, Event Bus, and Device Control services over Unix Sockets — your app never touches hardware or the inference engine directly; it calls SDK clients, which forward to the corresponding services.
 
-| Client | Responsibility | Typical call |
-|:---|:---|:---|
-| `InferenceClient` | Subscribe to AI inference results (the platform runs the model frame by frame and pushes results to the app) | `subscribe(stream=, model=, fps=)` |
-| `FdMediaClient` | Video frame retrieval (get the raw frame corresponding to an inference result) | `get_frame(stream)` |
-| `EventClient` | Event bus publish/subscribe (cross-app, cross-module integration) | `publish(topic, payload)` / `on_event(topic, cb)` |
-| `DeviceClient` | Hardware control and status (fill light, IR-CUT, PTZ, temperature, etc.) | `set_white_light(n)` / `get_device_status()` |
+**Key constraint: the SDK is not on PyPI and cannot be `pip install`ed from the network.** The source lives in the `neoruntime-sdks` repo under `python/hailo_ipc_sdk/` and must be bundled into your app image — the device's container runtime has no outbound network for pip.
 
-Beyond these core clients, the SDK also covers: `AppClient` (app/container management), `OverlayClient` (overlay detection boxes onto the RTSP/Web view), `EncodedStreamClient` (H.264/H.265 encoded streams), audio streams, and camera ISP/encoder control. `Config` is a utility class for reading the `APP_ID`, per-service socket paths, and debug flags (e.g. `Config.get_app_id()`, `Config.is_debug()`). For the full set of classes and methods, see [SDK Reference](../3-reference/1-sdk-reference.md).
+For what each client solves and how to choose one, see [SDK Reference §2 Module Overview](../3-reference/1-sdk-reference.md#2-what-each-module-solves).
 
-:::note Not on PyPI
-The SDK is **not published to PyPI**. The source lives in the `neoruntime-sdks` repository under `python/hailo_ipc_sdk/` and must be bundled into your application image — the device's container runtime has **no outbound network for pip**, so you cannot install it at runtime.
-:::
+## 2. Get the SDK and Embed It into the Image
 
-## 2. Where the SDK Comes From and How to Embed It
-
-:::info Get the source repos first (two of them)
-The SDK lives in the **neoruntime-sdks** repository; sample apps live in the **neoruntime-apps** repository. Clone both into the **same parent directory** — the unified build script takes the SDK from the sibling `neoruntime-sdks` by default:
+The SDK lives in the **neoruntime-sdks** repo; sample apps live in the **neoruntime-apps** repo. Clone both into the **same parent directory** — the unified build script takes the SDK from the sibling `neoruntime-sdks` by default:
 
 ```bash
 git clone https://github.com/camthink-ai/neoruntime-sdks.git
 git clone https://github.com/camthink-ai/neoruntime-apps.git
 ```
 
-Directories relevant to this tutorial series:
-
-```
-neoruntime-sdks/
-└── python/
-    ├── hailo_ipc_sdk/   # Python SDK source (includes protobuf stubs, works out of the box)
-    └── setup.py         # SDK install script (copied into the app image at build time)
-
-neoruntime-apps/
-├── examples/             # Tutorial samples
-│   ├── hello-world/        # Minimal closed-loop example (no SDK)
-│   ├── person-detection/   # Person-detection AI app (uses SDK)
-│   └── ...                 # object-detection / people-counting / face-cascade, etc.
-├── showcases/            # model-showcase / parking-lot / gym-ops demos
-├── templates/basic/      # App scaffold (copy it when starting a new app)
-└── scripts/build_app.sh # Unified build script
-```
-:::
-
 There are three ways to get the SDK into your image, depending on your project layout.
 
-**Option A: `scripts/build_app.sh` unified build (recommended; used by all repo sample apps)**
+**Option A: Unified build script (recommended; used by all repo sample apps)**
 
-The unified build script in the `neoruntime-apps` repository automatically copies the sibling `neoruntime-sdks/python/hailo_ipc_sdk/` into the app directory, bakes it into the image with `docker buildx`, and packages an `.aipc` bundle. You only need:
+`neoruntime-apps`'s `scripts/build_app.sh` automatically copies the sibling `neoruntime-sdks/python/hailo_ipc_sdk/` into the app directory, bakes it into the image with `docker buildx`, and packages an `.aipc` bundle. No manual `pip install`, no network needed:
 
 ```bash
 cd neoruntime-apps
@@ -70,87 +41,54 @@ cd neoruntime-apps
 # auto: copy SDK → buildx → save → package .aipc
 ```
 
-No manual `pip install` in the Dockerfile, no network needed.
+**Option B: Manual `COPY` for standalone projects**
 
-**Option B: Manual `COPY` for custom projects**
-
-If your app lives outside the repo's sample structure (a standalone project), copy the SDK directory into the image and install it locally in the Dockerfile:
+When your app lives outside the repo's sample structure, copy the SDK into the image and install it locally in the Dockerfile:
 
 ```dockerfile
 COPY hailo_ipc_sdk /app/hailo_ipc_sdk
 RUN pip install --no-cache-dir /app/hailo_ipc_sdk
 ```
 
-**Option C: Pre-build a wheel and `pip install` it (cleanest; best for distribution and reuse)**
+**Option C: Pre-build a wheel and `pip install` it (best for distribution and reuse)**
 
-Build the SDK into a single wheel file first, then install it into the image like any other dependency — the image carries only the artifact, not the entire source tree, and the same wheel can be reused across apps. The repo's `showcases/model-showcase` uses this approach.
-
-1. Build the wheel on your dev machine (one-time; the artifact name follows the version in `setup.py`):
+Build a universal wheel first (the SDK is pure Python, so it's `py3-none-any`, independent of the device's ARM64 architecture) — the image carries only the artifact, not the whole source tree:
 
 ```bash
 cd neoruntime-sdks/python
-pip wheel . --no-deps -w dist/
-# produces dist/hailo_ipc_sdk-0.2.1-py3-none-any.whl
+pip wheel . --no-deps -w dist/     # produces dist/hailo_ipc_sdk-<version>-py3-none-any.whl (version follows setup.py)
 ```
-
-The SDK is pure Python, so this yields a universal wheel (`py3-none-any`) that is independent of the device's ARM64 architecture.
-
-2. Copy the wheel into your app directory and install it directly in the Dockerfile:
 
 ```dockerfile
-COPY hailo_ipc_sdk-0.2.1-py3-none-any.whl /tmp/
-RUN pip install --no-cache-dir /tmp/hailo_ipc_sdk-0.2.1-py3-none-any.whl && rm /tmp/hailo_ipc_sdk-0.2.1-py3-none-any.whl
+COPY hailo_ipc_sdk-<version>-py3-none-any.whl /tmp/
+RUN pip install --no-cache-dir /tmp/hailo_ipc_sdk-<version>-py3-none-any.whl && rm /tmp/hailo_ipc_sdk-<version>-py3-none-any.whl
 ```
 
-The key point: **the SDK must be carried into the image** — never depend on runtime network installation.
-
-:::note Protobuf stubs are included
-The SDK ships with pre-generated protobuf stubs (`neoruntime-sdks/python/hailo_ipc_sdk/proto/*_pb2.py`). They are baked into the image together with the SDK at build time — **no manual generation is needed**; `import hailo_ipc_sdk` works out of the box.
-:::
+> Whatever the method, the point is that **the SDK must be carried into the image**. The SDK ships with pre-generated protobuf stubs (`python/hailo_ipc_sdk/proto/*_pb2.py`), so `import hailo_ipc_sdk` works out of the box — no manual generation needed.
 
 ## 3. Calling Pattern
 
-All clients share the same shape — instantiation takes no arguments (the SDK reads the socket path from environment variables injected by the platform), then you call subscribe/publish/control methods:
+All SDK clients share the same shape: **instantiation takes no arguments** (the SDK reads the socket path from environment variables injected by the platform), then you call in one of three modes:
 
-```python
-from hailo_ipc_sdk import InferenceClient, EventClient, DeviceClient
+1. **Subscription iterator** — `for ... in xxx.subscribe(...)` yields results continuously (per-frame inference, events, encoded streams); build your app's main loop on top of it;
+2. **Publish** — `EventClient.publish(topic, payload)` broadcasts an event; other apps subscribe to the same topic and react;
+3. **Control** — `DeviceClient.set_white_light(n)` etc. drive the hardware directly.
 
-infer  = InferenceClient()
-events = EventClient()
-device = DeviceClient()
+Minimal skeleton code for each client: [SDK Examples §1 Pattern Selection](../3-reference/2-sdk-examples.md#1-the-four-patterns-choose-first). Two pitfalls to remember when writing calls:
 
-# 1. Subscription iterator: get inference results frame by frame (the platform runs the model in the background)
-#    stream must be a stream that publishes raw NV12 frames (sub or third);
-#    main only publishes encoded H264 (for RTSP), subscribe("main") hangs forever
-for frame_seq, result in infer.subscribe(stream="sub", model="<model-name>", fps=10):
-    persons = [o for o in result.objects if o.label == "person"]
-
-# 2. Event publish/subscribe: cross-app integration
-events.publish("app/<app-id>/detection", {"count": len(persons)})
-events.on_event("system/*", lambda ev: ...)
-
-# 3. Device control: drive hardware
-device.set_white_light(50)
-status = device.get_device_status()
-```
-
-Three things to keep in mind:
-
-1. **Don't hardcode names** — `stream` and `model` must match real values on the device. Call `infer.list_models()` / `FdMediaClient().list_streams()` first to discover them, otherwise you get `StatusCode.NOT_FOUND`;
-2. **Subscription is a blocking iterator** — `for ... in subscribe(...)` yields frames continuously; build your app's main loop on top of it;
-3. **Shut down gracefully** — listen for `SIGTERM` (the platform sends it when stopping your app), then break the loop and close the clients.
-
-For a complete real-world example (model/stream discovery, permission declaration, event publishing, light control), see the [Person Detection tutorial](../2-cookbook/1-person-detection.md).
+- **Don't hardcode names** — use the device's real `stream`/`model` values, query them with `list_streams()` / `list_models()` first (see [SDK Reference §3.2](../3-reference/1-sdk-reference.md#32-dont-hardcode-stream-and-model-names));
+- **Subscription is a blocking iterator** — Ctrl-C can't interrupt it; shut down gracefully (see [SDK Reference §3.4](../3-reference/1-sdk-reference.md#34-blocking-iterators-need-graceful-exit)).
 
 ## 4. Permissions Are a Contract
 
-What the SDK can call is **dictated by the `permissions` section of `app.yaml`**, not by what you write in code. The platform enforces sandboxing against this list: any video stream, model, event topic, or device control not declared here is rejected by the platform at call time. So when writing an SDK app, the calls in `app.py` must correspond one-to-one with what `app.yaml` declares.
+What the SDK can call is **dictated by the `permissions` section of `app.yaml`**, not by what you write in code. The platform enforces sandboxing against this list: any video stream, model, event topic, or device control not declared here is rejected at call time. So the calls in `app.py` must correspond one-to-one with what `app.yaml` declares.
 
-For the meaning of each permission field, see the [permission manifest field table in the Person Detection tutorial](../2-cookbook/1-person-detection.md#31-application-manifest-appyaml).
+For the meaning of each permission field, see [App Reference §4 Permission Model](../3-reference/0-app-reference.md#4-permission-model).
 
 ## 5. Next Steps
 
 - [Hello World](./1-hello-world.md) — no SDK; run the full "build → deploy → start → verify" closed loop first;
 - [Person Detection](../2-cookbook/1-person-detection.md) — a real AI app using the SDK, with complete code and on-device testing;
-- For a field-by-field API reference of each SDK client, see [SDK Reference](../3-reference/1-sdk-reference.md);
-- For build/deploy errors, see [Troubleshooting FAQ](../../5-troubleshooting.md).
+- Four app patterns and complete repo source: [SDK Examples](../3-reference/2-sdk-examples.md);
+- Per-client API details: [SDK Reference](../3-reference/1-sdk-reference.md);
+- Build/deploy errors: [Troubleshooting FAQ](../../5-troubleshooting.md).
