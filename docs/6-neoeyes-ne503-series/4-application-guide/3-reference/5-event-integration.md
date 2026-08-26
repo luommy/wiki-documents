@@ -1,98 +1,161 @@
 ---
-description: NE503 事件总线对接实战指南，涵盖 MQTT 桥接、推理结果订阅、REST API 远程管理和业务系统集成模式。
-keywords: [NE503, Event Bus, MQTT, REST API, 事件集成, 系统对接]
-tags: [系统集成, NE503, 事件总线, MQTT]
+description: NE503 Event Bus 集成参考，说明 gRPC 事件协议、主题通配符、推理与设备事件来源、Python SDK、WebSocket 和 MQTT 桥接。
+keywords: [NE503 Event Bus, 事件总线, Topic, gRPC, WebSocket, MQTT, hailo_ipc_sdk]
+tags: [系统集成, NE503, 事件总线, MQTT, WebSocket]
 ---
 
 # Event Integration
 
-NE503 的 Event Bus 是平台级 Pub/Sub 消息中枢，AI 推理结果、设备告警、应用生命周期等事件均通过它分发。本文面向需要将 NE503 事件集成到外部系统的开发者，介绍 Topic 协议、MQTT 桥接、REST API 调用和常见集成模式。
+NE503 的 Event Bus 是设备内部的发布/订阅消息中枢。本页只讲**事件协议和接入方式**；HTTP 认证、请求体和事件管理接口请看 [RESTful API 参考](./3-restful-api.md)，应用权限请看 [应用参考](./0-app-reference.md)。
 
-## 1. 事件总线协议概览
+## 1. 先选择接入方式
 
-### 1.1 接入方式
+| 接入方式 | 默认端点 | 适用场景 | 位置 |
+|:---|:---|:---|:---|
+| Python SDK | `unix:///run/aipc/event-bus.sock` | 容器内应用发布或订阅 | 使用 `hailo_ipc_sdk.events.EventClient` |
+| gRPC | 同上；由部署环境提供可达端点 | C++、Go 或自定义服务 | 使用 `event.proto` |
+| REST | `/api/v1/events/topics`、`/api/v1/events/publish` | 外部系统查询主题或发布事件 | 需要 API 认证 |
+| WebSocket | `/api/v1/events/stream` | 浏览器或外部系统实时接收 | 需要 API 认证 |
+| MQTT 桥接 | 由桥接程序连接上述接口 | 对接已有 MQTT 平台 | 需要自己维护桥接进程 |
 
-| 接入方式 | 端点 | 适用场景 |
+设备内部的 gRPC TCP 地址如果被部署为 loopback，只能由设备本机访问；外部主机不要假设可以直接连接，应使用 REST/WebSocket 或经批准的隧道方案。
+
+## 2. 主题匹配
+
+主题使用 `/` 分隔的层级字符串。当前匹配器支持精确匹配、`*` 单级匹配、`**` 多级匹配，以及 `**/suffix` 形式的后缀匹配。
+
+| 订阅表达式 | 匹配示例 | 不匹配示例 |
 |:---|:---|:---|
-| gRPC（Unix Socket） | `unix:///run/aipc/event-bus.sock` | 设备内部服务、容器内应用 |
-| gRPC（TCP） | `127.0.0.1:50053` | C++ 客户端 |
-| REST API | `https://<设备IP>/api/v1/events/*` | 外部系统集成 |
-| WebSocket | `wss://<设备IP>/api/v1/events/stream` | Web 前端实时订阅 |
+| `inference/model_a/main` | 完全相同的主题 | `inference/model_b/main` |
+| `inference/*/main` | `inference/model_a/main` | `inference/model_a/sub/extra` |
+| `inference/**` | `inference/model_a/main`、更深层级主题 | 不属于 `inference/` 的主题 |
+| `**/detections` | 任意前缀下以 `detections` 结尾的主题 | `.../detections/raw` |
 
-### 1.2 Topic 命名与通配符
+通配符只解决主题匹配，不会替订阅者解析 payload。高吞吐场景应缩小订阅范围，并根据 `queue_size`、`drop_old` 和消费者处理速度做取舍。
 
-Event Bus 使用 `/` 分隔的层级式 Topic，支持三种通配符：`*`（单级）、`**`（多级）、`**/suffix`（后缀）。匹配规则见源码 `platform/event-bus/proto/event.proto`。
+## 3. Event 消息结构
 
-| 模式 | 说明 | 示例 |
-|:---|:---|:---|
-| 精确匹配 | 完全匹配主题名 | `inference/yolov8n/third` |
-| `*` 单级通配 | 匹配一个层级 | `inference/*/third` |
-| `**` 多级通配 | 匹配多个层级 | `inference/**` |
-| `**/suffix` 后缀匹配 | 匹配任意前缀下的指定后缀 | `**/detections` |
-
-| Topic 前缀 | 来源 | 示例 |
-|:---|:---|:---|
-| `inference/` | AI Runtime | `inference/person_v1/cam0_main` |
-| `device/` | 设备控制服务 | `device/temperature_alert` |
-| `app/` | 应用管理器 | `app/started`、`app/installed` |
-| `system/` | 系统级事件 | `system/ota_progress` |
-| `alert/` | 告警事件 | `alert/threshold_exceeded` |
-| `model/` | 模型生命周期 | `model/loaded` |
-
-> 上表为常见前缀示例，并非穷举。推理 topic 为三段式 `inference/{model_id}/{stream_id}`，其余前缀多为两段式。
-
-### 1.3 Event 消息结构
+协议定义在工程源码 `platform/event-bus/proto/event.proto`：
 
 ```json
 {
-  "topic": "inference/person_v1/cam0_main",
+  "topic": "app/alert",
   "timestamp_ns": 1717545600000000000,
-  "source": "ai-runtime",
-  "event_id": "evt-1717545600000-1",
-  "payload": "{\"model_id\":\"person_v1\",\"stream_id\":\"cam0_main\",\"objects\":[...]}",
+  "source": "people_counting",
+  "event_id": "evt-1",
+  "payload": "{\"type\":\"person_detected\"}",
   "payload_type": "json",
-  "metadata": { "stream": "cam0_main", "model_id": "person_v1" }
+  "metadata": {
+    "stream_id": "main"
+  }
 }
 ```
 
 | 字段 | 类型 | 说明 |
 |:---|:---|:---|
-| `topic` | string | 事件主题 |
-| `timestamp_ns` | uint64 | 纳秒级时间戳 |
-| `source` | string | 来源（服务名或 app_id） |
-| `event_id` | string | 自动生成的唯一 ID |
-| `payload` | bytes / dict | 线上为 JSON 编码的 bytes；Python SDK（`neoruntime_ipc_sdk`）已自动反序列化为 dict，故示例中可直接 `event.payload.get(...)` |
-| `metadata` | map | 可选键值对元数据（多数事件不携带） |
+| `topic` | string | 主题名称 |
+| `timestamp_ns` | uint64 | 纳秒时间戳 |
+| `source` | string | 服务名或应用 ID |
+| `event_id` | string | 事件 ID；发布响应也会返回 ID |
+| `payload` | bytes | JSON 或其他编码的内容 |
+| `payload_type` | string | 当前常用 `json`，也可标记 `protobuf` |
+| `metadata` | map of string to string | 可选元数据 |
 
-## 2. MQTT 桥接配置
+Python SDK 的 `EventClient` 会把 JSON payload 转为 `event.payload` 字典；原始 gRPC 客户端需要根据 `payload_type` 自己解析。发布请求还支持 `persistent` 和 `ttl_ms`。
 
-NE503 Event Bus 使用 gRPC 协议，外部 MQTT 系统需通过桥接程序接入。桥接程序作为 Event Bus 订阅者，将事件转发到外部 MQTT Broker。
+订阅请求支持 `topic`、`subscriber_id`、`filters`、`queue_size` 和 `drop_old`；服务端提供 `Publish`、`PublishBatch`、`Subscribe`、`Unsubscribe`、主题查询和统计 RPC。
 
+## 4. 事件来源与主题形态
+
+主题前缀用于快速定位来源，但不是固定的全量枚举：
+
+| 来源 | 源码中的主题形态 | 说明 |
+|:---|:---|:---|
+| App Manager | `app/{eventType}` | 应用安装、启动、停止等生命周期事件 |
+| Device Control | `device/{eventType}` | 设备控制服务发布的设备事件 |
+| AI Runtime 常规结果 | `inference/{model_id}/{stream_id}` | `grpc_service.cpp` 的结果发布路径 |
+| AI Runtime 自动推理路径 | `inference/{stream_id}` | `auto_infer.cpp` 中的另一条发布路径 |
+| 应用自定义事件 | 由应用自行定义 | 应与 `app/{app_id}/...` 等命名约定保持一致 |
+
+AI Runtime 的两条源码路径并不具有相同的段数。订阅第三方推理结果时优先使用设备当前实际出现的主题，并结合 `event.metadata` 或 payload 判断模型和码流；不要对所有固件版本都硬编码三段式主题。
+
+## 5. Python SDK：发布与订阅
+
+```python
+from hailo_ipc_sdk.events import EventClient
+
+
+def main():
+    with EventClient() as events:
+        events.publish(
+            "app/people_counting/stats",
+            {"current_count": 2, "threshold": 10},
+            metadata={"stream_id": "main"},
+        )
+
+        for event in events.subscribe(
+            "app/**",
+            queue_size=100,
+            drop_old=True,
+        ):
+            print(event.topic, event.payload, event.source)
+
+
+if __name__ == "__main__":
+    main()
 ```
-NE503 Event Bus (gRPC) --> [Bridge] --> MQTT Broker --> 业务系统
+
+`EventClient` 还提供 `publish_batch()`、`on_event()`、`unsubscribe()`、`list_topics()`、`get_topic_info()`、`get_stats()` 和 `get_topic_stats()`。订阅是阻塞迭代器；长时间运行的应用应处理退出信号并调用 `close()`。
+
+### 5.1 权限清单
+
+应用使用 Event Bus 前，在 `app.yaml` 中声明主题范围：
+
+```yaml
+permissions:
+  events:
+    publish:
+      - app/people_counting/*
+    subscribe:
+      - inference/**
 ```
 
-桥接客户端示例（**运行在设备本机**，通过 Unix Socket 连接 Event Bus）。设备的 gRPC TCP 端点 `127.0.0.1:50053` 仅监听 loopback，外部主机无法直连；若需从外部服务器集成，请改用下文的 REST/WebSocket 端点，或通过 SSH 隧道转发 loopback 端口：
+发布和订阅权限分别校验。不要为了省事使用过大的 `**`，除非应用确实需要接收所有主题。
+
+## 6. WebSocket：外部实时订阅
+
+事件 WebSocket 路径为：
+
+```text
+wss://<设备IP>/api/v1/events/stream
+```
+
+先通过 REST 登录，再按 [RESTful API 参考](./3-restful-api.md) 的认证约定建立连接。服务端在源码中以通配符订阅 Event Bus，再把事件转发给 WebSocket 客户端；因此 URL 上附加的主题过滤不能替代客户端过滤。客户端应根据 `topic`、`source` 或 payload 做二次筛选，并处理断线重连和重复事件。
+
+如果业务只需要设备内的应用间通信，优先使用 Unix Socket 上的 SDK/gRPC；WebSocket 更适合浏览器、网关或外部监控系统。
+
+## 7. MQTT 桥接
+
+MQTT 不是 Event Bus 的原生协议。桥接程序作为 Event Bus 订阅者，再把事件转换成 MQTT 消息：
 
 ```python
 import json
+import os
+
 import paho.mqtt.client as mqtt
-from neoruntime_ipc_sdk.events import EventClient
+from hailo_ipc_sdk.events import EventClient
 
-MQTT_BROKER = "mqtt.example.com"
-MQTT_PORT = 1883
-MQTT_PREFIX = "ne503"
 
-mqtt_client = mqtt.Client(client_id="ne503-bridge")
-mqtt_client.username_pw_set("username", "password")  # 可选认证
-mqtt_client.connect(MQTT_BROKER, MQTT_PORT, keepalive=60)
+mqtt_client = mqtt.Client(client_id=os.environ["MQTT_CLIENT_ID"])
+mqtt_client.username_pw_set(
+    os.environ["MQTT_USERNAME"], os.environ["MQTT_PASSWORD"]
+)
+mqtt_client.connect(os.environ["MQTT_HOST"], int(os.environ.get("MQTT_PORT", "1883")))
 mqtt_client.loop_start()
 
-event_client = EventClient(endpoint="unix:///run/aipc/event-bus.sock")
-
+events = EventClient()
 try:
-    for event in event_client.subscribe("**"):
-        mqtt_topic = f"{MQTT_PREFIX}/{event.topic}"
+    for event in events.subscribe("**"):
         payload = json.dumps({
             "timestamp_ns": event.timestamp_ns,
             "source": event.source,
@@ -100,174 +163,25 @@ try:
             "payload": event.payload,
             "metadata": event.metadata,
         })
-        mqtt_client.publish(mqtt_topic, payload, qos=1)
+        mqtt_client.publish(f"ne503/{event.topic}", payload, qos=1)
 finally:
-    event_client.close()
+    events.close()
     mqtt_client.loop_stop()
     mqtt_client.disconnect()
 ```
 
-MQTT Broker 认证支持用户名密码（`username_pw_set`）、TLS 证书（`tls_set`）和 Token 方式。
+生产桥接需要补充 TLS、认证密钥管理、重连、QoS 和重复事件处理。不要把账号密码写入文档示例或镜像源码。
 
-## 3. 订阅 AI 推理结果
+## 8. 集成落地时的三个决定
 
-AI Runtime 完成推理后自动发布到 `inference/{model_id}/{stream_id}` Topic（三段式：前缀 + 模型 ID + 码流 ID），`auto_publish_results` 默认开启。
+1. **主题范围**：按业务订阅最小主题集合，避免无关事件挤占队列。
+2. **消息语义**：payload 中保留业务对象、时间戳和必要的幂等键；不要只依赖接收时间。
+3. **失败处理**：为 SDK、WebSocket 和 MQTT 消费者定义重连、丢弃旧消息、重复消费和下游不可用时的策略。
 
-### 3.1 推理结果 Payload
+## 9. 相关文档
 
-```json
-{
-  "model_id": "person_v1",
-  "stream_id": "cam0_main",
-  "frame_sequence": 42,
-  "objects": [
-    { "label": "person", "confidence": 0.92,
-      "bbox": { "x": 0.15, "y": 0.20, "width": 0.30, "height": 0.55 } }
-  ],
-  "infer_time_us": 8500
-}
-```
-
-载荷中的结果类型取决于模型：检测模型填充 `objects`、分类模型填充 `classifications`、姿态模型填充 `landmarks`。
-
-### 3.2 消费者示例
-
-以下代码运行在能访问设备 Event Bus TCP 端点（`127.0.0.1:50053`）的主机上：
-
-```python
-from neoruntime_ipc_sdk.events import EventClient
-
-event_client = EventClient()  # 通过 TCP 端点连接
-
-# 订阅特定模型
-for event in event_client.subscribe("inference/person_v1/**"):
-    persons = [o for o in event.payload.get("objects", [])
-               if o["label"] == "person"]
-    print(f"[{event.event_id}] 检测到 {len(persons)} 人")
-
-# 通配符订阅所有模型
-for event in event_client.subscribe("inference/**"):
-    model = event.topic.split("/")[-2]  # 三段式 topic，倒数第二段为 model_id
-    stream = event.payload.get("stream_id", "?")
-    count = len(event.payload.get("objects", []))
-    print(f"[{model}] stream={stream}, objects={count}")
-
-# 按 metadata 过滤码流
-for event in event_client.subscribe(
-    "inference/**", filters={"stream": "cam0_sub"}
-):
-    print(f"子码流: {event.event_id}")
-```
-
-## 4. 设备告警订阅
-
-设备控制服务自动发布以下事件：
-
-| 事件 Topic | 触发条件 | 关键字段 |
-|:---|:---|:---|
-| `device/temperature_alert` | 温度超过阈值（75°C 警告 / 85°C 严重） | `temperature`, `level` |
-| `device/gpio_change` | GPIO 状态变化 | `pin`, `value` |
-| `device/ircut_night` | IR-Cut 切换到夜景模式 | `mode` |
-| `device/light_sensor_change` | 光感传感器读数变化 | `value` |
-| `device/ptz_move_complete` | PTZ 动作完成 | `preset_id` |
-
-> 以上事件类型来自固件 `DeviceEvent` 枚举，实际可用性与字段取决于硬件配置与固件版本。
-
-应用管理器发布生命周期事件：`app/started`、`app/stopped`、`app/installed`、`app/uninstalled`。
-
-```python
-from neoruntime_ipc_sdk.events import EventClient
-
-event_client = EventClient()  # 通过 TCP 端点连接
-
-for event in event_client.subscribe("device/**"):
-    level = event.payload.get("level", "info")
-    if level == "critical":
-        temp = event.payload.get("temperature")
-        print(f"[严重] 设备温度 {temp}°C")
-```
-
-## 5. REST API 远程管理
-
-外部系统通过 HTTP 端点管理事件和应用，无需 gRPC 连接。认证默认开启，所有请求需先登录获取 Token 并携带。
-
-### 5.1 Token 认证
-
-```bash
-# 登录获取 Token
-curl -k -X POST https://192.168.1.100/api/login \
-  -H "Content-Type: application/json" \
-  -d '{"username": "admin", "password": "password"}'
-
-# 请求时携带 Token（三选一）
-curl -H "Authorization: Bearer <token>" ...
-curl -H "X-API-Key: <token>" ...
-curl "ws://...?token=<token>"  # WebSocket
-```
-
-### 5.2 事件 API
-
-```bash
-# 列出当前订阅 pattern（返回的是订阅者 pattern，非已发布 topic）
-curl -k https://192.168.1.100/api/v1/events/topics
-
-# 发布事件
-curl -k -X POST https://192.168.1.100/api/v1/events/publish \
-  -H "Content-Type: application/json" \
-  -d '{"topic": "app/custom_alert", "payload": {"type": "intrusion"}}'
-```
-
-WebSocket 实时订阅（浏览器端）：
-
-```javascript
-const ws = new WebSocket("wss://192.168.1.100/api/v1/events/stream?token=<token>");
-ws.onmessage = (e) => {
-  const d = JSON.parse(e.data);
-  // 注意：服务端固定订阅 *（全量），URL 上的 topics 参数不生效——
-  // 想只收某类事件，必须在客户端按 topic 字段过滤
-  if (!d.topic.startsWith("inference/")) return;
-  console.log(`[${d.topic}]`, d.payload);
-};
-```
-
-> **坑：WebSocket 收到的是全量事件流**。服务端固定订阅 `*`，不读 URL 的 `topics` 查询参数——传子集也会收到所有事件。想只处理某类事件，只能在客户端按消息的 `topic` 字段过滤（如上例）。
-
-## 6. 业务系统集成模式
-
-### 6.1 单设备直连
-
-通过 WebSocket 或 REST API 直接获取单台设备的事件，适合设备少、实时性要求高的场景。
-
-```
-NE503 ──HTTP/WebSocket──> 业务服务器
-```
-
-### 6.2 多设备 MQTT 汇聚
-
-每台设备运行桥接程序，事件汇聚到中央 MQTT Broker，Topic 中携带设备标识区分来源：
-
-```
-NE503 #1 ─┐
-NE503 #2 ─┤──MQTT Bridge──> Broker ──> 业务服务
-NE503 #3 ─┘
-```
-
-桥接时使用 `f"ne503/{DEVICE_ID}/{event.topic}"` 作为 MQTT Topic。
-
-### 6.3 Webhook 转发
-
-与 MQTT 桥接（§2）同模式——订阅事件后通过 HTTP POST 转发到外部业务端点：
-
-```python
-import requests
-for event in event_client.subscribe("inference/**"):
-    requests.post(WEBHOOK_URL, json={"topic": event.topic, "payload": event.payload}, timeout=5)
-```
-
-桥接程序同样需运行在设备本机（50053 仅 loopback）。
-
-## 7. 相关文档
-
-- [RESTful API 参考](./3-restful-api.md) — 所有 HTTP 端点的完整参考
-- [系统架构 · 平台服务层](../../3-software-guide/0-system-architecture.md) — Event Bus 等服务职责与源码指针
-- [应用开发参考](./0-app-reference.md) — 基于 SDK 开发自定义应用
+- [应用参考](./0-app-reference.md) — Event Bus 权限和应用清单
+- [SDK 参考](./1-sdk-reference.md) — SDK 包名、客户端和端点
+- [SDK 示例](./2-sdk-examples.md) — 推理到事件的完整调用骨架
+- [RESTful API 参考](./3-restful-api.md) — 事件 REST、认证和 WebSocket 路径
+- [event.proto](https://github.com/camthink-ai/neoruntime/blob/main/platform/event-bus/proto/event.proto) — Event Bus 协议源码

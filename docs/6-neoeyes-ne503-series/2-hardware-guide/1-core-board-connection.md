@@ -20,7 +20,7 @@ NE503 由以下物理模组组成：
 | 接口板 | STM32G0B0RET6 | MCU 管理外部 IO、电源、外设控制，板上集成 TF 卡座（详见 [Interface Board](./2-aipc-board-connection.md)） |
 | 传感器板 | IMX678-AAQR1-C | 4K CMOS 图像传感器，通过 FPC 连接器接入 |
 | 灯板 | — | 双光灯板（白光/红光 PWM）+ 红外灯板（近/远红外 PWM） |
-| 镜头模组 | AN41908A-VBA | AF 自动变焦与自动对焦镜头驱动 |
+| 镜头模组 | 按 SKU 配置 | 可选 `AF Lens (44.5° HFOV)` 或 `Motorized Zoom (110° HFOV)`；驱动器件与控制能力以具体配置为准 |
 
 核心板与接口板通过板对板连接器互联：核心板提供 SoC 原生引脚，接口板上的设备通过连接器挂接到这些引脚。
 
@@ -34,7 +34,7 @@ NE503 由以下物理模组组成：
 
 | # | 功能 | 芯片型号 | 类别 |
 |:--|:-----|:---------|:-----|
-| 1 | LPDDR4 | MT53E2G32D4DE-046 WT:C | SoC 内建 |
+| 1 | LPDDR4 | 4 GB / 8 GB（具体芯片型号随配置） | SoC 内建 |
 | 2 | eMMC | SDINBDA6-64G-H | SoC 内建 |
 | 3 | QSPI Flash | IS25WP064D-JKLE | SoC 内建 |
 | 4 | 温度传感器 | TMP1075DSGR | 板载 I2C |
@@ -52,7 +52,7 @@ NE503 由以下物理模组组成：
 | 11 | TF 卡 | — | SDIO0 + GPIO | 整机接口 |
 | 12 | 调试串口 | — | UART0 | 调试接口 |
 | 13 | BOOT 模式 | — | BOOT0/BOOT1 | 调试接口 |
-| 14 | 镜头驱动 | AN41908A-VBA | SPI（CS1） | 内部预留 |
+| 14 | 镜头驱动 | 按镜头配置 | SPI（CS1） | 内部预留 |
 | 15 | 音频编解码 | NAU88C10 | I2S + I2C0 | 内部预留 |
 | 16 | 雷达模组 | — | UART2 + GPIO | 内部预留 |
 | 17 | MCU 复位控制 | SN74LVC1G14DCK | GPIO | 内部预留 |
@@ -61,9 +61,9 @@ NE503 由以下物理模组组成：
 
 以下资源通过 SoC 原生接口直连，物理焊接在核心处理板上。
 
-### LPDDR4（MT53E2G32D4DE-046 WT:C）
+### LPDDR4（当前记录的 8 GB 配置：MT53E2G32D4DE-046 WT:C）
 
-8 GB LPDDR4，4266 Mb/s，8.5 GB/s 单通道带宽。
+NE503 提供 4 GB 和 8 GB LPDDR4 配置。本文记录的 8 GB 配置使用 MT53E2G32D4DE-046 WT:C，速率为 4266 Mb/s，单通道带宽为 8.5 GB/s；4 GB 配置的器件型号与带宽以对应 BOM 为准。
 
 | 引脚 | 功能 |
 |:---|:---|
@@ -185,7 +185,7 @@ I2C1 从设备地址 **0x6A**，25 MHz，PCIe Gen4 低抖动 0.3 ps。
 
 ### 镜头驱动
 
-核心板 SPI 总线通过 CS1 片选引出，连接 AN41908A-VBA AF 自动变焦与自动对焦镜头驱动。与 QSPI Flash 共享 SPI 总线，通过不同片选区分。MCU 侧 SPI1 也连接同一芯片，负责镜头归零与限位保护（详见 [Interface Board](./2-aipc-board-connection.md)）。
+核心板 SPI 总线通过 CS1 片选引出，为镜头驱动提供控制路径，并与 QSPI Flash 共享 SPI 总线、通过不同片选区分。本文的板级记录对应 AN41908A-VBA 驱动器件；实际安装的镜头选项、驱动器件以及自动对焦/变焦能力以具体 SKU、BOM 和固件为准。MCU 侧 SPI1 负责镜头归零与限位保护（详见 [Interface Board](./2-aipc-board-connection.md)）。
 
 | 引脚 | 功能 |
 |:---|:---|

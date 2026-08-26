@@ -1,122 +1,169 @@
 ---
-description: NE503 Python SDK 四类典型应用模式（实时计数、事件告警、设备控制、级联推理）的选型与最小骨架，完整可运行源码在 neoruntime-apps 仓库 examples/ 下，直接抄改即可。
-keywords: [NE503, SDK 示例, 应用模式, InferenceClient, EventClient, DeviceClient, 级联推理]
-tags: [应用开发, NE503, SDK, 示例]
+description: NE503 Python SDK 实战示例，使用当前 hailo_ipc_sdk 展示推理订阅、事件发布、设备控制和退出清理。
+keywords: [NE503 SDK 示例, hailo_ipc_sdk, InferenceClient, EventClient, DeviceClient, 推理, 事件]
+tags: [SDK示例, NE503, Python, 推理, 事件集成]
 ---
 
 # SDK Examples
 
-本文用 4 个最常见场景演示 `neoruntime_ipc_sdk` 怎么搭。先看[选型表](#1-四类典型模式先选型)定位你要的模式，再照骨架写。**每个模式的完整可运行源码在 `neoruntime-apps` 仓库 `examples/` 目录下**，直接拿去改，不用在这篇里抄完整代码。
+本页只保留四种最常见的业务骨架。代码使用工程仓库当前的导入路径和客户端方法；`stream`、`model` 和权限仍必须按目标设备确认。
 
-骨架里的 `stream`、`model` 是示例值，部署前先查设备真实值再填（见 [SDK 参考 §3.2](./1-sdk-reference.md#32-流名与模型名不能写死)）。
+完整项目、`app.yaml` 和构建文件见 [neoruntime-apps](https://github.com/camthink-ai/neoruntime-apps)。部署步骤见 [SDK 工作流](../1-app-development/0-sdk-workflow.md)。
 
-## 1. 四类典型模式（先选型）
+## 1. 订阅推理并统计目标
 
-| # | 模式 | 典型场景 | 核心 API | 仓库完整示例 |
-|:--|:-----|:---------|:---------|:-------------|
-| 1 | 实时推理计数 | 统计画面中各目标的出现次数 | `subscribe()` + `count_by_label()` | [examples/people-counting](https://github.com/camthink-ai/neoruntime-apps/blob/main/examples/people-counting/app.py) |
-| 2 | 推理 → 事件告警 | 检测到目标时发事件，与其他应用联动 | `subscribe()` + `EventClient.publish()` | [examples/object-detection](https://github.com/camthink-ai/neoruntime-apps/blob/main/examples/object-detection/app.py) |
-| 3 | 推理 → 设备控制 | 根据检测结果开灯、切日夜 | `subscribe()` + `DeviceClient` | [examples/person-detection](https://github.com/camthink-ai/neoruntime-apps/blob/main/examples/person-detection/app.py) |
-| 4 | 级联推理（进阶） | 第一次推理的输出裁剪后喂给第二个模型 | `subscribe()` + `infer()` | [examples/face-cascade](https://github.com/camthink-ai/neoruntime-apps/blob/main/examples/face-cascade/README.md) |
-
-> 前三种覆盖了绝大多数应用。「订阅推理流」是共性骨架，差异在拿到结果后做什么——计数、发事件、还是控设备。级联推理是最深的一族，先读懂前三种再上。
-
-## 2. 模式一：实时推理计数
-
-每帧都会返回检测结果，用 `count_by_label()` 按标签计数、定时汇总即可：
+`InferenceClient.subscribe()` 返回 `(frame_seq, result)`。检测结果可以直接使用 `count_by_label()` 或遍历 `result.objects`：
 
 ```python
-import time
-from neoruntime_ipc_sdk import InferenceClient
+from hailo_ipc_sdk import InferenceClient
 
-inf = InferenceClient()
-report_at = time.monotonic() + 5.0        # 每 5 秒打印一次汇总
 
-for frame_seq, result in inf.subscribe(stream="sub", model="hailo_yolov8n_384_640"):
-    if time.monotonic() < report_at:
-        continue
+def main():
+    inference = InferenceClient()
+    try:
+        for frame_seq, result in inference.subscribe(
+            stream="main",
+            model="person_vehicle_v1",
+            fps=10,
+        ):
+            count = result.count_by_label("person")
+            if count:
+                print(f"frame={frame_seq}: {count} person(s)")
+    finally:
+        inference.close()
 
-    report_at = time.monotonic() + 5.0
-    print(f"seq={frame_seq}: {len(result.objects)} objects")
-    for obj in result.objects:
-        print(f"  {obj.label} {obj.score:.2f} {obj.bbox.to_xyxy()}")
+
+if __name__ == "__main__":
+    main()
 ```
 
-完整版（含阈值过滤、告警事件、优雅退出）见 [examples/people-counting](https://github.com/camthink-ai/neoruntime-apps/blob/main/examples/people-counting/app.py) 与 [Person Detection 教程](../2-cookbook/1-person-detection.md)。
+这段骨架对应仓库中的 [object-detection 示例](https://github.com/camthink-ai/neoruntime-apps/blob/main/examples/object-detection/app.py) 和 [people-counting 示例](https://github.com/camthink-ai/neoruntime-apps/blob/main/examples/people-counting/app.py)。不要默认所有模型都有 `objects`；分类、姿态、OCR 等模型要按实际结果字段处理。
 
-## 3. 模式二：推理 → 事件告警
+## 2. 推理结果发布为业务事件
 
-检测到告警条件时通过事件总线广播，其他应用（如仪表板、联动脚本）订阅同一主题处理：
+应用可以把检测结果转换成自己的业务事件。事件主题需要同时出现在清单的 `events.publish` 白名单中：
 
 ```python
-from neoruntime_ipc_sdk import InferenceClient, EventClient
+from hailo_ipc_sdk import EventClient, InferenceClient
 
-inf = InferenceClient()
+
+def main():
+    inference = InferenceClient()
+    events = EventClient()
+    try:
+        for frame_seq, result in inference.subscribe(
+            stream="main",
+            model="person_vehicle_v1",
+            fps=10,
+        ):
+            count = result.count_by_label("person")
+            if count > 0:
+                events.publish(
+                    "app/alert",
+                    {
+                        "type": "person_detected",
+                        "count": count,
+                        "frame_sequence": frame_seq,
+                    },
+                )
+    finally:
+        inference.close()
+        events.close()
+
+
+if __name__ == "__main__":
+    main()
+```
+
+`EventClient.publish()` 还支持 `persistent=True`、`ttl_ms` 和 `metadata`。持久化、通配符订阅以及消息字段见 [事件集成](./5-event-integration.md)。
+
+## 3. 推理结果驱动设备控制
+
+使用 `DeviceClient` 前，先在 `app.yaml` 中声明对应的设备权限。下面只展示工程仓库已使用的白光灯控制：
+
+```python
+from hailo_ipc_sdk import DeviceClient, InferenceClient
+
+
+def main():
+    inference = InferenceClient()
+    device = DeviceClient()
+    light_on = False
+    try:
+        for _, result in inference.subscribe(
+            stream="main",
+            model="person_vehicle_v1",
+            fps=10,
+        ):
+            detected = result.has_person()
+            if detected and not light_on:
+                device.set_white_light(100)
+                light_on = True
+            elif not detected and light_on:
+                device.set_white_light(0)
+                light_on = False
+    finally:
+        if light_on:
+            device.set_white_light(0)
+        inference.close()
+        device.close()
+
+
+if __name__ == "__main__":
+    main()
+```
+
+完整的阈值、告警去重、统计窗口和信号处理可参考 [people-counting 示例](https://github.com/camthink-ai/neoruntime-apps/blob/main/examples/people-counting/app.py)。PTZ、镜头、IR-CUT 和 GPIO 的方法与权限不要在没有硬件能力确认时直接启用。
+
+## 4. 长时间运行与优雅退出
+
+流式订阅是阻塞迭代器。生产应用至少要做到三件事：接收 `SIGINT`/`SIGTERM`，停止主循环，关闭所有 SDK 客户端：
+
+```python
+import signal
+
+from hailo_ipc_sdk import EventClient, InferenceClient
+
+
+running = True
+
+
+def stop(_signum, _frame):
+    global running
+    running = False
+
+
+signal.signal(signal.SIGINT, stop)
+signal.signal(signal.SIGTERM, stop)
+
+inference = InferenceClient()
 events = EventClient()
-
-for frame_seq, result in inf.subscribe(stream="sub", model="hailo_yolov8n_384_640"):
-    hits = [o for o in result.get_objects_by_label("person") if o.score >= 0.6]
-    if hits:
-        events.publish(
-            f"app/{APP_ID}/person_detected",     # 主题命名：app/<应用ID>/<事件名>
-            {"frame": frame_seq, "count": len(hits)},
-            persistent=True,                     # 持久化，订阅者后来上线也能收到
-        )
+try:
+    for frame_seq, result in inference.subscribe(
+        stream="main", model="person_vehicle_v1", fps=10
+    ):
+        if not running:
+            break
+        # 处理 result
+finally:
+    inference.close()
+    events.close()
 ```
 
-事件总线的订阅、通配符与权限声明见 [SDK 参考 §3 平台约束](./1-sdk-reference.md#3-平台特有的约束) 和 [事件集成](./5-event-integration.md)；完整联动示例见 [examples/object-detection](https://github.com/camthink-ai/neoruntime-apps/blob/main/examples/object-detection/app.py)。
+仓库的 people-counting 和 object-detection 示例都在退出路径关闭客户端。`face-cascade` 目录当前的 `main.py` 实际仍是“人员检测后发布告警”的简单示例，不是完整的裁剪后二次推理实现；不要把其 README 中的级联描述当作已验证的级联代码。
 
-## 4. 模式三：推理 → 设备控制
+## 5. 从示例到可部署应用
 
-`DeviceClient` 直接控制硬件外设，检测结果驱动灯光/日夜切换：
+1. 复制一个与业务最接近的 `neoruntime-apps/examples` 项目。
+2. 把导入路径统一为 `hailo_ipc_sdk`。
+3. 用目标设备的真实码流、模型 ID 和事件主题替换示例值。
+4. 在 `app.yaml` 中只声明代码实际用到的权限，并按 [应用参考](./0-app-reference.md) 配置资源、卷和健康检查。
+5. 构建镜像、安装应用、启动应用，再查看应用日志和设备侧结果。
 
-```python
-from neoruntime_ipc_sdk import InferenceClient, DeviceClient, IrCutMode
+## 6. 相关文档
 
-inf = InferenceClient()
-device = DeviceClient()
-
-for frame_seq, result in inf.subscribe(stream="sub", model="hailo_yolov8n_384_640"):
-    if result.has_person():              # 检测到人：开补光灯、切日间
-        device.set_white_light(80)
-        device.set_ircut(IrCutMode.DAY)
-    else:                                # 无人：关灯、开红外、切夜间
-        device.set_white_light(0)
-        device.set_ir_led(True)
-        device.set_ircut(IrCutMode.NIGHT)
-```
-
-灯光、云台、镜头、GPIO 等全部外设接口见 [SDK 参考模块速览](./1-sdk-reference.md#2-每个模块解决什么问题)；完整真机案例（含初始状态读取、超时切换）见 [examples/person-detection](https://github.com/camthink-ai/neoruntime-apps/blob/main/examples/person-detection/app.py)。
-
-## 5. 模式四：级联推理（进阶）
-
-第一段订阅的检测结果只是「目标在哪」，很多时候还要对目标区域再做一次推理——人脸检测后再跑关键点，车辆检测后再跑车牌。核心是第一次拿到的 `bbox` 裁剪出小图，用 `infer()` 单帧喂第二段模型：
-
-```python
-for frame_seq, result in inf.subscribe(stream="sub", model="<检测模型>"):
-    for obj in result.objects:
-        crop = frame_crop(obj.bbox)       # 按 bbox 裁剪，实现见仓库完整示例
-        second = inf.infer(crop, model_id="<第二段模型>")
-        # second.classifications / second.landmarks / ... 处理结果
-```
-
-完整实现（含裁剪、结果合并、事件总线输出）见 [examples/face-cascade](https://github.com/camthink-ai/neoruntime-apps/blob/main/examples/face-cascade/README.md)。两段模型都要先在设备上导入并查真实模型名，不能写死。
-
-## 6. 把骨架变成真机应用
-
-骨架只是核心逻辑，跑真机还需要构建镜像、声明权限、上传部署：
-
-1. **clone 仓库**（与 SDK 同父目录）：
-   ```bash
-   git clone https://github.com/camthink-ai/neoruntime-apps.git
-   ```
-2. **复制最近的示例为起点**：`cp -r examples/<模式> my-app/`，改 `app.py` 的业务逻辑、`app.yaml` 的 `metadata.id`/模型名/权限声明（权限参考 [应用参考 §4 权限模型](./0-app-reference.md#4-权限模型)）。
-3. **构建 → 上传 → 启动**：与 Hello World 完全一致，见 [Hello World §3 构建镜像](../1-app-development/1-hello-world.md#3-构建镜像) 与 [§4 部署到设备](../1-app-development/1-hello-world.md#4-部署到设备)。报错排查见 [故障排查 FAQ](../../5-troubleshooting.md)。
-
-## 7. 相关文档
-
-- [SDK 参考](./1-sdk-reference.md) — 模块速览、安装与平台特有约束
-- [SDK 工作流](../1-app-development/0-sdk-workflow.md) — 从克隆到部署的开发流程与调用范式
-- [应用参考](./0-app-reference.md) — app.yaml 配置、权限模型、部署流程
-- [Person Detection 教程](../2-cookbook/1-person-detection.md) — 完整真机案例
-- [事件集成](./5-event-integration.md) — 事件总线协议与主题
+- [SDK 参考](./1-sdk-reference.md) — 包名、模块、端点和平台约束
+- [SDK 工作流](../1-app-development/0-sdk-workflow.md) — 构建、部署和第一次调用
+- [应用参考](./0-app-reference.md) — `app.yaml` 和权限
+- [事件集成](./5-event-integration.md) — Event Bus 接入
+- [RESTful API 参考](./3-restful-api.md) — 外部系统管理接口

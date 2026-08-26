@@ -2,80 +2,79 @@
 id: ai-assisted-dev
 title: AI-Assisted Development
 sidebar_position: 3
-description: 用 Claude Code 配合 ne503-dev skill 做 AI 辅助开发——一句话描述需求，Claude 自动写出应用代码（逻辑 + 清单）、部署到设备并验收跑通。以"停留告警"应用做完整真机演示。
-keywords: [NE503, ne503-dev, Claude Code, skill, AI 辅助开发, 应用开发, 停留告警, loitering, 状态机, 自然语言]
+description: 用 Claude Code 和 ne503-dev skill，将一句自然语言需求实现为可在 NE503 上运行的停留告警应用，并完成部署与验收。
+keywords: [NE503, ne503-dev, Claude Code, AI 辅助开发, 应用开发, 停留告警, loitering, 状态机]
 tags: [应用开发, NE503, AI 辅助开发, skill]
 ---
 
 # AI-Assisted Development
 
-本篇演示 **AI 辅助开发**：用一句自然语言描述需求，由 Claude（基于 `ne503-dev` skill）完成应用的开发、部署与验收，全程无需手动执行命令。
+本篇演示如何用 **Claude Code** 和 `ne503-dev` skill 开发一个 NE503 应用。
 
-演示应用为 **停留告警**（Loitering Detection）：检测到人员连续停留 10 秒即触发告警，人员离开后重置。
+示例需求很简单：检测到人员连续停留 10 秒后发送告警；人员离开后，计时和告警状态重置。你只需要描述需求并确认关键参数，Claude 会根据设备实际情况完成代码、清单、构建、部署和验收。
 
 :::tip 直接体验成品
-想跳过开发过程、直接部署成品？下载本次演示产出的预编译包 [lingering-detection.tar](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/app-development/ai-assisted-dev/lingering-detection.tar)，解压即得 `app.yaml` 与 `image.tar`，按 [Hello World](./1-hello-world.md) §4 的步骤部署到设备即可。
+如果只想查看运行结果，可以下载预编译包 [lingering-detection.tar](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/app-development/ai-assisted-dev/lingering-detection.tar)。解压后得到 `app.yaml` 和 `image.tar`，再按 [Hello World 的部署步骤](./1-hello-world.md#4-部署到设备)导入设备。
 :::
 
 ## 1. 前置准备
 
 | 条件 | 说明 |
 |:---|:---|
-| Claude Code | 安装到本机。 |
-| ne503-dev skill | [下载 skill zip](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/app-development/ai-assisted-dev/ne503-dev.zip)，解压至 `~/.claude/skills/`（即 `~/.claude/skills/ne503-dev/`）。 |
-| Docker | 安装到本机，用于构建应用镜像。 |
-| NE503 设备 | 准备一台就绪的设备：记下设备 IP 与 admin 密码，并确认平台已初始化（HALv2 已装、ai-runtime 健康、检测模型已 scan+load）。 |
+| Claude Code | 已安装并可以正常运行。 |
+| `ne503-dev` skill | [下载 skill](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/app-development/ai-assisted-dev/ne503-dev.zip)，解压到 `~/.claude/skills/ne503-dev/`。 |
+| Docker | 用于构建 ARM64 应用镜像。 |
+| NE503 设备 | 设备已联网，准备好 IP 和 `admin` 密码；HAL v2、`ai-runtime` 和检测模型已就绪。 |
 
-## 2. 从一句话到一个新应用
+## 2. 从一句需求到可运行应用
 
-传统开发流程要做的事——编写 `app.py` 业务逻辑、配置 `app.yaml` 权限、查询设备可用的模型与视频流、构建镜像、部署、验收——在 AI 辅助开发里全部交给 Claude，开发者只需用自然语言描述需求。以下是一次真机会话的完整过程（2026-06-22），输入仅一句话。
+### 2.1 描述需求
 
-### 2.1 输入需求
-
-在 Claude Code 中调用 `ne503-dev` skill，用自然语言描述需求：
+在 Claude Code 中调用 `ne503-dev`，直接说明目标和设备地址：
 
 > 做一个应用：检测到人停留 10 秒就发告警。部署到 `<设备 IP>`。
 
-Claude 读取 skill 后自主启动规划，与开发者确认少数细节后即开工：
+Claude 会先确认必要信息，再开始开发。你不需要一开始就指定代码结构，但需要确认最终的停留时长、检测阈值等业务参数。
 
 <video controls width="100%">
   <source src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/app-development/ai-assisted-dev/ai-assist-start_new.mp4" type="video/mp4"></source>
   您的浏览器不支持视频播放。
 </video>
 
-### 2.2 Claude 开发这个应用（核心）
+### 2.2 Claude 完成应用开发
 
-需求确认后，Claude 以 SDK 的 `apps/template/` 应用模板为起点自主开发，关键决策有三：
+Claude 会以 SDK 应用模板为基础，完成三件关键工作：
 
-- **占位值修正**：模板里的示例模型与视频流在真机上跑不通，Claude 查询设备后改为真实值——模型 `hailo_yolov8n_384_640`、视频流 `sub`（发布原始 NV12 帧；`main` 只发编码 H264，无法推理）。
-- **停留状态机**：应用的核心逻辑。人进入画面即开始计时，连续停留满 10 秒触发告警，连续 3 秒未检测到则判定离开并重置；3 秒宽限窗口（`GRACE_SECONDS`）容忍侧身、遮挡造成的短暂丢帧。
-- **清单配置**：`app.yaml` 声明所需的视频流、模型、事件主题，以及可调环境变量（停留时长 `LOITER_SECONDS`、检测阈值 `DETECTION_THRESHOLD`、宽限秒数 `GRACE_SECONDS` 等）。
+1. **先确认设备资源**：查询设备上实际可用的模型和视频流。示例使用模型 `hailo_yolov8n_384_640` 和原始视频流 `sub`；`main` 是编码 H264 流，不能直接用于推理。
+2. **实现停留状态机**：人员出现时开始计时，连续停留满 10 秒触发一次告警；连续 3 秒未检测到人员则判定离开并重置。`GRACE_SECONDS` 用于容忍转身或遮挡造成的短暂漏检。
+3. **生成应用清单**：在 `app.yaml` 中声明视频流、模型、事件主题和可调参数，包括 `LOITER_SECONDS`、`DETECTION_THRESHOLD`、`GRACE_SECONDS` 等。
 
-完整的开发过程（模板选取 → 占位修正 → 状态机编写）见下：
+这一步的重点不是让 AI 猜一个示例值，而是让应用使用设备当前真实的模型、视频流和权限。
 
 <video controls width="100%">
   <source src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/app-development/ai-assisted-dev/ai-assist-end_new.mp4" type="video/mp4"></source>
   您的浏览器不支持视频播放。
 </video>
 
-### 2.3 Claude 部署并验收
+### 2.3 自动部署并验收
 
-代码写完后，部署同样由 Claude 自主完成——调用 skill 内置脚本，将"构建→上传→安装→启动→验收"全自动一次跑通，应用随之进入 `running`。
+代码和清单准备好后，`ne503-dev` 会依次完成：
 
-部署完成后，Claude 进一步验证三件事：推理确实上线（拉日志确认模型加载与首帧到达）、平台注入的权限与 `app.yaml` 声明一致、人进入画面即可触发一次完整检测。Web 控制台视角的验收过程见下：
+```text
+构建 ARM64 镜像 → 上传 → 安装 → 启动 → 查看状态和日志
+```
+
+验收时重点确认三件事：
+
+- 应用状态为 `Running`，日志中出现模型加载和首帧推理信息；
+- 平台注入的权限与 `app.yaml` 中的声明一致；
+- 人进入画面后，能触发一次完整的检测和告警流程。
 
 <video controls width="100%">
   <source src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/app-development/ai-assisted-dev/verify-on-web_new.mp4" type="video/mp4"></source>
   您的浏览器不支持视频播放。
 </video>
 
-真机重复多轮，告警稳定落在 10.1 秒，累计 3 次独立告警，无误报、无漏报。
+在本次真机演示中，告警时间稳定在 10.1 秒，共完成 3 次独立告警验证。
 
-输入一句话需求，即可产出一个在设备上实跑的停留告警应用——全程无任何手动步骤。
-
-完整过程汇总视频（按需查看）：
-
-<video controls width="100%">
-  <source src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/app-development/ai-assisted-dev/ai-assisted-development_new.mp4" type="video/mp4"></source>
-  您的浏览器不支持视频播放。
-</video>
+完整过程视频：[ai-assisted-development_new.mp4](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/app-development/ai-assisted-dev/ai-assisted-development_new.mp4)

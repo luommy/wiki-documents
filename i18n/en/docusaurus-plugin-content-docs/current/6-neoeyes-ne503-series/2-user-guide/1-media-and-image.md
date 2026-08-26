@@ -126,7 +126,7 @@ NE503 focuses on RTSP integration and does not provide ONVIF device discovery. A
 
 ## Image (Picture, Overlays, and Lens)
 
-The **Image** page has three sub-tabs: **Image / Overlay / Control** — Image adjusts quality and transforms, Overlay adds overlays and privacy masks, Control drives the lens and IR.
+The **Image** page has three sub-tabs: **Image / Overlay / Control** — Image adjusts quality and transforms, Overlay adds overlays and privacy masks, and Control drives the lens and IR. Lens controls depend on the lens configuration installed in the device; not every SKU exposes the same controls.
 
 ### Quality and Transform (Image Tab)
 
@@ -184,10 +184,10 @@ The two are independent: Privacy Mask blocks a **fixed position**, regardless of
 
 | Item | Effect |
 |------|--------|
-| **Zoom** | Zoom slider (shows the multiplier, e.g., 1.0x) |
-| **Focus** | Focus slider (shows the position percentage and zone, e.g., MID) |
-| **One-shot AF** | Click once to trigger a single autofocus at the current zoom |
-| **Reset to 1.0x** | Return to the minimum zoom |
+| **Zoom** | Zoom slider provided by motorized-zoom configurations (shows the multiplier, e.g., 1.0x) |
+| **Focus** | Focus slider provided by configurations with focus control (shows the position percentage and zone, e.g., MID) |
+| **One-shot AF** | Available on autofocus-capable configurations; click once to trigger autofocus at the current zoom |
+| **Reset to 1.0x** | Return to the minimum zoom on motorized-zoom configurations |
 | **IR-Cut Filter** | Infrared cut filter toggle — on during the day for accurate color, off at night to let in infrared light (the status text indicates the current mode) |
 
 **IR Light Control**
@@ -199,4 +199,4 @@ The two are independent: Privacy Mask blocks a **fixed position**, regardless of
 
 Enable as needed for night or low-light scenes; adjust brightness based on distance and scene. Note that fill lights add to power draw and heat.
 
-> To **control the lens or IR remotely from an app** (e.g., programmatic zoom), the app must be installed with the Device Control permission.
+> To **control the lens or IR remotely from an app** (e.g., programmatic zoom), the installed lens configuration must support that capability, and the app must be installed with the Device Control permission.

@@ -273,5 +273,5 @@ curl -k -X DELETE https://<设备IP>/api/v1/apps/hello-world -H "Authorization: 
 
 - [SDK Workflow](./0-sdk-workflow.md) —— 下一步：把 SDK 装进应用镜像，让应用真正做 AI 推理
 - [Person Detection](../2-cookbook/1-person-detection.md) —— 一个用 SDK 的完整真机案例
-- [App Reference §2 app.yaml 完整参考](../3-reference/0-app-reference.md#2-appyaml-完整参考) —— `app.yaml` 各字段含义与权限声明
+- [App Reference §2 app.yaml 完整参考](../3-reference/0-app-reference.md#2-清单结构) —— `app.yaml` 各字段含义与权限声明
 - [故障排查 FAQ](../../5-troubleshooting.md) —— 构建、部署、启动报错

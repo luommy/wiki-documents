@@ -11,6 +11,8 @@ tags: [NE503, App Deployment, Container App, Person Detection, Occupancy Monitor
 
 The apps below have all been verified on real NE503 hardware. Download and install them directly for testing, or use the source code as a reference for your own development to accelerate POC delivery.
 
+If you need a ready-made model, start with the [CamThink Model Zoo](https://www.camthink.ai/developer-center/models/). The Model Zoo provides downloadable model files that you can use to build your own app; this page provides complete app packages that have already been verified.
+
 ## App List
 
 

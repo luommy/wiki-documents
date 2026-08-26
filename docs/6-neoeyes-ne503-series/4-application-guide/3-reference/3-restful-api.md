@@ -1,540 +1,393 @@
 ---
-description: NE503 RESTful API 完整参考，涵盖系统管理、AI 模型、事件总线、设备控制、应用管理、容器管理、媒体配置、系统监控、存储管理等所有 HTTP 端点，包含认证机制和 WebSocket 实时通信接口。
-keywords: [NE503 API, RESTful API, HTTP接口, WebSocket, 设备控制API, 模型管理API, 应用管理API]
-tags: [API参考, NE503, RESTful, HTTP接口, 开发者]
+description: NE503 RESTful API 参考，按源码整理认证、系统、AI、设备、媒体、应用、文件、存储、网络、运维和 WebSocket 接口。
+keywords: [NE503 API, RESTful API, HTTP, WebSocket, 设备控制, AI 模型, 应用管理, 媒体配置]
+tags: [API参考, NE503, RESTful, WebSocket, 开发者]
 ---
 
 # RESTful API Reference
 
-Platform API 是 NE503 的 HTTP 网关，基于 Go + Gin 框架（数据存储 SQLite / GORM），通过 gRPC 连接池代理所有后端服务（AI Runtime、Event Bus、Device Control、App Manager、camera-daemon 等），并支持 WebSocket 实时通信（事件流、视频流、容器日志、Web 终端）。平台整体分层架构、服务拓扑与启动依赖见[系统架构](../../3-software-guide/0-system-architecture.md)。
+Platform API 是 NE503 的 HTTP 网关。本文按资源组织接口，帮助你先定位端点，再到 Swagger 查看具体请求体和响应 schema。
 
----
+本文的路径默认省略 `/api/v1` 前缀：例如表中的 `GET /system/info`，实际地址是 `GET https://<设备IP>/api/v1/system/info`。登录 `POST /api/login` 不使用 `/api/v1` 前缀。
 
-## 1. 概述
+## 1. 请求约定
 
-Platform API 是 NE503 的 HTTP 网关，基于 Go + Gin 框架构建，统一代理所有后端 gRPC 服务（AI Runtime、Event Bus、Device Control、App Manager 等），并支持 WebSocket 实时通信（事件流、视频流、容器日志、Web 终端）。
+### 1.1 基础地址和认证
 
-| 项目 | 说明 |
+| 项目 | 值 |
 |:---|:---|
-| 端点前缀 | `/api/v1` |
 | 基础地址 | `https://<设备IP>` |
-| Swagger UI | `/swagger/`（交互式文档，可直接试调） |
-| OpenAPI 规格 | `/api/v1/swagger.yaml` |
+| API 前缀 | `/api/v1` |
+| Swagger UI | `/swagger/`（以设备实际部署为准） |
 | 协议 | HTTP + WebSocket |
-| 响应格式 | JSON |
+| 常规响应 | JSON |
 
-> 以下各节路径均省略 `/api/v1` 前缀，实际请求时需拼接完整路径，如 `/api/v1/system/info`。登录端点 `/api/login` 是例外，独立于该前缀。
-
----
-
-## 2. 认证
-
-Platform API **默认启用认证**。除公开端点外，所有请求必须携带有效 Token，否则返回 `401`。
-
-**登录获取 Token：**
+除公开接口外，请先登录，再把返回的访问令牌放入请求头：
 
 ```bash
-# 登录端点独立于 /api/v1 前缀
 curl -k -X POST https://<设备IP>/api/login \
-  -H "Content-Type: application/json" \
-  -d '{"username":"admin","password":"password"}'
+  -H 'Content-Type: application/json' \
+  -d '{"username":"<username>","password":"<password>"}'
 ```
 
-```json
-// 响应
-{"code":0,"message":"Success","data":{"token":"Bearer <token>","username":"admin"}}
+```bash
+curl -k https://<设备IP>/api/v1/system/info \
+  -H 'Authorization: Bearer <token>'
 ```
 
-> 出厂默认账号 `admin` / 密码 `password`，**生产部署务必修改**（通过 `POST /system/password` 或配置文件 `auth.username` / `auth.password`）。返回的 Token 为本次登录的**会话凭据**：修改密码或平台服务重启后失效，脚本应处理 `401` 并重新登录；长期集成可使用配置中的静态 API 密钥（`X-API-Key` 或 `Authorization` Bearer），其出厂默认值已公开，生产环境务必更换（见[安全加固](../../2-user-guide/7-security-hardening.md)）。
+源代码注册的公开接口是：
 
-**Token 传递方式：**
-
-| 方式 | 格式 | 适用场景 |
+| 方法 | 实际路径 | 用途 |
 |:---|:---|:---|
-| HTTP Header | `Authorization: Bearer <token>` | REST API 请求（推荐） |
-| HTTP Header | `X-API-Key: <token>` | REST API 请求 |
-| Query Parameter | `?token=<token>` | WebSocket 连接（浏览器侧无法自定义 Header 时） |
+| `POST` | `/api/login` | 登录 |
+| `GET` | `/api/v1/auth/public-key` | 登录前获取公钥 |
+| `GET` | `/api/v1/system/health` | 健康检查 |
+| `GET` | `/api/v1/system/ota/status` | OTA 状态轮询 |
+| `GET` | `/api/v1/system/os-upgrade/status` | OS 升级状态轮询 |
 
-**公开端点（无需认证）：**
+`/api/v1/logout` 也由服务端注册，但是否需要客户端显式调用取决于会话管理方式。其余 `/api/v1` 路由默认经过认证中间件。
 
-- `POST /api/login` — 登录
-- `GET /system/health` — 健康检查
+### 1.2 请求和响应
 
-> 注意：出厂默认即开启认证。第三方集成时必须先登录拿 Token，再带 Token 调用其余端点。
+- JSON 请求使用 `Content-Type: application/json`。
+- 文件上传使用接口定义的 `multipart/form-data` 字段。
+- 设备重启、升级、格式化、删除模型、删除文件、停止进程等接口会改变设备状态；先在测试设备验证。
+- 业务判断不能只看 HTTP 状态码，同时检查响应中的 `code`、`message`、`data` 或 Swagger 定义的业务状态。
+- 令牌、密码、API key 和设备地址不要提交到日志或文档仓库。
 
----
-## 3. 系统管理
+## 2. 按任务找接口
 
-系统管理接口负责设备登录鉴权、系统信息查询、固件升级（OTA）、时间与 NTP 配置等底层运维操作，主要面向集成方做设备纳管、健康监测与远程维护。
+| 任务 | 资源组 | 先看哪些接口 |
+|:---|:---|:---|
+| 设备纳管 | system、device-info、network | `/system/info`、`/system/health`、`/device-info`、`/network/config` |
+| 模型准备 | ai | `/ai/capabilities`、`/ai/models`、`/ai/models/upload` |
+| 应用安装运行 | apps、containers、images | `/apps`、`/apps/{app_id}/start`、`/containers` |
+| 相机和码流 | media、streams、h264 | `/media/config`、`/media/status`、`/streams`、`/h264/{stream_id}` |
+| 设备外设 | device | `/device/status`、`/device/light`、`/device/lens/*` |
+| 实时事件 | events | `/events/topics`、`/events/publish`、`/events/stream` |
+| 系统运维 | monitor、processes、logs、files | `/monitor/*`、`/processes`、`/logs/*`、`/files/*` |
 
-### 3.1 登录与系统信息
+## 3. 系统、模型和事件
 
-| 方法 | 路径 | 说明 |
-| --- | --- | --- |
-| POST | `/login` | 提交用户名密码换取访问令牌（Token）；真实地址为 `POST /api/login`（独立于 `/api/v1` 前缀），公开端点，无需鉴权 |
-| GET | `/system/health` | 健康检查，公开端点，无需鉴权，常用于存活探测 |
-| GET | `/system/info` | 获取设备系统信息（型号、版本、硬件等） |
-| GET | `/system/stats` | 获取系统运行统计（CPU、内存、磁盘等资源占用） |
+### 3.1 系统、时间、OTA 和 OS 升级
 
-登录是调用其他受保护接口的前提：成功后返回的 Token 需以 `Authorization: Bearer <token>` 形式携带在后续请求头中。请求体为 JSON，包含 `username` 与 `password` 两个字段（均为必填）。
+| 方法 | 路径 |
+|:---|:---|
+| `GET` | `/system/info` |
+| `GET` | `/system/stats` |
+| `GET` | `/system/time` |
+| `POST` | `/system/time/set` |
+| `POST` | `/system/time/sync-from-client` |
+| `GET` / `PUT` | `/system/time/config` |
+| `PUT` | `/system/time/timezone` |
+| `GET` | `/system/time/timezones` |
+| `PUT` | `/system/time/ntp` |
+| `POST` | `/system/time/ntp/sync` |
+| `POST` | `/system/password` |
+| `POST` | `/system/restart` |
+| `GET` | `/system/ota/detect` |
+| `POST` | `/system/ota/parse` |
+| `POST` | `/system/ota/install` |
+| `POST` | `/system/ota/install-from-path` |
+| `GET` | `/system/ota/status`（公开状态查询） |
+| `POST` | `/system/os-upgrade/upload` |
+| `POST` | `/system/os-upgrade/validate` |
+| `POST` | `/system/os-upgrade/install` |
+| `GET` | `/system/os-upgrade/status`（公开状态查询） |
+| `POST` | `/system/os-upgrade/reboot` |
+| `POST` | `/system/os-upgrade/cancel` |
+| `DELETE` | `/system/os-upgrade/package` |
 
-### 3.2 密码与重启
+升级和重启接口应按“上传/解析或校验 → 执行 → 轮询状态 → 必要时重连”的状态机使用。`install-from-path` 要求设备上的本地绝对路径，不是调用方电脑路径。
 
-| 方法 | 路径 | 说明 |
-| --- | --- | --- |
-| POST | `/system/password` | 修改后台登录密码 |
-| POST | `/system/restart` | 触发设备系统重启 |
+### 3.2 AI Runtime
 
-修改密码请求体为 JSON，需提供 `old_password`（旧密码，可选）与 `new_password`（新密码，必填）。`/system/restart` 无请求体，调用后设备将重启，期间服务短暂不可用，应做好重连重试。
+| 方法 | 路径 |
+|:---|:---|
+| `GET` | `/ai/capabilities` |
+| `GET` / `POST` | `/ai/models` |
+| `POST` | `/ai/models/parse` |
+| `POST` | `/ai/models/upload` |
+| `POST` | `/ai/models/scan` |
+| `GET` | `/ai/models/{model_id}` |
+| `DELETE` | `/ai/models/{model_id}` |
+| `POST` | `/ai/models/{model_id}/load` |
+| `POST` | `/ai/models/{model_id}/unload` |
+| `GET` | `/ai/models/{model_id}/apps` |
+| `GET` | `/ai/stats` |
 
-### 3.3 固件升级（OTA)
+模型文件上传、注册、加载和删除不是同一个动作。尤其是 `DELETE /ai/models/{model_id}`，应先确认是否会删除设备上的模型文件以及是否仍有应用使用它，再执行。
 
-| 方法 | 路径 | 说明 |
-| --- | --- | --- |
-| GET | `/system/ota/detect` | 检查是否存在新的 OTA 固件更新 |
-| GET | `/system/ota/status` | 查询当前 OTA 升级进度与状态 |
-| POST | `/system/ota/install` | 上传固件包并安装，`multipart/form-data` 字段名为 `firmware` |
-| POST | `/system/ota/parse` | 仅解析固件文件信息，不执行安装，`multipart/form-data` 字段名为 `firmware` |
-| POST | `/system/ota/install-from-path` | 从设备本地绝对路径安装固件（运维） |
+### 3.3 Event Bus
 
-升级典型流程：先 `/system/ota/detect` 检查更新或用 `/system/ota/parse` 校验本地固件包 → `/system/ota/install` 上传安装 → 轮询 `/system/ota/status` 跟踪进度。`install-from-path` 需请求体 `{ "path": "<设备上固件文件的绝对路径>" }`，适用于固件已预先下发到设备的运维场景，第三方集成一般用上传方式即可。
+| 方法 | 路径 | 用途 |
+|:---|:---|:---|
+| `GET` | `/events/topics` | 列出主题 |
+| `POST` | `/events/publish` | 发布事件 |
+| `GET` | `/events/stream` | WebSocket 实时事件流 |
 
-### 3.4 时间管理
+事件的 Topic、payload、认证和 WebSocket 使用边界见 [事件集成](./5-event-integration.md)，这里不重复协议说明。
 
-| 方法 | 路径 | 说明 |
-| --- | --- | --- |
-| GET | `/system/time` | 获取设备当前系统时间 |
-| POST | `/system/time/set` | 手动设置系统时间 |
-| GET | `/system/time/config` | 获取时间配置（NTP 是否启用、NTP 服务器等） |
-| PUT | `/system/time/timezone` | 设置设备时区 |
-| GET | `/system/time/timezones` | 列出设备支持的可选时区 |
-| PUT | `/system/time/ntp` | 配置 NTP 设置（启用/关闭、服务器地址） |
-| POST | `/system/time/ntp/sync` | 立即触发一次 NTP 时间同步 |
+## 4. 设备、摄像头和音视频
 
-手动设置时间请求体为 `{ "datetime": "<RFC3339 时间戳>" }`，例如 `2024-01-01T12:00:00Z`。设置时区请求体为 `{ "timezone": "Asia/Shanghai" }`，可先通过 `/system/time/timezones` 取合法值。NTP 配置请求体为 `{ "enabled": true, "server": "ntp.aliyun.com" }`；启用 NTP 后可用 `/system/time/ntp/sync` 立即同步一次，避免等待下次定时同步。
+### 4.1 设备控制
 
----
+| 方法 | 路径 |
+|:---|:---|
+| `GET` | `/device/status` |
+| `POST` | `/device/light` |
+| `POST` | `/device/ir-led` |
+| `POST` | `/device/ir-cut` |
+| `POST` | `/device/ptz` |
+| `POST` | `/device/zoom` |
+| `POST` | `/device/focus` |
+| `POST` | `/device/autofocus` |
+| `POST` | `/device/lens/oneshot-af` |
+| `POST` | `/device/lens/af/oneshot` |
+| `GET` | `/device/lens/af/status` |
+| `POST` | `/device/lens/af/cancel` |
+| `POST` | `/device/lens/zoom-follow` |
+| `GET` | `/device/lens/status` |
+| `PUT` | `/device/lens/zoom-level` |
+| `PUT` | `/device/lens/focus-level` |
+| `POST` | `/device/lens/reset-zero` |
+| `POST` | `/device/lens/iris` |
+| `POST` | `/device/lens/iris-target` |
+| `PUT` | `/device/lens/limits` |
+| `POST` | `/device/lens/init` |
+| `POST` | `/device/lens/goto` |
+| `GET` / `POST` | `/device/gpio` |
+| `GET` | `/device/gpio/{pin}` |
+| `GET` / `POST` | `/device/fan` |
+| `GET` / `POST` | `/device/heat` |
+| `GET` / `POST` | `/device/radar` |
+| `GET` / `POST` | `/device/alarm-out` |
+| `GET` | `/device/alarm-out/{channel}` |
+| `GET` / `POST` | `/device/wiegand` |
+| `GET` | `/device/wiegand/{channel}` |
+| `GET` | `/device/alarm-outputs` |
+| `POST` | `/device/rs485/init` |
+| `POST` | `/device/rs485/deinit` |
+| `POST` | `/device/rs485/tx` |
+| `GET` | `/device/capabilities` |
 
-## 4. AI 模型与推理
+设备控制接口可能实际改变灯光、镜头、云台、GPIO、RS485 或其他外设。请求前确认权限、硬件能力和停止/复位方式。
 
-本组端点面向需要直接管理推理模型的开发者，用于在设备 AI 运行时中注册、上传、查询和卸载模型文件（.hef、.onnx、.bin、.tflite 等），并获取运行时的整体统计信息；应用侧通常不直接调用，模型准备阶段会用到。
+### 4.2 码流和媒体配置
 
-### 4.1 模型管理
+| 方法 | 路径 |
+|:---|:---|
+| `GET` | `/streams` |
+| `GET` | `/streams/{stream_id}` |
+| `GET` | `/h264/{stream_id}`（WebSocket/MSE 码流） |
+| `GET` / `POST` | `/media/config` |
+| `GET` / `PUT` | `/media/config/field` |
+| `GET` | `/media/config/export` |
+| `POST` | `/media/config/import` |
+| `GET` / `PUT` | `/media/image` |
+| `GET` / `PUT` | `/media/transform` |
+| `PUT` | `/media/encoder` |
+| `PUT` | `/media/rtsp` |
+| `PUT` | `/media/ai-overlay` |
+| `GET` / `PUT` | `/media/osd` |
+| `POST` | `/media/osd/upload-image` |
+| `GET` | `/media/osd/font` |
+| `GET` | `/media/osd/image/{name}` |
+| `GET` / `PUT` | `/media/privacy-mask` |
+| `PUT` | `/media/encoder/reconfig` |
+| `GET` | `/media/profile` |
+| `GET` | `/media/profiles` |
+| `POST` | `/media/profile/switch` |
+| `POST` | `/media/profile/backup` |
+| `POST` | `/media/pipeline/reconfigure` |
+| `GET` | `/media/status` |
+| `POST` | `/media/streams` |
+| `DELETE` | `/media/streams/{name}` |
+| `POST` | `/media/streams/{name}/enable` |
+| `DELETE` | `/media/streams/{name}/disable` |
 
-| 方法 | 路径 | 说明 |
-| --- | --- | --- |
-| GET | `/ai/models` | 列出所有已注册模型 |
-| POST | `/ai/models` | 登记一个新模型（指向设备上已有的模型文件路径） |
-| POST | `/ai/models/scan` | 扫描模型库目录，把新放入的模型文件登记进数据库 |
-| POST | `/ai/models/upload` | 上传模型文件并自动登记到运行时 |
-| GET | `/ai/models/{model_id}` | 查询指定模型的详细信息 |
-| POST | `/ai/models/{model_id}/load` | 加载指定模型到 NPU（登记后需加载才能推理） |
-| DELETE | `/ai/models/{model_id}` | 删除模型登记**并删除模型文件本身**（高危，见下方警示） |
-| GET | `/ai/models/{model_id}/apps` | 查询当前正在使用该模型的应用列表 |
+批量配置导入可能写入多个运行时配置并触发 camera-daemon 重启；热重配置接口则按各自语义执行。修改前先导出配置，确认目标字段和回滚方案。
 
-请求体要点：
+### 4.3 音频
 
-- `POST /ai/models`:JSON 体，必填 `model_path`（模型文件在设备上的绝对路径，如 `/data/aipc/models/yolov8n.hef`)；可选项 `model_id` 用于自定义模型标识，不传则由系统生成。
-- `POST /ai/models/scan`:无请求体。扫描模型库目录（如 `/data/aipc/models/`）并把其中未登记的模型文件登记进数据库，已登记的跳过。这是把 HEF 文件放上设备后的标准登记路径。
-- `POST /ai/models/upload`:multipart/form-data 上传，必填字段为 `model`（模型文件本身，支持 `.hef`、`.onnx`、`.bin`、`.tflite`)；可选 `model_id`、`model_type`(hef/onnx/tflite)、`variant`、`threshold`（检测阈值）、`max_detections`（最大检测数）等推理参数。适合模型文件尚未在设备上的场景。
+| 方法 | 路径 |
+|:---|:---|
+| `GET` | `/audio/capture-devices` |
+| `GET` | `/audio/playback-devices` |
+| `GET` | `/audio/status` |
+| `POST` | `/audio/capture/start` |
+| `POST` | `/audio/capture/stop` |
+| `PUT` | `/audio/config` |
+| `POST` | `/audio/playback/start` |
+| `POST` | `/audio/playback/stop` |
+| `GET` | `/audio/stream`（WebSocket） |
+| `GET` | `/audio/talk`（WebSocket） |
 
-**模型部署的标准路径**：把 HEF 文件放到 `/data/aipc/models/<category>/`（如 `detection/`）→ `POST /ai/models/scan` 扫描登记 → `POST /ai/models/{model_id}/load` 加载到 NPU。完整流程见[模型训练与 HEF 部署 §7](../1-app-development/4-model-training-and-hef.md)。
-
-:::danger 高危：DELETE 会连带删除模型文件
-`DELETE /ai/models/{model_id}` **不仅取消登记，还会从磁盘删除模型文件本身**，且设备上通常没有副本——出厂预置的 HEF 被误删后无法恢复。调用前务必：
-1. 先 `GET /ai/models/{model_id}/apps` 确认没有应用正在引用；
-2. 需要保留模型文件时，先从模型库目录复制备份。
-:::
-
-### 4.2 运行时统计
-
-| 方法 | 路径 | 说明 |
-| --- | --- | --- |
-| GET | `/ai/stats` | 获取 AI 运行时的整体统计信息（已注册模型数、加载状态等） |
-
----
-
-## 5. 应用与容器管理
-
-管理设备上运行的 AI 应用及其底层容器：安装、启停、查看日志与运行状态，以及拉取/删除容器镜像。面向需要远程部署或运维自有应用的三方集成方。
+## 5. 应用、容器和镜像
 
 ### 5.1 应用管理
 
-应用由 `app.yaml` 清单描述，每个应用有唯一 `app_id`，底层对应一个或多个容器。
-
-| 方法 | 路径 | 说明 |
-| --- | --- | --- |
-| GET | `/apps` | 列出所有已安装应用 |
-| POST | `/apps` | 按 `app.yaml` 清单安装应用 |
-| GET | `/apps/{app_id}` | 查看指定应用详情 |
-| DELETE | `/apps/{app_id}` | 卸载指定应用，可用 `keep_logs` 保留日志 |
-| POST | `/apps/{app_id}/start` | 启动指定应用 |
-| POST | `/apps/{app_id}/stop` | 停止指定应用，可用 `timeout` 控制优雅退出等待 |
-| POST | `/apps/{app_id}/restart` | 重启指定应用 |
-| GET | `/apps/{app_id}/stats` | 查看应用运行统计（CPU、内存等） |
-| GET | `/apps/{app_id}/logs` | 查看应用日志，支持 `max_lines` 与 `follow` |
-| GET | `/apps/{app_id}/permissions` | 查看应用被授予的权限 |
-| POST | `/apps/wizard` | 通过向导快速安装应用（直接给 app_id/名称/镜像） |
-| POST | `/apps/upload-image` | 上传容器镜像文件到设备 |
-
-安装应用的两种入口区别：
-- `POST /apps`：已有完整 `app.yaml` 清单，请求体 `{ manifest_path, image_path? }`，`manifest_path` 必填，`image_path` 可选（离线安装本地镜像时使用）。
-- `POST /apps/wizard`：无需提前写清单，请求体 `{ metadata: { id, name }, image, config? }`（真机实际要求 `metadata.id`/`metadata.name` + 顶层 `image`，与 spec 标注略有出入），`config` 为应用自定义配置对象，适合三方系统快速推送一个应用。
-- `POST /apps/upload-image`：`multipart/form-data` 上传镜像文件，字段名 `file`，用于设备无外网时离线导入镜像。
-
-### 5.2 容器管理
-
-直接操作底层容器（一般通过应用层间接管理，仅在排障或特殊场景使用）。
-
-| 方法 | 路径 | 说明 |
-| --- | --- | --- |
-| GET | `/containers` | 列出容器，支持按 `state`、`search` 过滤及分页 |
-| GET | `/containers/{id}` | 查看容器详情 |
-| DELETE | `/containers/{id}` | 删除指定容器 |
-| GET | `/containers/{id}/stats` | 查看容器资源占用 |
-| GET | `/containers/{id}/logs` | 查看容器日志，`tail` 控制返回行数 |
-| GET | `/containers/{id}/logs/stream` | 实时推送容器日志（SSE，`text/event-stream`） |
-| POST | `/containers/{id}/start` | 启动容器 |
-| POST | `/containers/{id}/stop` | 停止容器 |
-| POST | `/containers/{id}/restart` | 重启容器 |
-
-`GET /containers` 常用过滤参数：`state` 取值 `running`/`stopped`/`all`，`search` 按名称模糊匹配，`page`/`page_size` 分页（默认 1/20）。
-
-### 5.3 容器镜像
-
-| 方法 | 路径 | 说明 |
-| --- | --- | --- |
-| GET | `/images` | 列出本地容器镜像 |
-| POST | `/images/pull` | 从镜像仓库拉取镜像，请求体 `{ image }` |
-| DELETE | `/images/{image}` | 删除本地镜像 |
-
-### 5.4 容器实时日志与终端（WebSocket）
-
-两个 WebSocket 端点用于实时交互，连接时通过 `token` 查询参数传递认证令牌：
-
-| 方法 | 路径 | 说明 |
-| --- | --- | --- |
-| GET | `/containers/{id}/logs/ws` | 实时推送容器日志（WebSocket），`tail` 控制初始行数 |
-| GET | `/containers/{id}/exec/ws` | 交互式容器终端（WebSocket），可指定 `cols`/`rows`/`command` |
-
-`exec/ws` 默认执行 `/bin/sh`，终端尺寸默认 80×24，一般仅用于现场调试，三方集成很少直接使用。
-
----
-
-## 6. 应用商店
-
-应用商店（Store）用于浏览、检索可安装的 AI 应用，并管理设备上已安装应用的记录。第三方集成方一般通过商店接口查找目标应用、触发安装，再用安装管理接口查询运行状态或卸载。接口路径已去掉 `/api/v1` 前缀。
-
-### 6.1 商店目录
-
-浏览商店中的应用列表及其分类、标签信息。
-
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| GET | `/store/apps` | 列出商店中的应用，支持按分类、关键词搜索、是否精选过滤及分页 |
-| GET | `/store/apps/{key}` | 获取指定应用的详情（路径参数 `key` 为应用唯一标识） |
-| GET | `/store/categories` | 列出应用分类，供筛选与导航使用 |
-| GET | `/store/tags` | 列出应用标签，用于多维度检索 |
-
-`GET /store/apps` 常用查询参数：`category`（分类）、`search`（关键词）、`featured`（是否精选）、`page` 与 `page_size`（分页），均为可选。
-
-### 6.2 安装与已装应用管理
-
-从商店安装应用，并维护设备本地的安装记录。
-
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| POST | `/store/apps/{key}/install` | 从商店安装指定应用（`key` 为应用标识） |
-| GET | `/store/installs` | 列出设备上已安装的应用记录 |
-| POST | `/store/installs` | 创建一条安装记录 |
-| GET | `/store/installs/{app_id}` | 获取指定已装应用的安装详情 |
-| PUT | `/store/installs/{app_id}` | 更新指定应用的安装记录 |
-| DELETE | `/store/installs/{app_id}` | 删除指定应用的安装记录（卸载并清理记录） |
-
-请求体要点：
-
-- **`POST /store/apps/{key}/install`**：可选请求体可指定安装的 `version`（版本号）与 `config`（应用初始化配置对象）。留空则使用商店默认版本与配置。
-- **`POST /store/installs`**：请求体需提供 `app_id` 与 `name`（均为必填），另有可选字段 `version`、`image`、`store_app_id`，用于手动登记一条安装记录。
-- **`PUT /store/installs/{app_id}`**：用于回写安装状态，可更新字段包括 `status`、`container_id`、`pid`、`message` 与 `config`，便于跟踪容器或进程的运行情况。
-
-日常第三方集成通常只需 `POST /store/apps/{key}/install` 触发安装、再用 `GET /store/installs/{app_id}` 轮询状态即可；`POST/PUT/DELETE /store/installs` 这一组更偏底层记录维护，一般无需直接调用。
-
----
-
-## 7. 设备控制
-
-本组用于远程操控 NE503 的硬件外设与镜头，并查询/维护设备基础信息，适合第三方平台对接补光灯、红外夜视、云台变焦以及 GPIO 外设。
-
-### 7.1 设备状态与信息
-
-| 方法 | 路径 | 说明 |
-| --- | --- | --- |
-| GET | `/device/status` | 查询设备整体运行状态 |
-| GET | `/device-info` | 获取设备信息（型号、版本、名称等） |
-| PUT | `/device-info` | 修改设备名称 |
-
-### 7.2 光源与夜视
-
-| 方法 | 路径 | 说明 |
-| --- | --- | --- |
-| POST | `/device/light` | 设置白光补光灯亮度（0–100） |
-| POST | `/device/ir-led` | 开关红外补光灯 |
-| POST | `/device/ir-cut` | 切换 IR-CUT 滤光片模式（auto/day/night） |
-
-### 7.3 镜头与云台
-
-| 方法 | 路径 | 说明 |
-| --- | --- | --- |
-| POST | `/device/ptz` | 云台与镜头统一控制（水平/俯仰/变倍/聚焦/预置位/停止） |
-| POST | `/device/zoom` | 单独控制变倍速度 |
-| POST | `/device/focus` | 单独控制聚焦速度 |
-| POST | `/device/autofocus` | 开关自动聚焦 |
-
-### 7.4 GPIO
-
-| 方法 | 路径 | 说明 |
-| --- | --- | --- |
-| POST | `/device/gpio` | 写入指定 GPIO 引脚的电平值 |
-| GET | `/device/gpio/{pin}` | 读取指定 GPIO 引脚的电平值 |
-
-**请求体要点**
-
-- 光源类：`/device/light` 传 `level`（整数 0–100）；`/device/ir-led` 传布尔 `status`；`/device/ir-cut` 传 `mode`（`auto`/`day`/`night`）。
-- 云台统一入口 `/device/ptz` 通过 `action`（`pan`/`tilt`/`stop`/`preset`/`zoom`/`focus`）区分动作，再按动作配 `direction`+`speed`（水平/俯仰）、`zoom_speed`/`focus_speed`（正负代表方向）或 `preset_id`（1–255）。如果只需单一变倍或聚焦，也可直接用 `/device/zoom`、`/device/focus`，二者仅传一个 `speed`（-100～100，负值缩小/近焦，正值放大/远焦）。
-- GPIO：写入时传 `pin`（引脚号）与布尔 `value`；读取时引脚号放在路径参数 `{pin}` 中。
-- 改设备名：`PUT /device-info` 传 `device_name`，仅允许字母、数字、下划线和连字符。
-
----
-
-## 8. 媒体与视频流
-
-这组接口用于查看视频流列表、订阅实时 H.264 画面，以及调整摄像头底层参数（ISP 图像、编码器、RTSP、AI 叠加、OSD 字幕等），面向需要做二次画面接入或图像调校的第三方集成方。
-
-### 8.1 视频流查询与实时订阅
-
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| GET | `/streams` | 列出设备当前可用的视频流（编码通道）及其基本信息。 |
-| GET | `/streams/{stream_id}` | 查询指定视频流的详细信息（分辨率、编码、帧率等）。 |
-| GET | `/h264/{stream_id}` | 订阅指定流的实时 H.264 裸码流，通过 WebSocket 持续推送视频帧（WebSocket）。 |
-
-### 8.2 摄像头配置（整体）
-
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| GET | `/media/config` | 读取摄像头守护进程（camera daemon）的完整配置。 |
-| POST | `/media/config` | 以部分覆盖（partial overlay）方式更新守护进程配置并立即生效，请求体只需包含要改的字段。 |
-
-### 8.3 图像与编码
-
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| PUT | `/media/image` | 调整 ISP 图像参数（亮度、对比度、饱和度、锐度，取值均为 0～100）。 |
-| PUT | `/media/encoder` | 调整某条流的编码参数（码率、帧率、GOP 等），需指定 `stream_name`。 |
-| PUT | `/media/encoder/reconfig` | 对指定流做完整的编码器重建（可改分辨率、编码 h264/h265、码率、帧率、GOP），改动幅度大于上面的 `/media/encoder`。 |
-
-### 8.4 RTSP、叠加层与 OSD
-
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| PUT | `/media/rtsp` | 开启或关闭设备内置 RTSP 服务（请求体 `{ "enabled": true/false }`）。 |
-| PUT | `/media/ai-overlay` | 配置 AI 检测结果叠加层（是否启用、是否显示标签/置信度、线条粗细）。 |
-| PUT | `/media/osd` | 配置屏幕字幕（OSD），支持按流添加文本和时间戳叠加，可设置位置、字号、颜色、是否启用。 |
-
-### 8.5 关键请求体要点
-
-- `PUT /media/image`：传 `brightness`/`contrast`/`saturation`/`sharpness` 四个整数，范围都是 0 到 100，只下发需要调整的字段即可。
-- `PUT /media/encoder` 与 `PUT /media/encoder/reconfig`：必须带 `stream_name` 指定目标流。前者做轻量参数微调（`bitrate_bps`/`framerate`/`gop`）；后者做完整重建，可改 `width`（64～4096）、`height`（64～2160）、`codec`（`h264` 或 `h265`）、`fps` 等，开销更大，适合需要切换编码格式或分辨率时使用。
-- `POST /media/config`：是整体配置的部分覆盖，请求体是任意子集字段的 JSON 对象，适合批量下发而不必关心每条专用接口。
-
-### 8.6 使用建议
-
-第三方做实时预览时，可先 `GET /streams` 拿到可用流 ID，再通过 `GET /h264/{stream_id}` 建立 WebSocket 拉取 H.264 裸码流自行解码播放；若希望直接走标准协议，可 `PUT /media/rtsp` 打开内置 RTSP 服务，用任意 RTSP 播放器拉流。画面叠加（检测结果、时间戳水印）通过 `ai-overlay` 与 `osd` 两类接口在设备端完成，无需客户端自行绘制。
-
----
-
-## 9. 事件总线与事件日志
-
-这组资源面向需要接收设备实时事件、或检索历史事件记录的第三方集成方：事件总线（Event Bus）提供发布/订阅式的实时事件通道，事件日志（Event Logs）则把设备运行过程中产生的事件持久化存储，供按条件检索与统计。
-
-### 9.1 事件总线
-
-事件总线以主题（topic）为中心，集成方可订阅感兴趣的主题、也可主动发布事件，适合做实时联动（例如在检测到目标后立即收到推送）。
-
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| GET | `/events/topics` | 列出当前所有事件主题及其订阅者数量。 |
-| POST | `/events/publish` | 向指定主题发布一条事件，消息会分发给当前所有订阅者。 |
-| GET | `/events/stream` | 订阅实时事件流，连接升级为 WebSocket 后持续推送事件（WebSocket）。 |
-
-请求体与连接要点：
-
-- `POST /events/publish` 的请求体必填 `topic`（如 `app/detection/result`），另可携带任意结构的 `payload` 对象作为事件内容。
-- `GET /events/stream` 是 WebSocket 端点，连接地址形如 `wss://<设备IP>/api/v1/events/stream?token=<token>`，需把登录获得的 Token 通过 `token` 查询参数传入以完成鉴权。
-
-### 9.2 事件日志
-
-事件日志对历史事件做持久化归档，支持按类别、级别、时间范围筛选和分页查询，并提供聚合统计，便于排查问题或对接外部监控系统。
-
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| GET | `/event-logs` | 按类别、级别、时间范围、关键字筛选并分页查询事件日志。 |
-| POST | `/event-logs` | 写入一条事件日志，供系统或集成方主动记录关键事件。 |
-| DELETE | `/event-logs` | 按保留天数清理历史日志，释放存储空间。 |
-| GET | `/event-logs/statistics` | 获取事件日志的聚合统计信息（如各级别/类别计数）。 |
-
-关键参数说明：
-
-- `GET /event-logs` 支持的查询参数包括：`category`（类别）、`level`（级别）、`start_time` / `end_time`（时间范围，ISO 8601 格式）、`search`（关键字检索），以及 `limit`（每页条数，最大 1000，默认 50）与 `offset`（分页偏移，默认 0）；返回结果除 `entries` 列表外还附带 `total`，便于分页计算。
-- `POST /event-logs` 的请求体必填 `event_type`、`source`、`message` 三项，可选 `level`、`category`、`user` 及任意结构的 `data` 扩展字段。
-- `DELETE /event-logs` 的请求体必填 `days`（保留天数，取值 1～365），早于该天数的日志将被清除；该操作偏运维用途，第三方集成一般用查询与统计即可。
-
----
-
-## 10. 系统监控、存储与网络
-
-本组用于查询设备运行状态（CPU、内存、磁盘、网络）、管理外接存储设备，以及查看与修改网络配置，适合做运维监控面板或远程维护的第三方集成方调用。
-
-### 10.1 系统资源监控
-
-查询设备当前各类资源占用情况，均为只读 GET 接口，可用于健康检查与负载巡检。
-
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| GET | `/monitor/summary` | 获取系统资源总览（CPU、内存、磁盘等关键指标的汇总视图） |
-| GET | `/monitor/cpu` | 获取 CPU 使用率明细 |
-| GET | `/monitor/memory` | 获取内存与交换分区（swap）使用情况 |
-| GET | `/monitor/disk` | 获取各磁盘分区占用情况 |
-| GET | `/monitor/network` | 获取网络接口的收发流量统计 |
-
-### 10.2 存储管理
-
-列出可用磁盘与分区，并对块设备执行挂载、卸载、格式化操作。变更型操作请求体要点如下：
-
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| GET | `/storage/disks` | 列出当前可用磁盘及其分区信息 |
-| POST | `/storage/mount` | 将块设备挂载到指定目录 |
-| POST | `/storage/unmount` | 卸载此前已挂载的磁盘 |
-
-- 挂载（`/storage/mount`）：需提供 `device`（如 `/dev/sda1`）与挂载目标 `target`（如 `/mnt/sda1`）；`device` 为必填。
-- 卸载（`/storage/unmount`）：仅需提供此前挂载的 `target` 路径。
-
-### 10.3 网络配置
-
-查询或修改网络接口配置，可在 DHCP 与静态 IP 模式之间切换。
-
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| GET | `/network/config` | 获取当前网络配置（IP、子网掩码、网关、DNS 等） |
-| GET | `/network/interfaces` | 列出所有网络接口 |
-
-> 网络配置写入（DHCP/静态切换、改 IP）属设备初始部署操作，第三方集成一般只读 `GET /network/config` 与 `/network/interfaces` 做监控；如需改配请走设备运维流程，避免改错子网导致设备失联。
-
----
-
-## 11. 内部与调试端点
-
-以下端点面向设备运维与排障，**不属于第三方集成 API**，集成方一般无需调用（应用日志可通过 `/apps/{app_id}/logs` 获取）。完整定义见 Swagger（`/swagger/`）：
-
-| 类别 | 端点 | 说明 |
-|:---|:---|:---|
-| 文件系统 | `/files/*` | 任意文件读写、上传/下载、删除、批量操作 |
-| 进程 | `/processes/*` | 列出进程、向进程发送信号（`kill`） |
-| 系统日志 | `/logs/*` | systemd 服务日志查看与下载 |
-| 调试日志 | `/debug-logs/*` | 打包导出服务与日志文件（tar.gz） |
-| Web 终端 | `/terminal/ws` | root 级交互式 shell（WebSocket） |
-| 开发工作台 | `/dev/*` | Web IDE 项目与构建流水线 |
-
-> 这些端点权限高（含任意文件操作、进程信号、root shell），第三方集成不应依赖。生产部署建议通过防火墙或额外鉴权收敛暴露面。
-
----
-
-## 12. SSH 与系统设置
-
-SSH 服务状态查询（只读）与自定义键值配置（key-value），供运维监控或集成方持久化业务参数。
-
-### 12.1 SSH 状态
-
-| 方法 | 路径 | 说明 |
-|:---|:---|:---|
-| GET | `/ssh/config` | 查询当前 SSH 服务配置（端口、认证方式等） |
-| GET | `/ssh/status` | 查看 SSH 服务运行状态 |
-| GET | `/ssh/logs` | 获取 SSH 登录记录，用于安全审计 |
-
-> SSH 配置的写入（改端口、root 登录开关等）属设备安全加固操作，不纳入集成 API；如需调整请通过设备运维流程。
-
-### 12.2 系统设置
-
-通用的键值（key-value）配置存储，可用来持久化自定义参数（如检测阈值等业务配置），按 key 整条读写。
-
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| GET | `/settings` | 获取全部自定义设置项。 |
-| POST | `/settings` | 新增或更新一个设置项（按 key 写入 value）。 |
-| DELETE | `/settings/{key}` | 按 key 删除指定设置项。 |
-
-写入时请求体为对象，包含 `key`（必填，设置名）与 `value`（字符串形式的值），例如 `{"key":"detection_threshold","value":"0.75"}`。
-
-## 13. 响应格式
-
-所有 API 响应使用统一的 JSON 信封。
-
-**成功响应：**
-
-```json
-{
-  "code": 0,
-  "message": "Success",
-  "data": { ... }
-}
-```
-
-**错误响应：**
-
-```json
-{
-  "code": 2000,
-  "message": "Unauthorized",
-  "error": {
-    "detail": "Invalid or missing authentication token",
-    "type": "auth"
-  }
-}
-```
-
-| 字段 | 类型 | 说明 |
-|:---|:---|:---|
-| `code` | int | `0` 表示成功，非零表示错误 |
-| `message` | string | 状态描述 |
-| `data` | object | 成功时的响应数据（错误时缺省） |
-| `error` | object | 错误时的详情（仅业务错误携带，如 401/1001；路由 404 不带；成功时缺省） |
-| `error.detail` | string | 人类可读的错误说明 |
-| `error.type` | string | 错误分类（如 `auth`） |
-
-常见错误码：`1001` 请求格式无效、`2000` 认证失败、`3002` 内部错误、`4000` 资源不存在、`404` 路由不存在。
-
----
-
-## 14. WebSocket 接口
-
-所有 WebSocket 端点通过 `?token=<token>` 传递认证 Token。
-
-| 路径 | 用途 | 数据方向 |
-|:---|:---|:---|
-| `/events/stream` | 事件流实时推送 | 服务端 → 客户端 |
-| `/h264/{stream_id}` | H.264 视频流推送 | 服务端 → 客户端 |
-| `/containers/{id}/logs/ws` | 容器日志实时流 | 服务端 → 客户端 |
-| `/containers/{id}/exec/ws` | 容器终端交互 | 双向 |
-| `/terminal/ws` | Web 终端（SSH） | 双向 |
-| `/logs/stream/ws` | 服务日志实时流 | 服务端 → 客户端 |
-
----
-
-## 15. 相关文档
-
-- [平台架构](../../3-software-guide/0-system-architecture.md) — NE503 四层架构、服务职责与源码指针
-- [应用开发](./0-app-reference.md) — 容器应用开发参考
-- [SDK 参考](./1-sdk-reference.md) — Python SDK 完整 API 参考
-- [视频与成像](../../2-user-guide/1-media-and-image.md) — RTSP 视频流对接与 NVR/VMS 接入
-- [事件集成](./5-event-integration.md) — Event Bus 对接实战
+| 方法 | 路径 |
+|:---|:---|
+| `GET` / `POST` | `/apps` |
+| `GET` | `/apps/{app_id}` |
+| `DELETE` | `/apps/{app_id}` |
+| `POST` | `/apps/{app_id}/start` |
+| `POST` | `/apps/{app_id}/stop` |
+| `POST` | `/apps/{app_id}/restart` |
+| `GET` | `/apps/{app_id}/stats` |
+| `GET` | `/apps/{app_id}/logs` |
+| `GET` | `/apps/{app_id}/permissions` |
+| `POST` | `/apps/wizard` |
+| `POST` | `/apps/upload-image` |
+| `POST` | `/apps/upload-manifest` |
+| `POST` | `/apps/install-package` |
+| `GET` | `/apps/install-progress/{task_id}` |
+
+应用清单字段见 [应用参考](./0-app-reference.md)。安装、启动、停止和重启是不同状态转换，自动化脚本应分别检查返回结果和应用状态。
+
+### 5.2 容器和镜像
+
+| 方法 | 路径 |
+|:---|:---|
+| `GET` | `/containers` |
+| `GET` / `DELETE` | `/containers/{id}` |
+| `GET` | `/containers/{id}/stats` |
+| `GET` | `/containers/{id}/logs` |
+| `GET` | `/containers/{id}/logs/stream` |
+| `GET` | `/containers/{id}/logs/ws`（WebSocket） |
+| `POST` | `/containers/{id}/start` |
+| `POST` | `/containers/{id}/stop` |
+| `POST` | `/containers/{id}/restart` |
+| `GET` | `/containers/{id}/exec/ws`（WebSocket） |
+| `GET` | `/images` |
+| `POST` | `/images/pull` |
+| `DELETE` | `/images/{image}` |
+
+容器操作属于运维接口。不要把容器 ID、镜像名和应用 ID 混用；删除镜像前确认没有应用依赖它。
+
+## 6. 文件、日志、存储和网络
+
+### 6.1 文件和终端
+
+| 方法 | 路径 |
+|:---|:---|
+| `GET` / `DELETE` | `/files` |
+| `GET` / `POST` | `/files/content` |
+| `POST` | `/files/upload` |
+| `GET` | `/files/download` |
+| `POST` | `/files/batch-download` |
+| `POST` | `/files/batch-delete` |
+| `POST` | `/files/mkdir` |
+| `POST` | `/files/rename` |
+| `GET` | `/terminal/ws`（WebSocket） |
+
+文件处理受服务端允许目录限制。即使请求看起来只是“下载”或“重命名”，也应使用设备允许的绝对路径，并在删除、批量删除前复核目标集合。
+
+### 6.2 日志和 SSH
+
+| 方法 | 路径 |
+|:---|:---|
+| `GET` / `POST` | `/ssh/config` |
+| `GET` | `/ssh/status` |
+| `GET` | `/ssh/logs` |
+| `GET` | `/logs/services` |
+| `GET` | `/logs/files` |
+| `GET` | `/logs/content` |
+| `GET` | `/logs/download` |
+| `GET` | `/logs/stream/ws`（WebSocket） |
+| `POST` | `/debug-logs/export` |
+| `GET` | `/debug-logs/services` |
+| `GET` | `/debug-logs/files` |
+
+### 6.3 存储、网络和设备信息
+
+| 方法 | 路径 |
+|:---|:---|
+| `GET` | `/storage/disks` |
+| `POST` | `/storage/mount` |
+| `POST` | `/storage/unmount` |
+| `POST` | `/storage/format` |
+| `GET` / `POST` | `/network/config` |
+| `GET` | `/network/interfaces` |
+| `GET` / `PUT` | `/device-info` |
+| `GET` | `/device-info/factory` |
+| `POST` | `/device-info/factory` |
+
+`POST /storage/format`、`POST /network/config` 和设备信息写接口会改变设备状态，自动化系统应增加权限隔离、参数校验和回滚策略。
+
+## 7. 监控、进程、事件日志和开发工作台
+
+### 7.1 监控与进程
+
+| 方法 | 路径 |
+|:---|:---|
+| `GET` | `/monitor/summary` |
+| `GET` | `/monitor/cpu` |
+| `GET` | `/monitor/memory` |
+| `GET` | `/monitor/disk` |
+| `GET` | `/monitor/network` |
+| `GET` | `/monitor/snapshot` |
+| `GET` | `/monitor/gyro/attitude` |
+| `GET` | `/processes` |
+| `GET` | `/processes/{pid}` |
+| `POST` | `/processes/{pid}/kill` |
+
+`kill` 是高风险动作；先查询 PID 的命令和归属，再确认不是平台关键服务。
+
+### 7.2 事件日志
+
+| 方法 | 路径 |
+|:---|:---|
+| `GET` / `POST` / `DELETE` | `/event-logs` |
+| `GET` | `/event-logs/statistics` |
+| `GET` | `/event-logs/templates` |
+
+### 7.3 设置、应用商店和开发工作台
+
+| 方法 | 路径 |
+|:---|:---|
+| `GET` / `POST` | `/settings` |
+| `DELETE` | `/settings/{key}` |
+| `GET` | `/config/jobs` |
+| `GET` | `/config/jobs/{id}` |
+| `GET` | `/store/apps` |
+| `GET` | `/store/apps/{key}` |
+| `POST` | `/store/apps/{key}/install` |
+| `GET` | `/store/categories` |
+| `GET` | `/store/tags` |
+| `GET` / `POST` | `/store/installs` |
+| `GET` / `PUT` / `DELETE` | `/store/installs/{app_id}` |
+| `GET` | `/dev/base-images` |
+| `GET` / `POST` | `/dev/projects` |
+| `GET` / `PUT` / `DELETE` | `/dev/projects/{id}` |
+| `POST` | `/dev/projects/{id}/upload` |
+| `POST` | `/dev/projects/{id}/source` |
+| `GET` | `/dev/projects/{id}/files` |
+| `GET` / `POST` | `/dev/projects/{id}/file` |
+| `GET` | `/dev/projects/{id}/builds` |
+| `POST` | `/dev/projects/{id}/build` |
+
+## 8. WebSocket 使用
+
+| 端点 | 用途 |
+|:---|:---|
+| `/events/stream` | Event Bus 实时事件 |
+| `/h264/{stream_id}` | H.264/MSE 视频流 |
+| `/audio/stream` | 音频流 |
+| `/audio/talk` | 双向语音 |
+| `/terminal/ws` | Web 终端 |
+| `/logs/stream/ws` | 日志流 |
+| `/containers/{id}/logs/ws` | 容器日志 WebSocket |
+| `/containers/{id}/exec/ws` | 容器 exec WebSocket |
+
+这些端点均属于 `/api/v1` 下的认证路由。浏览器无法在原生 WebSocket 构造器中自定义普通 Header 时，按部署版本支持的认证方式传递会话信息，并处理过期、断线和重连。事件 WebSocket 的主题语义见 [事件集成](./5-event-integration.md)。
+
+## 9. 源码、Swagger 和变更检查
+
+- [neoruntime `main.go`](https://github.com/camthink-ai/neoruntime/blob/main/platform/platform-api/server/main.go) — 路由注册和认证边界
+- [OpenAPI `swagger.yaml`](https://github.com/camthink-ai/neoruntime/blob/main/docs/api/swagger.yaml) — 请求参数、响应 schema 和交互式接口依据
+- [应用参考](./0-app-reference.md) — 应用清单和容器权限
+- [事件集成](./5-event-integration.md) — Event Bus 和事件 WebSocket
+
+平台路由由工程源码持续演进。若设备实际 Swagger、源码和本文出现差异：请求体和响应以设备 Swagger 为准，路由是否注册以对应版本的 `main.go` 为准，并在升级评审中同步本文。

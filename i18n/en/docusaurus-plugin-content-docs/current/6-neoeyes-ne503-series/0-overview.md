@@ -21,7 +21,7 @@ NeoEyes NE503 is an edge AI smart camera based on the **Hailo-15H SoC**, featuri
 
 - **On-Device AI Inference Loop**: 20 TOPS (INT8) NPU supports multi-model concurrent inference. Image capture, analysis, and structured output run entirely on-device with zero cloud dependency, meeting low-latency and data localization requirements.
 
-- **4K Professional Imaging System**: Sony IMX678 (1/1.8") + Hailo Gen2 AI-ISP + AF auto-zoom lens (F1.6), supporting 4K@30fps H.265 encoding and &lt;0.01 LUX full-color night vision. Maintains image quality under HDR, low-light, and concurrent inference workloads, balancing wide-angle coverage and long-range recognition.
+- **4K Professional Imaging System**: Sony IMX678 (1/1.8") + Hailo Gen2 AI-ISP + selectable lens configurations (`AF Lens (44.5° HFOV)` or `Motorized Zoom (110° HFOV)`), supporting 4K@30fps H.265 encoding and &lt;0.01 LUX full-color night vision. The field of view and focus/zoom capabilities depend on the selected lens configuration.
 
 - **Containerized Application Platform**: Built on containerd runtime with OCI image deployment and sandbox isolation. Models and applications can be independently deployed and upgraded. Algorithm vendors, integrators, OEMs, and operations teams build industry solutions on a unified platform, avoiding vendor lock-in.
 
@@ -33,13 +33,13 @@ NeoEyes NE503 is an edge AI smart camera based on the **Hailo-15H SoC**, featuri
 
 Below is a summary of the NE503's core specifications. For full chip-level and module-level parameters, see [Hardware Specifications](./2-hardware-guide/0-specifications.md):
 
-| Item | Specification |
+| Specification | Details |
 |------|---------------|
-| SoC | Hailo-15H, Cortex-A53 × 4 @ 1.3 GHz |
-| NPU | Hailo NPU, 20 TOPS @ INT8 (supports 4-bit quantization), DSP 350 GOPS |
-| Memory / Storage | 8 GB LPDDR4 / 64 GB eMMC, supports TF Card expansion (M.2 not yet supported) |
-| Image Sensor | Sony IMX678, 1/1.8" CMOS, 4K UHD, Hailo Gen2 AI-ISP (&lt;0.01 LUX full-color night vision) |
-| Lens | AF auto-zoom 8–32mm (4x), F1.6–F1.7 |
+| CPU | Quad-core Cortex-A53 × 4 @ 1.3 GHz |
+| AI Compute | 20 TOPS @ INT8 (supports 4-bit quantization), DSP 350 GOPS |
+| Memory / Storage | 4 GB or 8 GB LPDDR4 / 64 GB eMMC, supports TF Card expansion (M.2 not yet supported) |
+| Image Sensor | 1/1.8" CMOS, 4K UHD, AI-ISP (&lt;0.01 LUX full-color night vision) |
+| Lens | `AF Lens (44.5° HFOV)` or `Motorized Zoom (110° HFOV)`; exact controls depend on the configuration |
 | Video | H.264 / H.265 hardware encoding 4K@30fps; RTSP main / sub / third stream |
 | Network | 10/100M LAN, supports PoE 802.3AT; data protocols MQTT / Event Bus |
 | Power / Consumption | DC 12V or PoE 802.3AT; 5–6W (typical load) |
@@ -91,7 +91,7 @@ AI-ISP delivers clear color images even in extremely low-light environments, wit
   <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/overview/imaging-module.jpg" alt="Imaging Module" width="60%" />
 </div>
 
-The NE503 imaging system pairs a Sony IMX678 (1/1.8") image sensor with an AF auto-zoom lens. The sensor and lens share a matched 1/1.8" target surface, minimizing edge sharpness falloff. The lens covers 8mm (H 44.5°) to 32mm (H 14.5°), enabling a single unit to handle both wide-area surveillance and distant detail identification, with AF auto-zoom for on-site adjustment. The F1.6 wide aperture, combined with AI-ISP low-light enhancement, maintains image quality in dark and backlit conditions.
+The NE503 imaging system combines a Sony IMX678 (1/1.8") image sensor, Hailo Gen2 AI-ISP, and a selectable lens module. The available lens configurations are `AF Lens (44.5° HFOV)` and `Motorized Zoom (110° HFOV)`; the actual field of view and focus/zoom capabilities depend on the selected SKU and device firmware. AI-ISP low-light enhancement helps maintain image quality in dark and backlit conditions.
 
 ### Sensor
 
@@ -114,27 +114,19 @@ The NE503 imaging system pairs a Sony IMX678 (1/1.8") image sensor with an AF au
   </thead>
   <tbody>
     <tr>
-      <td>Focal Length</td>
-      <td>8mm (wide) – 32mm (telephoto)</td>
+      <td>Available Lenses</td>
+      <td><code>AF Lens (44.5° HFOV)</code>; <code>Motorized Zoom (110° HFOV)</code></td>
     </tr>
     <tr>
-      <td>Aperture</td>
-      <td>F1.6 (wide) – F1.7 (telephoto), DC-Iris auto aperture</td>
-    </tr>
-    <tr>
-      <td>Field of View</td>
-      <td>Horizontal 44.5° (W) / 14.5° (T); Diagonal 52° (W) / 16.6° (T); Vertical 24.6° (W) / 8.4° (T)</td>
-    </tr>
-    <tr>
-      <td>Electromechanical</td>
-      <td>AF autofocus and auto-zoom, DC-Iris auto aperture, IR-Cut electromagnetic switching</td>
+      <td>Configuration Differences</td>
+      <td>Focal length, aperture, focus, zoom, and other electromechanical capabilities depend on the selected lens configuration and device firmware</td>
     </tr>
   </tbody>
 </table>
 
 ### Lens Drive & Image Stabilization
 
-The NE503 supports AF autofocus and auto-zoom with 4x optical zoom. Lens control is handled by the SoC via SPI CS1 (the default runtime control path), while the MCU provides lens homing and limit protection via SPI1. The onboard gyroscope supports EIS electronic image stabilization, maintaining image stability even at the telephoto end.
+The lens-control path is coordinated by the SoC-side SPI CS1 and the interface-board MCU-side SPI1. The available autofocus, zoom, homing, and limit-protection functions depend on the selected lens configuration and device firmware. The onboard gyroscope supports EIS electronic image stabilization.
 
 ## Hardware Architecture
 
@@ -146,9 +138,9 @@ NE503 features a dual-board structure with a **Processor Board** and an **Interf
 
 ### Processor Board & Interface Board
 
-The Processor Board integrates the SoC, NPU, memory, storage, and camera interface (SoC, NPU, 8 GB LPDDR4, 64 GB eMMC; M.2 SSD expansion supported but not yet enabled), handling all computing and AI inference tasks. The Interface Board manages peripherals and communication interfaces through an independent MCU (Arm Cortex-M0+ @ 64 MHz) — AF lens, fill light, IR-CUT, Alarm IO, RS-485, light sensor, and reserved thermal control — so even if the Processor Board fails, underlying functions such as lens homing, fill light control, and IO protection continue to operate normally. External interfaces brought out by the Interface Board include Alarm IN × 1 + Wiegand output × 2, Line-In / Line-Out, RS-485, and TF Card (UHS-I); the fill light interface provides IR fill light (supported, 80m) with white fill light reserved.
+The Processor Board integrates the SoC, NPU, memory, storage, and camera interface (4 GB or 8 GB LPDDR4, 64 GB eMMC; M.2 SSD expansion is documented but not yet enabled by the current firmware), handling all computing and AI inference tasks. The Interface Board manages peripherals and communication interfaces through an independent MCU (Arm Cortex-M0+ @ 64 MHz), including lens control, fill light, IR-CUT, Alarm IO, RS-485, light sensor, and reserved thermal control. The exact lens-control capabilities depend on the selected configuration. External interfaces brought out by the Interface Board include Alarm IN × 1 + Wiegand output × 2, Line-In / Line-Out, RS-485, and TF Card (UHS-I); the fill light interface provides IR fill light (supported, 80m) with white fill light reserved.
 
-Board-level chip models, terminal definitions, and power supply details are covered in [Hardware Specifications](./2-hardware-guide/0-specifications.md), [Core Board](./2-hardware-guide/1-core-board-connection.md), and [Interface Board](./2-hardware-guide/2-aipc-board-connection.md).
+Board-level component details, terminal definitions, and power supply details are covered in [Hardware Specifications](./2-hardware-guide/0-specifications.md), [Core Board](./2-hardware-guide/1-core-board-connection.md), and [Interface Board](./2-hardware-guide/2-aipc-board-connection.md).
 
 ## System Architecture
 

@@ -20,7 +20,7 @@ NE503 consists of the following physical modules:
 | Interface Board | STM32G0B0RET6 | MCU managing external IO, power, and peripheral control; TF card slot on board (see [Interface Board](./2-aipc-board-connection.md)) |
 | Sensor Board | IMX678-AAQR1-C | 4K CMOS image sensor, connected via FPC connector |
 | Light Board | — | Dual-light board (white/red PWM) + IR light board (near/far-IR PWM) |
-| Lens Module | AN41908A-VBA | AF auto-zoom and autofocus lens driver |
+| Lens Module | SKU-dependent | Selectable `AF Lens (44.5° HFOV)` or `Motorized Zoom (110° HFOV)`; the driver device and controls depend on the configuration |
 
 The core board and interface board are interconnected via board-to-board connectors: the core board provides native SoC pins, and devices on the interface board are connected to these pins through the connectors.
 
@@ -34,7 +34,7 @@ Core board resources are divided into two categories by physical location:
 
 | # | Function | Chip Model | Category |
 |:--|:---------|:-----------|:---------|
-| 1 | LPDDR4 | MT53E2G32D4DE-046 WT:C | SoC built-in |
+| 1 | LPDDR4 | 4 GB / 8 GB (configuration-dependent device) | SoC built-in |
 | 2 | eMMC | SDINBDA6-64G-H | SoC built-in |
 | 3 | QSPI Flash | IS25WP064D-JKLE | SoC built-in |
 | 4 | Temperature Sensor | TMP1075DSGR | On-board I2C |
@@ -52,7 +52,7 @@ Core board resources are divided into two categories by physical location:
 | 11 | TF Card | — | SDIO0 + GPIO | Product |
 | 12 | Debug UART | — | UART0 | Debug |
 | 13 | BOOT Mode | — | BOOT0/BOOT1 | Debug |
-| 14 | Lens Driver | AN41908A-VBA | SPI (CS1) | Internal |
+| 14 | Lens Driver | Lens-configuration dependent | SPI (CS1) | Internal |
 | 15 | Audio Codec | NAU88C10 | I2S + I2C0 | Internal |
 | 16 | Radar Module | — | UART2 + GPIO | Internal |
 | 17 | MCU Reset Control | SN74LVC1G14DCK | GPIO | Internal |
@@ -61,9 +61,9 @@ Core board resources are divided into two categories by physical location:
 
 The following resources are directly connected via native SoC interfaces and physically soldered on the core processing board.
 
-### LPDDR4 (MT53E2G32D4DE-046 WT:C)
+### LPDDR4 (documented 8 GB configuration: MT53E2G32D4DE-046 WT:C)
 
-8 GB LPDDR4, 4266 Mb/s, 8.5 GB/s single-channel bandwidth.
+NE503 is available with 4 GB or 8 GB LPDDR4. The documented 8 GB configuration uses MT53E2G32D4DE-046 WT:C at 4266 Mb/s with 8.5 GB/s single-channel bandwidth; the device model and bandwidth for the 4 GB configuration must follow its BOM.
 
 | Pin | Function |
 |:---|:---|
@@ -185,7 +185,7 @@ The core board connects to the image sensor via MIPI CSI-2 data lanes and I2C0 c
 
 ### Lens Driver
 
-The core board SPI bus is routed via CS1 chip select to connect the AN41908A-VBA AF auto-zoom and autofocus lens driver. Shares SPI bus with QSPI Flash, distinguished by different chip selects. MCU SPI1 also connects to the same chip for homing and limit protection (see [Interface Board](./2-aipc-board-connection.md)).
+The core board SPI bus is routed via CS1 chip select to provide the lens-driver control path. It shares the SPI bus with QSPI Flash and is distinguished by a separate chip select. The board record in this page corresponds to the AN41908A-VBA driver device; the installed lens option, driver device, and autofocus/zoom capabilities must follow the specific SKU, BOM, and firmware. MCU SPI1 handles lens homing and limit protection (see [Interface Board](./2-aipc-board-connection.md)).
 
 | Pin | Function |
 |:---|:---|

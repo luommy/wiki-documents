@@ -21,7 +21,7 @@ NeoEyes NE503 是一款基于 **Hailo-15H SoC** 的边缘 AI 智能相机，搭�
 
 - **端侧 AI 闭环推理**：20 TOPS（INT8）NPU 支持多模型并发推理，图像采集、分析与结构化输出全程在设备端完成，零云端依赖，满足低延迟与数据本地化要求。
 
-- **4K 专业成像系统**：Sony IMX678（1/1.8"）+ Hailo Gen2 AI-ISP + AF 自动变焦镜头（F1.6），支持 4K@30fps H.265 编码与 &lt;0.01 LUX 全彩夜视，在 HDR、低照及并发推理负载下保持成像质量，兼顾广角覆盖与远端识别。
+- **4K 专业成像系统**：Sony IMX678（1/1.8"）+ Hailo Gen2 AI-ISP + 可选镜头配置（`AF Lens (44.5° HFOV)` 或 `Motorized Zoom (110° HFOV)`），支持 4K@30fps H.265 编码与 &lt;0.01 LUX 全彩夜视。视场范围及对焦/变焦能力取决于所选镜头配置。
 
 - **容器化应用平台**：基于 containerd 运行时，OCI 标准镜像部署，沙箱隔离。模型与应用可独立部署升级，算法供应商、集成商、OEM 厂商与运维团队基于统一底座构建行业方案，避免供应商锁定。
 
@@ -33,13 +33,13 @@ NeoEyes NE503 是一款基于 **Hailo-15H SoC** 的边缘 AI 智能相机，搭�
 
 NE503 整机核心规格摘要如下，芯片级与模组级完整参数见[硬件规格](./2-hardware-guide/0-specifications.md)：
 
-| 项目 | 规格 |
+| 规格参数 | 参数 |
 |------|------|
-| SoC | Hailo-15H，Cortex-A53 × 4 @ 1.3 GHz |
-| NPU | Hailo NPU，20 TOPS @ INT8（支持 4-bit 量化），DSP 350 GOPS |
-| 内存 / 存储 | 8 GB LPDDR4 / 64 GB eMMC，支持 TF Card 扩展（M.2 暂未支持） |
-| 图像传感器 | Sony IMX678，1/1.8" CMOS，4K UHD，Hailo Gen2 AI-ISP（&lt;0.01 LUX 全彩夜视） |
-| 镜头 | AF 自动变焦 8–32mm（4x），F1.6–F1.7 |
+| CPU | 四核 Cortex-A53 × 4 @ 1.3 GHz |
+| AI 算力 | 20 TOPS @ INT8（支持 4-bit 量化），DSP 350 GOPS |
+| 内存 / 存储 | 4 GB 或 8 GB LPDDR4 / 64 GB eMMC，支持 TF Card 扩展（M.2 暂未支持） |
+| 图像传感器 | 1/1.8" CMOS，4K UHD，AI-ISP（&lt;0.01 LUX 全彩夜视） |
+| 镜头 | `AF Lens (44.5° HFOV)` 或 `Motorized Zoom (110° HFOV)`；具体控制能力随配置而定 |
 | 视频 | H.264 / H.265 硬件编码 4K@30fps；RTSP 主/子/三码流 |
 | 网络 | 10/100M LAN，支持 PoE 802.3AT；数据协议 MQTT / Event Bus |
 | 供电 / 功耗 | DC 12V 或 PoE 802.3AT；5–6W（典型负载） |
@@ -91,7 +91,7 @@ AI-ISP 在极低照度环境下仍可输出清晰彩色画面，AI 降噪自适�
   <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/overview/imaging-module.jpg" alt="成像模组" width="60%" />
 </div>
 
-NE503 成像系统由 Sony IMX678（1/1.8"）图像传感器与 AF 自动变焦镜头组成，传感器与镜头靶面 1:1 匹配，边缘画质无明显衰减。镜头覆盖 8mm（H 44.5°）至 32mm（H 14.5°）焦距段，单机即可完成广角全景监控与远端细节识别，AF 自动变焦支持现场按需切换。F1.6 大光圈配合 AI-ISP 低照增强，在暗光和逆光场景下仍保持成像质量。
+NE503 成像系统由 Sony IMX678（1/1.8"）图像传感器、Hailo Gen2 AI-ISP 与可选镜头模组组成。镜头配置包括 `AF Lens (44.5° HFOV)` 和 `Motorized Zoom (110° HFOV)`；实际视场范围及对焦、变焦能力以所选 SKU 和设备固件为准。AI-ISP 低照增强可帮助设备在暗光和逆光场景下保持成像质量。
 
 ### 传感器
 
@@ -114,27 +114,19 @@ NE503 成像系统由 Sony IMX678（1/1.8"）图像传感器与 AF 自动变焦�
   </thead>
   <tbody>
     <tr>
-      <td>焦距范围</td>
-      <td>8mm（广角）– 32mm（长焦）</td>
+      <td>可选镜头</td>
+      <td><code>AF Lens (44.5° HFOV)</code>；<code>Motorized Zoom (110° HFOV)</code></td>
     </tr>
     <tr>
-      <td>光圈</td>
-      <td>F1.6（广角端）– F1.7（长焦端），DC-Iris 自动光圈</td>
-    </tr>
-    <tr>
-      <td>视场角</td>
-      <td>水平 44.5°（W）/ 14.5°（T）；对角线 52°（W）/ 16.6°（T）；垂直 24.6°（W）/ 8.4°（T）</td>
-    </tr>
-    <tr>
-      <td>机电能力</td>
-      <td>AF 自动对焦与自动变焦，DC-Iris 自动光圈，IR-Cut 电磁切换</td>
+      <td>配置差异</td>
+      <td>焦距、光圈、对焦、变焦及其他机电能力以所选镜头配置和设备固件为准</td>
     </tr>
   </tbody>
 </table>
 
 ### 镜头驱动与图像稳定
 
-NE503 支持 AF 自动对焦与自动变焦，光学变焦范围 4x。控制方式支持 SoC 通过 SPI CS1 控制镜头（默认运行时控制路径），MCU 通过 SPI1 提供镜头归零与限位保护。板载陀螺仪支持 EIS 电子防抖，在变焦远端仍可保持画面稳定。
+镜头控制链路由 SoC 侧 SPI CS1 与接口板 MCU 侧 SPI1 协同实现；实际可用的自动对焦、变焦、归零和限位功能取决于所选镜头配置和设备固件。板载陀螺仪支持 EIS 电子防抖。
 
 ## 硬件架构
 
@@ -146,9 +138,9 @@ NE503 采用**核心处理板**与**接口板**双板结构，通过板对板连
 
 ### 核心处理板与接口板
 
-核心处理板集成 SoC、NPU、内存、存储与相机接口（SoC、NPU、8 GB LPDDR4、64 GB eMMC，支持 M.2 SSD 扩展，暂未支持），承载全部计算与 AI 推理任务；接口板通过独立 MCU（Arm Cortex-M0+ @ 64 MHz）管理外设与通信接口（AF 镜头、补光灯、IR-CUT、Alarm IO、RS-485、光敏采样、温控预留），即使核心处理板异常，镜头归零、补光控制等底层功能依然正常。接口板引出的外部接口有 Alarm IN × 1 + Wiegand 输出 × 2、Line-In / Line-Out、RS-485、TF Card（UHS-I），补光灯接口含红外补光（已支持，80m）与白光补光（预留）。
+核心处理板集成 SoC、NPU、内存、存储与相机接口（4 GB 或 8 GB LPDDR4、64 GB eMMC，支持 M.2 SSD 扩展但当前固件暂未启用），承载全部计算与 AI 推理任务；接口板通过独立 MCU（Arm Cortex-M0+ @ 64 MHz）管理外设和镜头控制、补光灯、IR-CUT、Alarm IO、RS-485、光敏采样及温控预留。镜头的具体控制能力随所选配置而定。接口板引出的外部接口有 Alarm IN × 1 + Wiegand 输出 × 2、Line-In / Line-Out、RS-485、TF Card（UHS-I），补光灯接口含红外补光（已支持，80m）与白光补光（预留）。
 
-板级芯片型号、接线端子定义与供电详表见[硬件规格](./2-hardware-guide/0-specifications.md)、[核心板接线](./2-hardware-guide/1-core-board-connection.md)与[接口板接线](./2-hardware-guide/2-aipc-board-connection.md)。
+板级器件、接线端子定义与供电详表见[硬件规格](./2-hardware-guide/0-specifications.md)、[核心板接线](./2-hardware-guide/1-core-board-connection.md)与[接口板接线](./2-hardware-guide/2-aipc-board-connection.md)。
 
 ## 系统架构
 

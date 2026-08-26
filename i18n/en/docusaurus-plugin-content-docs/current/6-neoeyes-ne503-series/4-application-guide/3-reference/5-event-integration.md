@@ -1,98 +1,161 @@
 ---
-description: NE503 Event Bus integration guide covering MQTT bridging, inference result subscriptions, REST API remote management, and business system integration patterns.
-keywords: [NE503, Event Bus, MQTT, REST API, event integration, system integration]
-tags: [System Integration, NE503, Event Bus, MQTT]
+description: NE503 Event Bus integration reference covering gRPC events, topic wildcards, inference and device producers, Python SDK, WebSocket, and MQTT bridges.
+keywords: [NE503 Event Bus, event bus, topic, gRPC, WebSocket, MQTT, hailo_ipc_sdk]
+tags: [System Integration, NE503, Event Bus, MQTT, WebSocket]
 ---
 
 # Event Integration
 
-The NE503 Event Bus is a platform-level Pub/Sub message hub through which AI inference results, device alarms, application lifecycle, and other events are distributed. This document is intended for developers who need to integrate NE503 events into external systems, and introduces the Topic protocol, MQTT bridging, REST API calls, and common integration patterns.
+The NE503 Event Bus is the device's internal publish/subscribe message hub. This page covers **event protocols and access methods**. For HTTP authentication and event-management requests, see [RESTful API Reference](./3-restful-api.md); for app permissions, see [App Reference](./0-app-reference.md).
 
-## 1. Event Bus Protocol Overview
+## 1. Choose an access method
 
-### 1.1 Access Methods
+| Access method | Default endpoint | Use it for | Location |
+|:---|:---|:---|:---|
+| Python SDK | `unix:///run/aipc/event-bus.sock` | Publishing or subscribing inside a container | `hailo_ipc_sdk.events.EventClient` |
+| gRPC | Same endpoint, as exposed by deployment | C++, Go, or custom services | `event.proto` |
+| REST | `/api/v1/events/topics`, `/api/v1/events/publish` | External topic queries or publishing | API authentication required |
+| WebSocket | `/api/v1/events/stream` | Browser or external real-time consumers | API authentication required |
+| MQTT bridge | Bridge-specific | Existing MQTT platforms | Maintain the bridge process yourself |
 
-| Access Method | Endpoint | Applicable Scenarios |
+If the device's internal gRPC TCP address is deployed on loopback, only the device itself can reach it. External hosts should use REST/WebSocket or an approved tunnel instead of assuming direct access.
+
+## 2. Topic matching
+
+Topics are hierarchical strings separated by `/`. The current matcher supports exact matches, single-level `*`, multi-level `**`, and the suffix form `**/suffix`.
+
+| Subscription expression | Matches | Does not match |
 |:---|:---|:---|
-| gRPC (Unix Socket) | `unix:///run/aipc/event-bus.sock` | On-device services, in-container applications |
-| gRPC (TCP) | `127.0.0.1:50053` | C++ clients |
-| REST API | `http://<device_ip>:8080/api/v1/events/*` | External system integration |
-| WebSocket | `ws://<device_ip>:8080/api/v1/events/stream` | Web frontend real-time subscription |
+| `inference/model_a/main` | The exact topic | `inference/model_b/main` |
+| `inference/*/main` | `inference/model_a/main` | `inference/model_a/sub/extra` |
+| `inference/**` | `inference/model_a/main` and deeper topics | Topics outside `inference/` |
+| `**/detections` | Any topic ending in `detections` | `.../detections/raw` |
 
-### 1.2 Topic Naming and Wildcards
+Wildcards match topics; they do not parse payloads for the subscriber. Narrow subscriptions for high-throughput applications, and choose `queue_size`, `drop_old`, and consumer speed deliberately.
 
-The Event Bus uses `/`-separated hierarchical Topics and supports three wildcards: `*` (single level), `**` (multi-level), and `**/suffix` (suffix). Matching rules are defined in the source file `platform/event-bus/proto/event.proto`.
+## 3. Event message structure
 
-| Pattern | Description | Example |
-|:---|:---|:---|
-| Exact match | Exact topic name match | `inference/yolov8n/third` |
-| `*` Single-level wildcard | Matches one level | `inference/*/third` |
-| `**` Multi-level wildcard | Matches multiple levels | `inference/**` |
-| `**/suffix` Suffix match | Matches a given suffix under any prefix | `**/detections` |
-
-| Topic Prefix | Source | Example |
-|:---|:---|:---|
-| `inference/` | AI Runtime | `inference/person_v1/cam0_main` |
-| `device/` | Device control service | `device/temperature_alert` |
-| `app/` | Application Manager | `app/started`, `app/installed` |
-| `system/` | System-level events | `system/ota_progress` |
-| `alert/` | Alarm events | `alert/threshold_exceeded` |
-| `model/` | Model lifecycle | `model/loaded` |
-
-> The table above lists common prefix examples and is not exhaustive. The inference topic uses the three-segment format `inference/{model_id}/{stream_id}`; other prefixes are mostly two-segment.
-
-### 1.3 Event Message Structure
+The protocol is defined in `platform/event-bus/proto/event.proto`:
 
 ```json
 {
-  "topic": "inference/person_v1/cam0_main",
+  "topic": "app/alert",
   "timestamp_ns": 1717545600000000000,
-  "source": "ai-runtime",
-  "event_id": "evt-1717545600000-1",
-  "payload": "{\"model_id\":\"person_v1\",\"stream_id\":\"cam0_main\",\"objects\":[...]}",
+  "source": "people_counting",
+  "event_id": "evt-1",
+  "payload": "{\"type\":\"person_detected\"}",
   "payload_type": "json",
-  "metadata": { "stream": "cam0_main", "model_id": "person_v1" }
+  "metadata": {
+    "stream_id": "main"
+  }
 }
 ```
 
 | Field | Type | Description |
 |:---|:---|:---|
-| `topic` | string | Event topic |
-| `timestamp_ns` | uint64 | Nanosecond timestamp |
-| `source` | string | Source (service name or app_id) |
-| `event_id` | string | Auto-generated unique ID |
-| `payload` | bytes / dict | On the wire this is JSON-encoded bytes; the Python SDK (`neoruntime_ipc_sdk`) already deserializes it into a dict, so the examples can call `event.payload.get(...)` directly |
-| `metadata` | map | Optional key-value metadata (not carried by most events) |
+| `topic` | string | Topic name |
+| `timestamp_ns` | uint64 | Timestamp in nanoseconds |
+| `source` | string | Service name or application ID |
+| `event_id` | string | Event ID; the publish response also returns an ID |
+| `payload` | bytes | JSON or another encoded payload |
+| `payload_type` | string | Commonly `json`; may also identify `protobuf` |
+| `metadata` | map of string to string | Optional metadata |
 
-## 2. MQTT Bridge Configuration
+The Python SDK converts JSON payloads into the `event.payload` dictionary. A raw gRPC client must parse the payload according to `payload_type`. Publish requests also support `persistent` and `ttl_ms`.
 
-The NE503 Event Bus uses the gRPC protocol; external MQTT systems must connect via a bridge program. The bridge program acts as an Event Bus subscriber and forwards events to an external MQTT Broker.
+Subscribe requests support `topic`, `subscriber_id`, `filters`, `queue_size`, and `drop_old`. The service exposes `Publish`, `PublishBatch`, `Subscribe`, `Unsubscribe`, topic queries, and statistics RPCs.
 
+## 4. Event producers and topic shapes
+
+Prefixes help locate a producer, but they are not a complete fixed enumeration:
+
+| Producer | Source-code topic shape | Meaning |
+|:---|:---|:---|
+| App Manager | `app/{eventType}` | App install, start, stop, and lifecycle events |
+| Device Control | `device/{eventType}` | Device-control events |
+| Normal AI Runtime results | `inference/{model_id}/{stream_id}` | Result path in `grpc_service.cpp` |
+| AI Runtime auto-inference path | `inference/{stream_id}` | Another result path in `auto_infer.cpp` |
+| App-defined events | App-defined | Keep names consistent with conventions such as `app/{app_id}/...` |
+
+The two AI Runtime paths in source do not have the same number of segments. When consuming inference events, inspect topics produced by the target build and use `event.metadata` or the payload to identify the model and stream. Do not hardcode a three-segment topic for every firmware version.
+
+## 5. Python SDK: publish and subscribe
+
+```python
+from hailo_ipc_sdk.events import EventClient
+
+
+def main():
+    with EventClient() as events:
+        events.publish(
+            "app/people_counting/stats",
+            {"current_count": 2, "threshold": 10},
+            metadata={"stream_id": "main"},
+        )
+
+        for event in events.subscribe(
+            "app/**",
+            queue_size=100,
+            drop_old=True,
+        ):
+            print(event.topic, event.payload, event.source)
+
+
+if __name__ == "__main__":
+    main()
 ```
-NE503 Event Bus (gRPC) --> [Bridge] --> MQTT Broker --> Business System
+
+`EventClient` also provides `publish_batch()`, `on_event()`, `unsubscribe()`, `list_topics()`, `get_topic_info()`, `get_stats()`, and `get_topic_stats()`. Subscription is a blocking iterator; long-running apps should handle shutdown and call `close()`.
+
+### 5.1 Manifest permissions
+
+Declare the topic range in `app.yaml` before an app uses Event Bus:
+
+```yaml
+permissions:
+  events:
+    publish:
+      - app/people_counting/*
+    subscribe:
+      - inference/**
 ```
 
-Example bridge client (**runs on the device itself**, connects to the Event Bus via Unix Socket). The device's gRPC TCP endpoint `127.0.0.1:50053` only listens on the loopback interface and cannot be reached directly by external hosts; if you need to integrate from an external server, use the REST/WebSocket endpoints below instead, or forward the loopback port through an SSH tunnel:
+Publish and subscribe permissions are checked separately. Do not use a broad `**` just for convenience unless the application genuinely needs every topic.
+
+## 6. WebSocket: external real-time subscription
+
+The event WebSocket path is:
+
+```text
+wss://<device-ip>/api/v1/events/stream
+```
+
+Log in through REST first, then follow the authentication conventions in [RESTful API Reference](./3-restful-api.md). Source starts the server-side event stream with a wildcard Event Bus subscription and forwards events to WebSocket clients; a topic filter appended to the URL is therefore not a substitute for client-side filtering. Filter by `topic`, `source`, or payload, and handle reconnects and duplicate events.
+
+For device-internal app-to-app communication, prefer the SDK/gRPC Unix Socket. WebSocket is better suited to browsers, gateways, and external monitoring systems.
+
+## 7. MQTT bridge
+
+MQTT is not a native Event Bus protocol. A bridge subscribes to Event Bus and converts each event into an MQTT message:
 
 ```python
 import json
+import os
+
 import paho.mqtt.client as mqtt
-from neoruntime_ipc_sdk.events import EventClient
+from hailo_ipc_sdk.events import EventClient
 
-MQTT_BROKER = "mqtt.example.com"
-MQTT_PORT = 1883
-MQTT_PREFIX = "ne503"
 
-mqtt_client = mqtt.Client(client_id="ne503-bridge")
-mqtt_client.username_pw_set("username", "password")  # Optional authentication
-mqtt_client.connect(MQTT_BROKER, MQTT_PORT, keepalive=60)
+mqtt_client = mqtt.Client(client_id=os.environ["MQTT_CLIENT_ID"])
+mqtt_client.username_pw_set(
+    os.environ["MQTT_USERNAME"], os.environ["MQTT_PASSWORD"]
+)
+mqtt_client.connect(os.environ["MQTT_HOST"], int(os.environ.get("MQTT_PORT", "1883")))
 mqtt_client.loop_start()
 
-event_client = EventClient(endpoint="unix:///run/aipc/event-bus.sock")
-
+events = EventClient()
 try:
-    for event in event_client.subscribe("**"):
-        mqtt_topic = f"{MQTT_PREFIX}/{event.topic}"
+    for event in events.subscribe("**"):
         payload = json.dumps({
             "timestamp_ns": event.timestamp_ns,
             "source": event.source,
@@ -100,169 +163,25 @@ try:
             "payload": event.payload,
             "metadata": event.metadata,
         })
-        mqtt_client.publish(mqtt_topic, payload, qos=1)
+        mqtt_client.publish(f"ne503/{event.topic}", payload, qos=1)
 finally:
-    event_client.close()
+    events.close()
     mqtt_client.loop_stop()
     mqtt_client.disconnect()
 ```
 
-The MQTT Broker authentication supports username/password (`username_pw_set`), TLS certificates (`tls_set`), and token-based methods.
+Production bridges also need TLS, secret management, reconnects, QoS, and duplicate-event handling. Never place credentials in documentation examples or image source.
 
-## 3. Subscribing to AI Inference Results
+## 8. Three integration decisions
 
-After AI Runtime completes inference, it automatically publishes to the `inference/{model_id}/{stream_id}` topic (three-segment: prefix + model ID + stream ID); `auto_publish_results` is enabled by default.
+1. **Topic scope:** subscribe to the smallest useful set to avoid filling queues with unrelated events.
+2. **Message semantics:** retain business objects, timestamps, and idempotency keys in the payload; do not rely only on receive time.
+3. **Failure behavior:** define reconnect, stale-message, duplicate-consumption, and downstream-outage behavior for SDK, WebSocket, and MQTT consumers.
 
-### 3.1 Inference Result Payload
+## 9. Related documentation
 
-```json
-{
-  "model_id": "person_v1",
-  "stream_id": "cam0_main",
-  "frame_sequence": 42,
-  "objects": [
-    { "label": "person", "confidence": 0.92,
-      "bbox": { "x": 0.15, "y": 0.20, "width": 0.30, "height": 0.55 } }
-  ],
-  "infer_time_us": 8500
-}
-```
-
-The result type in the payload depends on the model: detection models populate `objects`, classification models populate `classifications`, and pose models populate `landmarks`.
-
-### 3.2 Consumer Example
-
-The following code runs on a host that can reach the device's Event Bus TCP endpoint (`127.0.0.1:50053`):
-
-```python
-from neoruntime_ipc_sdk.events import EventClient
-
-event_client = EventClient()  # Connects via the TCP endpoint
-
-# Subscribe to a specific model
-for event in event_client.subscribe("inference/person_v1/**"):
-    persons = [o for o in event.payload.get("objects", [])
-               if o["label"] == "person"]
-    print(f"[{event.event_id}] Detected {len(persons)} persons")
-
-# Wildcard subscribe to all models
-for event in event_client.subscribe("inference/**"):
-    model = event.topic.split("/")[-2]  # Three-segment topic; second-to-last segment is the model_id
-    stream = event.payload.get("stream_id", "?")
-    count = len(event.payload.get("objects", []))
-    print(f"[{model}] stream={stream}, objects={count}")
-
-# Filter by stream via metadata
-for event in event_client.subscribe(
-    "inference/**", filters={"stream": "cam0_sub"}
-):
-    print(f"Sub-stream: {event.event_id}")
-```
-
-## 4. Device Alarm Subscription
-
-The device control service automatically publishes the following events:
-
-| Event Topic | Trigger Condition | Key Fields |
-|:---|:---|:---|
-| `device/temperature_alert` | Temperature exceeds threshold (75°C warning / 85°C critical) | `temperature`, `level` |
-| `device/gpio_change` | GPIO state change | `pin`, `value` |
-| `device/ircut_night` | IR-Cut switched to night mode | `mode` |
-| `device/light_sensor_change` | Light sensor reading change | `value` |
-| `device/ptz_move_complete` | PTZ action completed | `preset_id` |
-
-> The above event types are derived from the firmware `DeviceEvent` enumeration; actual availability and fields depend on the hardware configuration and firmware version.
-
-The Application Manager publishes lifecycle events: `app/started`, `app/stopped`, `app/installed`, `app/uninstalled`.
-
-```python
-from neoruntime_ipc_sdk.events import EventClient
-
-event_client = EventClient()  # Connects via the TCP endpoint
-
-for event in event_client.subscribe("device/**"):
-    level = event.payload.get("level", "info")
-    if level == "critical":
-        temp = event.payload.get("temperature")
-        print(f"[Critical] Device temperature {temp}°C")
-```
-
-## 5. REST API Remote Management
-
-External systems manage events and applications via HTTP endpoints without requiring a gRPC connection. Authentication is enabled by default; all requests must first log in to obtain a Token and carry it.
-
-### 5.1 Token Authentication
-
-```bash
-# Log in to obtain a Token
-curl -X POST http://192.168.1.100:8080/api/login \
-  -H "Content-Type: application/json" \
-  -d '{"username": "admin", "password": "password"}'
-
-# Carry the Token in requests (choose one of three)
-curl -H "Authorization: Bearer <token>" ...
-curl -H "X-API-Key: <token>" ...
-curl "ws://...?token=<token>"  # WebSocket
-```
-
-### 5.2 Events API
-
-```bash
-# List current subscription patterns (returns subscriber patterns, not published topics)
-curl http://192.168.1.100:8080/api/v1/events/topics
-
-# Publish an event
-curl -X POST http://192.168.1.100:8080/api/v1/events/publish \
-  -H "Content-Type: application/json" \
-  -d '{"topic": "app/custom_alert", "payload": {"type": "intrusion"}}'
-```
-
-WebSocket real-time subscription (browser side):
-
-```javascript
-const ws = new WebSocket("ws://192.168.1.100:8080/api/v1/events/stream?token=<token>");
-ws.onmessage = (e) => {
-  const d = JSON.parse(e.data);
-  console.log(`[${d.topic}]`, d.payload);
-};
-```
-
-## 6. Business System Integration Patterns
-
-### 6.1 Single-Device Direct Connection
-
-Obtain events from a single device directly via WebSocket or REST API; suitable for scenarios with few devices and high real-time requirements.
-
-```
-NE503 ──HTTP/WebSocket──> Business Server
-```
-
-### 6.2 Multi-Device MQTT Aggregation
-
-Each device runs a bridge program; events are aggregated to a central MQTT Broker, with the device identifier carried in the Topic to distinguish sources:
-
-```
-NE503 #1 ─┐
-NE503 #2 ─┤──MQTT Bridge──> Broker ──> Business Service
-NE503 #3 ─┘
-```
-
-When bridging, use `f"ne503/{DEVICE_ID}/{event.topic}"` as the MQTT Topic.
-
-### 6.3 Webhook Forwarding
-
-Same pattern as MQTT bridging (§2) -- subscribe to events and forward them to an external business endpoint via HTTP POST:
-
-```python
-import requests
-for event in event_client.subscribe("inference/**"):
-    requests.post(WEBHOOK_URL, json={"topic": event.topic, "payload": event.payload}, timeout=5)
-```
-
-The bridge program must likewise run on the device itself (50053 is loopback-only).
-
-## 7. Related Documentation
-
-- [RESTful API Reference](./3-restful-api.md) — Complete reference for all HTTP endpoints
-- [System Architecture · Platform Services Layer](../../3-software-guide/0-system-architecture.md) — Responsibilities and source pointers for services such as the Event Bus
-- [Application Development Reference](./0-app-reference.md) — Building custom applications based on the SDK
+- [App Reference](./0-app-reference.md) — Event Bus permissions and app manifests
+- [SDK Reference](./1-sdk-reference.md) — SDK package, clients, and endpoints
+- [SDK Examples](./2-sdk-examples.md) — inference-to-event application skeleton
+- [RESTful API Reference](./3-restful-api.md) — REST events, authentication, and WebSocket paths
+- [event.proto](https://github.com/camthink-ai/neoruntime/blob/main/platform/event-bus/proto/event.proto) — Event Bus protocol source

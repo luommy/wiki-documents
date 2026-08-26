@@ -273,5 +273,5 @@ curl -k -X DELETE https://<device-ip>/api/v1/apps/hello-world -H "Authorization:
 
 - [SDK Workflow](./0-sdk-workflow.md) — next step: embed the SDK into your app image so your app can do real AI inference
 - [Person Detection](../2-cookbook/1-person-detection.md) — a complete on-device case using the SDK
-- [App Reference §2 app.yaml Complete Reference](../3-reference/0-app-reference.md#2-appyaml-complete-reference) — what each `app.yaml` field means, and permissions
+- [App Reference §2 app.yaml Complete Reference](../3-reference/0-app-reference.md#2-manifest-structure) — what each `app.yaml` field means, and permissions
 - [Troubleshooting FAQ](../../5-troubleshooting.md) — build, deploy, and startup errors

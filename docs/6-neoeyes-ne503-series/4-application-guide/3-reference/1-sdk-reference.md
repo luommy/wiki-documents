@@ -1,120 +1,159 @@
 ---
-description: NE503 Python SDK (neoruntime_ipc_sdk) 使用指南：一分钟跑通第一个推理，各模块解决什么问题，以及推理订阅用 sub/third、自训模型走 raw_output_only 等平台特有约束。
-keywords: [NE503 SDK, Python SDK, neoruntime_ipc_sdk, InferenceClient, 推理订阅, sub流, raw_output_only, EventClient]
+description: NE503 Python SDK 参考，说明 hailo_ipc_sdk 的安装包名、模块选择、服务端点、推理订阅和资源清理约束。
+keywords: [NE503 SDK, Python SDK, hailo_ipc_sdk, InferenceClient, EventClient, FdMediaClient, 推理订阅]
 tags: [SDK参考, NE503, Python, 应用开发, 开发者]
 ---
 
 # SDK Reference
 
-`neoruntime_ipc_sdk` 是 NE503 容器应用的 Python SDK。它在容器内通过 gRPC / Unix Socket 直连平台的 AI Runtime、Event Bus、Device Control 等服务，让你不用碰底层协议就能做推理、收事件、控设备。典型作用是把一行
+NE503 应用使用的 Python SDK 实际包名是 **`hailo_ipc_sdk`**，发行包名是 **`hailo-ipc-sdk`**，当前工程版本为 `0.4.0`。旧示例中的过时包名不是当前 SDK 的导入路径。
+
+本页提供模块选择和平台约束；完整类、参数和返回值以 [neoruntime-sdks Python API 文档](https://github.com/camthink-ai/neoruntime-sdks/tree/main/python/docs/api) 为准。
+
+## 1. 先确认包名和版本
+
+代码导入：
 
 ```python
-for seq, result in inf.subscribe(stream="sub", model="hailo_yolov8n_384_640"):
+from hailo_ipc_sdk import InferenceClient, EventClient
 ```
 
-变成「每一帧视频都实时返回检测结果」。
+构建镜像时使用的项目目录是 `python/hailo_ipc_sdk`，`setup.py` 的发行包名是 `hailo-ipc-sdk`。请让镜像中的 SDK 版本与平台版本匹配，不要只根据文档中的旧导入名判断安装是否成功。
 
-> **完整 API 签名以官方 Sphinx 文档站为权威**：[英文站](https://camthink-ai.github.io/neoruntime-sdks/python/en/index.html) / [中文站](https://camthink-ai.github.io/neoruntime-sdks/python/zh/index.html)，包含每个类和方法的全部参数、返回类型与代码示例。本文不复述签名，只讲两件 wiki 独有的事：**每个模块解决什么问题、怎么选**，以及 **NE503 平台特有的调用约束**。
+检查容器内实际安装结果：
 
-安装方式：设备上随应用镜像携带，本地开发见[开发者指南 §2 Docker 开发环境](../../3-software-guide/1-developer-guide.md#2-docker-开发环境)。C++ 版 SDK 与 Python 模块一一镜像，C++ API 见 [Doxygen 文档站](https://camthink-ai.github.io/neoruntime-sdks/cpp/en/)。
+```bash
+python -c "import hailo_ipc_sdk; print(hailo_ipc_sdk.__version__)"
+```
 
-## 1. 一分钟跑通
+SDK 工作流、镜像构建和部署步骤见 [SDK 工作流 §4 第一次调用](../1-app-development/0-sdk-workflow.md#4-完成第一次-sdk-调用)。
 
-以最常见、也是多数 AI 应用的骨架——「订阅视频流做实时推理」为例：
+## 2. 按任务选择模块
+
+以下类由 `hailo_ipc_sdk` 顶层导出；完整签名不要在应用文档中重复维护，请直接打开 SDK API 文档。
+
+| 任务 | 类 | 主要能力 |
+|:---|:---|:---|
+| AI 单帧和流式推理 | `InferenceClient` | `infer()`、`infer_batch()`、`subscribe()`、模型查询和注册 |
+| 原始视频帧 | `FdMediaClient` | DMA-BUF/原始帧订阅、单帧读取、码流枚举 |
+| 编码视频 | `EncodedStreamClient` | 编码帧读取和连续订阅 |
+| Event Bus | `EventClient` | 发布、批量发布、订阅、主题查询和统计 |
+| 设备控制 | `DeviceClient`、`IrCutMode` | 灯光、IR-CUT、PTZ、镜头和 GPIO |
+| 摄像头管线 | `CameraClient` | ISP、编码器、RTSP、OSD、配置和流状态 |
+| AI 叠加 | `OverlayClient` | 配置和应用 AI overlay |
+| 应用管理 | `AppClient` | 应用列表、状态、统计和日志 |
+| 音频控制 | `AudioClient`、`AudioStreamClient` | 音频设备、采集、播放和流 |
+| 运行时配置 | `Config` | 读取应用 ID、IPC 端点和调试开关 |
+| 插件 | `PluginDiscovery`、`PluginServer` | 发现能力、提供插件服务 |
+
+一个应用可以组合多个客户端，但每个客户端都要在退出时关闭；长时间运行的订阅尤其不能依赖进程被强制结束来释放连接。
+
+## 3. 平台约束
+
+### 3.1 码流和模型名称必须来自目标设备
+
+`InferenceClient.subscribe()` 的参数是 `stream`、`model`、`fps`、`session_id` 和 `raw_output_only`。名称是设备运行时资源，不是 SDK 常量：
 
 ```python
-from neoruntime_ipc_sdk import InferenceClient
+from hailo_ipc_sdk import FdMediaClient, InferenceClient
 
-inf = InferenceClient()
-for seq, result in inf.subscribe(stream="sub", model="hailo_yolov8n_384_640"):
-    print(f"Frame {seq}: {len(result.objects)} objects")
+media = FdMediaClient()
+inference = InferenceClient()
+
+print("raw streams:", media.list_streams())
+print("models:", [m.model_id for m in inference.list_models()])
+```
+
+确认实际资源后再把值传给 `subscribe()`。不同固件、摄像头配置和应用清单可能使用 `main`、`sub`、`third` 或其他码流名；不能把某个示例中的名称复制到所有设备。
+
+### 3.2 `raw_output_only` 只用于原始输出
+
+```python
+for frame_seq, result in inference.subscribe(
+    stream="main",
+    model="person_vehicle_v1",
+    fps=10,
+    raw_output_only=False,
+):
     for obj in result.objects:
-        print(f"  {obj.label}: {obj.score:.2f} @ [{obj.bbox.x:.2f}, {obj.bbox.y:.2f}]")
+        print(obj.label, obj.score)
 ```
 
-三段就能跑：**订阅推理流 → 传模型真实名 → 遍历每帧结果**。上面的 `stream` 和 `model` 是示例值，部署前必须换成设备真实值（先 `list_streams()` / `list_models()` 查，不能写死——见[平台特有约束 §3.2](#32-流名与模型名不能写死)）。
+需要自己解析张量时才设置 `raw_output_only=True`，并从 `result.raw_outputs` 读取原始输出；需要使用 `objects`、`classifications`、`landmarks` 等 SDK 解析结果时保持默认值。
 
-订阅范式（阻塞迭代器、优雅退出）与完整可运行示例见 [SDK 工作流 §3 调用范式](../1-app-development/0-sdk-workflow.md#3-调用范式) 和 [SDK 示例](./2-sdk-examples.md)。
+### 3.3 流式订阅是阻塞迭代器
 
-## 2. 每个模块解决什么问题
-
-SDK 按平台能力拆成多个模块，每个 `XxxClient` 对应设备上的一个服务。**先看这张表选模块，再点进对应页面查完整 API**：
-
-| 模块 | 解决什么问题 | 核心类 | 完整 API |
-|:---|:---|:---|:---|
-| `inference` | AI 推理：单帧 `infer`、流式 `subscribe`、模型管理 | `InferenceClient` | [官方站 inference](https://camthink-ai.github.io/neoruntime-sdks/python/zh/api/inference.html) |
-| `media` | 零拷贝取视频帧（DMA-BUF）、H.264 编码流 | `FdMediaClient`、`EncodedStreamClient` | [官方站 media](https://camthink-ai.github.io/neoruntime-sdks/python/zh/api/media.html) |
-| `events` | 事件总线：发布/订阅/批量、通配符主题 | `EventClient` | [官方站 events](https://camthink-ai.github.io/neoruntime-sdks/python/zh/api/events.html) |
-| `device` | 外设控制：灯光、云台、镜头、GPIO、Wiegand、RS-485 | `DeviceClient` | [官方站 device](https://camthink-ai.github.io/neoruntime-sdks/python/zh/api/device.html) |
-| `app` | 应用生命周期：安装/启停/卸载/日志（通常由 Web 控制台承担） | `AppClient` | [官方站 app](https://camthink-ai.github.io/neoruntime-sdks/python/zh/api/app.html) |
-| `plugin` | gRPC 插件发现与托管（扩展平台能力的高级用法） | `PluginDiscovery`、`PluginServer` | [官方站 plugin](https://camthink-ai.github.io/neoruntime-sdks/python/zh/api/plugin.html) |
-| `config` | 读环境变量拿连接端点，/ 容器内外路径转换 | `Config` | [官方站 config](https://camthink-ai.github.io/neoruntime-sdks/python/zh/api/config.html) |
-| `camera` | 摄像头底层：ISP、编码器、RTSP、OSD、AI 叠加 | `CameraClient` | 官方站未收录，见[源码 camera.py](https://github.com/camthink-ai/neoruntime-sdks/blob/main/python/neoruntime_ipc_sdk/camera.py) |
-| `overlay` | 把检测框叠加到画面（RTSP/Web） | `OverlayClient` | 官方站未收录，见[源码 overlay.py](https://github.com/camthink-ai/neoruntime-sdks/blob/main/python/neoruntime_ipc_sdk/overlay.py) |
-| `audio` / `audio_stream` | 音频采集/播放、双向对讲 | `AudioClient`、`AudioStreamClient` | 官方站未收录，见[源码 audio.py](https://github.com/camthink-ai/neoruntime-sdks/blob/main/python/neoruntime_ipc_sdk/audio.py) |
-
-**选模块的方法**：先问「我要做什么」，再对表找对应 Client。绝大多数容器应用只用到前三个——`inference`（推理）+ `events`（告警联动）+ `device`（必要时控硬件）。`app`/`plugin`/`camera`/`audio` 属高级用法，用到时再查。
-
-## 3. 平台特有的约束
-
-这几条是 NE503 实机上踩过的坑，官方文档站没有，**部署前必须理解**。
-
-### 3.1 推理订阅用 `sub`/`third`，`main` 只发编码流
-
-`main` 流只发编码后的 H.264，**没有原始帧、没有推理数据**。`inference.subscribe()` 和 `media` 的帧获取只能订阅发布 NV12 原始帧的流：`sub` 或 `third`（`third` 是平台默认推理流）。用 `main` 订阅推理会永久挂起或拿不到结果。
-
-> 注意：SDK 的 `FdMediaClient().list_streams()` 当前**硬编码**返回 `['main', 'sub']`，未列出 `third`。要核对设备实际可用流，用 `aipc-cli stream list` 或 `CameraClient().get_stream_status()`。
-
-三路码流的完整约束（分辨率/编码/原始帧/推理分发）见[视频与成像 · RTSP 对接](../../2-user-guide/1-media-and-image.md#rtsp-对接)。
-
-### 3.2 流名与模型名不能写死
-
-本页示例里的 `stream="sub"`、`model="hailo_yolov8n_384_640"` 是**示例值**。模型名随设备预置可改，推理流随配置可增删（`main`/`sub`/`third`）。部署前在设备上跑一遍：
+`subscribe()` 会持续等待结果，调用线程会在 `for` 循环中阻塞。应用应处理退出信号，并在 `finally` 中关闭客户端：
 
 ```python
-from neoruntime_ipc_sdk import InferenceClient, FdMediaClient
-print(InferenceClient().list_models())   # 如 ['hailo_yolov8n_384_640']
-print(FdMediaClient().list_streams())    # 硬编码返回 ['main', 'sub']，不含 third
+try:
+    for frame_seq, result in inference.subscribe(
+        stream="main", model="person_vehicle_v1", fps=10
+    ):
+        handle(result)
+finally:
+    inference.close()
 ```
 
-把真实值填入 `app.py` 和 `app.yaml`，否则会 `NOT_FOUND` 或拿不到数据。
+停止生成器会取消底层流式 RPC；`close()` 仍然是应用退出时应保留的显式清理动作。`EventClient`、`FdMediaClient`、`DeviceClient` 等客户端同样适合使用上下文管理器或 `finally` 清理。
 
-### 3.3 自训模型订阅要加 raw_output_only
+### 3.4 模型注册是受权限控制的操作
 
-设备内置后处理算子按 **预置模型** 的张量名查找输出，无法匹配自训 HEF 的张量名。自训模型走默认路径（`False`）结果为空，必须：
+`register_model()` 只有在应用清单的 `inference.allow_register_model` 开启，并且模型路径、模型 ID 和设备运行时均满足要求时才应调用。普通推理应用只声明已注册模型，不要在启动阶段无条件注册。
+
+## 4. 端点和容器环境
+
+SDK 默认在容器内通过 Unix Socket 连接平台服务，也可以用环境变量覆盖：
+
+| 环境变量 | 默认值 |
+|:---|:---|
+| `AI_RUNTIME_ENDPOINT` | `unix:///run/aipc/ai-runtime.sock` |
+| `EVENT_BUS_ENDPOINT` | `unix:///run/aipc/event-bus.sock` |
+| `DEVICE_CONTROL_ENDPOINT` | `unix:///run/aipc/device-control.sock` |
+| `CAMERA_CONTROL_ENDPOINT` | `unix:///run/aipc/camera-control.sock` |
+| `APP_MANAGER_ENDPOINT` | `unix:///run/aipc/app-manager.sock` |
+| `SHM_BASE_PATH` | `/run/aipc/shm` |
+| `ENCODED_SOCKET_DIR` | `/run/aipc/encoded` |
+| `APP_ID` | `unknown` |
+| `DEBUG` | `0` |
+| `LOG_LEVEL` | `INFO` |
+
+通常不需要在应用中手写这些端点；先确认 [应用参考](./0-app-reference.md) 的权限和容器配置，再使用 SDK 默认值。
+
+## 5. 最小推理骨架
+
+下面的 `main`、`person_vehicle_v1` 是工程示例中出现过的值，仅用于展示调用形态。部署前仍须按第 3.1 节查询并替换：
 
 ```python
-for seq, result in inf.subscribe(stream="sub", model="<自训模型id>", raw_output_only=True):
-    for tensor in result.raw_outputs:
-        boxes = np.asarray(tensor).reshape(-1, 6)   # HailoRT NMS 输出
-```
+from hailo_ipc_sdk import InferenceClient
 
-NMS 已在 HEF 编译时烤入，应用侧只做坐标换算与阈值过滤。完整说明见[模型训练与 HEF 部署 §7 部署到 NE503](../1-app-development/4-model-training-and-hef.md#7-部署到-ne503)。
 
-### 3.4 订阅是阻塞迭代器，要做优雅退出
-
-`subscribe()`（推理、事件、视频）都是阻塞生成器。Ctrl-C 无法直接打断，需捕获 `KeyboardInterrupt` 后 `close()` 释放连接，否则容器退出时可能残留连接。
-
-```python
 def main():
-    inf = InferenceClient()
+    inference = InferenceClient()
     try:
-        for seq, result in inf.subscribe(stream="sub", model="..."):
-            ...
-    except KeyboardInterrupt:
-        inf.close()
+        for frame_seq, result in inference.subscribe(
+            stream="main",
+            model="person_vehicle_v1",
+            fps=10,
+        ):
+            people = result.count_by_label("person")
+            if people:
+                print(f"frame={frame_seq}, people={people}")
+    finally:
+        inference.close()
+
+
+if __name__ == "__main__":
+    main()
 ```
 
-完整可运行示例见 [Person Detection 教程](../2-cookbook/1-person-detection.md)。
+推理结果的字段和结果类型取决于模型；不要假设所有模型都会返回 `objects`。模型、码流和推理权限需要在 `app.yaml` 中一并声明。
 
-## 4. 环境变量与配置
+## 6. 与开发流程的关系
 
-`neoruntime_ipc_sdk` 通过环境变量拿到各服务连接端点（`AI_RUNTIME_ENDPOINT`、`EVENT_BUS_ENDPOINT` 等）和容器身份（`APP_ID`）。平台会在应用启动时自动注入，容器内**无需手动设置**。完整变量列表与意义见[应用参考 §7 环境变量参考](./0-app-reference.md#7-环境变量参考)。
-
-## 相关文档
-
-- [SDK 示例](./2-sdk-examples.md) — 从小到大 4 个完整应用
-- [SDK 工作流](../1-app-development/0-sdk-workflow.md) — 从克隆到部署的开发流程与调用范式
-- [应用参考](./0-app-reference.md) — 项目创建、app.yaml 配置、部署流程
-- [Person Detection 教程](../2-cookbook/1-person-detection.md) — 完整真机案例
-- [系统架构 · 平台服务层](../../3-software-guide/0-system-architecture.md) — AI Runtime、Event Bus 等服务职责与源码指针
+- [SDK 工作流](../1-app-development/0-sdk-workflow.md) — 项目创建、镜像构建、部署和第一次调用
+- [SDK 示例](./2-sdk-examples.md) — 订阅、事件发布、设备控制和退出清理
+- [应用参考](./0-app-reference.md) — `app.yaml` 权限、环境变量和卷挂载
+- [RESTful API 参考](./3-restful-api.md) — 外部 HTTP 管理接口，不重复 SDK 类签名
+- [事件集成](./5-event-integration.md) — Event Bus 的主题、消息和跨系统接入
+- [neoruntime-sdks Python API](https://github.com/camthink-ai/neoruntime-sdks/tree/main/python/docs/api) — SDK 的完整 API 参考

@@ -11,6 +11,8 @@ tags: [NE503, 应用部署, 容器应用, Person Detection, 占用率监测, Saf
 
 以下应用均已在 NE503 实机验证通过，可直接下载安装到设备测试，也可参考源码二次开发，加速 POC 落地。
 
+如果你需要现成模型，请先查看 [CamThink Model Zoo](https://www.camthink.ai/developer-center/models/)。Model Zoo 提供可下载的模型文件，你可以基于合适的模型自行构建应用；本页则提供已经验证过的完整应用包。
+
 ## 应用列表
 
 

@@ -1,95 +1,111 @@
 ---
-description: NE503 product wiring and power guide — external interface overview, alarm input and Wiegand output usage and linkage direction, RS-485 transparent byte channel, PoE vs DC power selection, and debug-port entry points.
-keywords: [NE503 wiring, Alarm IN, RS-485, Wiegand, PoE power, DC power, debug port]
-tags: [User Guide, NE503, wiring, power]
+description: "NE503 field wiring guide: connect PoE or DC power, Alarm IN, Wiegand, RS-485, and audio from the terminal diagram, then identify when a debug interface is needed."
+keywords: [NE503 wiring, terminals, PoE, DC 12V, Alarm IN, Wiegand, RS-485, audio]
+tags: [User Guide, NE503, wiring, field installation]
 ---
 
 # Product Wiring
 
-This page covers how to wire the device: choosing power, what to connect to the alarm and expansion interfaces, and where the debug port lives. For the full interface specification list see [Product Overview](../0-overview.md); for the Web side of each interface see [Peripherals](./3-peripherals.md).
+If you are connecting the NE503 to equipment on site, follow this order: **identify the terminals → choose one power method → connect the external equipment → power on and check**. This page does not cover developer API details. For interface configuration, see [Peripherals](./3-peripherals.md); for board-level pin definitions, see [Interface Board](../2-hardware-guide/2-aipc-board-connection.md).
 
-## 1. Power: PoE or DC
+Disconnect the device from power before wiring. Connect PoE or DC power only after all terminals are wired.
 
-NE503 supports two power options — choose by site infrastructure:
+## 1. Identify the External Terminals
 
-| Option | Spec | Best for |
-|:--------|:-----|:---------|
-| **PoE** | 802.3at (RJ45 port) | Sites with a PoE switch — a single cable carries both power and data |
-| **DC supply** | DC 12V (~5–6 W) | No PoE infrastructure, or centralized power / UPS scenarios |
+The figure shows the NE503 external terminals. The RJ45 port is used for networking and PoE. On the green terminal block, the DC power terminals are followed by the I/O terminals from left to right.
 
-**How to choose**:
+<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/hardware-guide/aipc-board-connection/terminal-block-annotation.png" alt="NE503 External Terminal Block Annotation" style={{ width: '100%', height: 'auto' }} />
 
-- If the site already has a PoE switch and the port power class meets 802.3at → choose PoE: one less power cable, fastest install.
-- If the site only has a plain switch, or you have centralized DC power / UPS backup → choose DC 12V. Size the adapter's rated current with the ~6 W power draw in mind.
+| Figure label | Terminal label | Connect to |
+|:---:|:---|:---|
+| RJ45 | PoE | PoE switch or ordinary network switch; only a PoE switch supplies power over the cable |
+| 1 | DC- | DC power negative |
+| 2 | DC+ | DC 12V power positive |
+| 3 | A / D0 | Wiegand D0 output |
+| 4 | B / D1 | Wiegand D1 output |
+| 5 | G | Wiegand / Alarm common ground |
+| 6 | IN | Alarm IN input |
+| 7 | G | Audio common ground |
+| 8 | I | Line-In audio input |
+| 9 | O | Line-Out audio output |
 
-**Notes**:
+> In the figure, **A / B** are Wiegand **D0 / D1**, not RS-485 A / B. RS-485 uses a separate interface on the device; see [§4](#4-rs-485-and-audio).
 
-- **Do not connect both power sources at the same time.**
-- Budget 6 W per device (full load, peripherals included).
+## 2. Connect One Power Source
 
-> DC connector polarity and plug specifications follow the hardware documentation shipped with the device.
+The NE503 supports two power methods. Choose one for the site:
 
-## 2. Alarm Input (Alarm IN)
+| Power method | Connection | When to use it |
+|:---|:---|:---|
+| **PoE** | Connect the RJ45 port to an IEEE 802.3at PoE switch with an Ethernet cable | You want network and power over one cable |
+| **DC 12V** | Connect the adapter positive to **DC+ (2)** and negative to **DC- (1)** | No PoE is available, or the site uses centralized power / UPS |
 
-The product exposes **one** alarm input (terminal labeled Alarm IN) for dry-contact signals such as door contacts, IR beams, or smoke detectors.
+Typical device power is 5–6 W. **Do not connect PoE and DC 12V at the same time**. For DC power, size the adapter's rated current with the 6 W draw in mind.
 
-**Know two things before wiring**:
+After powering on, wait for the device to start and open its IP address in a browser. If the Web Console opens, the basic power and network connection is working.
 
-1. **In the current firmware, alarm-input signal reporting (event bus / API) is not yet available** — triggering the alarm input produces no event, and there is nothing to observe on the Web UI. If you need alarm linkage, read the sensor signal directly from an external system (e.g. an access controller).
-2. **Linkage flows out, not in** — NE503's linkage capability is the **Wiegand ×2** outputs (relay + level) that **drive** access-control and other external devices; on the platform side, your app subscribes to AI events and drives the output (see [Peripherals · linkage](./3-peripherals.md)).
+## 3. Connect Alarm and Access-Control Equipment
 
-**Wiring steps** (scenario: door contact → Alarm IN):
+### 3.1 Alarm Input
 
-1. Power off, open the terminal cover, and locate the **Alarm IN** terminal.
-2. Wire the door contact's NO/NC output to the alarm-input terminal (exact pinout, common terminal, and input type: see the hardware documentation shipped with the device).
-3. Power on and verify: since the current firmware has no event reporting, **not seeing a trigger state on the Web page is expected** — it is not a wiring error.
+Alarm IN is a switch-state input that can connect to a door contact, IR beam, smoke detector, or similar device. Sensor output types can differ, so check the supplied hardware documentation for the input type, trigger level, and common terminal before wiring. The example below uses a passive door contact:
 
-> Terminal pinout, input level type (dry contact / active level), and allowed input range follow the hardware documentation shipped with the device. Verify before wiring.
+1. Connect one door-contact wire to **IN (6)**.
+2. Connect the other door-contact wire to **G (5)**.
+3. Power on the device.
 
-## 3. RS-485 Expansion Interface
+The current firmware does not report Alarm IN triggers to the Web UI or event interface. Therefore, no status change on the Web page after triggering the contact is expected. Use the access controller or another external system to read and handle the input state.
 
-The product provides an **RS-485** expansion interface for PTZ cameras or RS-485 sensors (temperature/humidity, radar, etc.).
+> If the sensor provides an active voltage signal, do not copy the door-contact wiring directly. Confirm the permitted input voltage range and common terminal in the hardware documentation first.
 
-**Understand what it is first: a transparent byte channel.** The device does not "speak" PTZ protocols for you — in software, RS-485 is just a channel for sending and receiving raw bytes:
+### 3.2 Wiegand Output
 
-- Your app calls `Rs485Init` via the SDK / gRPC to set the baud rate and serial parameters, then sends with `Rs485Tx` and subscribes to `EV_RS485_RX` to receive.
-- PTZ protocols (Pelco-D/P, custom protocols, etc.) are implemented by your own application.
-- Terminal A/B polarity and pinout: see the hardware documentation shipped with the device.
+Wiegand is an output interface. It sends linkage signals from the NE503 to an access controller or other external equipment; it is not a reader input. Wire it as follows:
 
-**Typical steps for a PTZ** (scenario: RS-485 PTZ):
+1. Connect the access controller's **D0** to NE503 **A / D0 (3)**.
+2. Connect the access controller's **D1** to NE503 **B / D1 (4)**.
+3. Connect the access controller's **GND** to NE503 **G (5)**.
 
-1. Power off and wire: connect the PTZ's A/B wires to the device's RS-485 terminal (A→A, B→B — swapped polarity means no communication); power the PTZ per its own spec.
-2. Check the PTZ protocol manual for baud rate, protocol type, and PTZ address (DIP switches).
-3. Power on the device, call `Rs485Init` in your app with a baud rate matching the PTZ, send control frames in the protocol format, and confirm the PTZ moves.
+After wiring, configure the Wiegand channel in [Peripherals](./3-peripherals.md). The platform does not automatically turn an AI detection into a Wiegand output; an application or business system must receive the event and drive the output when linkage is needed.
 
-**Typical steps for a sensor** (scenario: RS-485 temperature/humidity sensor):
+## 4. RS-485 and Audio
 
-1. Wire A/B and power per the sensor manual (most RS-485 sensors also need a common ground).
-2. In your app, call `Rs485Init` with the sensor's baud rate, then poll registers per its protocol (usually Modbus RTU).
-3. A valid response frame means the link works; if there is no response, follow [Troubleshooting §7.4](../5-troubleshooting.md#74-alarm-input--wiegand--rs-485-runtime-issues).
+### 4.1 RS-485
 
-> RS-485 bus termination, biasing, multi-drop topology requirements, and whether the terminal exposes GND follow the hardware documentation shipped with the device.
+Use RS-485 to connect a PTZ or an RS-485 sensor. RS-485 only transports bytes; the protocol is determined by the external device and the application.
 
-## 4. Audio Interfaces
+1. Power off and connect the external device's **A to A and B to B**.
+2. Power the external device according to its own documentation.
+3. Power on the NE503 and use the same baud rate and protocol parameters as the external device.
 
-**Line-In / Line-Out**: connect a field microphone and an amplified speaker for monitoring and talkback; enable on the Web side under **Peripherals → Mic Input / Speaker Output**.
+If a PTZ does not move or a sensor does not respond, first check three things: whether A/B are reversed, whether both sides share ground, and whether the baud rate and protocol match. For the RS-485 terminal definition, see [Interface Board · RS-485](../2-hardware-guide/2-aipc-board-connection.md#rs-485). For runtime issues, see [Troubleshooting FAQ §7.4](../5-troubleshooting.md#74-alarm-input--wiegand--rs-485-runtime-issues).
+
+### 4.2 Audio
+
+- **Line-In**: connect the microphone signal wire to **I (8)** and its ground wire to **G (7)**.
+- **Line-Out**: connect the amplifier or powered speaker signal wire to **O (9)** and its ground wire to **G (7)**.
+
+After wiring, enable the corresponding **Mic Input** or **Speaker Output** channel on the **Peripherals** page. Check the signal level against the external audio equipment's documentation; until it is confirmed, do not connect Line-Out directly to a passive speaker.
 
 ## 5. Debug Interfaces
 
-The device has **three kinds of serial interfaces with different purposes** — wiring the wrong one means at best no communication, at worst a damaged port:
+**Normal installation and daily operation do not require a debug connection.** Use the interfaces below only for system recovery, serial logs, or interface-board MCU firmware flashing.
 
-| Kind | Purpose | Who uses it |
-|:-----|:--------|:------------|
-| **SoC UART debug console** | Serial log, UART recovery mode (unbrick / system reflash) | Platform ops |
-| **ST-LINK / SWD debug port** | Interface-board MCU firmware flashing | Firmware developers |
-| **Internal MCU host-link** | Internal communication between core board and interface-board MCU (`/dev/ttyS0 @ 921600`) — **not an external interface; do not attach peripherals** | Platform internal |
+| What you need to do | Interface | Connection and operation |
+|:---|:---|:---|
+| View boot logs or enter UART recovery mode | **SoC UART** | Use a **1.8V-compatible** USB-to-serial adapter on the debug serial port. For system recovery, set `BOOT0 OFF / BOOT1 ON` and press Reset. |
+| Factory-program interface-board MCU firmware | **ST-LINK / SWD** | Connect ST-LINK to `PA13/SWDIO`, `PA14/SWDCLK`, `NRST`, `GND`, and `3V3 VREF`. The device must still be powered by PoE; ST-LINK does not power the device. Use MCU OTA for field updates. |
+| Internal communication between the core board and interface-board MCU | **Internal MCU host-link** | This is an internal connection, not an external interface. Do not connect field equipment to it. |
 
-Step-by-step operations and wiring photos for the first two are in [System Flashing](../3-software-guide/2-system-flashing.md):
+For system recovery, serial logs, or MCU firmware flashing, follow the corresponding steps in [System Flashing](../3-software-guide/2-system-flashing.md):
 
-| Purpose | Entry |
-|:--------|:-------|
-| UART recovery mode (unbrick / reflash) | DIP switch BOOT0 OFF, BOOT1 ON + Reset button ([§2.1](../3-software-guide/2-system-flashing.md#21-enter-uart-recovery-mode)) |
-| Interface-board MCU firmware flashing | ST-LINK / SWD connection ([§4](../3-software-guide/2-system-flashing.md#4-interface-board-mcu-firmware)) |
-| Serial console log | UART debug cable ([§1.4 hardware connection](../3-software-guide/2-system-flashing.md#14-hardware-connection)) |
+- [Host preparation and serial voltage](../3-software-guide/2-system-flashing.md#1-prepare-firmware-and-host)
+- [UART recovery mode](../3-software-guide/2-system-flashing.md#2-recover-the-boot-chain)
+- [Interface-board MCU OTA](../3-software-guide/2-system-flashing.md#5-flash-the-mcu-firmware)
 
-> Don't confuse the two "BOOT0"s: the SoC **BOOT0/BOOT1 DIP switch** switches the whole system's boot mode; interface-board MCU pin **PA14** is also called BOOT0 (shared with SWDCLK), but that belongs to MCU-internal flashing and has nothing to do with the system DIP switch.
+## Related Docs
+
+- [Peripherals](./3-peripherals.md) — Web configuration for alarm input, Wiegand, and audio
+- [Interface Board](../2-hardware-guide/2-aipc-board-connection.md) — RS-485 and interface-board pin definitions
+- [System Flashing](../3-software-guide/2-system-flashing.md) — UART recovery, serial logs, OS upgrades, and MCU OTA
+- [Troubleshooting FAQ](../5-troubleshooting.md) — alarm input / Wiegand / RS-485 runtime issues

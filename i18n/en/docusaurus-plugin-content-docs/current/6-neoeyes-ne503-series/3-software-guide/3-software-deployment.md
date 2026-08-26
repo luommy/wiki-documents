@@ -1,112 +1,103 @@
 ---
-description: NE503 platform software deployment guide, covering release package deployment and deployment verification.
-keywords: [NE503, deployment, deploy.sh, systemd]
-tags: [platform development, NE503, deployment, operations]
+description: NE503 platform software installation and upgrade guide covering Web upgrade, SSH deployment, version verification, and rollback.
+keywords: [NE503, platform software, Web upgrade, OTA, deploy.sh, release package]
+tags: [application guide, NE503, software deployment, operations]
 ---
 
 # Software Deployment
 
-This document explains how to deploy the NE503 platform software release package to a device. Platform software includes platform services, HAL libraries, and the Web console. This is distinct from system image (hailo-os) flashing — see [System Flashing](./2-system-flashing.md) for that.
+This page covers installation and upgrade of the NE503 platform software release package (`.tar.gz`). Platform software includes platform services, HAL libraries, and the Web console.
 
-> Prerequisites: Complete the environment setup and build process in [Developer Guide](./1-developer-guide.md) to produce the `build/release/aipc-hailo15-<version>.tar.gz` release package.
+The system OS uses a `.swu` package and a different workflow; see [System Flashing](./2-system-flashing.md).
 
-## 1. Release Package Deployment
+## 1. Prepare the Release Package
 
-### 1.1 Transfer Package
+Download a package from [neoruntime Releases](https://github.com/camthink-ai/neoruntime/releases), or build it from source:
+
+```bash
+make pack-release VERSION=<version>
+ls -lh build/release/aipc-hailo15-<version>.tar.gz
+```
+
+See [Developer Guide](./1-developer-guide.md) for build requirements. Before starting, confirm that:
+
+- The target is an NE503 device and the Web console or SSH is available.
+- Web upgrade uses an administrator account; SSH deployment requires `root` privileges.
+- `/data` is writable and has enough space: `df -h /data`.
+- Power and network connectivity will remain stable, and the current `Firmware Version` is recorded.
+
+## 2. Upgrade Through the Web Console
+
+Use Web upgrade when the device is running and reachable through the Web console.
+
+1. Open `https://<device-ip>` and sign in with an administrator account.
+2. Open `Settings → Device Info`.
+3. Under `Firmware & Hardware`, find `Firmware Version` and click its `Update` button. Do not click `Update` beside `System OS Version`.
+
+   ![Firmware Update dialog](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/software-guide/software-deployment/software-upgrade.jpg)
+
+4. Upload one `aipc-hailo15-<version>.tar.gz` file.
+5. Confirm that power is stable, select `I understand and wish to continue with the upgrade`, and click `Confirm Update`.
+6. Wait for upload, writing, and reboot to finish. Do not refresh the page, click again, or cut power.
+7. After the device comes back online, sign in again and verify `Firmware Version`.
+
+The upgrade is complete when the device is online, you can sign in again, and `Firmware Version` shows the target version. If `Device offline` appears, check power and network, then click `Re-detect`.
+
+## 3. Install or Upgrade Through SSH
+
+For first installation or an unavailable Web entry, run `deploy.sh` on the device:
 
 ```bash
 scp build/release/aipc-hailo15-<version>.tar.gz root@<device-ip>:/data/
-```
-
-### 1.2 Execute Deployment
-
-```bash
 ssh root@<device-ip>
-# root partition is nearly full (3.3G, 99% used); extract directly in /data
-cd /data && tar xzf aipc-hailo15-<version>.tar.gz
-cd aipc-hailo15-<version> && ./deploy.sh
+cd /data
+tar xzf aipc-hailo15-<version>.tar.gz
+cd aipc-hailo15-<version>
+./deploy.sh
 ```
 
-Expected output (key stages excerpted; per-file `+ xxx -> ...` logs omitted):
+When `Proceed with deployment? [y/N]` appears, verify the target and enter `y`. A successful deployment includes:
 
-```plaintext
-[deploy]   AIPC Hot-swap Deploy
-[deploy]   Current version:  unknown (first deploy) or previous version
-[deploy]   Package version:  1.0.0
-[deploy]   Config deploy:    yes
-[deploy]   Install prefix:   /data/aipc
-Proceed with deployment? [y/N] y
-[deploy] [1/8] Creating runtime directories...
-[deploy] [2/8] Backing up current installation...
-[deploy] [3/8] Stopping services for hot-swap...
-[deploy] [4/8] Deploying binaries...
-[deploy] [5/8] Deploying firstboot initialization script...
-[deploy] [6/8] Deploying HAL libraries...
-[deploy] [7/8] Deploying configs and systemd units...
-[deploy] [8/8] Starting services...
-[deploy] Running health checks (timeout 15s)...
-[deploy] Service status:
-[deploy]   aipc-healthmon: active
-[deploy]   event-bus: active
-[deploy]   camera-daemon: active
-[deploy]   ai-runtime: active
-[deploy]   platform-api: active
-[deploy]   app-manager: active
-[deploy]   device-control: active
-[deploy]   device-discovery: active
+```text
 [deploy]   Deploy successful!
-[deploy]   Version: 1.0.0
+[deploy]   Version: <version>
 ```
 
-### 1.3 deploy.sh Options
+The install path is fixed at `/data/aipc`. Before deployment, the script checks the package version and compatibility metadata; incompatible packages do not stop the existing services.
 
-| Option | Description |
-|--------|-------------|
-| `--force` | Force deployment, skip confirmation prompts |
-| `--rollback` | Roll back to previous version |
-| `--status` | Display current deployment status |
-| `--no-config` | Skip config file overwrite (preserve device config) |
+Common options:
 
-> The install path is fixed at `/data/aipc` and cannot be customized (the root partition is 3.3G / 99% used and cannot fit the release package).
+| Option | Effect |
+|:---|:---|
+| `--force` | Skip confirmation; compatibility checks still run |
+| `--no-config` | Preserve the device's existing configuration |
+| `--status` | Show the current version and backup information |
+| `--rollback` | Restore the previous version from the latest backup |
 
-Complete examples:
+## 4. Verify or Roll Back
+
+After signing in again, open `Settings → Device Info` and confirm that `Firmware Version` has changed.
+
+Verify through SSH:
 
 ```bash
-./deploy.sh --force              # Force deploy (skip confirmation)
-./deploy.sh --rollback           # Roll back to previous version
-./deploy.sh --status             # Check deployment status
+cat /data/aipc/VERSION
+systemctl is-active platform-api
+systemctl --failed
 ```
 
-## 2. Release Package Contents
-
-`aipc-hailo15-<version>.tar.gz` contains:
-
-| Path | Contents |
-|------|----------|
-| `opt/aipc/bin/` | Platform service binaries + CLI + tools |
-| `opt/aipc/scripts/` | Ops scripts (firstboot / healthmon / logrotate) |
-| `opt/aipc/lib/hal/` | HAL shared libraries |
-| `opt/aipc/etc/` | YAML configuration |
-| `opt/aipc/etc/security/` | seccomp policies |
-| `opt/aipc/web/` | Web console |
-| `opt/aipc/swagger-ui/` | API documentation |
-| `opt/aipc/models/` | Model directory (empty, requires separate download) |
-| `systemd/` | systemd service units |
-| `deploy.sh` | Hot-swap deployment script |
-| `VERSION` | Version metadata |
-
-## 3. Deployment Verification
-
-After deployment, confirm the AIPC services are running on the device. Start with the platform liveness endpoint (`GET /system/health`, a public endpoint requiring no auth; see [RESTful API](../4-application-guide/3-reference/3-restful-api.md#3-system-management)), then verify key services are active:
+If services are unhealthy, run the following from the release package directory:
 
 ```bash
-systemctl status platform-api
+./deploy.sh --rollback
 ```
 
-For the full service list and startup-failure troubleshooting, see [Troubleshooting · Service Startup Failure](../5-troubleshooting.md#82-service-startup-failure). Access the Web console at `https://<device-ip>` with default credentials `admin` / `password`.
+Rollback requires an available device backup.
 
-## 4. Related Documentation
+## 5. Related Documentation
 
-- [Developer Guide](./1-developer-guide.md) — Environment setup and building
-- [System Architecture](./0-system-architecture.md) — Four-layer architecture and core services
-- [System Flashing](./2-system-flashing.md) — System image flashing
+- [Developer Guide](./1-developer-guide.md) — Build the platform software release package
+- [System Flashing](./2-system-flashing.md) — Install or upgrade the `.swu` system OS
+- [Version Matrix](./5-version-matrix.md) — Component versions and compatibility
+- [Troubleshooting](../5-troubleshooting.md) — Service, network, and storage issues
+- [NeoRuntime deployment guide](https://github.com/camthink-ai/neoruntime/blob/main/docs/deployment/DEPLOYMENT.md) — `deploy.sh` reference

@@ -1,112 +1,103 @@
 ---
-description: NE503 平台软件部署指南，涵盖发布包部署和部署验证。
-keywords: [NE503, 部署, deploy.sh, systemd]
-tags: [平台开发, NE503, 部署, 运维]
+description: NE503 平台软件安装与升级指南，包含网页升级、SSH 部署、版本验证和回滚。
+keywords: [NE503, 平台软件, 网页升级, OTA, deploy.sh, 发布包]
+tags: [应用指南, NE503, 软件部署, 运维]
 ---
 
 # Software Deployment
 
-本文档说明如何将 NE503 平台软件发布包部署到设备上运行。平台软件包括平台服务、HAL 库、Web 控制台等，区别于系统镜像（hailo-os）的烧录 — 后者请参阅 [System Flashing](./2-system-flashing.md)。
+本页用于安装或升级 NE503 平台软件发布包（`.tar.gz`）。平台软件包含平台服务、HAL 库和 Web 控制台。
 
-> 前置条件：已完成 [Developer Guide](./1-developer-guide.md) 中的环境搭建和构建，产出 `build/release/aipc-hailo15-<version>.tar.gz` 发布包。
+系统 OS 使用 `.swu` 包，流程不同，请参阅[系统烧录](./2-system-flashing.md)。
 
-## 1. 发布包部署
+## 1. 准备发布包
 
-### 1.1 传输发布包
+从 [neoruntime Releases](https://github.com/camthink-ai/neoruntime/releases) 下载，或在源码仓库构建：
+
+```bash
+make pack-release VERSION=<version>
+ls -lh build/release/aipc-hailo15-<version>.tar.gz
+```
+
+构建要求见[开发指南](./1-developer-guide.md)。开始前确认：
+
+- 目标设备为 NE503，且 Web 控制台或 SSH 可用。
+- 网页升级使用管理员账号；SSH 部署需要 `root` 权限。
+- `/data` 可写且空间足够：`df -h /data`。
+- 升级期间保持供电和网络稳定，并记录当前 `Firmware Version`。
+
+## 2. 通过网页升级
+
+网页升级适用于已经运行且可以访问 Web 控制台的设备。
+
+1. 打开 `https://<device-ip>`，登录管理员账号。
+2. 进入 `Settings → Device Info`。
+3. 在 `Firmware & Hardware` 中找到 `Firmware Version`，点击对应的 `Update`。不要点击 `System OS Version` 的 `Update`。
+
+   ![平台软件升级窗口](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/software-guide/software-deployment/software-upgrade.jpg)
+
+4. 上传一个 `aipc-hailo15-<version>.tar.gz` 文件。
+5. 确认供电稳定，勾选 `I understand and wish to continue with the upgrade`，点击 `Confirm Update`。
+6. 等待上传、写入和重启完成。期间不要刷新页面、重复点击或断电。
+7. 设备重新上线后重新登录，在 `Firmware Version` 中确认目标版本。
+
+升级完成的判断：设备重新上线、可以重新登录，且 `Firmware Version` 显示目标版本。出现 `Device offline` 时，先检查供电和网络，再点击 `Re-detect`。
+
+## 3. 通过 SSH 安装或升级
+
+首次安装或网页不可用时，在设备上执行 `deploy.sh`：
 
 ```bash
 scp build/release/aipc-hailo15-<version>.tar.gz root@<device-ip>:/data/
-```
-
-### 1.2 执行部署
-
-```bash
 ssh root@<device-ip>
-# root 分区已满（3.3G、已用 99%），直接在 /data 分区解压
-cd /data && tar xzf aipc-hailo15-<version>.tar.gz
-cd aipc-hailo15-<version> && ./deploy.sh
+cd /data
+tar xzf aipc-hailo15-<version>.tar.gz
+cd aipc-hailo15-<version>
+./deploy.sh
 ```
 
-预期输出（节选关键阶段，省略逐文件 `+ xxx -> ...` 日志）：
+看到 `Proceed with deployment? [y/N]` 后确认并输入 `y`。部署成功时日志包含：
 
-```plaintext
-[deploy]   AIPC Hot-swap Deploy
-[deploy]   Current version:  unknown（首次）或旧版本号
-[deploy]   Package version:  1.0.0
-[deploy]   Config deploy:    yes
-[deploy]   Install prefix:   /data/aipc
-Proceed with deployment? [y/N] y
-[deploy] [1/8] Creating runtime directories...
-[deploy] [2/8] Backing up current installation...
-[deploy] [3/8] Stopping services for hot-swap...
-[deploy] [4/8] Deploying binaries...
-[deploy] [5/8] Deploying firstboot initialization script...
-[deploy] [6/8] Deploying HAL libraries...
-[deploy] [7/8] Deploying configs and systemd units...
-[deploy] [8/8] Starting services...
-[deploy] Running health checks (timeout 15s)...
-[deploy] Service status:
-[deploy]   aipc-healthmon: active
-[deploy]   event-bus: active
-[deploy]   camera-daemon: active
-[deploy]   ai-runtime: active
-[deploy]   platform-api: active
-[deploy]   app-manager: active
-[deploy]   device-control: active
-[deploy]   device-discovery: active
+```text
 [deploy]   Deploy successful!
-[deploy]   Version: 1.0.0
+[deploy]   Version: <version>
 ```
 
-### 1.3 deploy.sh 参数
+安装路径固定为 `/data/aipc`。部署前脚本会检查发布包版本和兼容性信息；不匹配时不会停止现有服务。
 
-| 参数 | 说明 |
-|------|------|
-| `--force` | 强制部署，跳过确认提示 |
-| `--rollback` | 回滚到上一版本 |
-| `--status` | 查看当前部署状态 |
-| `--no-config` | 跳过配置文件覆盖（保留设备上的配置） |
+常用参数：
 
-> 安装路径固定为 `/data/aipc`，不支持自定义（root 分区 3.3G 已用 99%，装不下发布包）。
+| 参数 | 作用 |
+|:---|:---|
+| `--force` | 跳过确认提示，不跳过兼容性检查 |
+| `--no-config` | 保留设备现有配置 |
+| `--status` | 查看当前版本和备份信息 |
+| `--rollback` | 从最近备份恢复上一版本 |
 
-完整示例：
+## 4. 升级后验证与回滚
+
+网页重新登录后，进入 `Settings → Device Info`，确认 `Firmware Version` 已更新。
+
+SSH 验证：
 
 ```bash
-./deploy.sh --force              # 强制部署（跳过确认）
-./deploy.sh --rollback           # 回滚到上一版本
-./deploy.sh --status             # 查看部署状态
+cat /data/aipc/VERSION
+systemctl is-active platform-api
+systemctl --failed
 ```
 
-## 2. 发布包内容
-
-`aipc-hailo15-<version>.tar.gz` 包含以下内容：
-
-| 路径 | 内容 |
-|------|------|
-| `opt/aipc/bin/` | 平台服务二进制 + CLI + 工具 |
-| `opt/aipc/scripts/` | 运维脚本（firstboot / healthmon / logrotate） |
-| `opt/aipc/lib/hal/` | HAL 共享库 |
-| `opt/aipc/etc/` | YAML 配置 |
-| `opt/aipc/etc/security/` | seccomp 策略 |
-| `opt/aipc/web/` | Web 控制台 |
-| `opt/aipc/swagger-ui/` | API 文档 |
-| `opt/aipc/models/` | 模型目录（空，需单独下载） |
-| `systemd/` | systemd 服务单元 |
-| `deploy.sh` | 热替换部署脚本 |
-| `VERSION` | 版本元数据 |
-
-## 3. 部署验证
-
-部署完成后在设备上确认 AIPC 服务正常。先用平台健康端点快速探测 API 存活（`GET /system/health`，公开端点无需鉴权，见 [RESTful API](../4-application-guide/3-reference/3-restful-api.md#3-系统管理)），再确认关键服务 active：
+如果服务异常，在发布包目录执行：
 
 ```bash
-systemctl status platform-api
+./deploy.sh --rollback
 ```
 
-全部服务列表与启动失败排查见[故障排查 · 服务启动失败](../5-troubleshooting.md#82-服务启动失败)。浏览器访问 `https://<device-ip>`，默认凭据 `admin` / `password`。
+回滚需要设备上存在可用备份。
 
-## 4. 相关文档
+## 5. 相关文档
 
-- [Developer Guide](./1-developer-guide.md) — 开发环境搭建和构建
-- [System Architecture](./0-system-architecture.md) — 四层架构、数据链路与服务清单（服务启动依赖见其 §3.3）
-- [System Flashing](./2-system-flashing.md) — 系统镜像烧录
+- [开发指南](./1-developer-guide.md) — 构建平台软件发布包
+- [系统烧录](./2-system-flashing.md) — 安装或升级 `.swu` 系统 OS
+- [版本对照](./5-version-matrix.md) — 查看组件版本和兼容性
+- [故障排查](../5-troubleshooting.md) — 服务、网络和存储问题
+- [NeoRuntime deployment guide](https://github.com/camthink-ai/neoruntime/blob/main/docs/deployment/DEPLOYMENT.md) — `deploy.sh` 说明

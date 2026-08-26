@@ -1,270 +1,191 @@
 ---
-description: NE503 AIPC platform architecture deep dive, covering the four-layer architecture, end-to-end data path, 7 platform services, HAL v2 hardware abstraction, zero-copy optimization, and multi-platform support. Designed to help developers and integrators thoroughly understand system design and data flow.
-keywords: [NE503 architecture, AIPC platform, HAL hardware abstraction, zero-copy, gRPC, DMA-BUF, edge AI, Python SDK, event bus]
-tags: [platform architecture, NE503, edge AI, developer documentation, system design]
+description: "NE503 software platform architecture overview: the relationship between application containers, platform services, HAL, and hardware, plus the main path from image capture to inference results. Implementation details and interface definitions link to the NeoRuntime source repository."
+keywords: [NE503 architecture, AIPC platform, platform services, HAL, data flow, application containers, AI inference, NeoRuntime]
+tags: [Platform Architecture, NE503, Edge AI, Developer Documentation, System Design]
 ---
 
 # System Architecture
 
-The NE503 software stack has four layers: application containers, platform services, hardware abstraction (HAL), and hardware. This page helps you understand three things: **how the system is layered, how a frame travels from the sensor to the detection result your app receives, and which hardware each service operates through the HAL**. After reading, you can locate where a feature lives (what to change), follow the data path (which stream to subscribe to), and follow the links at the end to the open-source repository for implementation-level depth.
+The NE503 software platform has four layers: **application containers → platform services → HAL hardware abstraction → hardware**. This page explains only how the layers divide responsibilities and how data moves between them. For service APIs, configuration fields, sockets, startup dependencies, and HAL implementation details, use the source-repository links at the end of the page.
 
-## 1. Four-Layer Architecture Overview
+## 1. Four-Layer Platform Architecture
 
 ```mermaid
-graph TB
-    subgraph "Application Container Layer"
-        APP["Business Services\nPython / Go / C++"]
-    end
+flowchart TB
+APP["Application Layer<br/>Containers & AI Pipelines"]
 
-    subgraph "Platform Services Layer"
-        GO["Go Microservices"]
-        CPP["C++ Daemons"]
-    end
+subgraph PLATFORM["Platform Services Layer"]
+direction LR
 
-    subgraph "Hardware Abstraction Layer HAL"
-        HAL["HAL Unified Interface"]
-    end
+DP["Data Plane<br/>camera-daemon<br/>ai-runtime"]
 
-    subgraph "Hardware Layer"
-        SOC["SoC (Current: Hailo-15H)"]
-    end
+CP["Control Plane<br/>API · Lifecycle<br/>Events · Device"]
 
-    APP -- "SDK gRPC" --> GO
-    APP -- "SDK gRPC + SHM" --> CPP
-    GO -- gRPC --> CPP
-    CPP -- "HAL Unified Interface" --> HAL
-    HAL -- Driver --> SOC
+end
+
+HAL["HAL v2<br/>Unified Hardware Interfaces<br/>Video · AI · Codec · IO"]
+
+HW["Hardware Layer<br/>Sensor · NPU · MCU"]
+
+
+APP -->|SDK / gRPC| CP
+
+APP -->|Media API| DP
+
+CP -->|Control| DP
+
+DP -->|DMA-BUF<br/>Inference Buffer| HAL
+
+HAL --> HW
+
+
+classDef app fill:#e3f2fd,stroke:#1565c0,color:#000
+classDef platform fill:#e8f5e9,stroke:#2e7d32,color:#000
+classDef hal fill:#fce4ec,stroke:#ad1457,color:#000
+classDef hw fill:#efebe9,stroke:#4e342e,color:#000
+
+
+class APP app
+class DP,CP platform
+class HAL hal
+class HW hw
 ```
 
-| Layer | What it governs | Notes |
+| Layer | Main Responsibility | Relationship to Upper Layer |
 |:---|:---|:---|
-| Application Container Layer | Third-party AI applications, model inference pipelines | Python/Go/C++, containerized runtime |
-| Platform Services Layer | Camera management, AI inference, container management, event dispatch, device control, API gateway, device discovery | Go microservices + C++ daemons |
-| Hardware Abstraction Layer | A unified interface for all hardware (NPU/sensor/encoders/peripherals) | Services call only the HAL; they never touch hardware directly |
-| Hardware Layer | SoC, NPU, ISP, sensors, MCU | Hailo-15H (current), RKxxx / Jetson (extensible) |
+| Application Containers | Run business applications, model pipelines, and integration logic | Use device capabilities through SDK or platform interfaces; do not access hardware directly |
+| Platform Services · Data Plane | `camera-daemon` manages media pipeline outputting encoded streams & raw frames; `ai-runtime` schedules NPU inference | Receive application requests, orchestrate video/inference data flows |
+| Platform Services · Control Plane | `platform-api` provides HTTP gateway, `app-manager` manages containers, `event-bus` distributes events, `device-control` drives peripherals, `device-discovery` discovers devices | Handle control commands, lifecycle, event distribution; do not move video frames directly |
+| HAL v2 | Unified C interfaces for video, inference, codec, peripherals, and buffers | Hides SoC and vendor runtime differences; dynamically loads platform implementations |
+| Hardware & Vendor Runtimes | Execute image capture, encoding, NPU inference, and MCU peripheral control | Driven by platform-specific HAL implementations (Hailo-15 / Stub) |
 
-How the four layers cooperate in a single inference is the next section.
+## 2. End-to-End Data Flow
 
----
+Video, AI inference, and peripheral control are separated into three independent paths, corresponding to media processing, inference service, and device control flows in the source repository.
 
-## 2. End-to-End Data Path
-
-A frame's journey from the sensor to the detection result your app receives follows a single pipeline:
-
-```mermaid
-graph LR
-    SENSOR["IMX678 sensor (4K)"] -->|MIPI| ISP["ISP image processing"]
-    ISP -->|GStreamer pipeline| CAM["camera-daemon"]
-    CAM -->|hardware scaling| MAIN["main stream 4K@30"]
-    CAM -->|hardware scaling| SUB["sub stream 720p@30"]
-    CAM -->|hardware scaling| THIRD["third stream 640x384@15"]
-    MAIN -->|H.264| R1["RTSP :8554/main"]
-    SUB -->|H.264| R2["RTSP :8554/sub"]
-    THIRD -->|H.264| R3["RTSP :8554/third"]
-    SUB -.raw NV12 frames (zero-copy).-> AIRT["ai-runtime"]
-    THIRD -.raw NV12 frames (zero-copy).-> AIRT
-    AIRT -->|HAL.ML| NPU["NPU inference"]
-    NPU -->|"results carry frame_sequence + timestamp_ns"| APP["app container (SDK subscribe)"]
-    NPU --> EBUS["event-bus (detection events)"]
-    NPU -->|"Overlay detection boxes onto the picture"| R1
-```
-
-Capture, scaling, encoding, RTSP, and raw-frame distribution are handled by camera-daemon; inference scheduling by ai-runtime. Both operate the hardware through the unified HAL interface (see §4). Peripheral control (light/PTZ/GPIO) takes a separate path: app → device-control (gRPC) → HAL.IO → MCU.
-
-As shown in the diagram, only `sub` and `third` hand **raw NV12 frames** (unencoded) to ai-runtime zero-copy; `main` outputs encoded H.264 only — the key constraint of the inference path:
-
-> When subscribing for inference, `stream` must be `sub` or `third`; specifying `main` will never yield results. Full stream parameters (resolution/bitrate/GOP/raw frames) are in [Video and Imaging · RTSP Integration](../2-user-guide/1-media-and-image.md#rtsp-integration).
-
-### How Detections Stay Aligned with Frames, Events, and the Picture
-
-Every inference result carries `frame_sequence` (frame number) and `timestamp_ns` (nanosecond timestamp); all three consumers share them:
-
-- **Fetch the raw frame**: the app calls `FdMediaClient.get_frame()` to grab the very same frame (snapshots, post-processing);
-- **Event timing**: detection events on the event bus carry the same timestamp for correlating with business systems;
-- **On-picture overlay**: the platform draws detection boxes onto the encoded picture per the `stream_map` config (factory default `third:main,sub:main`) — the boxes you see in RTSP/Web, the inference results, and the events are aligned to the same frame.
-
-### Why Apps Never Touch Hardware Directly
-
-An app container has no direct access to the NPU, sensor, or encoders:
-
-1. **Calls go through services**: the SDK talks to platform services (inference, events, device control) over Unix Sockets; the services operate the hardware via the HAL on the app's behalf;
-2. **Permissions are the contract**: what an app may call is declared in `app.yaml` `permissions`; undeclared calls are rejected by the platform;
-3. **Five-layer sandbox**: containers run under namespace isolation, capability dropping, seccomp syscall filtering, cgroups resource limits, and a read-only rootfs.
-
-See [security-architecture.md](https://github.com/camthink-ai/neoruntime/blob/main/docs/architecture/security-architecture.md) in the open-source repository for the full isolation and security design.
-
----
-
-## 3. Platform Services Layer
-
-Platform services fall into two groups: the **data plane** (ai-runtime, camera-daemon — the movers of frames and inference, performance-critical, C++) and the **management plane** (the other five — lifecycle, events, API, peripherals, discovery, Go microservices). Services communicate via gRPC over Unix Domain Sockets; the REST API is exposed externally through the platform-api gateway (internal `127.0.0.1:8080`, via nginx `:443`).
-
-### 3.1 Service Collaboration
-
-platform-api is the unified external entry point, aggregating every service's gRPC interfaces; event-bus is the messaging hub that nearly all services publish to; camera-daemon and device-control cooperate over a dedicated socket for lens control.
+### Video and Media Path
 
 ```mermaid
 flowchart LR
-    API["platform-api<br/>REST · WebSocket"]
-    Cam["camera-daemon"]
-    AI["ai-runtime"]
-    Bus{{"event-bus"}}
-    AppMgr["app-manager"]
-    DevCtrl["device-control"]
+    SENSOR[Sensor / ISP] --> CAM["camera-daemon"]
+    CAM --> SHM["Raw Frames SHM / DMA-BUF\n→ ai-runtime"]
+    CAM --> ENC["Encoded H.264 / H.265\n→ RTSP / Remote Access"]
+    CAM --> HBUF[hal_buffer.h\nUnified Frame Buffer]
 
-    API -->|gRPC aggregate| AI
-    API -->|gRPC aggregate| AppMgr
-    API -->|gRPC aggregate| DevCtrl
-    API -->|gRPC aggregate| Bus
-    API -->|camera-control.sock| Cam
-    AppMgr -->|schedule containers| AI
-    DevCtrl -->|camera-control.sock| Cam
-    Cam -.publish events.-> Bus
-    AI -.publish events.-> Bus
-    DevCtrl -.publish events.-> Bus
+    classDef src fill:#e3f2fd,stroke:#1565c0,color:#000
+    classDef svc fill:#e8f5e9,stroke:#2e7d32,color:#000
+    classDef out fill:#fff3e0,stroke:#ef6c00,color:#000
+    classDef hal fill:#fce4ec,stroke:#880e4f,color:#000
+
+    class SENSOR src
+    class CAM svc
+    class SHM,ENC out
+    class HBUF hal
 ```
 
-device-discovery is relatively independent: it manages external managed devices via MQTT/UDP and consumes no other platform services, so it is not in the diagram. The gRPC contract authority is the [source repository](https://github.com/camthink-ai/neoruntime)'s proto and YAML files; this page does not restate them.
+- `camera-daemon` manages the imaging pipeline via HAL, provides zero-copy raw frames (DMA-BUF) to `ai-runtime`, and outputs encoded streams for RTSP/remote access.
 
-### 3.2 Socket Overview
-
-Internal communication goes over `/run/aipc/*.sock` (for on-device diagnosis, use `ss -x | grep aipc` or `systemctl status`). The single exception: event-bus also listens on TCP `127.0.0.1:50053` for Hailo C++ gRPC clients (the Hailo gRPC library lacks a unix socket resolver).
-
-| Socket | Provider | Consumers | Purpose |
-|:--|:--|:--|:--|
-| `/run/aipc/camera.sock` | camera-daemon | ai-runtime | Raw-frame fd receiving (SCM_RIGHTS zero-copy) |
-| `/run/aipc/camera-control.sock` | camera-daemon | device-control, platform-api | Lens control (lens_hal protocol) |
-| `/run/aipc/ai-runtime.sock` | ai-runtime | SDK apps, platform-api, app-manager | Inference (inference.proto) |
-| `/run/aipc/app-manager.sock` | app-manager | platform-api | App lifecycle (app.proto) |
-| `/run/aipc/event-bus.sock` | event-bus | all services, SDK apps | Event pub/sub (event.proto) |
-| `/run/aipc/device-control.sock` | device-control | SDK apps, platform-api | Peripheral control (device.proto) |
-| `/run/aipc/device-discovery.sock` | device-discovery | platform-api | Device discovery (discovery.proto) |
-
-### 3.3 Startup Dependencies
-
-Startup dependencies come from the [systemd unit declarations](https://github.com/camthink-ai/neoruntime/tree/main/systemd) (`After` / `Wants`). Shared prerequisites for every service: `aipc-restore.service`, `aipc-firstboot.service`, `network.target`; the table lists only what is **specific** to each service:
-
-| Service | Specific dependencies |
-|:--|:--|
-| camera-daemon | After `aipc-mcu-prep`, `isp_media_server`, `hailort_server` |
-| ai-runtime | After + Wants `containerd.service` |
-| event-bus, device-discovery | none specific |
-| device-control | After + Wants **camera-daemon**; After `aipc-mcu-prep` |
-| app-manager | Wants `ai-runtime`, `event-bus`, `containerd` |
-| platform-api | After + Wants `ai-runtime`, `app-manager`, `device-control`, `event-bus` |
-
-Troubleshooting notes:
-
-- **camera-daemon has the deepest base-unit chain** (MCU prep → ISP media server → HailoRT server) — for picture issues, check `systemctl status isp_media_server hailort_server` before camera-daemon itself;
-- ai-runtime starts in parallel with camera-daemon and connects via socket retry — ai-runtime coming up before camera-daemon is normal;
-- platform-api starts last; `After` guarantees ordering, not readiness (Wants is a weak dependency — a failed dependency still lets it start).
-
-### 3.4 Service Inventory
-
-All paths below are relative to the [neoruntime repository](https://github.com/camthink-ai/neoruntime) root.
-
-| Service | Responsibility | Source entry |
-|:--|:--|:--|
-| camera-daemon (C++) | Hardware abstraction entry: sensor, ISP, H.264/H.265 encoding, RTSP, MCU communication, audio; hands frames downstream zero-copy via DMA-BUF fds | `platform/camera-daemon/`, proto `camera.proto`/`lens_hal.proto`, design doc `docs/services/CAMERA_DAEMON_DESIGN.md` |
-| ai-runtime (C++) | AI inference runtime: HEF model loading, single-shot/streaming inference, NPU scheduling, CLIP text encoding, GenAI streaming and post-processing; results auto-published to event-bus | `platform/ai-runtime/`, proto `inference.proto`, reference `docs/services/ai-runtime.md` |
-| app-manager | Container app lifecycle: wraps containerd for app/image/container install, start/stop, logs, exec, Web URL registration | `platform/app-manager/`, proto `app.proto` |
-| event-bus | Platform messaging hub: pub/sub, batch publish, topic management, wildcard subscription | `platform/event-bus/`, proto `event.proto` |
-| device-control | Peripheral control: PTZ, lens, fill light/IR LED/IR-Cut, fan/heater/radar, alarm output (relay/Wiegand), RS485, GPIO | `platform/device-control/`, proto `device.proto` |
-| device-discovery | CamThink device discovery and management: CT-Disc protocol (LAN UDP multicast `239.255.255.250:19850`, CAT1 via MQTT registration), SN-keyed device registry, heartbeat and management commands | `platform/device-discovery/`, proto `discovery.proto` |
-| platform-api | HTTP/WebSocket gateway: aggregates each service's gRPC, exposes REST APIs and WebSocket externally, hosts the web console backend and authentication | `platform/platform-api/` + frontend `web/` |
-
----
-
-## 4. Hardware Abstraction Layer (HAL)
-
-The HAL is the only channel between platform services and hardware: porting to a new SoC means rewriting the HAL implementation only — all service-layer code stays untouched.
-
-### 4.1 HAL Interface Overview
-
-HAL headers are organized by component subdirectory under `hal_v2/include/`:
-
-| Directory | Coverage |
-|:---|:---|
-| `media/` | Video capture, encoding (H.264/H.265), OSD, ISP, audio, profile management |
-| `model/` | Model inference, post-processing (NMS), GenAI (LLM/VLM), visualization, CLIP text encoding |
-| `dsp/` | Crop, scale, format conversion, privacy mask, stabilization |
-| `peripheral/` | MCU communication, GPIO/sensor; device layer includes LED, lens, alarm, RS485, RTC, OTA, etc. |
-| `common/` | Common enums/error codes, `HalFrameBuffer` frame buffer, basic types, logging |
-
-Which service consumes which HAL sub-interface (e.g., ai-runtime consumes the `model/` inference interfaces, camera-daemon consumes the `media/` capture/encoding interfaces) is documented in the [HAL v2 overview](https://github.com/camthink-ai/neoruntime/blob/main/docs/architecture/hal_v2_overview.md) in the open-source repository.
-
-### 4.2 Core Data Structure: HalFrameBuffer
-
-`HalFrameBuffer` is the platform's core frame data carrier: frame metadata (dimensions, pixel format, timestamp) and memory descriptors (DMA-BUF fd, stride) are packaged together and passed between capture, inference, and encoding modules. It supports DMA-BUF zero-copy and CPU memory modes, with lifecycle managed by reference counting — the entire video → AI → encoding pipeline shares the same DMA-BUF without memory copying.
-
-> For the complete struct definition, see the GitHub repository under `hal_v2/include/common/`.
-
-### 4.3 Multi-Platform Support
+### AI Inference and Event Path
 
 ```mermaid
-graph LR
-    HAL_API["HAL Unified Interface hal_*.h"] --> STUB["Stub Implementation (local testing)"]
-    HAL_API --> HAILO["Hailo-15 Implementation (NPU acceleration)"]
-    HAL_API --> RK["RKxxx Implementation (Rockchip)"]
-    HAL_API --> JETSON["Jetson Implementation (NVIDIA)"]
+flowchart TB
+    FRAME["Raw Frames<br/>SHM / DMA-BUF<br/>camera-daemon"]
+    AIRT["ai-runtime<br/>Model · Session · Scheduler"]
+    HAL["HAL Inference API<br/>hal_inference.h"]
+    NPU[NPU]
+    POST["Post-processing"]
+    RES["Inference Results"]
+    EB["event-bus"]
+
+    subgraph SUBS["Result Subscribers"]
+        direction LR
+        BIZ["Business Service<br/>Container"]
+        MODEL["Model Service<br/>Container"]
+        WEB["Web Console<br/>via platform-api"]
+    end
+
+    FRAME -->|DMA-BUF / SHM| AIRT
+    AIRT --> HAL
+    HAL --> NPU
+    NPU --> POST
+    POST --> RES
+    RES -->|When event publishing is enabled| EB
+    EB -->|Pub/Sub| BIZ
+    EB -->|Pub/Sub| MODEL
+    EB -->|HTTP API| WEB
+
+    classDef src fill:#e1f5fe,stroke:#01579b,color:#000
+    classDef svc fill:#e8f5e9,stroke:#1b5e20,color:#000
+    classDef hal fill:#fce4ec,stroke:#880e4f,color:#000
+    classDef hw fill:#efebe9,stroke:#3e2723,color:#000
+    classDef out fill:#fff3e0,stroke:#e65100,color:#000
+    classDef bus fill:#f3e5f5,stroke:#4a148c,color:#000
+
+    class FRAME src
+    class AIRT svc
+    class HAL hal
+    class NPU hw
+    class POST,RES out
+    class EB bus
+    class BIZ,MODEL,WEB src
 ```
 
-Current implementations: Hailo-15 (complete) + Stub (a complete stub implementation for hardware-free development). To support a new SoC, implement the corresponding HAL interfaces — the service layer and all apps stay untouched.
+- `ai-runtime` receives raw frames from `camera-daemon`, schedules the NPU through the HAL inference API, and performs model inference and post-processing.
+- When event publishing is enabled, `ai-runtime` publishes inference results to `event-bus`: business and model containers receive them through Pub/Sub, while the Web Console obtains them through `platform-api`.
 
----
-
-## 5. Web Console
-
-The web console is the device's management interface: device info and network settings, live preview, model and application management, peripheral control, and log viewing (including a WebSocket terminal and live container logs).
-
-Access it at `https://<device-ip>` (development and usage details in [web-console.md](https://github.com/camthink-ai/neoruntime/blob/main/docs/services/web-console.md) in the open-source repository).
-
----
-
-## 6. Key Technical Features
-
-### 6.1 Zero-Copy Optimization
+### Peripheral Control Path
 
 ```mermaid
-sequenceDiagram
-    participant S as Sensor
-    participant CAM as camera-daemon
-    participant AI as ai-runtime
-    participant E as Encoder
+flowchart TB
+    APP["Application / Web / SDK"]
+    API["platform-api"]
+    DC["device-control<br/>gRPC"]
+    HIO["HAL.IO<br/>hal_io.h"]
+    MCU["MCU<br/>UART"]
+    PERI["Light · PTZ · GPIO · Lens"]
+    FB["Status Feedback"]
 
-    S->>CAM: Capture raw data, create DMA-BUF
-    CAM->>AI: Pass DMA-BUF fd via SCM_RIGHTS (no memory copy)
-    AI->>AI: HAL.ML schedules NPU inference
-    CAM->>E: Route same DMA-BUF to encoding module
-    Note over CAM,E: DMA-BUF lifecycle managed by reference counting
+    APP -->|HTTP / gRPC| API
+    API -->|gRPC| DC
+    DC --> HIO
+    HIO -->|MCU protocol| MCU
+    MCU --> PERI
+    PERI --> FB
+    FB -->|Status / Events| DC
+
+    classDef app fill:#e1f5fe,stroke:#01579b,color:#000
+    classDef svc fill:#fff3e0,stroke:#e65100,color:#000
+    classDef hal fill:#fce4ec,stroke:#880e4f,color:#000
+    classDef hw fill:#efebe9,stroke:#3e2723,color:#000
+    classDef peri fill:#fff3e0,stroke:#ef6c00,color:#000
+    classDef feedback fill:#f3e5f5,stroke:#4a148c,color:#000
+
+    class APP app
+    class API,DC svc
+    class HIO hal
+    class MCU hw
+    class PERI peri
+    class FB feedback
 ```
 
-Core mechanisms:
-- `HalFrameBuffer` passes DMA-BUF file descriptors via `dma_fds[]`, enabling zero-copy throughout the video -> AI -> encoding pipeline
-- Reference counting manages frame lifecycle (`hal_frame_buffer_ref` / `hal_frame_buffer_release`)
-- FD passing between ai-runtime and camera-daemon via `SCM_RIGHTS` (no memory copy required)
+- External requests are normally forwarded through `platform-api` to `device-control`; `device-control` drives lights, PTZ, GPIO, and lenses through `HAL.IO` and the MCU protocol, with status and events returning along the feedback path.
+- In the current implementation, lens control may also use `device-control`'s CameraControl interface to `camera-daemon`; see the source repository for the complete branch.
 
-### 6.2 Event-Driven Architecture
+> These paths describe only platform component relationships. For detailed service responsibilities, API methods, message formats, configuration, and deployment, see the [NeoRuntime architecture overview](https://github.com/camthink-ai/neoruntime/blob/main/docs/architecture/README.md) and the corresponding documents in the source repository.
 
-The Event Bus uses a publish/subscribe pattern with MQTT-style wildcard matching (`*` single level, `**` multi-level, `**/suffix` suffix). AI inference results are published under `inference/{model_id}/{stream_id}`, and app custom events under `app/{app_id}/...`. All inference results, container events, and device events generated by services are dispatched through the Event Bus; third-party applications subscribe using the SDK's `EventClient`. Topic naming rules, wildcard matching, and subscription code are covered in [Event Integration](../4-application-guide/3-reference/5-event-integration.md).
+## 3. Go Deeper in the Source Repository
 
-### 6.3 Containerized Application Platform
+The following implementation and interface references are maintained in the source repository rather than duplicated on this page:
 
-- containerd runtime with OCI standard images — apps ship as standard Docker images, decoupled from the platform
-- Multi-container support (Main + Sub): declared dependencies are pulled up automatically by the platform; you don't orchestrate startup order yourself
-- Health checks (Command / HTTP / TCP) plus automatic restart with backoff — a restarted app surfaces no error to the user, so design your app to be idempotent (receiving the same frame/event twice must not cause side effects)
+- [Architecture overview and complete data flows](https://github.com/camthink-ai/neoruntime/blob/main/docs/architecture/README.md) — layered architecture, core components, data flows, deployment, and security design
+- [HAL v2 overview](https://github.com/camthink-ai/neoruntime/blob/main/docs/architecture/hal_v2_overview.md) — HAL interfaces, platform implementations, and hardware-abstraction boundaries
+- [Platform-service documentation](https://github.com/camthink-ai/neoruntime/tree/main/docs/services) — detailed documentation for `ai-runtime`, `camera-daemon`, `event-bus`, `device-control`, and other services
+- [Service configurations](https://github.com/camthink-ai/neoruntime/tree/main/configs) — configuration templates for the platform services
+- [Platform source and protos](https://github.com/camthink-ai/neoruntime/tree/main/platform) — service implementations, gRPC interfaces, and message definitions
+- [NE503 SDK repository](https://github.com/camthink-ai/neoruntime-sdks) — Python / C++ SDKs and shared protos
+- [NE503 application repository](https://github.com/camthink-ai/neoruntime-apps) — application templates and examples
 
----
+**Related Wiki pages**:
 
-## 7. Related Documentation
-
-**Within this wiki**:
-
-- [Application Development Guide](../4-application-guide/3-reference/0-app-reference.md) — How to write and deploy container applications
-- [Python SDK Reference](../4-application-guide/3-reference/1-sdk-reference.md) — SDK API signatures and usage examples
-
-**Open-source repository (implementation-level deep dives)**:
-
-- [Architecture Overview & Data Flow](https://github.com/camthink-ai/neoruntime/blob/main/docs/architecture/README.md) — Full architecture docs with four data-flow diagrams
-- [Security Architecture](https://github.com/camthink-ai/neoruntime/blob/main/docs/architecture/security-architecture.md) — Sandbox isolation and security model design
-- [Service Reference Docs](https://github.com/camthink-ai/neoruntime/tree/main/docs/services) — Per-service deep dives (ai-runtime / event-bus / camera-daemon design, etc.)
+- [Developer Guide](./1-developer-guide.md) — development environment, build, and deployment entry points
+- [Application Development Reference](../4-application-guide/3-reference/0-app-reference.md) — application and SDK usage

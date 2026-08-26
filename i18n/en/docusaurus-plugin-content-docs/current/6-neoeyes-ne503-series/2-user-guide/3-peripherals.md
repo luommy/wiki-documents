@@ -36,4 +36,4 @@ Enabling a channel drives its output to the active level. Wiegand is an output i
 - **AI events driving external devices**: there is no built-in "AI detection → alarm output" auto-linkage; an app or business system subscribes to AI events and acts on them (e.g. drives an external relay).
 - **Alarm input reporting**: not yet wired into the event bus in the current firmware — see the Alarm Input section above.
 
-> For physical wiring and power selection of each interface, see [Product Wiring & Power](./8-product-wiring.md).
+> For physical wiring and power selection of each interface, see [Product Wiring](./8-product-wiring.md).

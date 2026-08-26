@@ -1,94 +1,163 @@
 ---
-description: NE503 Python SDK (neoruntime_ipc_sdk) getting-started workflow — what the SDK is, where the source lives, three ways to embed it into your app image, calling patterns, and the permission contract. Read this before the hands-on tutorials.
-keywords: [NE503, Python SDK, neoruntime_ipc_sdk, SDK embedding, container application, build_app.sh, calling pattern]
+description: "A single-page NE503 Python SDK (neoruntime_ipc_sdk) workflow: prepare the source, embed the SDK in an app image, declare permissions, make the first call, and deploy it."
+keywords: [NE503, Python SDK, neoruntime_ipc_sdk, SDK embedding, container application, build_app.sh, permissions]
 tags: [application development, NE503, SDK, getting started]
 ---
 
 # SDK Workflow
 
-This page walks through the full "get the NE503 Python SDK (`neoruntime_ipc_sdk`) up and running" flow: **what it is → where the source lives → how to embed it into your app image → how to make your first call → what permissions require**. Once you've been through it, [Hello World](./1-hello-world.md) (the deployment loop) and [Person Detection](../2-cookbook/1-person-detection.md) (a real AI app) are only about their own business logic — no need to revisit how the SDK plugs in.
+This page follows one path: **prepare the source → embed the SDK → declare permissions → call the SDK → build and deploy → verify**. When it works, you can start from a sample app and replace its business logic.
 
-:::info Reading order
-**SDK Workflow (this page) → [Hello World](./1-hello-world.md) (deployment loop, no SDK) → [Person Detection](../2-cookbook/1-person-detection.md) (real AI app, uses the SDK)**
-:::
+## 1. Know these two prerequisites
 
-## 1. What the SDK Is
+`neoruntime_ipc_sdk` runs **inside the NE503 application container** and uses platform-injected Unix Sockets to call AI Runtime, Event Bus, and Device Control. The app does not access hardware or the inference engine directly.
 
-`neoruntime_ipc_sdk` runs **inside your application container** and talks to the platform's AI Runtime, Event Bus, and Device Control services over Unix Sockets — your app never touches hardware or the inference engine directly; it calls SDK clients, which forward to the corresponding services.
+The SDK **is not on PyPI**. The device container normally cannot reach the network to run `pip install`, so the SDK must be bundled into the app image at build time. The SDK already includes generated protobuf files; no manual generation is needed.
 
-**Key constraint: the SDK is not on PyPI and cannot be `pip install`ed from the network.** The source lives in the `neoruntime-sdks` repo under `python/neoruntime_ipc_sdk/` and must be bundled into your app image — the device's container runtime has no outbound network for pip.
+Common clients:
 
-For what each client solves and how to choose one, see [SDK Reference §2 Module Overview](../3-reference/1-sdk-reference.md#2-what-each-module-solves).
+| What you need to do | Client | Common calls |
+|:---|:---|:---|
+| Subscribe to inference results or run single-frame inference | `InferenceClient` | `subscribe()`, `infer()` |
+| Publish or subscribe to app events | `EventClient` | `publish()`, `subscribe()` |
+| Control lights, lens, PTZ, and other peripherals | `DeviceClient` | `set_white_light()`, `set_ircut()`, and more |
 
-## 2. Get the SDK and Embed It into the Image
+## 2. Prepare the project and embed the SDK
 
-The SDK lives in the **neoruntime-sdks** repo; sample apps live in the **neoruntime-apps** repo. Clone both into the **same parent directory** — the unified build script takes the SDK from the sibling `neoruntime-sdks` by default:
+Clone the SDK and app repositories under the same parent directory:
 
 ```bash
 git clone https://github.com/camthink-ai/neoruntime-sdks.git
 git clone https://github.com/camthink-ai/neoruntime-apps.git
 ```
 
-There are three ways to get the SDK into your image, depending on your project layout.
+### Recommended: use the unified build script
 
-**Option A: Unified build script (recommended; used by all repo sample apps)**
-
-`neoruntime-apps`'s `scripts/build_app.sh` automatically copies the sibling `neoruntime-sdks/python/neoruntime_ipc_sdk/` into the app directory, bakes it into the image with `docker buildx`, and packages an `.aipc` bundle. No manual `pip install`, no network needed:
+Sample apps use `neoruntime-apps/scripts/build_app.sh`. It copies the SDK from the sibling `neoruntime-sdks`, builds an ARM64 image with Docker buildx, and packages an `.aipc` bundle:
 
 ```bash
 cd neoruntime-apps
 ./scripts/build_app.sh examples/person-detection
-# auto: copy SDK → buildx → save → package .aipc
 ```
 
-**Option B: Manual `COPY` for standalone projects**
+### Standalone project: install from the Dockerfile
 
-When your app lives outside the repo's sample structure, copy the SDK into the image and install it locally in the Dockerfile:
+When the app is outside the sample-repository layout, copy the SDK into the image and install it locally:
 
 ```dockerfile
 COPY neoruntime_ipc_sdk /app/neoruntime_ipc_sdk
 RUN pip install --no-cache-dir /app/neoruntime_ipc_sdk
 ```
 
-**Option C: Pre-build a wheel and `pip install` it (best for distribution and reuse)**
-
-Build a universal wheel first (the SDK is pure Python, so it's `py3-none-any`, independent of the device's ARM64 architecture) — the image carries only the artifact, not the whole source tree:
+For distribution, build a universal wheel first:
 
 ```bash
 cd neoruntime-sdks/python
-pip wheel . --no-deps -w dist/     # produces dist/neoruntime_ipc_sdk-<version>-py3-none-any.whl (version follows setup.py)
+pip wheel . --no-deps -w dist/
 ```
 
-```dockerfile
-COPY neoruntime_ipc_sdk-<version>-py3-none-any.whl /tmp/
-RUN pip install --no-cache-dir /tmp/neoruntime_ipc_sdk-<version>-py3-none-any.whl && rm /tmp/neoruntime_ipc_sdk-<version>-py3-none-any.whl
+Install the resulting `neoruntime_ipc_sdk-<version>-py3-none-any.whl` in the Dockerfile. Whichever method you use, the final image must contain `neoruntime_ipc_sdk`.
+
+## 3. Declare the permissions in `app.yaml`
+
+The platform does not open access just because the code calls an SDK method. The `permissions` section must cover the streams, models, event topics, and peripherals used by the app; missing permissions are rejected at call time.
+
+Minimal example for an app that only subscribes to inference:
+
+```yaml
+spec:
+  image: aipc/my-app:1.0.0
+  permissions:
+    video:
+      - sub.raw
+    inference:
+      models: [<real-model-id>]
+      max_qps: 30
 ```
 
-> Whatever the method, the point is that **the SDK must be carried into the image**. The SDK ships with pre-generated protobuf stubs (`python/neoruntime_ipc_sdk/proto/*_pb2.py`), so `import neoruntime_ipc_sdk` works out of the box — no manual generation needed.
+Add `events` or `device` only when the app uses them. The model, stream, and topic values in the permissions must match the real device values and the code.
 
-## 3. Calling Pattern
+## 4. Make the first SDK call
 
-All SDK clients share the same shape: **instantiation takes no arguments** (the SDK reads the socket path from environment variables injected by the platform), then you call in one of three modes:
+First query the models and streams available on the device. Do not use the example values as if they were real values:
 
-1. **Subscription iterator** — `for ... in xxx.subscribe(...)` yields results continuously (per-frame inference, events, encoded streams); build your app's main loop on top of it;
-2. **Publish** — `EventClient.publish(topic, payload)` broadcasts an event; other apps subscribe to the same topic and react;
-3. **Control** — `DeviceClient.set_white_light(n)` etc. drive the hardware directly.
+```python
+from neoruntime_ipc_sdk import FdMediaClient, InferenceClient
 
-Minimal skeleton code for each client: [SDK Examples §1 Pattern Selection](../3-reference/2-sdk-examples.md#1-the-four-patterns-choose-first). Two pitfalls to remember when writing calls:
+inf = InferenceClient()
+media = FdMediaClient()
+print("models:", inf.list_models())
+print("streams:", media.list_streams())
+```
 
-- **Don't hardcode names** — use the device's real `stream`/`model` values, query them with `list_streams()` / `list_models()` first (see [SDK Reference §3.2](../3-reference/1-sdk-reference.md#32-dont-hardcode-stream-and-model-names));
-- **Subscription is a blocking iterator** — Ctrl-C can't interrupt it; shut down gracefully (see [SDK Reference §3.4](../3-reference/1-sdk-reference.md#34-blocking-iterators-need-graceful-exit)).
+Then put the real model name into the subscription loop:
 
-## 4. Permissions Are a Contract
+```python
+try:
+    for seq, result in inf.subscribe(
+        stream="sub",
+        model="<real-model-id>",
+    ):
+        print(f"frame={seq}, objects={len(result.objects)}")
+        for obj in result.objects:
+            print(obj.label, obj.score, obj.bbox.to_xyxy())
+except KeyboardInterrupt:
+    inf.close()
+```
 
-What the SDK can call is **dictated by the `permissions` section of `app.yaml`**, not by what you write in code. The platform enforces sandboxing against this list: any video stream, model, event topic, or device control not declared here is rejected at call time. So the calls in `app.py` must correspond one-to-one with what `app.yaml` declares.
+Remember these platform constraints:
 
-For the meaning of each permission field, see [App Reference §4 Permission Model](../3-reference/0-app-reference.md#4-permission-model).
+- Inference subscriptions use `sub` or `third`, which publish raw frames. `main` carries H.264 only and cannot be used for inference subscriptions.
+- `stream` and `model` must use the real device values; otherwise the call returns `NOT_FOUND` or produces no results.
+- For a custom HEF, add `raw_output_only=True` and decode the raw NMS output in the app. Preloaded models do not need this option.
 
-## 5. Next Steps
+Other common SDK calls:
 
-- [Hello World](./1-hello-world.md) — no SDK; run the full "build → deploy → start → verify" closed loop first;
-- [Person Detection](../2-cookbook/1-person-detection.md) — a real AI app using the SDK, with complete code and on-device testing;
-- Four app patterns and complete repo source: [SDK Examples](../3-reference/2-sdk-examples.md);
-- Per-client API details: [SDK Reference](../3-reference/1-sdk-reference.md);
-- Build/deploy errors: [Troubleshooting FAQ](../../5-troubleshooting.md).
+```python
+from neoruntime_ipc_sdk import DeviceClient, EventClient
+
+events = EventClient()
+events.publish("app/<app-id>/person_detected", {"count": 1})
+
+device = DeviceClient()
+device.set_white_light(80)
+```
+
+`subscribe()` is a blocking iterator. Close the client when handling `KeyboardInterrupt` or `SIGTERM`, so the container does not leave a connection behind.
+
+## 5. Build, deploy, and verify
+
+### 5.1 Build
+
+Start from a sample app:
+
+```bash
+cd neoruntime-apps
+./scripts/build_app.sh examples/person-detection
+```
+
+The script creates an `.aipc` package containing `app.yaml` and the ARM64 image.
+
+### 5.2 Deploy
+
+1. Log in to the NE503 Web Console and open **App Management**;
+2. Click **Import** and choose **Upload Package**;
+3. Upload the `.aipc` file and wait for installation to finish;
+4. Click **Start** on the application card.
+
+### 5.3 Verify
+
+After the app becomes **Running**, check its logs and confirm:
+
+- the app startup log appears;
+- `list_models()` returns a device model;
+- the subscription loop keeps receiving frames or events;
+- peripheral actions match the app logic when device control is used.
+
+If there is no output, check the model and stream names first, then check `app.yaml` permissions, and finally confirm that the app is not using `main` for inference.
+
+## 6. Continue from here
+
+- [SDK Reference](../3-reference/1-sdk-reference.md) — full clients and NE503 platform constraints;
+- [SDK Examples](../3-reference/2-sdk-examples.md) — counting, event alerts, device control, and cascaded inference;
+- [Person Detection](../2-cookbook/1-person-detection.md) — a complete application with on-device verification.
