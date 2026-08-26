@@ -91,7 +91,7 @@ NE503 通过容器运行 AI 应用，平台内置模型管理。**AI 类应用�
 
 ## 模型管理
 
-进入 **Models** 页面查看与管理推理模型。设备内置多类模型（目标检测、OCR、语义分割、关键点、深度估计、CLIP 零样本、图像分类等），具体清单以设备实际为准。
+进入 **Models** 页面查看与管理推理模型。设备内置多类模型（目标检测、OCR、语义分割、关键点、深度估计、CLIP 零样本、图像分类等），出厂预置清单见[版本兼容性矩阵](../3-software-guide/5-version-matrix.md)，具体以设备实际为准。
 
 <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/user-guide/applications-and-models/qs-models.png" />
 

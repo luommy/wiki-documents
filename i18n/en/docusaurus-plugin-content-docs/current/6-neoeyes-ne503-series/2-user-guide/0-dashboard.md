@@ -33,7 +33,7 @@ Four real-time gauges — the first reference for whether the device can keep up
 | **CPU Usage** | Processor utilization (4 cores) | Sustained > 80% means app load is heavy; consider stopping non-essential apps |
 | **NPU Usage** | AI inference unit utilization | Correlates with the number of running models; check here first if inference slows down |
 | **Memory Usage** | Memory used / total | Near the limit, containers may get OOM-killed; watch for apps that restart unexpectedly |
-| **Storage Usage** | Storage used / total | Above 80%, clean up recordings / logs or expand |
+| **Storage Usage** | Storage used / total | Sustained usage above 80% calls for cleanup |
 
 ### Stream Preview
 

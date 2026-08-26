@@ -6,7 +6,7 @@ tags: [NE301, model deployment, object detection, pose estimation, face detectio
 
 # NE301 Verified Models
 
-NE301 is based on the STM32N6 NPU and supports TFLite Int8 quantized model inference. The tables below list all models verified on actual devices (12 models total).
+NE301 is based on the STM32N6 NPU and supports TFLite Int8 quantized model inference. The tables below list all models verified on actual devices (12 models total). For other ready-to-use models, see the [Models page in the CamThink Developer Center](https://www.camthink.ai/developer-center/models/).
 
 ## Hardware Constraints
 

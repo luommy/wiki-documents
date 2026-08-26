@@ -114,7 +114,7 @@ The interface board controls external light boards via PWM (independent physical
 
 ### LENS Driver (AN41908A-VBA)
 
-The MCU SPI1 interface controls the AF auto-zoom and autofocus lens module. The SoC-side SPI CS1 is also connected to the same chip (default control path), while the MCU side handles lens homing and limit protection.
+The MCU SPI1 interface provides the control path for the installed lens module. The AN41908A-VBA entry on this page corresponds to the documented board-level driver device; the product offers `AF Lens (44.5° HFOV)` or `Motorized Zoom (110° HFOV)`, while the actual lens capabilities, driver device, and firmware controls depend on the specific SKU/BOM. The SoC-side SPI CS1 is also connected to this driver path (default control path), while the MCU side handles lens homing and limit protection.
 
 | Pin | Function |
 |:---|:---|

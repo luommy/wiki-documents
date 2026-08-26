@@ -6,7 +6,7 @@ tags: [NE301, 模型部署, 目标检测, 姿态估计, 人脸检测, 实例分�
 
 # NE301 Verified Models
 
-NE301 基于 STM32N6 NPU，支持 TFLite Int8 量化模型推理。下表列出所有经过实际设备验证的模型（共 12 个）。
+NE301 基于 STM32N6 NPU，支持 TFLite Int8 量化模型推理。下表列出所有经过实际设备验证的模型（共 12 个）。如需获取其他可直接使用的模型，可先查看 [CamThink Developer Center 的 Models 页面](https://www.camthink.ai/developer-center/models/)。
 
 ## 硬件约束
 

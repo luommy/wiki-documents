@@ -91,7 +91,7 @@ A summary of the previous five steps. Confirm and click **Install**. After insta
 
 ## Models
 
-Go to the **Models** page to view and manage inference models. The device comes with multiple built-in model types (object detection, OCR, semantic segmentation, keypoints, depth estimation, CLIP zero-shot, image classification, etc.); the actual list depends on the device.
+Go to the **Models** page to view and manage inference models. The device comes with multiple built-in model types (object detection, OCR, semantic segmentation, keypoints, depth estimation, CLIP zero-shot, image classification, etc.); the factory preload list is in the [Version Matrix](../3-software-guide/5-version-matrix.md), and the actual list depends on the device.
 
 <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/user-guide/applications-and-models/qs-models.png" />
 

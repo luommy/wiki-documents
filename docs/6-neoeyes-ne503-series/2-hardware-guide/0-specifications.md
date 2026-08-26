@@ -12,7 +12,7 @@ NE503 采用核心处理板（Hailo15H SoC）与接口板（STM32G0B0RET6 MCU）
 
 | 型号 | 型号描述 |
 |:---|:---|
-| NE503 | Hailo15H + eMMC 64GB + LPDDR4 8GB，AF 4x 变焦 |
+| NE503 | Hailo15H + eMMC 64GB + LPDDR4 4GB / 8GB；可选 `AF Lens (44.5° HFOV)` 或 `Motorized Zoom (110° HFOV)` |
 
 ## 模组级规格参数
 
@@ -23,7 +23,7 @@ NE503 各物理模组的主要器件参数如下：
 | 类型 | 芯片型号 | 规格参数 |
 |:---|:---|:---|
 | CPU / SoC | Hailo-15H | 四核 Arm Cortex-A53，频率 1.3 GHz；AI 算力高达 20 TOPS；ISP 支持最高 12 MP 分辨率，600 Mpixel/s 像素率，支持 HDR 和降噪；VPU 支持 H.265/H.264 编码 |
-| LPDDR4 | MT53E2G32D4DE-046 WT:C | 8 GB LPDDR4，4266 Mb/s，8.5 GB/s 单通道带宽 |
+| LPDDR4 | 8 GB 配置：MT53E2G32D4DE-046 WT:C | 4 GB 或 8 GB；当前记录的 8 GB 配置为 4266 Mb/s、8.5 GB/s 单通道带宽，4 GB 配置的器件型号与带宽以对应 BOM 为准 |
 | eMMC | SDINBDA6-64G-H | 64 GB eMMC |
 | QSPI Flash | IS25WP064D-JKLE | 8 MB，四线 SPI 协议，待机电流 8 µA，擦写次数 > 100,000 次 |
 | 温度传感器 | TMP1075DSGR | 12 bit 分辨率，0.0625°C，I2C 接口 |
@@ -38,7 +38,7 @@ NE503 各物理模组的主要器件参数如下：
 |:---|:---|:---|
 | MCU | STM32G0B0RET6 | Arm Cortex-M0+，64 MHz，512 KB Flash，144 KB RAM |
 | 温度传感器 | LMT87DCK | 模拟输出温度传感器，-50°C ~ 150°C |
-| 镜头驱动 | AN41908A-VBA | AF 自动变焦与自动对焦，SPI 接口 |
+| 镜头驱动 | AN41908A-VBA（已记录配置） | 镜头配置可选 `AF Lens (44.5° HFOV)` 或 `Motorized Zoom (110° HFOV)`；驱动器件与可用控制能力以具体 SKU/BOM 和固件为准 |
 | 音频编解码器 | NAU88C10 | I2S 接口音频编解码器（SoC 控制，非 MCU 管理） |
 
 ### 外部模组

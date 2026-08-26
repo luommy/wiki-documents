@@ -12,7 +12,7 @@ NE503 features a dual-board architecture with a core processing board (Hailo15H 
 
 | Model | Description |
 |:---|:---|
-| NE503 | Hailo15H + eMMC 64GB + LPDDR4 8GB, AF 4x zoom |
+| NE503 | Hailo15H + eMMC 64GB + LPDDR4 4GB / 8GB; selectable `AF Lens (44.5° HFOV)` or `Motorized Zoom (110° HFOV)` |
 
 ## Module-Level Specifications
 
@@ -23,7 +23,7 @@ Key device parameters for each physical module in NE503:
 | Type | Chip Model | Specifications |
 |:---|:---|:---|
 | CPU / SoC | Hailo-15H | Quad-core Arm Cortex-A53, 1.3 GHz; AI performance up to 20 TOPS; ISP supports up to 12 MP resolution, 600 Mpixel/s pixel rate, HDR and noise reduction; VPU supports H.265/H.264 encoding |
-| LPDDR4 | MT53E2G32D4DE-046 WT:C | 8 GB LPDDR4, 4266 Mb/s, 8.5 GB/s single-channel bandwidth |
+| LPDDR4 | 8 GB configuration: MT53E2G32D4DE-046 WT:C | 4 GB or 8 GB; the documented 8 GB configuration is 4266 Mb/s with 8.5 GB/s single-channel bandwidth; the device model and bandwidth for the 4 GB configuration must follow its BOM |
 | eMMC | SDINBDA6-64G-H | 64 GB eMMC |
 | QSPI Flash | IS25WP064D-JKLE | 8 MB, Quad SPI protocol, standby current 8 µA, erase cycles > 100,000 |
 | Temperature Sensor | TMP1075DSGR | 12-bit resolution, 0.0625°C, I2C interface |
@@ -38,7 +38,7 @@ Key device parameters for each physical module in NE503:
 |:---|:---|:---|
 | MCU | STM32G0B0RET6 | Arm Cortex-M0+, 64 MHz, 512 KB Flash, 144 KB RAM |
 | Temperature Sensor | LMT87DCK | Analog output temperature sensor, -50°C ~ 150°C |
-| Lens Driver | AN41908A-VBA | AF auto-zoom and autofocus, SPI interface |
+| Lens Driver | AN41908A-VBA (documented configuration) | Lens options are `AF Lens (44.5° HFOV)` or `Motorized Zoom (110° HFOV)`; the driver device and available controls depend on the specific SKU/BOM and firmware |
 | Audio Codec | NAU88C10 | I2S interface audio codec (SoC-controlled, not MCU-managed) |
 
 ### External Modules

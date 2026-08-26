@@ -6,11 +6,15 @@ tags: [快速入门, NE503, 首次部署]
 
 # Quick Start
 
-本指南带你完成 NE503 首次部署：开箱 → 连接 → 登录改密 → 验证画面 → 体验 AI → 配置网络与时区。走完后设备即可正式上线，更多功能见[用户指南](./2-user-guide/0-dashboard.md)。
+本指南带你完成 NE503 首次部署：开箱 → 连接 → 登录改密 → 验证画面 → 体验 AI → 配置网络与时区。走完后设备即可正式上线。
 
 <div align="center">
   <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/overview/ne503-main.png" alt="NeoEyes NE503" width="100%" />
 </div>
+
+## 本篇适合谁
+
+本篇是**试机用户与首次部署**的线性闭环（开箱到上线，约 10 分钟）。
 
 ## 1. 套件与准备
 
@@ -41,7 +45,7 @@ IP67 防护、-40 °C ~ +60 °C 工作温度，可户外安装。壁挂支架固
 ping 10.0.0.1
 ```
 
-能通即进入下一步。
+能通即进入下一步。不通时依次检查：网线 / PoE 供电是否正常（看设备指示灯）、电脑 IP 是否确实设在 `10.0.0.x` 网段、防火墙是否放行 ICMP。若设备此前接入了路由器 DHCP，则 IP 不再是 `10.0.0.1`，去路由器管理页查它分配到的地址；仍找不到见[故障排查](./5-troubleshooting.md)。
 
 ## 3. 登录并改密码
 
@@ -53,7 +57,7 @@ ping 10.0.0.1
 
 <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/quick-start/qs-dashboard.png" />
 
-**⚠️ 第一件事：改掉默认密码。** 默认密码公开，不改进网即裸奔。进入 **Settings → Device Info**，页面底部 **Change Password** 设新密码并妥善保管。
+**⚠️ 第一件事：改掉默认密码。** 默认密码公开，不改进网即裸奔。进入 **Settings → Device Info**，页面底部 **Change Password** 设新密码并妥善保管。注意：**设备无恢复出厂与密码重置功能，忘记密码只能联系支持重新刷机**——新密码务必记牢。
 
 <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/quick-start/qs-settings-device-info.png" />
 
@@ -63,25 +67,27 @@ ping 10.0.0.1
 
 <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/quick-start/qs-media.png" />
 
-顺便确认推流可用：右侧 **Configuration** 面板开启 **Enable RTSP Stream**，复制主码流地址 `rtsp://<设备IP>:8554/main`，用 VLC 打开网络串流粘贴地址播放——能播说明端到端链路畅通。
+顺便确认推流可用：右侧 **Configuration** 面板开启 **Enable RTSP Stream**，复制主码流地址 `rtsp://<设备IP>:8554/main`，用 VLC 打开网络串流粘贴地址播放——能播说明端到端链路畅通。该流为出厂 4K（3840×2160@30）且无需认证。若 VLC 黑屏或卡顿：先确认 RTSP 开关已保存生效、播放器强制选择了 TCP 传输，再查[故障排查 · 视频与流](./5-troubleshooting.md)。
 
 ## 5. 体验 AI
 
-NE503 的 AI 能力通过容器应用体现。官方应用仓库 [camthink-ai/neoruntime-apps](https://github.com/camthink-ai/neoruntime-apps) 提供多个示例应用，其中 **AI Model Showcase** 集中展示多模型推理——目标检测、语义分割、关键点、OCR、CLIP 零样本分类、单目深度估计等。
+NE503 的 AI 能力通过容器应用体现。**AI Model Showcase** 集中演示多模型推理——目标检测、语义分割、关键点、OCR、CLIP 零样本分类、单目深度估计等。官方仓库 [camthink-ai/neoruntime-apps](https://github.com/camthink-ai/neoruntime-apps) 提供**预构建安装包**，无需自行编译：
 
-从仓库克隆源码、按仓库说明构建 `.aipc` 安装包。控制台导入向导需要分别选择 `app.yaml` 和 `image.tar`，不能直接上传 `.aipc`。如果构建后只保留了 `.aipc`，先解压：
+1. **下载并解压** [model-showcase-latest-arm64.tar.gz](https://github.com/camthink-ai/neoruntime-apps/releases/download/showcase-bundles-latest/model-showcase-latest-arm64.tar.gz)（约 300 MB，含 `app.yaml` 与 `image.tar`）：
 
-```bash
-unzip -o <package>.aipc -d <package-directory>
-```
+   ```bash
+   tar xzf model-showcase-latest-arm64.tar.gz
+   ```
 
-在 **Applications** 页面点 **Import**，选择 **Upload Package**。在 **App Manifest** 中选择 `app.yaml`，在 **Container Image** 中选择 `image.tar`，再按向导勾选 Permissions（应用所需的模型与码流）完成安装：
+2. **上传安装**：在 **Applications** 页面点 **Import**，选择 **Upload Package**，在 **App Manifest** 中选择 `app.yaml`、在 **Container Image** 中选择 `image.tar`，按向导勾选 Permissions（应用所需的模型与码流），点 **Install**：
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/quick-start/qs-app-management.png" />
+   <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/quick-start/qs-app-management.png" />
 
-安装启动后，点击应用卡片的 **Visit App** 打开 Showcase 界面，切换不同模型实时查看推理效果：
+3. **查看效果**：安装后启动应用，点应用卡片的 **Visit App** 打开 Showcase 界面，切换不同模型实时查看推理效果：
 
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/quick-start/qs-model-showcase.png" />
+   <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/quick-start/qs-model-showcase.png" />
+
+想从源码自行构建（clone → `scripts/build_app.sh` 打包 `.aipc`），见 [SDK 工作流](./4-application-guide/1-app-development/0-sdk-workflow.md)；安装向导各步骤字段的完整说明见 [AI 应用与模型](./2-user-guide/2-applications-and-models.md)。
 
 ## 6. 配置网络与时区
 
@@ -104,13 +110,13 @@ unzip -o <package>.aipc -d <package-directory>
 
 ### 设时区
 
-时区错则视频 OSD 时间戳和录像文件命名全错。进入 **Settings → Time Settings**：选部署地时区，配 NTP 服务器（如 `pool.ntp.org`），点 **Sync Now** 立即同步。
+时区错则视频 OSD 时间戳错位，接入外部 NVR 后录像文件的时间标记也会随之错。进入 **Settings → Time Settings**：选部署地时区，配 NTP 服务器（如 `pool.ntp.org`），点 **Sync Now** 立即同步。
 
 <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/quick-start/qs-settings-time-settings.png" />
 
 ## 7. 接下来做什么
 
-设备已上线，按目标继续：
+设备已上线。按你想做的事查页：
 
 | 你想做的事 | 去哪 |
 |-----------|------|
@@ -118,9 +124,8 @@ unzip -o <package>.aipc -d <package-directory>
 | RTSP 拉流接入 NVR / VMS | [用户指南 · 视频与成像](./2-user-guide/1-media-and-image.md) |
 | 安装自己的 AI 应用、管理模型 | [用户指南 · AI 应用与模型](./2-user-guide/2-applications-and-models.md) |
 | 接报警器 / 门禁 / 音频外设 | [用户指南 · 外设 IO](./2-user-guide/3-peripherals.md) |
-| 升级固件 / 看日志 / 运维 | [用户指南 · 系统管理](./2-user-guide/4-settings-and-maintenance.md) |
-| REST API / Event Bus 对接业务系统 | [集成文档](./4-application-guide/2-3rd-party-integration/0-restful-api.md) |
-| 开发自己的容器应用 | [应用开发文档](./4-application-guide/1-app-development/0-sdk-workflow.md) |
+| 批量发现设备 / 命令行管理 | [用户指南 · 设备管理工具](./2-user-guide/4-device-management-tools.md) |
+| 升级固件 / 看日志 / 运维 | [用户指南 · 系统管理](./2-user-guide/5-deployment.md) |
 
 ### 速查卡
 
