@@ -1,66 +1,104 @@
 ---
-description: NE503 version compatibility matrix — current versions of the system firmware, platform services, SDK, MCU, and flashing tools, the six OS-upgrade compatibility gates, and the factory-preloaded models and apps, to help diagnose hidden issues caused by version mismatches.
-keywords: [NE503 version, firmware version, compatibility matrix, factory preload, MCU firmware, board_tools, platform service version]
+description: "NE503 version baseline and compatibility reference: system, platform-service, Web Console, SDK, MCU, and flashing-tool versions for OS 1.12.0 (build 2026-07-29), plus OS-upgrade validation gates and optional factory-preload content."
+keywords: [NE503 version, firmware version, compatibility matrix, factory preload, MCU firmware, hailo_ipc_sdk, OS upgrade]
 tags: [Software Guide, NE503, versioning, compatibility]
 ---
 
 # Version Matrix
 
-Version mismatches are the root of many "invisible" issues — a rejected upgrade package, a model that fails to load, or SDK calls behaving oddly usually trace back to versions that don't line up. This page lists the authoritative versions of each component on the current firmware line, the compatibility gates the platform enforces during upgrades, and the factory-preloaded models and apps.
+Use this page to handle four common tasks: confirm the device version, prepare development and flashing components, diagnose a rejected OS upgrade, and confirm factory-preload content.
 
-## 1. Component Versions
+The baseline corresponds to a `hailo15-ne503` device running OS `1.12.0` (build `2026-07-29`). It is a release snapshot, not a guarantee that every device is identical: the interface-board MCU version is measured on a sample device, and model/app contents can vary by order or firmware configuration.
 
-Current firmware line (2026-07 build):
+## 1. Version Baseline
 
-| Component | Current version | Source | How to check on the device |
-|-----------|----------------|--------|----------------------------|
-| System firmware (OS) | 1.12.0 (build 2026-07-29, machine `hailo15-ne503`) | [camthink-ai/meta-hailo-os](https://github.com/camthink-ai/meta-hailo-os) | Via SSH: `cat /etc/os-release`, `cat /etc/build-info` |
-| Platform services | v1.0.1 (the open-source version line starts here; old internal version numbers do not carry over — see [neoruntime Releases](https://github.com/camthink-ai/neoruntime/releases)) | [camthink-ai/neoruntime](https://github.com/camthink-ai/neoruntime) | Released and upgraded together with the OS |
-| Web Console | 0.2.4 (shipped with the platform services) | Same as above | Web Console **Settings → Device Info** |
-| Interface-board MCU firmware | 0.1.7.0 (measured on a sample device) | `ne503_ota_package_v<X.Y.Z>.bin` inside the firmware package | `mcu_version` field of `GET /api/v1/device/status` |
-| Python SDK (`neoruntime_ipc_sdk`) | 0.4.0 | [camthink-ai/neoruntime-sdks](https://github.com/camthink-ai/neoruntime-sdks) | Carried inside each app image; for interface-evolution compatibility see the [neoruntime-sdks Releases](https://github.com/camthink-ai/neoruntime-sdks/releases) notes |
-| C++ SDK (`neoruntime_ipc_sdk`) | 0.1.0 (mirrors the Python SDK's modules; `cv::Mat` where Python uses numpy) | Same repo (`cpp/` directory) | API reference on the [Doxygen docs site](https://camthink-ai.github.io/neoruntime-sdks/cpp/en/) |
-| Example apps (neoruntime-apps) | No standalone version number; tracks main | [camthink-ai/neoruntime-apps](https://github.com/camthink-ai/neoruntime-apps) | Get the latest build bundles from [Releases](https://github.com/camthink-ai/neoruntime-apps/releases) (`showcase-bundles-latest`) |
-| Flashing tool `hailo15_board_tools` | 1.10.1 | `tools/` directory of the meta-hailo-os repo | See [System Flashing](./2-system-flashing.md) |
+### 1.1 Device Components
+
+Check device-side versions first, then decide whether an SDK, app, or upgrade package matches. UI labels are kept in their device-side English form so they can be located directly.
+
+| Component | Version baseline | Where to check | Version meaning |
+|-----------|------------------|----------------|-----------------|
+| System OS | `1.12.0`; build `2026-07-29`; machine `hailo15-ne503` | `System OS Version` under `Settings → Device Info`; or via SSH with `cat /etc/os-release` and `cat /etc/build-info` | OS release version |
+| Platform services | `v1.0.1` | `Firmware Version` under `Settings → Device Info`; device file `/data/aipc/VERSION` | Platform version released and upgraded with the OS |
+| Web Console | `0.2.4` | Frontend source `web/package.json`; the Web Console may not display an independent frontend version | Web UI package version; not the OS or platform-service version |
+| Interface-board MCU firmware | `0.1.7.0` (measured on a sample device) | `MCU Ver` under `Image → Device Overview`; or the authenticated device-status API | Hardware-related firmware; the device value is authoritative |
+
+When querying the MCU version, `/api/v1` requires a Bearer token:
+
+```bash
+curl -k https://<device-ip>/api/v1/device/status \
+  -H "Authorization: Bearer <token>"
+```
+
+Read the `data.mcu_version` field in the response. Do not treat a `401` caused by a missing token as an MCU-version validation failure.
+
+### 1.2 Development and Flashing Components
+
+These components are used for development, packaging, or flashing. They should not be compared in the same category as the device OS or platform-service version.
+
+| Component | Version baseline | Version relationship |
+|-----------|------------------|----------------------|
+| Python SDK | `0.4.0`; package/module name `hailo_ipc_sdk` | Use the matching wheel from [neoruntime-sdks Releases](https://github.com/camthink-ai/neoruntime-sdks/releases) |
+| C++ SDK | `0.1.0`; namespace `hailo_ipc_sdk` | Independently versioned and mirrors the Python SDK `0.4.0` interface capability; see the [Doxygen documentation](https://camthink-ai.github.io/neoruntime-sdks/cpp/en/) |
+| Example apps (`neoruntime-apps`) | No standalone version number | Get build bundles such as `showcase-bundles-latest` from [neoruntime-apps Releases](https://github.com/camthink-ai/neoruntime-apps/releases); app bundles follow the main line |
+| Flashing tool `hailo15_board_tools` | `1.10.1` | Use the tool in the `tools/` directory of `meta-hailo-os` that belongs to the firmware release line; see [System Flashing](./2-system-flashing.md) |
+
+Version sources: system OS and flashing tools are in [camthink-ai/meta-hailo-os](https://github.com/camthink-ai/meta-hailo-os), platform services and the Web Console are in [camthink-ai/neoruntime](https://github.com/camthink-ai/neoruntime), and the SDKs are in [camthink-ai/neoruntime-sdks](https://github.com/camthink-ai/neoruntime-sdks).
 
 ## 2. OS Upgrade Compatibility Gates
 
-Before installing an OS upgrade package, the platform enforces the following gates (declared in the package's `sw-description` and on the device side; validation logic lives in `platform/osupgrade/validate.go` in the neoruntime repo). **If any gate fails, the package is rejected**, which prevents bricking the device with mismatched firmware:
+Before installing an `.swu` upgrade package, the platform checks the package, the running OS, the device hardware, and the recovery image together. The baseline values for the current OS `1.12.0` line are below. `machine`, `product`, and `hardware-compatibility` describe device identity; the other three constrain runtime, data, and recovery-toolchain version relationships.
 
-| Gate | What it checks |
-|------|----------------|
-| `machine` | Target machine of the package must match the device (e.g. `hailo15-ne503`) |
-| `product` | Product identifier must match |
-| `hardware-compatibility` | Device hardware revision must be in the package's compatibility list |
-| `aipc-compat-level` | Platform compatibility level; must match the device side (strict equality) |
-| `data-schema` | Data schema version; must be valid and match |
-| `min-recovery-version` | Minimum version required for the recovery image |
+| Gate | Current baseline | What the platform checks | First thing to check on failure |
+|------|------------------|--------------------------|----------------------------------|
+| `machine` | `hailo15-ne503` | Package target machine must match the device | Whether the package is for another machine |
+| `product` | `ne503` | Product identifier must match | Whether the package is for NE503 |
+| `hardware-compatibility` | `1.0` | Device hardware version must be in the package compatibility list | Whether the package supports the current hardware version |
+| `aipc-compat-level` | `1` | Platform compatibility level must match exactly | Whether the OS, platform services, and app are from the same coordinated release line |
+| `data-schema` | `1` | Data schema must be valid and compatible with the device data | Whether the OS, app, and on-device schema versions match; do not delete data casually to bypass the check |
+| `min-recovery-version` | `1.0.1` | Current recovery version must meet the package minimum | Whether recovery must first be updated through a supported release path |
 
-When an upgrade is rejected, the error names the failing gate (e.g. `machine mismatch: package=... device=...`) — switch to the package built for your machine accordingly.
+If any gate fails, the package is rejected before installation. See the [neoruntime OS upgrade implementation](https://github.com/camthink-ai/neoruntime/blob/main/platform/osupgrade/validate.go) for the validation logic.
 
-## 3. Factory Preload
+When an upgrade fails, start with the gate named in the error:
 
-The models and apps below are **options the platform can provide as factory presets** (authoritative source: `configs/preload.yaml` in the neoruntime repo; selected per project). What a given device actually ships with is determined by its order/firmware configuration:
+- `machine`, `product`, or `hardware-compatibility`: use a package matching the target machine, product, and hardware version.
+- `aipc-compat-level` or `data-schema`: use OS, platform-service, and app components from the same coordinated release line; do not mix release lines.
+- `min-recovery-version`: confirm the recovery version and update recovery through the supported upgrade path.
 
-### Preloaded Models (14)
+If the error does not identify a gate, preserve the page message and device logs, pause the upgrade, and confirm the package source. Do not infer compatibility from the filename alone.
 
-| Category | Model files (`.hef`) |
-|----------|---------------------|
-| Detection | `detection/hailo_yolov8n_384_640` (default detection model), `detection/yolov5m_vehicles` (vehicles), `detection/tiny_yolov4_license_plates` (license plates) |
-| Classification | `classification/vit_large` |
-| Segmentation | `segmentation/linknet_mbv1_ss_dpm_256` |
-| Keypoint | `keypoint/face_landmarks_lite` |
-| CLIP zero-shot | `clip/clip_vit_b_32_image_encoder_nv12`, `clip/clip_vit_b_16_image_encoder` |
-| Depth estimation | `depth/scdepthv3` |
-| OCR | `ocr/paddle_ocr_v5_mobile_detection`, `ocr/paddle_ocr_v5_mobile_recognition_nv12`, `ocr/lprnet` (license-plate recognition) |
+## 3. Optional Factory Preload
 
-### Preloaded Apps
+The content below comes from `configs/preload.yaml` in `neoruntime`. It describes the factory-preload options the platform can package by default. What a specific device actually contains is determined by its order and firmware configuration.
 
-- **AI Model Showcase** (`model-showcase`): a multi-model capability demo, available as a factory-preload option (preloaded but **not auto-started**; start it manually from the Applications page on first use).
+### Default Preloaded Models (12)
+
+| Category | Model file (`.hef`) | Purpose |
+|----------|---------------------|---------|
+| Detection | `detection/hailo_yolov8n_384_640.hef` | General object detection |
+| Detection | `detection/yolov5m_vehicles.hef` | Vehicle detection |
+| Detection | `detection/tiny_yolov4_license_plates.hef` | License-plate detection |
+| Classification | `classification/vit_large.hef` | Image classification |
+| Segmentation | `segmentation/linknet_mbv1_ss_dpm_256.hef` | Image segmentation |
+| Keypoint | `keypoint/face_landmarks_lite.hef` | Facial keypoints |
+| CLIP | `clip/clip_vit_b_32_image_encoder_nv12.hef` | CLIP image encoding |
+| CLIP | `clip/clip_vit_b_16_image_encoder.hef` | CLIP image encoding |
+| Depth estimation | `depth/scdepthv3.hef` | Monocular depth estimation |
+| OCR | `ocr/paddle_ocr_v5_mobile_detection.hef` | Text detection |
+| OCR | `ocr/paddle_ocr_v5_mobile_recognition_nv12.hef` | Text recognition |
+| OCR | `ocr/lprnet.hef` | License-plate recognition |
+
+The GenAI model `genai/Qwen3-VL-2B-Instruct.hef` is commented out as an optional item in the configuration (about 3 GB), so it is not counted among the 12 default models.
+
+### Optional Preloaded App
+
+| App | Auto-start | Description |
+|-----|------------|-------------|
+| AI Model Showcase (`model-showcase`) | No | A multi-model capability demo; if preloaded, start it manually from the Applications page the first time |
 
 ## 4. Related Documentation
 
 - [System Flashing](./2-system-flashing.md) — firmware package layout, flashing, and upgrade steps
-- [Model Training & HEF Deployment](../4-application-guide/1-app-development/4-model-training-and-hef.md) — the full lifecycle of custom models
 - [AI Apps and Models](../2-user-guide/2-applications-and-models.md) — model management in the Web Console
 - Version history: [neoruntime Releases](https://github.com/camthink-ai/neoruntime/releases) / [neoruntime-sdks Releases](https://github.com/camthink-ai/neoruntime-sdks/releases) / [neoruntime-apps Releases](https://github.com/camthink-ai/neoruntime-apps/releases)
