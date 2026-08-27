@@ -1,139 +1,91 @@
 ---
-description: NE503 快速入门：从开箱到看到 AI 出结果。涵盖套件准备、上电连接、登录改密、验证画面与码流、体验 AI、配置网络与时区，以及后续深入入口。
-keywords: [NE503 快速入门, 首次部署, Web 控制台登录, AI Model Showcase, 默认 IP, PoE 供电, 边缘 AI 相机]
+description: NE503 快速入门：完成首次上电、登录、画面和 AI 验证。
+keywords: [NE503 快速入门, 首次部署, Web 登录, AI Model Showcase, 默认 IP]
 tags: [快速入门, NE503, 首次部署]
 ---
 
 # Quick Start
 
-本指南带你完成 NE503 首次部署：开箱 → 连接 → 登录改密 → 验证画面 → 体验 AI → 配置网络与时区。走完后设备即可正式上线。
+完成：上电连接 → 登录改密 → 验证画面和码流 → 体验 AI → 配置网络。
 
 <div align="center">
   <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/overview/ne503-main.png" alt="NeoEyes NE503" width="100%" />
 </div>
 
-## 本篇适合谁
+## 1. 准备
 
-本篇是**试机用户与首次部署**的线性闭环（开箱到上线，约 10 分钟）。
+| 项目 | 要求 |
+|:--|:--|
+| 供电 | PoE 802.3AT，或 DC 12V |
+| 网络 | 交换机、网线、可设置以太网 IP 的电脑 |
+| 浏览器 | Chrome、Edge、Firefox 或 Safari |
 
-## 1. 套件与准备
+IP67，工作温度 -40 °C ~ +60 °C，功耗 5–6 W。安装需使用匹配的壁挂或其他支架。
 
-### 套件内容
+## 2. 上电并连接
 
-| 组件 | 数量 | 说明 |
-|------|------|------|
-| NE503 主机 | 1 | 核心处理板与接口板，IP67 防护 |
-| 壁挂螺丝包 | 1 | 固定螺丝与安装件 |
+PoE：网线接 PoE 交换机；DC：12V 适配器接 DC 口。指示灯常亮后进入下一步（约 30–60 秒）。
 
-### 自备物品
+出厂 IP 为 `10.0.0.1`。将电脑设为同网段地址，例如 `10.0.0.100/24`，然后执行：
 
-- **PoE 交换机**（802.3AT，推荐）+ 网线：一根线同时完成供电和联网
-- **或** DC 12V 电源适配器 + 普通交换机 + 网线
-- **电脑**：带以太网口，Windows / macOS / Linux，现代浏览器（Chrome / Edge / Firefox / Safari）
-
-### 安装位置
-
-IP67 防护、-40 °C ~ +60 °C 工作温度，可户外安装。壁挂支架固定到墙面 / 立杆，对准卡口旋紧螺丝；立杆与吊装场景需另购支架配件。整机功耗 5–6 W。
-
-## 2. 上电与连接
-
-**上电**：PoE 方式将网线接入 PoE 交换机；DC 方式将 12V 适配器接 DC 口。指示灯闪烁表示启动中，常亮即就绪（约 30–60 秒）。
-
-**连接**：出厂默认 IP `10.0.0.1`。将电脑以太网 IP 设为同一网段（如 `10.0.0.100`，子网掩码 `255.255.255.0`），然后 ping 验证：
-
-```bash
+~~~bash
 ping 10.0.0.1
-```
+~~~
 
-能通即进入下一步。不通时依次检查：网线 / PoE 供电是否正常（看设备指示灯）、电脑 IP 是否确实设在 `10.0.0.x` 网段、防火墙是否放行 ICMP。若设备此前接入了路由器 DHCP，则 IP 不再是 `10.0.0.1`，去路由器管理页查它分配到的地址；仍找不到见[故障排查](./5-troubleshooting.md)。
+能通即连接成功。不能连接时检查供电、网线、电脑 IP 和防火墙；若设备已接入 DHCP，从路由器查询新地址。
 
-## 3. 登录并改密码
+## 3. 登录并改密
 
-浏览器访问 `https://10.0.0.1`（首次访问会提示证书不受信任，按提示继续），用默认凭据登录——用户名 `admin`，密码 `password`：
+访问 `https://10.0.0.1`，用 `admin` / `password` 登录。
 
 <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/quick-start/qs-login.png" />
 
-登录后进入 Dashboard。左上角展开图标可显示导航栏文字（Dashboard / Media / Image / Applications / Models / Peripherals / Settings / Maintenance），后续操作在页面间跳转完成。
-
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/quick-start/qs-dashboard.png" />
-
-**⚠️ 第一件事：改掉默认密码。** 默认密码公开，不改进网即裸奔。进入 **Settings → Device Info**，页面底部 **Change Password** 设新密码并妥善保管。注意：**设备无恢复出厂与密码重置功能，忘记密码只能联系支持重新刷机**——新密码务必记牢。
+进入 **Settings → Device Info → Change Password**，设置新密码并保存。
 
 <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/quick-start/qs-settings-device-info.png" />
 
-## 4. 验证画面与码流
+> 设备没有本地密码重置功能。忘记密码需联系支持重新刷机。
 
-进入 **Media** 页面，主区域显示摄像头实时画面——看到画面即说明摄像头与图像链路正常工作。
+## 4. 验证画面和码流
+
+进入 **Media**，看到实时画面即摄像头链路正常。
 
 <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/quick-start/qs-media.png" />
 
-顺便确认推流可用：右侧 **Configuration** 面板开启 **Enable RTSP Stream**，复制主码流地址 `rtsp://<设备IP>:8554/main`，用 VLC 打开网络串流粘贴地址播放——能播说明端到端链路畅通。该流为出厂 4K（3840×2160@30）且无需认证。若 VLC 黑屏或卡顿：先确认 RTSP 开关已保存生效、播放器强制选择了 TCP 传输，再查[故障排查 · 视频与流](./5-troubleshooting.md)。
+开启 **Enable RTSP Stream**，用 VLC 打开：
+
+~~~text
+rtsp://<设备IP>:8554/main
+~~~
+
+能正常播放即拉流成功。黑屏或卡顿时确认 RTSP 已保存，并在播放器中使用 TCP。
 
 ## 5. 体验 AI
 
-NE503 的 AI 能力通过容器应用体现。**AI Model Showcase** 集中演示多模型推理——目标检测、语义分割、关键点、OCR、CLIP 零样本分类、单目深度估计等。官方仓库 [camthink-ai/neoruntime-apps](https://github.com/camthink-ai/neoruntime-apps) 提供**预构建安装包**，无需自行编译：
+下载并解压 [model-showcase-latest-arm64.tar.gz](https://github.com/camthink-ai/neoruntime-apps/releases/download/showcase-bundles-latest/model-showcase-latest-arm64.tar.gz)：
 
-1. **下载并解压** [model-showcase-latest-arm64.tar.gz](https://github.com/camthink-ai/neoruntime-apps/releases/download/showcase-bundles-latest/model-showcase-latest-arm64.tar.gz)（约 300 MB，含 `app.yaml` 与 `image.tar`）：
+~~~bash
+tar xzf model-showcase-latest-arm64.tar.gz
+~~~
 
-   ```bash
-   tar xzf model-showcase-latest-arm64.tar.gz
-   ```
+在 **Applications → Import → Upload Package** 中分别选择 `app.yaml` 和 `image.tar`，按需授予模型和码流权限后点击 **Install**。
 
-2. **上传安装**：在 **Applications** 页面点 **Import**，选择 **Upload Package**，在 **App Manifest** 中选择 `app.yaml`、在 **Container Image** 中选择 `image.tar`，按向导勾选 Permissions（应用所需的模型与码流），点 **Install**：
+<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/quick-start/qs-app-management.png" />
 
-   <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/quick-start/qs-app-management.png" />
+启动应用，点击 **Visit App** 查看推理结果。
 
-3. **查看效果**：安装后启动应用，点应用卡片的 **Visit App** 打开 Showcase 界面，切换不同模型实时查看推理效果：
+<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/quick-start/qs-model-showcase.png" />
 
-   <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/quick-start/qs-model-showcase.png" />
+源码、SDK 和构建资源见 [Resources](./4-application-guide/3-resources.md)。
 
-想从源码自行构建（clone → `scripts/build_app.sh` 打包 `.aipc`），见 [SDK 工作流](./4-application-guide/1-app-development/0-sdk-workflow.md)；安装向导各步骤字段的完整说明见 [AI 应用与模型](./2-user-guide/2-applications-and-models.md)。
+## 6. 配置网络和时区
 
-## 6. 配置网络与时区
-
-前 5 步走完设备已能工作。最后在 **Settings** 里配好网络与时区，即可正式上线。
-
-### 接入局域网
-
-出厂 IP `10.0.0.1` 仅用于首次配置。要让局域网内其他设备（NVR、业务服务器、同事电脑）能访问 NE503，进入 **Settings → Network**，根据环境二选一：
-
-| 模式 | 适用 | 操作 |
-|------|------|------|
-| **DHCP** | 有路由器自动分配 | 选 DHCP，保存 |
-| **Static Address** | 需固定 IP | 填 IP / 子网掩码 / 网关 / DNS |
-
-保存后设备切到新 IP。把电脑 IP 改回正常网段（或用同网段另一台电脑），用新 IP 重新访问 `https://<新IP>` 继续。
+进入 **Settings → Network**，选择 DHCP 或 Static Address。保存后使用新 IP 重新访问设备。
 
 <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/quick-start/qs-settings-network.png" />
 
-> 生产环境建议静态 IP 或在路由器绑定 MAC，避免 IP 变动导致对接失效。
-
-### 设时区
-
-时区错则视频 OSD 时间戳错位，接入外部 NVR 后录像文件的时间标记也会随之错。进入 **Settings → Time Settings**：选部署地时区，配 NTP 服务器（如 `pool.ntp.org`），点 **Sync Now** 立即同步。
+进入 **Settings → Time Settings**，选择时区，配置 NTP 后点击 **Sync Now**。
 
 <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/quick-start/qs-settings-time-settings.png" />
 
-## 7. 接下来做什么
-
-设备已上线。按你想做的事查页：
-
-| 你想做的事 | 去哪 |
-|-----------|------|
-| 调镜头 / 画质 / 叠加隐私遮罩 | [用户指南 · 视频与成像](./2-user-guide/1-media-and-image.md) |
-| RTSP 拉流接入 NVR / VMS | [用户指南 · 视频与成像](./2-user-guide/1-media-and-image.md) |
-| 安装自己的 AI 应用、管理模型 | [用户指南 · AI 应用与模型](./2-user-guide/2-applications-and-models.md) |
-| 接报警器 / 门禁 / 音频外设 | [用户指南 · 外设 IO](./2-user-guide/3-peripherals.md) |
-| 批量发现设备 / 命令行管理 | [用户指南 · 设备管理工具](./2-user-guide/4-device-management-tools.md) |
-| 升级固件 / 看日志 / 运维 | [用户指南 · 系统管理](./2-user-guide/5-deployment.md) |
-
-### 速查卡
-
-| 项目 | 值 |
-|------|-----|
-| Web 控制台 | `https://<设备IP>` |
-| 默认 IP | `10.0.0.1` |
-| Web 登录 | `admin` / `password` |
-| SSH 登录 | `root` / `root` |
-| RTSP 主码流 | `rtsp://<设备IP>:8554/main` |
-| 供电 | PoE 802.3AT 或 DC 12V，5–6 W |
+设备维护见[设备维护](./2-user-guide/5-device-maintenance.md)。

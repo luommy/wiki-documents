@@ -1,138 +1,91 @@
 ---
-description: Get your NE503 up and running — from unboxing to seeing AI inference results. Covers kit preparation, power and connection, login and password change, camera and stream verification, experiencing AI, network and time zone configuration, and where to go next.
-keywords: [NE503 quick start, first deployment, web console login, AI Model Showcase, default IP, PoE power, edge AI camera]
+description: "NE503 quick start: power on, log in, verify video, and run an AI demo."
+keywords: [NE503 quick start, first deployment, web login, AI Model Showcase, default IP]
 tags: [Quick Start, NE503, First Deployment]
 ---
 
 # Quick Start
 
-This guide walks you through the first deployment of the NE503: unbox → connect → log in & change password → verify the camera → experience AI → configure network and time zone. Once done, the device is ready to go live.
+Complete: power and connection → password change → camera and stream check → AI demo → network setup.
 
 <div align="center">
   <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/overview/ne503-main.png" alt="NeoEyes NE503" width="100%" />
 </div>
 
-## Who this page is for
+## 1. Prepare
 
-This page is the linear closed loop for **evaluators / first deployment** (unboxing to live, about 10 minutes).
-## 1. Kit and Preparation
+| Item | Requirement |
+|:--|:--|
+| Power | PoE 802.3AT or DC 12V |
+| Network | Switch, Ethernet cable, and a computer with configurable Ethernet IP |
+| Browser | Chrome, Edge, Firefox, or Safari |
 
-### Kit Contents
+IP67 rated, -40 °C to +60 °C operating temperature, 5–6 W power consumption. Use a matching wall-mount or other mounting bracket.
 
-| Component | Qty | Description |
-|-----------|-----|-------------|
-| NE503 main unit | 1 | Core processing board and interface board, IP67 rated |
-| Wall-mount screw pack | 1 | Mounting screws and hardware |
+## 2. Power and Connect
 
-### What You Need to Provide
+PoE: connect the Ethernet cable to a PoE switch. DC: connect a 12V adapter to the DC port. Proceed when the LED is solid (about 30–60 seconds).
 
-- **PoE switch** (802.3AT, recommended) + Ethernet cable: a single cable provides both power and network
-- **Or** DC 12V adapter + standard switch + Ethernet cable
-- **Computer**: with an Ethernet port, running Windows / macOS / Linux, and a modern browser (Chrome / Edge / Firefox / Safari)
+The factory IP is `10.0.0.1`. Set the computer to the same subnet, for example `10.0.0.100/24`, then run:
 
-### Installation Location
-
-IP67 rated, -40 °C to +60 °C operating temperature, suitable for outdoor installation. Secure the wall-mount bracket to the wall / pole, align the NE503 with the bracket and tighten the screws. Pole and ceiling mounts require additional brackets (sold separately). Power consumption: 5–6 W.
-
-## 2. Power and Connection
-
-**Power on**: For PoE, connect the Ethernet cable to a PoE switch; for DC, connect a 12V adapter to the DC port. The indicator blinks during startup and turns solid when ready (about 30–60 seconds).
-
-**Connect**: The default factory IP is `10.0.0.1`. Set your computer's Ethernet IP to the same subnet (e.g., `10.0.0.100`, mask `255.255.255.0`), then verify with ping:
-
-```bash
+~~~bash
 ping 10.0.0.1
-```
+~~~
 
-If it replies, proceed to the next step. If not, check in order: the Ethernet cable / PoE power (watch the device LED), that the computer IP is really on the `10.0.0.x` subnet, and that the firewall allows ICMP. If the device was previously attached to a router with DHCP, its IP is no longer `10.0.0.1` — look up the assigned address in the router admin page. Still nothing? See [Troubleshooting](./5-troubleshooting.md).
+A reply confirms the connection. If it fails, check power, cable, computer IP, and firewall. If the device has joined DHCP, look up its new address in the router.
 
 ## 3. Log In and Change the Password
 
-Open a browser and navigate to `https://10.0.0.1` (the browser will warn that the certificate is not trusted on first access — proceed as prompted). Sign in with the default credentials — username `admin`, password `password`:
+Open `https://10.0.0.1` and sign in with `admin` / `password`.
 
 <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/quick-start/qs-login.png" />
 
-After logging in, you land on the Dashboard. Click the expand icon in the top-left corner to show the navigation labels (Dashboard / Media / Image / Applications / Models / Peripherals / Settings / Maintenance) — you'll jump between these pages throughout this guide.
-
-<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/quick-start/qs-dashboard.png" />
-
-**⚠️ First thing: change the default password.** The default password is public knowledge; leaving it unchanged exposes the device. Go to **Settings → Device Info**, scroll to **Change Password** at the bottom, and set a new password. Note: **the device has no factory-reset or password-reset function — a lost password requires reflashing via support**, so keep the new password safe.
+Open **Settings → Device Info → Change Password**, set a new password, and save it.
 
 <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/quick-start/qs-settings-device-info.png" />
 
+> The device has no local password-reset function. A forgotten password requires support-assisted reflashing.
+
 ## 4. Verify the Camera and Stream
 
-Go to the **Media** page. The main area shows the live camera feed — seeing the image confirms that the camera sensor and image pipeline are working.
+Open **Media**. A live image confirms the camera pipeline.
 
 <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/quick-start/qs-media.png" />
 
-While you're here, confirm the stream works end to end: in the right-side **Configuration** panel, enable **Enable RTSP Stream**, copy the main stream URL `rtsp://<device-ip>:8554/main`, and pull it in VLC (Media → Open Network Stream → paste the URL → Play). Smooth playback means the full pipeline is healthy. This stream is factory 4K (3840×2160@30) and requires no authentication. If VLC shows a black screen or stutters: confirm the RTSP toggle was saved, force TCP transport in the player, then check [Troubleshooting · Video & Streams](./5-troubleshooting.md).
+Enable **Enable RTSP Stream** and open this URL in VLC:
 
-## 5. Experience the AI
+~~~text
+rtsp://<device-ip>:8554/main
+~~~
 
-NE503's AI capabilities are delivered through container apps. **AI Model Showcase** demonstrates multi-model inference — object detection, semantic segmentation, keypoints, OCR, CLIP zero-shot classification, monocular depth estimation, and more. The official [camthink-ai/neoruntime-apps](https://github.com/camthink-ai/neoruntime-apps) repository provides **prebuilt installation bundles** — no compilation needed:
+Successful playback confirms streaming. For a black screen or stutter, confirm the setting was saved and use TCP transport in the player.
 
-1. **Download and extract** [model-showcase-latest-arm64.tar.gz](https://github.com/camthink-ai/neoruntime-apps/releases/download/showcase-bundles-latest/model-showcase-latest-arm64.tar.gz) (about 300 MB; contains `app.yaml` and `image.tar`):
+## 5. Run the AI Demo
 
-   ```bash
-   tar xzf model-showcase-latest-arm64.tar.gz
-   ```
+Download and extract [model-showcase-latest-arm64.tar.gz](https://github.com/camthink-ai/neoruntime-apps/releases/download/showcase-bundles-latest/model-showcase-latest-arm64.tar.gz):
 
-2. **Upload and install**: On the **Applications** page, click **Import** and select **Upload Package**. Select `app.yaml` under **App Manifest** and `image.tar` under **Container Image**, then use the wizard to grant the Permissions (models and streams) the app needs, and click **Install**:
+~~~bash
+tar xzf model-showcase-latest-arm64.tar.gz
+~~~
 
-   <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/quick-start/qs-app-management.png" />
+Open **Applications → Import → Upload Package**, select `app.yaml` and `image.tar`, grant the required model and stream permissions, and click **Install**.
 
-3. **View results**: After installation, start the app and click **Visit App** on the app card to open the Showcase UI and switch between models to see inference results in real time:
+<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/quick-start/qs-app-management.png" />
 
-   <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/quick-start/qs-model-showcase.png" />
+Start the app and click **Visit App** to view inference results.
 
-To build from source instead (clone → `scripts/build_app.sh` to package the `.aipc`), see [SDK Workflow](./4-application-guide/1-app-development/0-sdk-workflow.md); for full field-by-field instructions on the install wizard, see [AI Apps and Models](./2-user-guide/2-applications-and-models.md).
+<img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/quick-start/qs-model-showcase.png" />
+
+Source, SDK, and build resources are listed in [Resources](./4-application-guide/3-resources.md).
 
 ## 6. Configure Network and Time Zone
 
-After step 5 the device already works. The last step is to configure the network and time zone on the **Settings** page, and the device is ready to go live.
-
-### Connect to Your LAN
-
-The factory IP `10.0.0.1` is for initial setup only. For other devices on your LAN (NVRs, servers, colleagues' computers) to reach the NE503, go to **Settings → Network** and choose:
-
-| Mode | When | What to do |
-|------|------|------------|
-| **DHCP** | A router assigns IPs automatically | Select DHCP and save |
-| **Static Address** | You need a fixed IP | Enter IP / subnet mask / gateway / DNS |
-
-After saving, the device switches to the new IP. Change your computer's IP back to its normal subnet (or use another machine on the same subnet) and re-access the device at `https://<new-ip>`.
+Open **Settings → Network**, select DHCP or Static Address, and save. Reconnect to the device at its new IP.
 
 <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/quick-start/qs-settings-network.png" />
 
-> For production, prefer a static IP or bind the MAC in the router to avoid IP changes breaking integrations.
-
-### Set the Time Zone
-
-A wrong time zone breaks video OSD timestamps, and once the device feeds an external NVR the recording files' time marks will be off too. Go to **Settings → Time Settings**: pick your deployment time zone, configure an NTP server (e.g., `pool.ntp.org`), and click **Sync Now**.
+Open **Settings → Time Settings**, select the time zone, configure NTP, and click **Sync Now**.
 
 <img src="https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/quick-start/qs-settings-time-settings.png" />
 
-## 7. What's Next
-
-The device is live. Look up where to go by task:
-
-| Your goal | Where to go |
-|-----------|-------------|
-| Tune the lens / image quality / overlays and privacy masks | [User Guide · Video and Imaging](./2-user-guide/1-media-and-image.md) |
-| Pull an RTSP stream into an NVR / VMS | [User Guide · Video and Imaging](./2-user-guide/1-media-and-image.md) |
-| Install your own AI app, manage models | [User Guide · AI Apps and Models](./2-user-guide/2-applications-and-models.md) |
-| Wire up alarm / access control / audio | [User Guide · Peripherals](./2-user-guide/3-peripherals.md) |
-| Discover devices in bulk / command-line management | [User Guide · Device Management Tools](./2-user-guide/4-device-management-tools.md) |
-| Upgrade firmware / view logs / operate | [User Guide · System Management](./2-user-guide/5-deployment.md) |
-
-### Quick Reference
-
-| Item | Value |
-|------|-------|
-| Web Console | `https://<device-ip>` |
-| Default IP | `10.0.0.1` |
-| Web login | `admin` / `password` |
-| SSH login | `root` / `root` |
-| RTSP main stream | `rtsp://<device-ip>:8554/main` |
-| Power | PoE 802.3AT or DC 12V, 5–6 W |
+For device maintenance, see [Device Maintenance](./2-user-guide/5-device-maintenance.md).

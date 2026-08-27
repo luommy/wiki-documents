@@ -2,16 +2,16 @@
 id: verified-apps
 title: NE503 Verified Apps
 sidebar_position: 4
-description: NE503 verified application use cases, covering person detection, occupancy monitoring, safety helmet compliance detection and more, with effect previews, verification details, and app package download links (app.yaml + image.tar) to help users preview results and get deployment packages in one step.
-keywords: [NE503, App Use Cases, Verified Apps, Person Detection, Occupancy Monitor, Safety Helmet, Container App, Edge AI, App Download]
+description: NE503 verified applications and deployment packages.
+keywords: [NE503, Verified Apps, Person Detection, Occupancy Monitor, Safety Helmet, App Download]
 tags: [NE503, App Deployment, Container App, Person Detection, Occupancy Monitor, Safety Helmet, Edge AI]
 ---
 
 # NE503 Verified Apps
 
-The apps below have all been verified on real NE503 hardware. Download and install them directly for testing, or use the source code as a reference for your own development to accelerate POC delivery.
+The apps below are verified on real NE503 hardware and can be downloaded for testing.
 
-If you need a ready-made model, start with the [CamThink Model Zoo](https://www.camthink.ai/developer-center/models/). The Model Zoo provides downloadable model files that you can use to build your own app; this page provides complete app packages that have already been verified.
+For models, see the [CamThink Model Zoo](https://www.camthink.ai/developer-center/models/); this page provides verified app packages.
 
 ## App List
 
@@ -26,23 +26,21 @@ If you need a ready-made model, start with the [CamThink Model Zoo](https://www.
 
 ## Deployment
 
-After downloading the app's `app.yaml` and `image.tar`, deploy via the Web Console:
+After downloading app.yaml and image.tar, deploy through the Web Console:
 
 Open Web Console → **App Management** → **Import** → **Upload Package**, upload `app.yaml` and `image.tar` separately, then click **Install**. After installation, click **Start** to launch the app.
 
 ![Deploy app: upload app.yaml and image.tar](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/verified-apps/upload-app.png)
 
 :::note Model preloading required
-Each app depends on a different inference model. Before first use, load the corresponding model in **Model Management** on the Web Console:
+Before first use, load the required model in Web Console **Model Management**:
 
-- **Person Detection / Occupancy Monitor**: depend on the preinstalled `hailo_yolov8n_384_640` — just scan and load it.
-- **Safety Helmet Detection**: depends on a custom-trained `safety_helmet_yolov8n_384_640` (2-class Helmet / No Helmet; the app package does not include the model). Import the corresponding `.hef` into **Model Management** and load it; the HEF can be obtained from the download link above or compiled from the app source.
+- **Person Detection / Occupancy Monitor**: scan and load the preinstalled `hailo_yolov8n_384_640`.
+- **Safety Helmet Detection**: import and load `safety_helmet_yolov8n_384_640` HEF; the app package does not include the model.
 
 ![Model preload: scan and load model](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/verified-apps/upload-model.png)
 :::
 
-> More app use cases are being adapted. For custom app development, see the [SDK Workflow](./1-app-development/0-sdk-workflow.md).
+> More app use cases are being adapted. For custom app development material, see [Resources](./3-resources.md).
 
 ---
-
-**Document Version**: v1.3 · **Last Updated**: 2026-07-21

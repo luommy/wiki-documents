@@ -8,7 +8,7 @@ tags: [NE503, 硬件规格, 芯片参数, 硬件参考]
 
 ## 简介
 
-NE503 采用核心处理板（Hailo15H SoC）与接口板（STM32G0B0RET6 MCU）双板架构，详见 [Core Board](./1-core-board-connection.md) 和 [Interface Board](./2-aipc-board-connection.md)。
+NE503 采用核心处理板（Hailo15H SoC）与接口板（STM32G0B0RET6 MCU）双板架构。
 
 | 型号 | 型号描述 |
 |:---|:---|
@@ -66,3 +66,8 @@ NE503 各物理模组的主要器件参数如下：
 | 版本 | 修订日期 | 修订内容 |
 |:---|:---|:---|
 | V1.0 | 2026-04-02 | 首发版本 |
+
+## 相关文档
+
+- [核心处理板](./1-core-board-connection.md)
+- [接口板](./2-aipc-board-connection.md)

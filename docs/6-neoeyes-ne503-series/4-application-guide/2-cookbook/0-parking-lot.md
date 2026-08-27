@@ -26,7 +26,7 @@ tags: [NE503, 应用开发, Cookbook, 车辆检测, 事件集成]
 - 设备上的 `/data/aipc/models` 已提供 Showcase 需要的四个 HEF；
 - 使用 ARM64 Release bundle，或准备好 Docker 和源码构建环境。
 
-## 2. 应用结构
+## 2. 关键配置
 
 ### 2.1 模型与事件
 
@@ -37,24 +37,9 @@ tags: [NE503, 应用开发, Cookbook, 车辆检测, 事件集成]
 | `license_plate_det` | 车牌区域检测 | RGB，416 × 416 |
 | `plate_recognition` | 车牌字符识别 | NV12，320 × 48 |
 
-模型文件由应用从设备的 `/data/aipc/models` 只读目录读取。启动时，应用根据 `MODEL_DEFS` 注册模型；完整路径、后处理配置和流水线代码见源码仓库。
+模型文件从设备的 `/data/aipc/models` 读取，完整配置以源码仓库为准。
 
-### 2.2 数据链路
-
-```text
-摄像头
-  ↓
-sub.raw 原始帧
-  ↓
-车辆检测 → 深度防伪 → 车牌检测 → 车牌识别
-  ↓                         ↓
-Parking Lot Web UI       Event Bus
-                           ├─ parking/vehicles
-                           ├─ parking/plates
-                           └─ parking/alerts
-```
-
-默认清单使用 `sub.raw` 和 `STREAM_ID=sub`。应用会根据模型输入尺寸探测可用流；不要在 `app.py` 和 `app.yaml` 中随意把流名改成另一个值，设备没有对应原始流时就无法推理。
+默认清单使用 `sub.raw` 和 `STREAM_ID=sub`。设备没有对应原始流时无法推理。
 
 ## 3. 获取并配置应用
 
@@ -115,7 +100,7 @@ env:
     value: "0"
 ```
 
-`HD_PREVIEW_ENABLED=0` 时，页面使用应用自己的 MJPEG `/stream` 预览。当前出货固件上的平台 H.264 地址可能只监听设备内部回环地址，旧清单如果设为 `1`，外部浏览器可能只看到黑屏。
+保持 `HD_PREVIEW_ENABLED=0`，使用应用的 MJPEG `/stream` 预览。
 
 ## 4. 安装、启动并打开页面
 
@@ -141,7 +126,7 @@ aipc-cli app install app.yaml parking-lot-image.tar
 http://<设备IP>:8090
 ```
 
-页面成功打开后，应看到 `Parking Lot Monitor`、实时画面和模型统计卡片。如果页面能打开但预览为黑屏，先确认清单中的 `HD_PREVIEW_ENABLED` 为 `0`，再访问 `http://<设备IP>:8090/stream` 确认 MJPEG 流可返回数据。
+预期结果：看到 `Parking Lot Monitor`、实时画面和模型统计。黑屏时确认 `HD_PREVIEW_ENABLED=0`，并检查 `/stream`。
 
 ## 5. 验证结果
 
@@ -152,7 +137,7 @@ http://<设备IP>:8090
 3. 确认 `Active Models` 列出四个模型。
 4. 将镜头对准车辆，观察车辆框、`VEHICLES` 数值和统计信息。
 
-`FPS`、推理耗时和检测数量会随场景、固件和设备负载变化，不能直接当作固定性能指标。
+FPS、推理耗时和检测数量随场景和设备负载变化。
 
 ![Parking Lot Monitor 实时检测界面](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/cookbook/parking-lot/webui-dashboard.png)
 
@@ -164,7 +149,7 @@ http://<设备IP>:8090
 aipc-cli event subscribe 'parking/*'
 ```
 
-将镜头对准车辆后，优先确认收到 `parking/vehicles`，载荷应包含车辆框和置信度。只有画面中有满足模型条件的清晰车牌时，才会产生 `parking/plates`；只有深度分析触发防伪条件时，才会产生 `parking/alerts`。这两个主题暂时没有消息，不等于模型没有启动。
+将镜头对准车辆，先确认收到 `parking/vehicles`。车牌和防伪主题需要满足对应场景条件。
 
 ### 5.3 查看状态和日志
 
@@ -177,8 +162,5 @@ aipc-cli event subscribe 'parking/*'
 
 ## 6. 相关文档
 
-- [应用开发工作流](../1-app-development/0-sdk-workflow.md) — 应用目录、权限和构建流程
-- [应用参考](../3-reference/0-app-reference.md) — `app.yaml` 权限、生命周期和容器约束
-- [事件集成](../3-reference/5-event-integration.md) — WebSocket、MQTT 和 HTTP 对接
-- [版本兼容性矩阵](../../3-software-guide/5-version-matrix.md) — 核对 OS、平台、SDK 和模型环境
+- [Resources](../3-resources.md) — `app.yaml`、SDK、API 和事件协议参考
 - [人员检测](./1-person-detection.md) — 单模型推理和事件发布示例

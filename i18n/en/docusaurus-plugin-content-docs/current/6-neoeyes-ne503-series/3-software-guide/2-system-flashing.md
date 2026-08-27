@@ -1,32 +1,22 @@
 ---
-description: NE503 guide for initial system flashing, boot-chain recovery, and OS upgrades.
-keywords: [NE503, system flashing, firmware, eMMC, TFTP, U-Boot]
+description: Guide to NE503 system flashing, boot-chain recovery, MCU firmware programming, and deployment verification.
+keywords: [NE503, system flashing, MCU, ST-LINK, eMMC, TFTP, U-Boot]
 tags: [software guide, NE503, system deployment]
 ---
 
 # System Flashing
 
-This page covers the NE503 system image: initial flashing, boot-chain recovery, MCU firmware OTA, and OS upgrades. For platform release-package deployment, see [Software Deployment](./3-software-deployment.md).
-
-## Choose a Path
-
-| Device state | Path |
-| --- | --- |
-| New device, or no U-Boot menu appears after power-on | [Prepare firmware and host](#1-prepare-firmware-and-host) → [Recover the boot chain](#2-recover-the-boot-chain) → [Flash the system to eMMC](#3-flash-the-system-to-emmc) → [Log in and verify](#4-log-in-and-verify) → [Flash the MCU Firmware](#5-flash-the-mcu-firmware) |
-| Device boots normally and needs an OS upgrade | Go directly to [Upgrade a Running Device](#6-upgrade-a-running-device) |
-| OS is installed and the MCU firmware needs an update | Go directly to [Flash the MCU Firmware](#5-flash-the-mcu-firmware) |
+NE503 initial system flashing, boot-chain recovery, MCU firmware programming, and deployment verification.
 
 ## 1. Prepare Firmware and Host
 
 ### 1.1 Download the Firmware
 
-Download the system firmware Release for `hailo15-ne503` from [meta-hailo-os Releases](https://github.com/camthink-ai/meta-hailo-os/releases) and extract it on an Ubuntu host. Get the matching flashing-tool wheel from the same Release. If you need to download the wheel separately, it is available in the repository's [`tools/` directory](https://github.com/camthink-ai/meta-hailo-os/tree/main/tools).
+Download the `hailo15-ne503` firmware, BSP, and flashing-tool wheel from [meta-hailo-os Releases](https://github.com/camthink-ai/meta-hailo-os/releases), then extract them on an Ubuntu host. The wheel is also available in the repository's [`tools/` directory](https://github.com/camthink-ai/meta-hailo-os/tree/main/tools). All files must come from the same Release.
 
-The wheel filename follows `hailo15_board_tools-<VERSION>-py3-none-any.whl`; take `<VERSION>` directly from the filename. The system firmware, wheel, and BSP must use matching versions.
+See the [NE503 firmware and deployment guide](https://github.com/camthink-ai/meta-hailo-os/blob/main/docs/hailo15-ne503-firmware-and-deployment.md) for the complete file list.
 
-The complete NE503 build artifacts and deployment procedure are documented in the [NE503 firmware and deployment guide](https://github.com/camthink-ai/meta-hailo-os/blob/main/docs/hailo15-ne503-firmware-and-deployment.md). The tools, boot-chain files, and system images must come from the same Release.
-
-Boot-chain files:
+Boot-chain files (used in Section 2):
 
 ```text
 hailo15_uart_recovery_fw.bin
@@ -40,7 +30,7 @@ customer_certificate.bin
 u-boot-tfa.itb
 ```
 
-System-image files:
+System-image files (used in Section 3):
 
 ```text
 fitImage
@@ -50,7 +40,7 @@ hailo-update-image-hailo15-ne503.swu
 
 ### 1.2 Install Tools and Connect the Device
 
-The steps below use an Ubuntu 20.04/22.04 host. Prepare a 1.8V-compatible USB-to-serial cable, an Ethernet cable, and PoE power.
+Host: Ubuntu 20.04/22.04. Prepare a 1.8V-compatible USB-to-serial cable, an Ethernet cable, and PoE.
 
 ```bash
 pip install tools/hailo15_board_tools-<VERSION>-py3-none-any.whl
@@ -58,14 +48,14 @@ sudo apt-get update
 sudo apt-get install u-boot-tools
 ```
 
-Connect the serial cable to the NE503 debug port and find the serial node:
+Connect the debug serial cable and confirm the device node:
 
 ```bash
 ls -lh /dev/serial/by-id/
 screen /dev/ttyACM0 115200
 ```
 
-The examples use `/dev/ttyACM0`; replace it with the actual node.
+The commands use `/dev/ttyACM0`; replace it with the actual node.
 
 ![CamThink serial adapter](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/software-guide/system-flashing/sys-04-serial-board.png)
 
@@ -90,7 +80,7 @@ TFTP_ADDRESS="0.0.0.0:69"
 TFTP_OPTIONS="--secure"
 ```
 
-Copy the system images:
+Copy the system images and restart TFTP:
 
 ```bash
 sudo mkdir -p /var/lib/tftpboot
@@ -104,7 +94,7 @@ sudo systemctl restart tftpd-hpa
 
 ## 2. Recover the Boot Chain
 
-Use this section for a new device or when the U-Boot menu cannot be reached. If the menu is available, skip to [Section 3](#3-flash-the-system-to-emmc).
+Use this section for a new device or when the U-Boot menu is unavailable. If it is available, skip to [Section 3](#3-flash-the-system-to-emmc).
 
 ### 2.1 Enter UART Recovery Mode
 
@@ -136,7 +126,32 @@ hailo15_spi_flash_program \
   --serial-device-name /dev/ttyACM0
 ```
 
-After the command exits normally, return BOOT0 and BOOT1 to **OFF**.
+Expected output (excerpt; repeated erase and validation lines are omitted):
+
+```text
+UART recovery load firmware and script version: 1.4
+flash detected, flash jedec_id: 0x9d701700
+Programming SCU firmware file: ./hailo15_scu_fw.bin...
+Provided file ./hailo15_scu_fw.bin was successfully programmed
+Programming SCU bootloader file: ./hailo15_scu_bl.bin...
+Provided file ./hailo15_scu_bl.bin was successfully programmed
+Programming SCU bootloader config file...
+Provided file ./scu_bl_cfg_a.bin was successfully programmed
+Programming U-Boot SPL file: ./u-boot-spl.bin...
+Provided file ./u-boot-spl.bin was successfully programmed
+Programming U-Boot env file: ./u-boot-initial-env...
+Provided file ./u-boot-initial-env was successfully programmed
+Programming Customer certificate file: ./customer_certificate.bin...
+Provided file ./customer_certificate.bin was successfully programmed
+Programming u-boot device-tree file: ./u-boot.dtb.signed...
+Provided file ./u-boot.dtb.signed was successfully programmed
+Programming U-Boot & TF-A file: ./u-boot-tfa.itb...
+Provided file ./u-boot-tfa.itb was successfully programmed
+```
+
+**Success:** all 8 components show `successfully programmed` and the command exits with code `0`.
+
+After flashing, power off the device, return BOOT0 and BOOT1 to **OFF**, and power it on again.
 
 ![DIP switch normal mode](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/software-guide/system-flashing/sys-18-dip-normal.png)
 
@@ -144,15 +159,15 @@ After the command exits normally, return BOOT0 and BOOT1 to **OFF**.
 
 ### 3.1 Enter the U-Boot Menu
 
-1. Connect PoE through the RJ45 port;
-2. Keep the serial terminal at `115200` baud;
-3. During the autoboot countdown, press `↑` or `↓` to open the U-Boot menu.
+1. Connect PoE through RJ45 and power on the device;
+2. Set the serial terminal to `115200`;
+3. During the boot countdown, press `↑` or `↓` to open the U-Boot menu.
 
 ![U-Boot boot menu](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/software-guide/system-flashing/sys-21-emmc-init-1.png)
 
 ### 3.2 Configure the Network
 
-The defaults are device `10.0.0.1` and TFTP host `10.0.0.2`. If the host uses another subnet, select **U-Boot console**:
+Connect the Ubuntu TFTP host and the device to the same subnet. The default device IP is `10.0.0.1` and the host IP is `10.0.0.2`; for another subnet, select **U-Boot console**:
 
 ```text
 setenv ipaddr 192.168.93.XXX
@@ -161,13 +176,11 @@ saveenv
 reset
 ```
 
-`serverip` must be the IP address of the Ubuntu host running TFTP.
+Set `serverip` to the IP address of the host running TFTP.
 
 ### 3.3 Write the System Image
 
-Return to the U-Boot menu and select **eMMC AB Board Init**. This is the current NE503 entry point for initial installation and recovery with the A/B layout.
-
-The device fetches the system files over TFTP and writes them to eMMC. Wait for the automatic reboot. Do not remove power or the Ethernet cable during the write.
+After confirming the network settings, select **eMMC AB Board Init** in the U-Boot menu. If you just ran `reset`, re-enter the menu as described in Section 3.1. Do not remove power or Ethernet during the write; the device reboots when complete.
 
 ## 4. Log In and Verify
 
@@ -178,68 +191,82 @@ Username: root
 Password: root
 ```
 
-Change the default password immediately, then run:
+Change the default password and verify:
 
 ```bash
-uname -r
+passwd
+cat /data/aipc/VERSION
 df -h /
 lsmod | grep hailo
 ip addr show eth0
 ```
 
-Confirm that the device has an IP address, the root filesystem is mounted, and the Hailo kernel modules are loaded.
+**Success:** the password is changed, `VERSION` returns the full version information, the device has an IP address, the root filesystem is mounted, and Hailo kernel modules are loaded.
 
-For a first-time deployment, continue with [Section 5: MCU Firmware](#5-flash-the-mcu-firmware) after this verification. Complete that required step before deploying platform software.
+After a first-time deployment, choose the MCU programming method in Section 5 based on the device state.
 
 ## 5. Flash the MCU Firmware
 
-MCU firmware flashing is a required step for the initial NE503 deployment. After Section 4 confirms that the system is running normally and accessible over SSH, deploy the MCU OTA package that matches the current NeoRuntime Release.
+Choose based on the device state:
 
-1. Download the `ne503_ota_package_v<X.Y.Z>.bin` package for the current NE503 Release from [neoruntime Releases](https://github.com/camthink-ai/neoruntime/releases);
-2. Copy the OTA package to `/data/aipc/firmware/mcu/`:
+- MCU is not programmed, the device cannot run normally, or OTA is unavailable: flash the HEX with ST-LINK;
+- The system boots normally: update the MCU with OTA and the `.bin` package.
 
-```bash
-ssh root@<device-ip> "mkdir -p /data/aipc/firmware/mcu"
-scp ne503_ota_package_v<X.Y.Z>.bin root@<device-ip>:/data/aipc/firmware/mcu/
+### 5.1 Flash the HEX File with ST-LINK
+
+Prepare ST-LINK, [STM32CubeProgrammer](https://www.st.com/en/development-tools/stm32cubeprog.html), and device power. Connect ST-LINK to the interface board's ST-LINK/SWD port: connect `PA13` to `SWDIO` and `PA14` to `SWDCLK/BOOT0`. Keep the device in normal boot mode.
+
+![ST-LINK location on the interface board](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/software-guide/system-flashing/mcu-st-link-port.png)
+
+Download and use the [combined HEX file `ne503_Main_v0.1.7_20260723.hex`](https://resources.camthink.ai/tools/ne503_Main_v0.1.7_20260723.hex):
+
+```text
+ne503_Main_v0.1.7_20260723.hex
 ```
 
-3. Keep the device powered and reboot it. During boot, `aipc-mcu-prep.service` checks the OTA package before the runtime services start and upgrades the MCU automatically when the package version is newer than the installed version:
+Confirm that the host detects ST-LINK and STM32G0B0:
 
 ```bash
-ssh root@<device-ip> "reboot"
+STM32_Programmer_CLI -l
+STM32_Programmer_CLI -c port=SWD
 ```
 
-4. Verify the service result after the reboot:
+Flash and verify:
 
 ```bash
-ssh root@<device-ip> "systemctl status aipc-mcu-prep.service"
-ssh root@<device-ip> "journalctl -b -u aipc-mcu-prep.service --no-pager | grep complete"
+STM32_Programmer_CLI -c port=swd -e all -w ./ne503_Main_v0.1.7_20260723.hex -v -rst
 ```
 
-The success log should contain `rtc=ok ota=done rc=0`. If the installed MCU version is already equal to or newer than the OTA package, the service skips a duplicate flash and completes the version check normally.
+`-e all` erases the entire MCU. Confirm the target device and firmware file before running it.
 
-Field updates use `ne503_ota_package_v<X.Y.Z>.bin`. `ne503_Main_v*.hex` is for factory SWD/ST-LINK programming only; the old `ne503_mcu.elf` + ST-LINK manual-flashing flow is no longer used.
+**Success:** download and verification complete with exit code `0`. Disconnect ST-LINK and reboot the device.
 
-## 6. Upgrade a Running Device
+### 5.2 Update a Running Device over OTA
 
-When the device is already running normally, use the Web Console OS upgrade entry. Do not repeat UART recovery or U-Boot TFTP flashing.
+Use OTA only when the system boots normally. Use the `ne503_ota_package_v<X.Y.Z>.bin` package matching the NeoRuntime Release; do not upload a `.hex` file to the OTA directory.
 
-1. Open **Settings → Device Info**;
-2. In **System OS Version**, click **Update**;
-3. Select the `.swu` file for `hailo15-ne503`;
-4. Wait for package validation to pass;
-5. Keep the device powered, acknowledge the confirmation, and start the upgrade;
-6. Wait for the device to reboot, verify the new system, and come back online.
+1. Download the [OTA package `ne503_ota_package_v0.1.7.bin`](https://resources.camthink.ai/tools/ne503_ota_package_v0.1.7.bin) to the Ubuntu host;
+2. Set the device address and upload the package:
 
-![System OS Upgrade dialog](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/software-guide/system-flashing/system-os-upgrade.jpg)
+```bash
+DEVICE_IP="<device-ip>"
+OTA_PACKAGE="ne503_ota_package_v0.1.7.bin"
 
-The upgrade is complete when the page reports success and the device is online again. See the [NeoRuntime OS upgrade guide](https://github.com/camthink-ai/neoruntime/blob/main/docs/deployment/os-upgrade.md) for the A/B mechanism.
+ssh root@"$DEVICE_IP" "mkdir -p /data/aipc/firmware/mcu"
+scp "$OTA_PACKAGE" root@"$DEVICE_IP":/data/aipc/firmware/mcu/
+ssh root@"$DEVICE_IP" "test -s /data/aipc/firmware/mcu/$OTA_PACKAGE && ls -lh /data/aipc/firmware/mcu/$OTA_PACKAGE"
+```
 
-## 7. Source Documentation
+After the remote file information is displayed, keep power connected and reboot:
 
-- [meta-hailo-os Releases: system firmware downloads](https://github.com/camthink-ai/meta-hailo-os/releases)
-- [meta-hailo-os: NE503 firmware and deployment](https://github.com/camthink-ai/meta-hailo-os/blob/main/docs/hailo15-ne503-firmware-and-deployment.md)
-- [neoruntime Releases: platform software and MCU firmware downloads](https://github.com/camthink-ai/neoruntime/releases)
-- [NeoRuntime: OS A/B upgrade](https://github.com/camthink-ai/neoruntime/blob/main/docs/deployment/os-upgrade.md)
-- [NeoRuntime: MCU OTA](https://github.com/camthink-ai/neoruntime/blob/main/docs/deployment/baseboard-mcu-rtc-ota.md)
-- [Software Deployment](./3-software-deployment.md)
+```bash
+ssh root@"$DEVICE_IP" reboot
+```
+
+The SSH connection will close normally. After the device is back online, verify:
+
+```bash
+ssh root@"$DEVICE_IP" 'journalctl -b -u aipc-mcu-prep.service --no-pager | grep -F "rtc=ok ota=done rc=0"'
+```
+
+**Success:** the log contains `rtc=ok ota=done rc=0`.

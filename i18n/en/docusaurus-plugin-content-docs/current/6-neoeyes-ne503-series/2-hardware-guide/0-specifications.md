@@ -8,7 +8,7 @@ tags: [NE503, hardware specifications, chip parameters, hardware reference]
 
 ## Introduction
 
-NE503 features a dual-board architecture with a core processing board (Hailo15H SoC) and an interface board (STM32G0B0RET6 MCU). For details, see [Core Board](./1-core-board-connection.md) and [Interface Board](./2-aipc-board-connection.md).
+NE503 features a dual-board architecture with a core processing board (Hailo15H SoC) and an interface board (STM32G0B0RET6 MCU).
 
 | Model | Description |
 |:---|:---|
@@ -66,3 +66,8 @@ Key device parameters for each physical module in NE503:
 | Version | Date | Changes |
 |:---|:---|:---|
 | V1.0 | 2026-04-02 | Initial release |
+
+## Related Documentation
+
+- [Core Board](./1-core-board-connection.md)
+- [Interface Board](./2-aipc-board-connection.md)
