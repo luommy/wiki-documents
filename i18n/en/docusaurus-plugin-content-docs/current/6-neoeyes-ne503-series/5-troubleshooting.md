@@ -113,7 +113,7 @@ Confirm:
 
 1. Model state is **Loaded**;
 2. app permissions include the model and raw stream;
-3. the model input is 384×640 NV12;
+3. the model input matches the active stream configuration;
 4. the threshold is not too high;
 5. inference uses third or sub, not main, which provides H.264 only.
 
@@ -121,7 +121,7 @@ See [Model Training and HEF](./4-application-guide/4-model-training-and-hef.md) 
 
 ### 3.2 Model not found or input-size error
 
-The model ID must match the registered device name. byte_size mismatch means the HEF input size does not match. Confirm the actual model name and input in aipc-cli model list and app logs, then update app.yaml or recompile the HEF.
+The model ID must match the registered device name. byte_size mismatch means the HEF input does not match the active stream configuration. Confirm the actual model name and input in aipc-cli model list and app logs, then update app.yaml or recompile the HEF.
 
 ## 4. Apps and Containers
 

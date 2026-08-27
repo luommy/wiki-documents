@@ -54,4 +54,4 @@ Open the **Models** page to manage inference models. The list depends on the dev
 
 ### Model Actions
 
-Each model card supports **Scan Models** (scan `/data/aipc/models/`), **Import** (upload a `.hef` file and enter Model ID, Model Type, and Threshold), and **Load / Unload / Detail / Delete**. Confirm that the model is **Loaded** before inference; models declared in app permissions load automatically at startup. Ensure the input size is **384×640 NV12**, adjust the Threshold as needed, and verify that the app is **Running** and produces the expected result.
+Each model card supports **Scan Models** (scan `/data/aipc/models/`), **Import** (upload a `.hef` file and enter Model ID, Model Type, and Threshold), and **Load / Unload / Detail / Delete**. Confirm that the model is **Loaded** before inference; models declared in app permissions load automatically at startup. Confirm that the model input matches the active stream configuration, adjust the Threshold as needed, and verify that the app is **Running** and produces the expected result.

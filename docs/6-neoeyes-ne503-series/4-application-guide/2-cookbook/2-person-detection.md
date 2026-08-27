@@ -12,8 +12,17 @@ tags: [NE503, 应用开发, Cookbook, 人员检测, 事件集成]
 
 完整代码、清单和 Dockerfile 见 [Person Detection 示例目录](https://github.com/camthink-ai/neoruntime-apps/tree/main/examples/person-detection)。本文只保留能让你跑通示例的步骤。
 
-## 1. 应用链路
-## 1. 关键配置
+## 1. 目标与前提
+
+完成后，应能看到人员检测结果，并收到 `app/person-detection/detection` 事件。
+
+开始前确认：
+
+- NE503 Web Console 可访问；
+- `person-detection` 模型已在设备上可用；
+- 已准备 Docker、Git，以及可访问 `neoruntime-apps` 和 `neoruntime-sdks` 的网络环境。
+
+## 2. 关键配置
 
 以下值来自仓库中的 `app.yaml` 和 `app.py`：
 
@@ -28,7 +37,9 @@ tags: [NE503, 应用开发, Cookbook, 人员检测, 事件集成]
 
 模型或流名不同时，先按设备实际值同步修改 `app.yaml` 和 `app.py`。
 
-## 2. 获取示例并检查清单
+## 3. 获取并构建应用
+
+### 3.1 获取源码并检查清单
 
 克隆应用仓库和 SDK 仓库：
 
@@ -69,9 +80,7 @@ env:
 
 完整字段见仓库中的 [`app.yaml`](https://github.com/camthink-ai/neoruntime-apps/blob/main/examples/person-detection/app.yaml)。`allow_register_model: false` 表示设备必须先提供 `person-detection` 模型。
 
-## 3. 构建、安装并启动
-
-### 3.1 构建 ARM64 包
+### 3.2 构建 ARM64 包
 
 设备使用 ARM64 镜像。推荐从 `neoruntime-apps` 根目录运行统一构建脚本：
 
@@ -88,7 +97,9 @@ examples/person-detection/person-detection.aipc
 
 SDK wheel 说明见 [neoruntime-sdks](https://github.com/camthink-ai/neoruntime-sdks#python-sdk)。
 
-### 3.2 安装
+## 4. 安装与启动
+
+### 4.1 安装
 
 在 Web Console 中进入 **App Management**，导入 `person-detection.aipc`，然后点击 **Install**。
 
@@ -101,13 +112,13 @@ cd /tmp/person-detection
 aipc-cli app install app.yaml image.tar
 ```
 
-### 3.3 启动
+### 4.2 启动
 
 在 **App Management** 中找到 `person-detection`，点击 **Start**，等待状态变为 **Running**。
 
-## 4. 验证推理和事件
+## 5. 验证结果
 
-### 4.1 验证应用状态和权限
+### 5.1 验证应用状态和权限
 
 在应用详情页确认：
 
@@ -118,7 +129,7 @@ aipc-cli app install app.yaml image.tar
 
 ![应用管理页（Person Detection 运行中）](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/app-development/person-detection/pd-01-apps-running.png)
 
-### 4.2 查看日志
+### 5.2 查看日志
 
 在应用详情页打开 **Logs**，或通过设备 API 拉取应用日志。至少应依次看到以下类型的记录：
 
@@ -135,7 +146,7 @@ Statistics: frames=..., detections=..., avg_persons=...
 
 ![Web Logs 实时检测输出](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/app-development/person-detection/pd-04-web-logs-live.png)
 
-### 4.3 验证事件
+### 5.3 验证事件
 
 在设备上订阅应用事件：
 
@@ -152,7 +163,7 @@ aipc-cli event subscribe 'app/person-detection/*'
 
 应用按 `ALERT_COOLDOWN_SECONDS` 发布 `alerts/detection`。白光联动需要对应硬件和权限。
 
-## 5. 相关文档
+## 6. 相关文档
 
 - [Resources](../3-resources.md) — `app.yaml`、SDK、API 和事件协议参考
-- [停车场管理](./0-parking-lot.md) — 多模型和 Web UI 的完整 Showcase
+- [停车场管理](./1-parking-lot.md) — 多模型和 Web UI 的完整 Showcase

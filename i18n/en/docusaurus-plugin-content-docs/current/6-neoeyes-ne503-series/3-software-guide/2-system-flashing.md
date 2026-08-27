@@ -191,17 +191,16 @@ Username: root
 Password: root
 ```
 
-Change the default password and verify:
+Change the root password and confirm that the OS has started:
 
 ```bash
 passwd
-cat /data/aipc/VERSION
-df -h /
-lsmod | grep hailo
-ip addr show eth0
+cat /etc/os-release
 ```
 
-**Success:** the password is changed, `VERSION` returns the full version information, the device has an IP address, the root filesystem is mounted, and Hailo kernel modules are loaded.
+The system image does not include the NE503 app. Do not use `/data/aipc/VERSION`, `aipc`, or Hailo modules as post-flashing checks.
+
+**Success:** the password is changed and `cat /etc/os-release` returns OS information.
 
 After a first-time deployment, choose the MCU programming method in Section 5 based on the device state.
 

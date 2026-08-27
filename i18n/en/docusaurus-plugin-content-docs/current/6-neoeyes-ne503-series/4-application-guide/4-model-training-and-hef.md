@@ -1,4 +1,5 @@
 ---
+sidebar_position: 3
 description: Convert a static YOLOv8 ONNX model into a Hailo HEF deployable on NE503, including quantization and compilation.
 keywords: [NE503, YOLOv8, model conversion, Hailo, HEF, DFC, ONNX]
 tags: [NE503, model conversion, Hailo, HEF]
@@ -20,7 +21,7 @@ MODEL_NAME="<model-name>"
 
 Training is outside this page; if the ONNX is ready, continue to Section 3.
 
-Training and ONNX export are outside this page. Use Ubuntu x86_64 with an NVIDIA GPU for FineTune. Download and extract the [Hailo AI Software Suite 2026-04 Docker environment](https://resources.camthink.ai/tools/hailo_ai_sw_suite_2026-04_docker.zip), then load the image:
+Use Ubuntu x86_64 with an NVIDIA GPU for FineTune. Download and extract the [Hailo AI Software Suite 2026-04 Docker environment](https://resources.camthink.ai/tools/hailo_ai_sw_suite_2026-04_docker.zip), then load the image:
 
 ```bash
 docker load -i <package-dir>/hailo_ai_sw_suite_2026-04.tar.gz
@@ -36,9 +37,11 @@ docker run --platform linux/amd64 --rm -it --gpus all \
 
 Run the commands below inside the container.
 
+If exporting ONNX from a `.pt` file, install [Ultralytics](https://docs.ultralytics.com/quickstart/) in the host or a separate Python environment; the Hailo Docker image does not include the `yolo` command.
+
 ## 2. ONNX Export
 
-If starting from `best.pt`, export a static ONNX model:
+If starting from `best.pt`, export a static ONNX model in the Ultralytics environment:
 
 ```bash
 yolo export model=<path>/best.pt \

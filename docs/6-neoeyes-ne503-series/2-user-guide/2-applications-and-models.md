@@ -54,4 +54,4 @@ NE503 通过 **Applications** 管理应用，通过 **Models** 管理模型。AI
 
 ### 模型操作
 
-模型卡支持 **Scan Models**（扫描 `/data/aipc/models/`）、**Import**（上传 `.hef` 并填写 Model ID、Model Type、Threshold）以及 **Load / Unload / Detail / Delete**。推理前确认模型为 **Loaded**；应用声明模型权限后启动时会自动加载。确保输入尺寸为 **384×640 NV12**，按需调整 Threshold，最后确认应用为 **Running** 并产生预期结果。
+模型卡支持 **Scan Models**（扫描 `/data/aipc/models/`）、**Import**（上传 `.hef` 并填写 Model ID、Model Type、Threshold）以及 **Load / Unload / Detail / Delete**。推理前确认模型为 **Loaded**；应用声明模型权限后启动时会自动加载。确认模型输入与实际码流配置匹配，按需调整 Threshold，最后确认应用为 **Running** 并产生预期结果。

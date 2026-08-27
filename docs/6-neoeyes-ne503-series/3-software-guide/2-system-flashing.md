@@ -191,17 +191,16 @@ reset
 密码：root
 ```
 
-修改默认密码并验证：
+修改 root 默认密码并确认 OS 已启动：
 
 ```bash
 passwd
-cat /data/aipc/VERSION
-df -h /
-lsmod | grep hailo
-ip addr show eth0
+cat /etc/os-release
 ```
 
-**成功：**密码已修改，`VERSION` 可读取完整版本信息，设备有 IP、根文件系统已挂载、Hailo 内核模块已加载。
+当前系统镜像不包含 NE503 app，不使用 `/data/aipc/VERSION`、`aipc` 或 Hailo 模块作为烧录后的验证项。
+
+**成功：**密码已修改，`cat /etc/os-release` 输出 OS 信息。
 
 首次部署完成本节后，按第 5 节的设备状态选择 MCU 烧录方式。
 

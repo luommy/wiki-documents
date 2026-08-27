@@ -113,7 +113,7 @@ aipc-cli app logs <app-id>
 
 1. 模型状态为 **Loaded**；
 2. 应用权限包含实际模型和原始码流；
-3. 模型输入为 384×640 NV12；
+3. 模型输入与实际码流配置匹配；
 4. 阈值没有过高；
 5. 推理使用 third 或 sub，不要使用只提供 H.264 的 main。
 
@@ -121,7 +121,7 @@ aipc-cli app logs <app-id>
 
 ### 3.2 Model not found 或输入尺寸错误
 
-模型 ID 必须与设备实际注册名一致。byte_size mismatch 表示 HEF 输入尺寸不匹配。先用 aipc-cli model list 和应用日志确认实际名称和输入，再修改 app.yaml 或重新编译 HEF。
+模型 ID 必须与设备实际注册名一致。byte_size mismatch 表示 HEF 输入与实际码流配置不匹配。先用 aipc-cli model list 和应用日志确认实际名称和输入，再修改 app.yaml 或重新编译 HEF。
 
 ## 4. 应用与容器
 

@@ -2,7 +2,7 @@
 id: resources
 slug: /neoeyes-ne503-series/application-guide/
 title: Resources
-sidebar_position: 3.5
+sidebar_position: 5
 description: NE503 应用开发所需的 NeoRuntime 平台、SDK、示例应用、API、事件协议和部署资料 GitHub 入口。
 keywords: [NE503, GitHub, NeoRuntime, SDK, 应用开发, REST API]
 tags: [NE503, 应用开发, GitHub, SDK]

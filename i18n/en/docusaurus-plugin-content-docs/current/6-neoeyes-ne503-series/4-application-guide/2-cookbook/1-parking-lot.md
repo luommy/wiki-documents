@@ -41,7 +41,7 @@ The app reads model files from `/data/aipc/models`; use the repository for the c
 
 The default manifest uses `sub.raw` and `STREAM_ID=sub`. Inference fails if the device has no matching raw stream.
 
-## 3. Get and configure the app
+## 3. Get and build the app
 
 ### 3.1 Download the Release bundle
 
@@ -55,9 +55,22 @@ sha256sum -c SHA256SUMS
 
 ### 3.2 Build from source
 
-You need Docker, `neoruntime-apps`, and the sibling `neoruntime-sdks` repository:
+You need Docker, `neoruntime-apps`, and the sibling `neoruntime-sdks` repository. Run the following commands from their parent directory. Clone the repositories for the first build; if they already exist, run the corresponding `git pull` commands:
 
 ```bash
+# First checkout
+git clone https://github.com/camthink-ai/neoruntime-sdks.git
+git clone https://github.com/camthink-ai/neoruntime-apps.git
+
+# Update existing checkouts
+git -C neoruntime-sdks pull
+git -C neoruntime-apps pull
+```
+
+Enter the `neoruntime-apps` root and build:
+
+```bash
+cd neoruntime-apps
 cd ../neoruntime-sdks/python
 python -m pip install --upgrade build
 python -m build --wheel
@@ -102,7 +115,7 @@ env:
 
 Keep `HD_PREVIEW_ENABLED=0` to use the app's MJPEG `/stream` preview.
 
-## 4. Install, start, and open the page
+## 4. Install and start
 
 ### 4.1 Install
 
@@ -163,4 +176,4 @@ In the app details page, confirm **Running** and inspect the app logs. Check for
 ## 6. Related docs
 
 - [Resources](../3-resources.md) — `app.yaml`, SDK, API, and event protocol references
-- [Person Detection](./1-person-detection.md) — single-model inference and event publishing example
+- [Person Detection](./2-person-detection.md) — single-model inference and event publishing example

@@ -1,4 +1,5 @@
 ---
+sidebar_position: 3
 description: 将静态 YOLOv8 ONNX 转换为可部署到 NE503 的 Hailo HEF，包含量化和编译步骤。
 keywords: [NE503, YOLOv8, 模型转换, Hailo, HEF, DFC, ONNX]
 tags: [NE503, 模型转换, Hailo, HEF]
@@ -36,9 +37,11 @@ docker run --platform linux/amd64 --rm -it --gpus all \
 
 以下命令均在容器内执行。
 
+如需从 `.pt` 导出 ONNX，请在宿主机或单独的 Python 环境安装 [Ultralytics](https://docs.ultralytics.com/quickstart/)；Hailo Docker 不包含 `yolo` 命令。
+
 ## 2. ONNX 导出
 
-如从 `best.pt` 开始，导出静态 ONNX：
+如从 `best.pt` 开始，请在上述 Ultralytics 环境中导出静态 ONNX：
 
 ```bash
 yolo export model=<path>/best.pt \

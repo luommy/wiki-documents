@@ -44,6 +44,10 @@ const configuredPlugins = [
           from: '/docs/neoeyes-ne503-series/user-guide/deployment',
           to: '/docs/neoeyes-ne503-series/user-guide/device-maintenance',
         },
+        {
+          from: '/docs/neoeyes-ne503-series/application-guide/hello-world',
+          to: '/docs/neoeyes-ne503-series/application-guide/cookbook/hello-world',
+        },
       ],
     }
   ],

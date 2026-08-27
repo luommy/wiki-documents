@@ -1,7 +1,7 @@
 ---
 id: ai-assisted-dev
 title: AI-Assisted Development
-sidebar_position: 3
+sidebar_position: 2
 description: 使用 Claude Code 和 ne503-dev 构建并部署 NE503 应用。
 keywords: [NE503, ne503-dev, Claude Code, AI 辅助开发, 应用开发]
 tags: [应用开发, NE503, AI 辅助开发]
@@ -12,17 +12,20 @@ tags: [应用开发, NE503, AI 辅助开发]
 本例使用 **Claude Code** 和 ne503-dev 构建“人员停留 10 秒告警”应用：人员连续出现 10 秒告警，离开后重置。
 
 :::tip 直接体验成品
-下载[预编译包](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/app-development/ai-assisted-dev/lingering-detection.tar)，解压后按 [Hello World 部署步骤](./1-hello-world.md#3-部署到设备)导入。
+下载[预编译包](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/app-development/ai-assisted-dev/lingering-detection.tar)，解压后按 [Hello World 部署步骤](./2-cookbook/0-hello-world.md#3-部署到设备)导入。
 :::
 
 ## 1. 前置准备
 
-| 条件 | 要求 |
+| 项目 | 要求 |
 |:--|:--|
 | Claude Code | 已安装并可运行 |
-| ne503-dev | [下载](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/app-development/ai-assisted-dev/ne503-dev.zip)，解压到 ~/.claude/skills/ne503-dev/ |
+| Skill name | `ne503-dev`；[下载](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/app-development/ai-assisted-dev/ne503-dev.zip)，解压到 `~/.claude/skills/ne503-dev/` |
+| [neoruntime](https://github.com/camthink-ai/neoruntime) | 平台服务、HAL、构建与部署脚本 |
+| [neoruntime-sdks](https://github.com/camthink-ai/neoruntime-sdks) | Python/C++ SDK |
+| [neoruntime-apps](https://github.com/camthink-ai/neoruntime-apps) | 应用模板和示例 |
 | Docker | 构建 ARM64 镜像 |
-| NE503 | 已联网；模型、HAL v2 和 ai-runtime 可用 |
+| 目标设备 | NE503 已联网；模型、HAL v2 和 ai-runtime 可用 |
 
 ## 2. 开发流程
 

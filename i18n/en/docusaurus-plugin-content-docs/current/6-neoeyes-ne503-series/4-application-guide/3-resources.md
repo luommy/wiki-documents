@@ -2,7 +2,7 @@
 id: resources
 slug: /neoeyes-ne503-series/application-guide/
 title: Resources
-sidebar_position: 3.5
+sidebar_position: 5
 description: GitHub entry point for the NeoRuntime platform, SDKs, sample apps, APIs, event protocols, and deployment resources used to develop for NE503.
 keywords: [NE503, GitHub, NeoRuntime, SDK, app development, REST API]
 tags: [NE503, Application Development, GitHub, SDK]

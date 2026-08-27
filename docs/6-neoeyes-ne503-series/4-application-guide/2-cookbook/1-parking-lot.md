@@ -41,7 +41,7 @@ tags: [NE503, 应用开发, Cookbook, 车辆检测, 事件集成]
 
 默认清单使用 `sub.raw` 和 `STREAM_ID=sub`。设备没有对应原始流时无法推理。
 
-## 3. 获取并配置应用
+## 3. 获取并构建应用
 
 ### 3.1 直接下载 Release bundle
 
@@ -55,9 +55,22 @@ sha256sum -c SHA256SUMS
 
 ### 3.2 从源码构建
 
-需要 Docker、`neoruntime-apps` 和同级的 `neoruntime-sdks`：
+需要 Docker、`neoruntime-apps` 和同级的 `neoruntime-sdks`。在两个仓库的父目录执行以下命令；首次构建时克隆仓库，已有仓库时执行对应的 `git pull`：
 
 ```bash
+# 首次获取
+git clone https://github.com/camthink-ai/neoruntime-sdks.git
+git clone https://github.com/camthink-ai/neoruntime-apps.git
+
+# 已有仓库时更新
+git -C neoruntime-sdks pull
+git -C neoruntime-apps pull
+```
+
+进入 `neoruntime-apps` 根目录后构建：
+
+```bash
+cd neoruntime-apps
 cd ../neoruntime-sdks/python
 python -m pip install --upgrade build
 python -m build --wheel
@@ -102,7 +115,7 @@ env:
 
 保持 `HD_PREVIEW_ENABLED=0`，使用应用的 MJPEG `/stream` 预览。
 
-## 4. 安装、启动并打开页面
+## 4. 安装与启动
 
 ### 4.1 安装
 
@@ -163,4 +176,4 @@ aipc-cli event subscribe 'parking/*'
 ## 6. 相关文档
 
 - [Resources](../3-resources.md) — `app.yaml`、SDK、API 和事件协议参考
-- [人员检测](./1-person-detection.md) — 单模型推理和事件发布示例
+- [人员检测](./2-person-detection.md) — 单模型推理和事件发布示例
