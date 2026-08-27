@@ -12,20 +12,19 @@ This recipe uses `neoruntime-apps/examples/person-detection` to run a minimal co
 
 The complete code, manifest, and Dockerfile are in the [Person Detection example](https://github.com/camthink-ai/neoruntime-apps/tree/main/examples/person-detection). This page keeps only the steps needed to run the example.
 
-## 1. App flow
+## 1. Goal and prerequisites
 
-```text
-third.raw raw frames
-      ↓
-person-detection model inference
-      ↓
-app.py keeps label=person above the threshold
-      ├─ app/person-detection/detection
-      ├─ alerts/detection (cooldown-limited)
-      └─ DeviceClient.set_white_light(50) (optional)
-```
+After completing this recipe, you should see person-detection results and receive the `app/person-detection/detection` event.
 
-The current values below come from the repository's `app.yaml` and `app.py`:
+Before you start, confirm that:
+
+- the NE503 Web Console is reachable;
+- the `person-detection` model is available on the device;
+- Docker, Git, and network access to `neoruntime-apps` and `neoruntime-sdks` are ready.
+
+## 2. Key configuration
+
+The values below come from the repository's `app.yaml` and `app.py`:
 
 | Item | Current value | Purpose |
 |:---|:---|:---|
@@ -36,9 +35,11 @@ The current values below come from the repository's `app.yaml` and `app.py`:
 | Detection threshold | `0.7` | Person confidence threshold injected by the manifest |
 | Alert topic | `alerts/detection` | Published at the `ALERT_COOLDOWN_SECONDS` interval |
 
-Do not replace `third`, `person-detection`, or `hailo_ipc_sdk` with names from an older example. If a device firmware exposes different model or stream names, update both `app.yaml` and `app.py`, then verify the actual values on the device first.
+If the model or stream names differ, update `app.yaml` and `app.py` together after checking the device values.
 
-## 2. Get the example and check the manifest
+## 3. Get and build the app
+
+### 3.1 Get the source and check the manifest
 
 Clone the app and SDK repositories:
 
@@ -77,11 +78,9 @@ env:
     value: "INFO"
 ```
 
-See the complete [`app.yaml`](https://github.com/camthink-ai/neoruntime-apps/blob/main/examples/person-detection/app.yaml) for all fields. `allow_register_model: false` means the device must already provide `person-detection`; the app does not register the model at startup.
+See the complete [`app.yaml`](https://github.com/camthink-ai/neoruntime-apps/blob/main/examples/person-detection/app.yaml). `allow_register_model: false` means the device must already provide `person-detection`.
 
-## 3. Build, install, and start
-
-### 3.1 Build the ARM64 package
+### 3.2 Build the ARM64 package
 
 The device runs ARM64 images. From the `neoruntime-apps` root, use the unified build script:
 
@@ -90,15 +89,17 @@ cd ../..
 ./scripts/build_app.sh examples/person-detection --arch arm64
 ```
 
-The script stages `hailo_ipc_sdk` from the sibling `neoruntime-sdks/python`, builds the container, and creates:
+The script gets `hailo_ipc_sdk` from the sibling `neoruntime-sdks/python` and creates:
 
 ```text
 examples/person-detection/person-detection.aipc
 ```
 
-For the SDK wheel path, see the [Python SDK instructions in neoruntime-sdks](https://github.com/camthink-ai/neoruntime-sdks#python-sdk). The SDK is not published on PyPI; this container build includes the SDK in the image.
+See the [Python SDK instructions in neoruntime-sdks](https://github.com/camthink-ai/neoruntime-sdks#python-sdk) for the wheel path.
 
-### 3.2 Install
+## 4. Install and start
+
+### 4.1 Install
 
 In the Web Console, open **App Management**, import `person-detection.aipc`, and click **Install**.
 
@@ -111,13 +112,13 @@ cd /tmp/person-detection
 aipc-cli app install app.yaml image.tar
 ```
 
-### 3.3 Start
+### 4.2 Start
 
-In **App Management**, find `person-detection`, click **Start**, and wait for the state to become **Running**. A short delay while the platform loads the image is normal on the first start.
+In **App Management**, find `person-detection`, click **Start**, and wait for **Running**.
 
-## 4. Verify inference and events
+## 5. Verify the result
 
-### 4.1 Verify app state and permissions
+### 5.1 Verify app state and permissions
 
 In the app details page, confirm:
 
@@ -128,7 +129,7 @@ In the app details page, confirm:
 
 ![App management (Person Detection running)](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/app-development/person-detection/pd-01-apps-running.png)
 
-### 4.2 Check the logs
+### 5.2 Check the logs
 
 Open **Logs** in the app details page, or fetch the app logs through the device API. You should see records equivalent to:
 
@@ -141,11 +142,11 @@ Detected 1 person(s)
 Statistics: frames=..., detections=..., avg_persons=...
 ```
 
-If no first result appears, check that `third.raw` exists on the device and that `person-detection` is loaded; a **Running** container alone is not enough.
+If no first result appears, check that `third.raw` and `person-detection` are available.
 
 ![Web Logs live detection output](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/app-development/person-detection/pd-04-web-logs-live.png)
 
-### 4.3 Verify events
+### 5.3 Verify events
 
 Subscribe to the app events on the device:
 
@@ -160,12 +161,9 @@ When `app/person-detection/detection` arrives, check:
 - `objects[].bbox`: normalized detection box;
 - `frame_sequence` and `timestamp_ns`: frame and timing information.
 
-When a person is detected, the app also publishes `alerts/detection` according to `ALERT_COOLDOWN_SECONDS`. Fill-light control depends on the device hardware and declared permission; event verification works independently when no fill light is connected.
+The app publishes `alerts/detection` according to `ALERT_COOLDOWN_SECONDS`. Fill-light control requires the corresponding hardware and permission.
 
-## 5. Related docs
+## 6. Related docs
 
-- [SDK Workflow](../1-app-development/0-sdk-workflow.md) — SDK embedding, permissions, and app builds
-- [App Reference](../3-reference/0-app-reference.md) — `app.yaml` permissions, lifecycle, and container constraints
-- [SDK Reference](../3-reference/1-sdk-reference.md) — Inference, Event, and Device client APIs
-- [Event Integration](../3-reference/5-event-integration.md) — WebSocket, MQTT, and HTTP integration
-- [Parking Lot](./0-parking-lot.md) — a multi-model Showcase with a web UI
+- [Resources](../3-resources.md) — `app.yaml`, SDK, API, and event protocol references
+- [Parking Lot](./1-parking-lot.md) — a multi-model Showcase with a web UI

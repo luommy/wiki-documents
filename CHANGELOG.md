@@ -6,6 +6,19 @@ All notable changes to the CamThink Wiki documentation will be documented in thi
 
 > This changelog reflects updates starting from **2025-12-23**. Major changes prior to this date are not recorded.
 
+## [2026-08-26]
+
+### Added
+- **NE503 Resources**: Added an Application Guide entry page linking to the NeoRuntime platform, SDKs, sample apps, APIs, Event Bus protocol, and prebuilt application bundles on GitHub.
+
+### Changed
+- **NE503 Application Guide structure adjusted**: Removed the `1-app-development/` subdirectory and moved the Hello World, AI-assisted development, and HEF model compilation pages to the Application Guide root.
+
+### Removed
+- **NE503 Application Guide Reference documents**: Removed the former App, SDK, examples, REST API, and event-integration references under `4-application-guide/3-reference/`; use the Resources entry for those materials.
+- **NE503 SDK Workflow**: Removed the SDK Workflow page under app development; use the Resources entry for SDK, API, sample, and event-protocol material.
+- **NE503 Version Matrix**: Removed the Software Guide version-baseline and compatibility-matrix page; use the corresponding GitHub repositories and release records for current versions and compatibility material.
+
 ## [2026-08-19]
 
 ### Changed

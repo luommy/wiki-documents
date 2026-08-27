@@ -6,6 +6,19 @@
 
 > 本更新日志自 **2025-12-23** 起开始记录，此前的历史变更未作追溯。
 
+## [2026-08-26]
+
+### 新增
+- **NE503 Resources**: 新增应用指南入口页，集中提供 NeoRuntime 平台、SDK、示例应用、API、Event Bus 协议和预构建应用的 GitHub 链接。
+
+### 变更
+- **NE503 应用开发文档结构调整**: 删除 `1-app-development/` 子目录，将 Hello World、AI 辅助开发和 HEF 模型编译文档移至应用指南根目录。
+
+### 移除
+- **NE503 应用指南 Reference 文档**: 删除 `4-application-guide/3-reference/` 下原有的 App、SDK、示例、REST API 和事件集成参考文档；相关材料通过 Resources 入口访问。
+- **NE503 SDK Workflow**: 删除应用开发下的 SDK Workflow 页面；SDK、API、示例和事件协议资料通过 Resources 入口访问。
+- **NE503 版本兼容性矩阵**: 删除软件指南中的版本基线与兼容性矩阵页面；当前版本与兼容性资料以对应 GitHub 仓库和发布记录为准。
+
 ## [2026-08-19]
 
 ### 变更

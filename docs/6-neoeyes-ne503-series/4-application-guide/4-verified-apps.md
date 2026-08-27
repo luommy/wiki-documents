@@ -2,16 +2,16 @@
 id: verified-apps
 title: NE503 Verified Apps
 sidebar_position: 4
-description: NE503 已验证应用用例，涵盖人员检测、占用率统计、安全帽合规检测等场景，包含效果预览图、验证详情和应用包下载链接（app.yaml + image.tar），帮助用户快速阅览效果并一键获取部署包。
-keywords: [NE503, 应用用例, Verified Apps, Person Detection, Occupancy Monitor, Safety Helmet, 安全帽检测, 容器应用, 边缘AI, 应用下载]
+description: NE503 已验证应用及部署包。
+keywords: [NE503, Verified Apps, Person Detection, Occupancy Monitor, Safety Helmet, 应用下载]
 tags: [NE503, 应用部署, 容器应用, Person Detection, 占用率监测, Safety Helmet, 边缘AI]
 ---
 
 # NE503 Verified Apps
 
-以下应用均已在 NE503 实机验证通过，可直接下载安装到设备测试，也可参考源码二次开发，加速 POC 落地。
+以下应用已在 NE503 实机验证，可直接下载测试。
 
-如果你需要现成模型，请先查看 [CamThink Model Zoo](https://www.camthink.ai/developer-center/models/)。Model Zoo 提供可下载的模型文件，你可以基于合适的模型自行构建应用；本页则提供已经验证过的完整应用包。
+需要模型时查看 [CamThink Model Zoo](https://www.camthink.ai/developer-center/models/)；本页提供已验证的完整应用包。
 
 ## 应用列表
 
@@ -35,14 +35,12 @@ tags: [NE503, 应用部署, 容器应用, Person Detection, 占用率监测, Saf
 :::note 模型需预加载
 各应用依赖的推理模型不同，首次使用前需在 Web 控制台 **Model Management** 中加载对应模型：
 
-- **Person Detection / Occupancy Monitor**：依赖出厂预装的 `hailo_yolov8n_384_640`，扫描并加载即可。
-- **Safety Helmet Detection**：依赖自训的 `safety_helmet_yolov8n_384_640`（2 类 Helmet / No Helmet，app 包不含模型）。需在 **Model Management** 导入对应的 `.hef` 后加载；该 HEF 可从上方的下载链接获取，或参考应用源码自行编译。
+- **Person Detection / Occupancy Monitor**：扫描并加载预装的 `hailo_yolov8n_384_640`。
+- **Safety Helmet Detection**：导入并加载 `safety_helmet_yolov8n_384_640` HEF；app 包不含模型。
 
 ![模型预加载：扫描并加载模型](https://resources.camthink.ai/wiki/img/neoeyes-ne503-series/application-guide/verified-apps/upload-model.png)
 :::
 
-> 更多应用用例正在适配中，自定义应用开发请参考 [SDK 工作流](./1-app-development/0-sdk-workflow.md)。
+> 更多应用用例正在适配中，自定义应用开发资料请参考 [Resources](./3-resources.md)。
 
 ---
-
-**文档版本**：v1.3 · **最后更新**：2026-07-21

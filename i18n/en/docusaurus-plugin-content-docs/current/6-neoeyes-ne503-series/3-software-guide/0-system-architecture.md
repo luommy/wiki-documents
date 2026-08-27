@@ -6,7 +6,7 @@ tags: [Platform Architecture, NE503, Edge AI, Developer Documentation, System De
 
 # System Architecture
 
-The NE503 software platform has four layers: **application containers → platform services → HAL hardware abstraction → hardware**. This page explains only how the layers divide responsibilities and how data moves between them. For service APIs, configuration fields, sockets, startup dependencies, and HAL implementation details, use the source-repository links at the end of the page.
+The NE503 software platform has four layers: **application containers → platform services → HAL → hardware**. This page covers their relationships and three data flows. See the source links for APIs, configuration, sockets, and startup dependencies.
 
 ## 1. Four-Layer Platform Architecture
 
@@ -51,17 +51,17 @@ class HAL hal
 class HW hw
 ```
 
-| Layer | Main Responsibility | Relationship to Upper Layer |
+| Layer | Responsibility | Relationship |
 |:---|:---|:---|
-| Application Containers | Run business applications, model pipelines, and integration logic | Use device capabilities through SDK or platform interfaces; do not access hardware directly |
-| Platform Services · Data Plane | `camera-daemon` manages media pipeline outputting encoded streams & raw frames; `ai-runtime` schedules NPU inference | Receive application requests, orchestrate video/inference data flows |
-| Platform Services · Control Plane | `platform-api` provides HTTP gateway, `app-manager` manages containers, `event-bus` distributes events, `device-control` drives peripherals, `device-discovery` discovers devices | Handle control commands, lifecycle, event distribution; do not move video frames directly |
-| HAL v2 | Unified C interfaces for video, inference, codec, peripherals, and buffers | Hides SoC and vendor runtime differences; dynamically loads platform implementations |
-| Hardware & Vendor Runtimes | Execute image capture, encoding, NPU inference, and MCU peripheral control | Driven by platform-specific HAL implementations (Hailo-15 / Stub) |
+| Application Containers | Run business applications and inference pipelines | Call device capabilities through SDKs or platform interfaces; no direct hardware access |
+| Platform Services · Data Plane | `camera-daemon` outputs raw frames and encoded streams; `ai-runtime` schedules NPU inference | Orchestrate video and inference flows |
+| Platform Services · Control Plane | `platform-api`, `app-manager`, `event-bus`, `device-control`, and `device-discovery` | Handle control, lifecycle, and events; do not move video frames directly |
+| HAL v2 | Provide interfaces for video, inference, codecs, peripherals, and buffers | Abstract SoC and vendor-runtime differences |
+| Hardware & Runtimes | Execute capture, encoding, inference, and MCU peripheral control | Driven by the platform HAL implementation |
 
 ## 2. End-to-End Data Flow
 
-Video, AI inference, and peripheral control are separated into three independent paths, corresponding to media processing, inference service, and device control flows in the source repository.
+Platform data flows are divided into video, AI inference, and peripheral control paths.
 
 ### Video and Media Path
 
@@ -83,7 +83,7 @@ flowchart LR
     class HBUF hal
 ```
 
-- `camera-daemon` manages the imaging pipeline via HAL, provides zero-copy raw frames (DMA-BUF) to `ai-runtime`, and outputs encoded streams for RTSP/remote access.
+- `camera-daemon` manages the imaging pipeline through HAL, outputs DMA-BUF raw frames to `ai-runtime`, and provides encoded RTSP streams.
 
 ### AI Inference and Event Path
 
@@ -130,8 +130,7 @@ flowchart TB
     class BIZ,MODEL,WEB src
 ```
 
-- `ai-runtime` receives raw frames from `camera-daemon`, schedules the NPU through the HAL inference API, and performs model inference and post-processing.
-- When event publishing is enabled, `ai-runtime` publishes inference results to `event-bus`: business and model containers receive them through Pub/Sub, while the Web Console obtains them through `platform-api`.
+- `ai-runtime` schedules NPU inference and post-processing through HAL. When event publishing is enabled, it publishes results to `event-bus`; business/model containers subscribe, and the Web Console accesses them through `platform-api`.
 
 ### Peripheral Control Path
 
@@ -168,24 +167,18 @@ flowchart TB
     class FB feedback
 ```
 
-- External requests are normally forwarded through `platform-api` to `device-control`; `device-control` drives lights, PTZ, GPIO, and lenses through `HAL.IO` and the MCU protocol, with status and events returning along the feedback path.
-- In the current implementation, lens control may also use `device-control`'s CameraControl interface to `camera-daemon`; see the source repository for the complete branch.
+- Requests flow through `platform-api` → `device-control` → `HAL.IO/MCU` to control lights, PTZ, GPIO, and lenses; status returns through the same path.
 
-> These paths describe only platform component relationships. For detailed service responsibilities, API methods, message formats, configuration, and deployment, see the [NeoRuntime architecture overview](https://github.com/camthink-ai/neoruntime/blob/main/docs/architecture/README.md) and the corresponding documents in the source repository.
+## 3. Source References
 
-## 3. Go Deeper in the Source Repository
+- [Architecture and data flows](https://github.com/camthink-ai/neoruntime/blob/main/docs/architecture/README.md) — layers, components, and data flows
+- [HAL v2](https://github.com/camthink-ai/neoruntime/blob/main/docs/architecture/hal_v2_overview.md) — interfaces and platform implementations
+- [Platform services](https://github.com/camthink-ai/neoruntime/tree/main/docs/services) — service documentation
+- [Service configurations](https://github.com/camthink-ai/neoruntime/tree/main/configs) — configuration templates
+- [Platform source and protos](https://github.com/camthink-ai/neoruntime/tree/main/platform) — implementations, gRPC, and message definitions
+- [NE503 SDK](https://github.com/camthink-ai/neoruntime-sdks) — Python / C++ SDKs and shared protos
+- [NE503 applications](https://github.com/camthink-ai/neoruntime-apps) — application templates and examples
 
-The following implementation and interface references are maintained in the source repository rather than duplicated on this page:
-
-- [Architecture overview and complete data flows](https://github.com/camthink-ai/neoruntime/blob/main/docs/architecture/README.md) — layered architecture, core components, data flows, deployment, and security design
-- [HAL v2 overview](https://github.com/camthink-ai/neoruntime/blob/main/docs/architecture/hal_v2_overview.md) — HAL interfaces, platform implementations, and hardware-abstraction boundaries
-- [Platform-service documentation](https://github.com/camthink-ai/neoruntime/tree/main/docs/services) — detailed documentation for `ai-runtime`, `camera-daemon`, `event-bus`, `device-control`, and other services
-- [Service configurations](https://github.com/camthink-ai/neoruntime/tree/main/configs) — configuration templates for the platform services
-- [Platform source and protos](https://github.com/camthink-ai/neoruntime/tree/main/platform) — service implementations, gRPC interfaces, and message definitions
-- [NE503 SDK repository](https://github.com/camthink-ai/neoruntime-sdks) — Python / C++ SDKs and shared protos
-- [NE503 application repository](https://github.com/camthink-ai/neoruntime-apps) — application templates and examples
-
-**Related Wiki pages**:
+**Related page**:
 
 - [Developer Guide](./1-developer-guide.md) — development environment, build, and deployment entry points
-- [Application Development Reference](../4-application-guide/3-reference/0-app-reference.md) — application and SDK usage

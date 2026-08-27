@@ -6,29 +6,22 @@ tags: [应用指南, NE503, 软件部署, 运维]
 
 # Software Deployment
 
-本页用于安装或升级 NE503 平台软件发布包（`.tar.gz`）。平台软件包含平台服务、HAL 库和 Web 控制台。
-
-系统 OS 使用 `.swu` 包，流程不同，请参阅[系统烧录](./2-system-flashing.md)。
+本页用于安装或升级 NE503 平台软件发布包（`.tar.gz`）。系统 OS 使用 `.swu` 包。
 
 ## 1. 准备发布包
 
-从 [neoruntime Releases](https://github.com/camthink-ai/neoruntime/releases) 下载，或在源码仓库构建：
+从 [neoruntime Releases](https://github.com/camthink-ai/neoruntime/releases) 下载 `aipc-hailo15-<version>.tar.gz`。
 
-```bash
-make pack-release VERSION=<version>
-ls -lh build/release/aipc-hailo15-<version>.tar.gz
-```
+开始前确认：
 
-构建要求见[开发指南](./1-developer-guide.md)。开始前确认：
-
-- 目标设备为 NE503，且 Web 控制台或 SSH 可用。
+- 目标设备为 NE503，Web 控制台或 SSH 可用。
 - 网页升级使用管理员账号；SSH 部署需要 `root` 权限。
 - `/data` 可写且空间足够：`df -h /data`。
-- 升级期间保持供电和网络稳定，并记录当前 `Firmware Version`。
+- 记录当前 `Firmware Version`，升级期间保持供电和网络稳定。
 
 ## 2. 通过网页升级
 
-网页升级适用于已经运行且可以访问 Web 控制台的设备。
+适用于已运行且可以访问 Web 控制台的设备。
 
 1. 打开 `https://<device-ip>`，登录管理员账号。
 2. 进入 `Settings → Device Info`。
@@ -41,11 +34,11 @@ ls -lh build/release/aipc-hailo15-<version>.tar.gz
 6. 等待上传、写入和重启完成。期间不要刷新页面、重复点击或断电。
 7. 设备重新上线后重新登录，在 `Firmware Version` 中确认目标版本。
 
-升级完成的判断：设备重新上线、可以重新登录，且 `Firmware Version` 显示目标版本。出现 `Device offline` 时，先检查供电和网络，再点击 `Re-detect`。
+**成功：**设备重新上线，可以重新登录，且 `Firmware Version` 显示目标版本。出现 `Device offline` 时，检查供电和网络，再点击 `Re-detect`。
 
 ## 3. 通过 SSH 安装或升级
 
-首次安装或网页不可用时，在设备上执行 `deploy.sh`：
+网页不可用或需要命令行部署时，执行 `deploy.sh`：
 
 ```bash
 scp build/release/aipc-hailo15-<version>.tar.gz root@<device-ip>:/data/
@@ -56,37 +49,34 @@ cd aipc-hailo15-<version>
 ./deploy.sh
 ```
 
-看到 `Proceed with deployment? [y/N]` 后确认并输入 `y`。部署成功时日志包含：
+出现 `Proceed with deployment? [y/N]` 时确认并输入 `y`。成功时包含：
 
 ```text
 [deploy]   Deploy successful!
 [deploy]   Version: <version>
 ```
 
-安装路径固定为 `/data/aipc`。部署前脚本会检查发布包版本和兼容性信息；不匹配时不会停止现有服务。
+安装路径为 `/data/aipc`。版本或兼容性不匹配时，脚本不会停止现有服务。
 
 常用参数：
 
 | 参数 | 作用 |
 |:---|:---|
-| `--force` | 跳过确认提示，不跳过兼容性检查 |
 | `--no-config` | 保留设备现有配置 |
 | `--status` | 查看当前版本和备份信息 |
 | `--rollback` | 从最近备份恢复上一版本 |
 
 ## 4. 升级后验证与回滚
 
-网页重新登录后，进入 `Settings → Device Info`，确认 `Firmware Version` 已更新。
+网页重新登录后，在 `Settings → Device Info` 确认 `Firmware Version` 已更新。
 
-SSH 验证：
+SSH 验证版本：
 
 ```bash
 cat /data/aipc/VERSION
-systemctl is-active platform-api
-systemctl --failed
 ```
 
-如果服务异常，在发布包目录执行：
+**成功：**输出完整 `VERSION` 内容，版本与目标版本一致。需要回退时，在发布包目录执行：
 
 ```bash
 ./deploy.sh --rollback
@@ -96,8 +86,5 @@ systemctl --failed
 
 ## 5. 相关文档
 
-- [开发指南](./1-developer-guide.md) — 构建平台软件发布包
-- [系统烧录](./2-system-flashing.md) — 安装或升级 `.swu` 系统 OS
-- [版本对照](./5-version-matrix.md) — 查看组件版本和兼容性
 - [故障排查](../5-troubleshooting.md) — 服务、网络和存储问题
 - [NeoRuntime deployment guide](https://github.com/camthink-ai/neoruntime/blob/main/docs/deployment/DEPLOYMENT.md) — `deploy.sh` 说明
