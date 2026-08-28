@@ -24,7 +24,7 @@ Before you start, confirm that:
 
 - NE503 has a working OS installation and the Web Console is reachable;
 - the four HEFs required by the Showcase are available under `/data/aipc/models`;
-- you will use the ARM64 Release bundle, or have Docker and the source build environment ready.
+- you will use the ARM64 Release bundle, or have Docker and a source-build environment ready.
 
 ## 2. Key configuration
 
@@ -53,35 +53,25 @@ cd parking-lot-*-arm64
 sha256sum -c SHA256SUMS
 ```
 
-### 3.2 Build from source
+### 3.2 Build from source (advanced)
 
-You need Docker, `neoruntime-apps`, and the sibling `neoruntime-sdks` repository. Run the following commands from their parent directory. Clone the repositories for the first build; if they already exist, run the corresponding `git pull` commands:
+Building from GitHub source is an advanced path. The current upstream process is defined by the `neoruntime-apps` README and may still require a sibling SDK checkout and a local wheel; do not treat it as the default SDK installation path.
 
 ```bash
-# First checkout
-git clone https://github.com/camthink-ai/neoruntime-sdks.git
 git clone https://github.com/camthink-ai/neoruntime-apps.git
 
 # Update existing checkouts
-git -C neoruntime-sdks pull
 git -C neoruntime-apps pull
 ```
 
-Enter the `neoruntime-apps` root and build:
+If you want to run Python code directly on the host, install the SDK from PyPI:
 
 ```bash
 cd neoruntime-apps
-cd ../neoruntime-sdks/python
-python -m pip install --upgrade build
-python -m build --wheel
-
-cd ../../neoruntime-apps
-scripts/build_showcase_artifacts.sh \
-  --wheel ../neoruntime-sdks/python/dist/hailo_ipc_sdk-*.whl \
-  parking-lot --arch arm64 --output dist/showcases
+pip install neoruntime-ipc-sdk
 ```
 
-The output is written to `dist/showcases/`. Follow the [neoruntime-apps README](https://github.com/camthink-ai/neoruntime-apps#showcase-bundles) for the current build requirements.
+The Python import module is `neoruntime_ipc_sdk`. To build from source, follow the current [neoruntime-apps README](https://github.com/camthink-ai/neoruntime-apps#showcase-bundles).
 
 ### 3.3 Check the key manifest fields
 

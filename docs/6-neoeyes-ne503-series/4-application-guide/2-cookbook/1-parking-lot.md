@@ -53,35 +53,25 @@ cd parking-lot-*-arm64
 sha256sum -c SHA256SUMS
 ```
 
-### 3.2 从源码构建
+### 3.2 从源码构建（进阶）
 
-需要 Docker、`neoruntime-apps` 和同级的 `neoruntime-sdks`。在两个仓库的父目录执行以下命令；首次构建时克隆仓库，已有仓库时执行对应的 `git pull`：
+从 GitHub 源码构建属于进阶路径。当前上游构建流程以 `neoruntime-apps` README 为准，可能仍需要同级 SDK 源码和本地 wheel；不要把它当作默认 SDK 安装方式。
 
 ```bash
-# 首次获取
-git clone https://github.com/camthink-ai/neoruntime-sdks.git
 git clone https://github.com/camthink-ai/neoruntime-apps.git
 
 # 已有仓库时更新
-git -C neoruntime-sdks pull
 git -C neoruntime-apps pull
 ```
 
-进入 `neoruntime-apps` 根目录后构建：
+如需在宿主机直接运行 Python 代码，使用 PyPI 安装 SDK：
 
 ```bash
 cd neoruntime-apps
-cd ../neoruntime-sdks/python
-python -m pip install --upgrade build
-python -m build --wheel
-
-cd ../../neoruntime-apps
-scripts/build_showcase_artifacts.sh \
-  --wheel ../neoruntime-sdks/python/dist/hailo_ipc_sdk-*.whl \
-  parking-lot --arch arm64 --output dist/showcases
+pip install neoruntime-ipc-sdk
 ```
 
-构建结果位于 `dist/showcases/`。源码构建规则和依赖以 [neoruntime-apps README](https://github.com/camthink-ai/neoruntime-apps#showcase-bundles) 为准。
+Python 代码中的导入模块为 `neoruntime_ipc_sdk`。如需构建源码包，按 [neoruntime-apps README](https://github.com/camthink-ai/neoruntime-apps#showcase-bundles) 的当前说明执行。
 
 ### 3.3 核对关键清单字段
 
@@ -175,5 +165,5 @@ aipc-cli event subscribe 'parking/*'
 
 ## 6. 相关文档
 
-- [Resources](../3-resources.md) — `app.yaml`、SDK、API 和事件协议参考
+- [资源](../3-resources.md) — `app.yaml`、SDK、API 和事件协议参考
 - [人员检测](./2-person-detection.md) — 单模型推理和事件发布示例
