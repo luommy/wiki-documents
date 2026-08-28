@@ -20,15 +20,15 @@ tags: [NE503, 应用开发, Cookbook, 人员检测, 事件集成]
 
 - NE503 Web Console 可访问；
 - `person-detection` 模型已在设备上可用；
-- 已准备 Docker、Git，以及可访问 `neoruntime-apps` 和 `neoruntime-sdks` 的网络环境。
+- 已准备 Docker、Git，以及可访问 `neoruntime-apps` 和 PyPI 的网络环境。
 
 ## 2. 关键配置
 
-以下值来自仓库中的 `app.yaml` 和 `app.py`：
+以下值来自仓库中的 `app.yaml` 和 Python SDK 使用示例：
 
 | 项目 | 当前值 | 用途 |
 |:---|:---|:---|
-| SDK 模块 | `hailo_ipc_sdk` | 容器内导入的 Python SDK |
+| SDK 模块 | `neoruntime_ipc_sdk` | PyPI SDK 在 Python 代码中的导入模块 |
 | 视频权限 | `third.raw` | 原始视频流权限 |
 | 订阅流 | `third` | `InferenceClient.subscribe()` 使用的流名 |
 | 模型 ID | `person-detection` | 设备上必须可用的模型 |
@@ -41,12 +41,21 @@ tags: [NE503, 应用开发, Cookbook, 人员检测, 事件集成]
 
 ### 3.1 获取源码并检查清单
 
-克隆应用仓库和 SDK 仓库：
+克隆应用仓库：
 
 ```bash
-git clone https://github.com/camthink-ai/neoruntime-sdks.git
 git clone https://github.com/camthink-ai/neoruntime-apps.git
 cd neoruntime-apps/examples/person-detection
+```
+
+如果要在宿主机直接运行 Python 示例，安装 PyPI 中的 SDK。安装包名是 `neoruntime-ipc-sdk`，代码中的导入模块为 `neoruntime_ipc_sdk`：
+
+```bash
+pip install neoruntime-ipc-sdk
+```
+
+```python
+from neoruntime_ipc_sdk import InferenceClient
 ```
 
 示例清单至少要包含以下权限和参数：
@@ -80,22 +89,9 @@ env:
 
 完整字段见仓库中的 [`app.yaml`](https://github.com/camthink-ai/neoruntime-apps/blob/main/examples/person-detection/app.yaml)。`allow_register_model: false` 表示设备必须先提供 `person-detection` 模型。
 
-### 3.2 构建 ARM64 包
+### 3.2 构建 ARM64 包（进阶）
 
-设备使用 ARM64 镜像。推荐从 `neoruntime-apps` 根目录运行统一构建脚本：
-
-```bash
-cd ../..
-./scripts/build_app.sh examples/person-detection --arch arm64
-```
-
-脚本从同级的 `neoruntime-sdks/python` 获取 `hailo_ipc_sdk`，生成：
-
-```text
-examples/person-detection/person-detection.aipc
-```
-
-SDK wheel 说明见 [neoruntime-sdks](https://github.com/camthink-ai/neoruntime-sdks#python-sdk)。
+设备使用 ARM64 镜像。从 GitHub 源码构建属于进阶路径；当前上游构建流程以 [neoruntime-apps README](https://github.com/camthink-ai/neoruntime-apps#development) 为准，可能仍需要同级 SDK 源码和本地 wheel。默认 SDK 安装命令仍为 `pip install neoruntime-ipc-sdk`；SDK API 参考见 [neoruntime-sdks Python API 文档](https://github.com/camthink-ai/neoruntime-sdks/tree/main/python/docs/api)。
 
 ## 4. 安装与启动
 
@@ -165,5 +161,5 @@ aipc-cli event subscribe 'app/person-detection/*'
 
 ## 6. 相关文档
 
-- [Resources](../3-resources.md) — `app.yaml`、SDK、API 和事件协议参考
+- [资源](../3-resources.md) — `app.yaml`、SDK、API 和事件协议参考
 - [停车场管理](./1-parking-lot.md) — 多模型和 Web UI 的完整 Showcase

@@ -20,15 +20,15 @@ Before you start, confirm that:
 
 - the NE503 Web Console is reachable;
 - the `person-detection` model is available on the device;
-- Docker, Git, and network access to `neoruntime-apps` and `neoruntime-sdks` are ready.
+- Docker, Git, and network access to `neoruntime-apps` and PyPI are ready.
 
 ## 2. Key configuration
 
-The values below come from the repository's `app.yaml` and `app.py`:
+The values below come from the repository's `app.yaml` and Python SDK usage examples:
 
 | Item | Current value | Purpose |
 |:---|:---|:---|
-| SDK module | `hailo_ipc_sdk` | Python SDK imported in the container |
+| SDK module | `neoruntime_ipc_sdk` | Python import module for the PyPI SDK |
 | Video permission | `third.raw` | Permission for the raw video stream |
 | Subscribed stream | `third` | Stream passed to `InferenceClient.subscribe()` |
 | Model ID | `person-detection` | Model that must be available on the device |
@@ -41,12 +41,21 @@ If the model or stream names differ, update `app.yaml` and `app.py` together aft
 
 ### 3.1 Get the source and check the manifest
 
-Clone the app and SDK repositories:
+Clone the app repository:
 
 ```bash
-git clone https://github.com/camthink-ai/neoruntime-sdks.git
 git clone https://github.com/camthink-ai/neoruntime-apps.git
 cd neoruntime-apps/examples/person-detection
+```
+
+If you want to run the Python example directly on the host, install the SDK from PyPI. The distribution package is `neoruntime-ipc-sdk`; the import module is `neoruntime_ipc_sdk`:
+
+```bash
+pip install neoruntime-ipc-sdk
+```
+
+```python
+from neoruntime_ipc_sdk import InferenceClient
 ```
 
 The manifest must include these permissions and settings:
@@ -80,22 +89,9 @@ env:
 
 See the complete [`app.yaml`](https://github.com/camthink-ai/neoruntime-apps/blob/main/examples/person-detection/app.yaml). `allow_register_model: false` means the device must already provide `person-detection`.
 
-### 3.2 Build the ARM64 package
+### 3.2 Build the ARM64 package (advanced)
 
-The device runs ARM64 images. From the `neoruntime-apps` root, use the unified build script:
-
-```bash
-cd ../..
-./scripts/build_app.sh examples/person-detection --arch arm64
-```
-
-The script gets `hailo_ipc_sdk` from the sibling `neoruntime-sdks/python` and creates:
-
-```text
-examples/person-detection/person-detection.aipc
-```
-
-See the [Python SDK instructions in neoruntime-sdks](https://github.com/camthink-ai/neoruntime-sdks#python-sdk) for the wheel path.
+The device runs ARM64 images. Building from GitHub source is an advanced path; the current upstream process is defined by the [neoruntime-apps README](https://github.com/camthink-ai/neoruntime-apps#development) and may still require a sibling SDK checkout and a local wheel. The default SDK installation command remains `pip install neoruntime-ipc-sdk`; see the [neoruntime-sdks Python API documentation](https://github.com/camthink-ai/neoruntime-sdks/tree/main/python/docs/api) for the SDK reference.
 
 ## 4. Install and start
 
