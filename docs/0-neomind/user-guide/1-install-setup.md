@@ -235,6 +235,10 @@ NeoMind 内置定时备份：**Settings → Preferences → 数据备份** 可�
 
 **恢复**（刻意设计为手动操作，避免自动回滚到过期数据）：停止服务 → 将备份目录内的文件拷回数据目录 → 启动服务。
 
+## 扩展市场源
+
+默认扩展市场托管在 GitHub(`raw.githubusercontent.com`),部分网络无法直连。管理员可在 **Settings → Preferences → 扩展市场源** 切换为镜像地址(例如 `https://ghfast.top/https://raw.githubusercontent.com/camthink-ai/NeoMind-Extensions`),保存后下一次市场请求即生效,无需重启;也可用环境变量 `NEOMIND_EXTENSION_MARKET_URL` 作为初始默认。**注意**:切换后安装包的完整性校验(SHA256)针对镜像源的产物生效。
+
 ## CLI API Key 配置
 
 NeoMind Server 首次启动时会**自动生成一个默认 API Key**（格式 `nmk_xxx`），用于 CLI 和外部系统认证。所有 `neomind` CLI 命令都需要有效 Key 才能调用 Server API。

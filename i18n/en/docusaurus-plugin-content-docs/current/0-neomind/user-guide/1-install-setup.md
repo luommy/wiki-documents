@@ -235,6 +235,10 @@ NeoMind includes scheduled backups: **Settings → Preferences → Data Backup**
 
 **Restoring** (deliberately manual — an automated rollback could silently revert to stale data): stop the server → copy the files from a backup directory back into the data directory → start the server.
 
+## Extension Marketplace Source
+
+The default extension marketplace is hosted on GitHub (`raw.githubusercontent.com`), which some networks cannot reach directly. Admins can switch to a mirror in **Settings → Preferences → Extension Marketplace** (e.g. `https://ghfast.top/https://raw.githubusercontent.com/camthink-ai/NeoMind-Extensions`); it takes effect on the next marketplace request with no restart. `NEOMIND_EXTENSION_MARKET_URL` seeds the default. **Note**: after switching, package integrity (SHA256) is verified against the mirror's artifacts.
+
 ## CLI API Key Setup
 
 NeoMind Server **auto-generates a default API Key** (format `nmk_xxx`) on first start. It's used for CLI authentication and external integrations. All `neomind` CLI commands require a valid key to call the Server API.
